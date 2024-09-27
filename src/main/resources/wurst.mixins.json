@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
+    "AbstractBlockRenderContextMixin",
     "AbstractBlockStateMixin",
     "AbstractSignEditScreenMixin",
     "AllowedAddressResolverMixin",
@@ -53,6 +54,7 @@
     "PackScreenMixin",
     "PlayerSkinProviderMixin",
     "PowderSnowBlockMixin",
+    "RenderLayersMixin",
     "RenderTickCounterDynamicMixin",
     "ScreenMixin",
     "ShulkerBoxScreenMixin",

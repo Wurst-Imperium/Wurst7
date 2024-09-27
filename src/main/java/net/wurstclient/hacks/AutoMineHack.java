@@ -16,17 +16,27 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.HandleBlockBreakingListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"auto mine", "AutoBreak", "auto break"})
-public final class AutoMineHack extends Hack implements UpdateListener
+public final class AutoMineHack extends Hack
+	implements UpdateListener, HandleBlockBreakingListener
 {
+	private final CheckboxSetting superFastMode =
+		new CheckboxSetting("Super fast mode",
+			"Breaks blocks faster than you normally could. May get detected by"
+				+ " anti-cheat plugins.",
+			false);
+	
 	public AutoMineHack()
 	{
 		super("AutoMine");
 		setCategory(Category.BLOCKS);
+		addSetting(superFastMode);
 	}
 	
 	@Override
@@ -37,14 +47,17 @@ public final class AutoMineHack extends Hack implements UpdateListener
 		WURST.getHax().nukerLegitHack.setEnabled(false);
 		WURST.getHax().speedNukerHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHax().veinMinerHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(HandleBlockBreakingListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(HandleBlockBreakingListener.class, this);
 		IKeyBinding.get(MC.options.attackKey).resetPressedState();
 		MC.interactionManager.cancelBlockBreaking();
 	}
@@ -86,11 +99,22 @@ public final class AutoMineHack extends Hack implements UpdateListener
 			// This case doesn't cancel block breaking in vanilla Minecraft.
 			return;
 		
+		if(!im.isBreakingBlock())
+			im.attackBlock(pos, side);
+		
 		if(im.updateBlockBreakingProgress(pos, side))
 		{
 			MC.particleManager.addBlockBreakingParticles(pos, side);
 			MC.player.swingHand(Hand.MAIN_HAND);
 			MC.options.attackKey.setPressed(true);
 		}
+	}
+	
+	@Override
+	public void onHandleBlockBreaking(HandleBlockBreakingEvent event)
+	{
+		// Cancel vanilla block breaking so we don't send the packets twice.
+		if(!superFastMode.isChecked())
+			event.cancel();
 	}
 }

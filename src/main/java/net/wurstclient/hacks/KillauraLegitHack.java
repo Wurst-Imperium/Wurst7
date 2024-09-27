@@ -83,8 +83,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	
 	private final SwingHandSetting swingHand =
 		SwingHandSetting.withoutOffOption(
-			"How KillauraLegit should swing your hand when attacking.",
-			SwingHand.CLIENT);
+			SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",

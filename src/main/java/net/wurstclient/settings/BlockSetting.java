@@ -24,6 +24,7 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public final class BlockSetting extends Setting
 {
@@ -31,7 +32,7 @@ public final class BlockSetting extends Setting
 	private final String defaultName;
 	private final boolean allowAir;
 	
-	public BlockSetting(String name, String description, String blockName,
+	public BlockSetting(String name, WText description, String blockName,
 		boolean allowAir)
 	{
 		super(name, description);
@@ -44,9 +45,15 @@ public final class BlockSetting extends Setting
 		this.allowAir = allowAir;
 	}
 	
+	public BlockSetting(String name, String descriptionKey, String blockName,
+		boolean allowAir)
+	{
+		this(name, WText.translated(descriptionKey), blockName, allowAir);
+	}
+	
 	public BlockSetting(String name, String blockName, boolean allowAir)
 	{
-		this(name, "", blockName, allowAir);
+		this(name, WText.empty(), blockName, allowAir);
 	}
 	
 	/**
@@ -60,6 +67,11 @@ public final class BlockSetting extends Setting
 	public String getBlockName()
 	{
 		return blockName;
+	}
+	
+	public String getShortBlockName()
+	{
+		return blockName.replace("minecraft:", "");
 	}
 	
 	public void setBlock(Block block)
@@ -133,7 +145,7 @@ public final class BlockSetting extends Setting
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "Block");
 		json.addProperty("defaultValue", defaultName);
 		json.addProperty("allowAir", allowAir);

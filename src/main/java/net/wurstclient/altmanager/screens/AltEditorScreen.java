@@ -73,6 +73,25 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void init()
 	{
+		nameOrEmailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60,
+			200, 20, Text.literal(""));
+		nameOrEmailBox.setMaxLength(48);
+		nameOrEmailBox.setFocused(true);
+		nameOrEmailBox.setText(getDefaultNameOrEmail());
+		addSelectableChild(nameOrEmailBox);
+		
+		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
+			200, 20, Text.literal(""));
+		passwordBox.setText(getDefaultPassword());
+		passwordBox.setRenderTextProvider((text, int_1) -> {
+			String stars = "";
+			for(int i = 0; i < text.length(); i++)
+				stars += "*";
+			return OrderedText.styledForwardsVisitedString(stars, Style.EMPTY);
+		});
+		passwordBox.setMaxLength(256);
+		addSelectableChild(passwordBox);
+		
 		addDrawableChild(doneButton = ButtonWidget
 			.builder(Text.literal(getDoneButtonText()), b -> pressDoneButton())
 			.dimensions(width / 2 - 100, height / 4 + 72 + 12, 200, 20)
@@ -100,25 +119,6 @@ public abstract class AltEditorScreen extends Screen
 			.builder(Text.literal("Open Skin Folder"), b -> openSkinFolder())
 			.dimensions((width / 2 - 100) / 2 - 64, height - 32, 128, 20)
 			.build());
-		
-		nameOrEmailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60,
-			200, 20, Text.literal(""));
-		nameOrEmailBox.setMaxLength(48);
-		nameOrEmailBox.setFocused(true);
-		nameOrEmailBox.setText(getDefaultNameOrEmail());
-		addSelectableChild(nameOrEmailBox);
-		
-		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
-			200, 20, Text.literal(""));
-		passwordBox.setText(getDefaultPassword());
-		passwordBox.setRenderTextProvider((text, int_1) -> {
-			String stars = "";
-			for(int i = 0; i < text.length(); i++)
-				stars += "*";
-			return OrderedText.styledForwardsVisitedString(stars, Style.EMPTY);
-		});
-		passwordBox.setMaxLength(256);
-		addSelectableChild(passwordBox);
 		
 		setFocused(nameOrEmailBox);
 	}
@@ -150,6 +150,7 @@ public abstract class AltEditorScreen extends Screen
 		
 		doneButton.active = !nameOrEmail.isEmpty()
 			&& !(alex && passwordBox.getText().isEmpty());
+		doneButton.setMessage(Text.literal(getDoneButtonText()));
 		
 		stealSkinButton.active = !alex;
 	}
@@ -358,14 +359,17 @@ public abstract class AltEditorScreen extends Screen
 		AltRenderer.drawAltBody(context, nameOrEmailBox.getText(),
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
+		String accountType = getPassword().isEmpty() ? "cracked" : "premium";
+		
 		// text
 		context.drawTextWithShadow(textRenderer, "Name (for cracked alts), or",
 			width / 2 - 100, 37, 10526880);
 		context.drawTextWithShadow(textRenderer, "E-Mail (for premium alts)",
 			width / 2 - 100, 47, 10526880);
-		context.drawTextWithShadow(textRenderer,
-			"Password (leave blank for cracked alts)", width / 2 - 100, 87,
-			10526880);
+		context.drawTextWithShadow(textRenderer, "Password (for premium alts)",
+			width / 2 - 100, 87, 10526880);
+		context.drawTextWithShadow(textRenderer, "Account type: " + accountType,
+			width / 2 - 100, 127, 10526880);
 		
 		String[] lines = message.split("\n");
 		for(int i = 0; i < lines.length; i++)
