@@ -36,8 +36,8 @@ import net.wurstclient.hacks.chestesp.ChestEspRenderer;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
-import net.wurstclient.util.ChunkUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.chunk.ChunkUtils;
 
 public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener

@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.util;
+package net.wurstclient.util.chunk;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.stream.Stream;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -25,36 +24,22 @@ import net.minecraft.world.dimension.DimensionType;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.settings.ChunkAreaSetting;
-import net.wurstclient.util.ChunkSearcher.Result;
 
-public final class ChunkSearcherCoordinator implements PacketInputListener
+public abstract class AbstractChunkCoordinator implements PacketInputListener
 {
-	private final HashMap<ChunkPos, ChunkSearcher> searchers = new HashMap<>();
-	private final ChunkAreaSetting area;
+	protected final HashMap<ChunkPos, ChunkSearcher> searchers =
+		new HashMap<>();
+	protected final ChunkAreaSetting area;
 	private BiPredicate<BlockPos, BlockState> query;
 	
-	private final Set<ChunkPos> chunksToUpdate =
+	protected final Set<ChunkPos> chunksToUpdate =
 		Collections.synchronizedSet(new HashSet<>());
 	
-	public ChunkSearcherCoordinator(ChunkAreaSetting area)
-	{
-		this((pos, state) -> false, area);
-	}
-	
-	public ChunkSearcherCoordinator(BiPredicate<BlockPos, BlockState> query,
+	public AbstractChunkCoordinator(BiPredicate<BlockPos, BlockState> query,
 		ChunkAreaSetting area)
 	{
 		this.query = Objects.requireNonNull(query);
 		this.area = Objects.requireNonNull(area);
-	}
-	
-	@Override
-	public void onReceivedPacket(PacketInputEvent event)
-	{
-		ChunkPos chunkPos = ChunkUtils.getAffectedChunk(event.getPacket());
-		
-		if(chunkPos != null)
-			chunksToUpdate.add(chunkPos);
 	}
 	
 	public boolean update()
@@ -85,6 +70,7 @@ public final class ChunkSearcherCoordinator implements PacketInputListener
 			{
 				searchers.remove(searcherPos);
 				searcher.cancel();
+				onRemove(searcher);
 				searchersChanged = true;
 			}
 		}
@@ -105,6 +91,11 @@ public final class ChunkSearcherCoordinator implements PacketInputListener
 		return searchersChanged;
 	}
 	
+	protected void onRemove(ChunkSearcher searcher)
+	{
+		// Overridden in ChunkVertexBufferCoordinator
+	}
+	
 	public void reset()
 	{
 		searchers.values().forEach(ChunkSearcher::cancel);
@@ -117,16 +108,6 @@ public final class ChunkSearcherCoordinator implements PacketInputListener
 		return searchers.values().stream().allMatch(ChunkSearcher::isDone);
 	}
 	
-	public Stream<Result> getMatches()
-	{
-		return searchers.values().stream().flatMap(ChunkSearcher::getMatches);
-	}
-	
-	public void setTargetBlock(Block block)
-	{
-		setQuery((pos, state) -> block == state.getBlock());
-	}
-	
 	public void setQuery(BiPredicate<BlockPos, BlockState> query)
 	{
 		this.query = Objects.requireNonNull(query);
@@ -134,7 +115,12 @@ public final class ChunkSearcherCoordinator implements PacketInputListener
 		searchers.clear();
 	}
 	
-	private HashSet<ChunkPos> clearChunksToUpdate()
+	public void setTargetBlock(Block block)
+	{
+		setQuery((pos, state) -> block == state.getBlock());
+	}
+	
+	protected HashSet<ChunkPos> clearChunksToUpdate()
 	{
 		synchronized(chunksToUpdate)
 		{

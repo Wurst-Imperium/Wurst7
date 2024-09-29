@@ -22,6 +22,7 @@ import net.wurstclient.clickgui.components.TextFieldEditButton;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public final class TextFieldSetting extends Setting
 {
@@ -29,8 +30,8 @@ public final class TextFieldSetting extends Setting
 	private final String defaultValue;
 	private final Predicate<String> validator;
 	
-	public TextFieldSetting(String name, String description,
-		String defaultValue, Predicate<String> validator)
+	public TextFieldSetting(String name, WText description, String defaultValue,
+		Predicate<String> validator)
 	{
 		super(name, description);
 		
@@ -45,21 +46,32 @@ public final class TextFieldSetting extends Setting
 		this.validator = validator;
 	}
 	
+	public TextFieldSetting(String name, String descriptionKey,
+		String defaultValue, Predicate<String> validator)
+	{
+		this(name, WText.translated(descriptionKey), defaultValue, validator);
+	}
+	
 	public TextFieldSetting(String name, String defaultValue,
 		Predicate<String> validator)
 	{
-		this(name, "", defaultValue, validator);
+		this(name, WText.empty(), defaultValue, validator);
 	}
 	
-	public TextFieldSetting(String name, String description,
-		String defaultValue)
+	public TextFieldSetting(String name, WText description, String defaultValue)
 	{
 		this(name, description, defaultValue, s -> true);
 	}
 	
+	public TextFieldSetting(String name, String descriptionKey,
+		String defaultValue)
+	{
+		this(name, WText.translated(descriptionKey), defaultValue, s -> true);
+	}
+	
 	public TextFieldSetting(String name, String defaultValue)
 	{
-		this(name, "", defaultValue, s -> true);
+		this(name, WText.empty(), defaultValue, s -> true);
 	}
 	
 	/**
@@ -134,7 +146,7 @@ public final class TextFieldSetting extends Setting
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "TextField");
 		json.addProperty("defaultValue", defaultValue);
 		return json;

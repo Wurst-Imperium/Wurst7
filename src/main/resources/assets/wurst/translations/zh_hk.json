@@ -94,7 +94,7 @@
   "description.wurst.hack.masstpa": "畀每個人發送 傳送申請。\n\n§c§l警告：§r中文伺服器使用會因為 Wurst 判斷嘅係英文而導致 傳送申請 仍喺繼續。",
   "description.wurst.hack.mileycyrus": "類似瘋狂按 Shift 潛行。",
   "description.wurst.hack.mobesp": "高亮附近嘅生物。",
-  "description.wurst.hack.mobspawnesp": "高亮生物可以生成嘅區域。\n§e黃色§r 可以喺夜間生成\n§c紅色§r - 可以喺任意時候生成",
+  "description.wurst.hack.mobspawnesp": "高亮生物可以生成嘅區域。",
   "description.wurst.hack.multiaura": "比 Killaura 更高級，能同一時間攻擊多個實體。",
   "description.wurst.hack.nameprotect": "隱藏所有玩家嘅名字。",
   "description.wurst.hack.nametags": "改變名字標簽大小使你可以經常可以睇到佢哋，同時都可以令你睇到啲正潛行嘅玩家名字標簽。",
