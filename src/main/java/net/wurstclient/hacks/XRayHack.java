@@ -18,6 +18,7 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
@@ -30,6 +31,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.ISimpleOption;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 
@@ -46,32 +49,32 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:anvil", "minecraft:beacon", "minecraft:bone_block",
 		"minecraft:bookshelf", "minecraft:brewing_stand",
 		"minecraft:budding_amethyst", "minecraft:chain_command_block",
-		"minecraft:chest", "minecraft:clay", "minecraft:coal_block",
-		"minecraft:coal_ore", "minecraft:command_block", "minecraft:copper_ore",
-		"minecraft:crafter", "minecraft:crafting_table",
-		"minecraft:decorated_pot", "minecraft:deepslate_coal_ore",
-		"minecraft:deepslate_copper_ore", "minecraft:deepslate_diamond_ore",
-		"minecraft:deepslate_emerald_ore", "minecraft:deepslate_gold_ore",
-		"minecraft:deepslate_iron_ore", "minecraft:deepslate_lapis_ore",
-		"minecraft:deepslate_redstone_ore", "minecraft:diamond_block",
-		"minecraft:diamond_ore", "minecraft:dispenser", "minecraft:dropper",
-		"minecraft:emerald_block", "minecraft:emerald_ore",
-		"minecraft:enchanting_table", "minecraft:end_portal",
-		"minecraft:end_portal_frame", "minecraft:ender_chest",
-		"minecraft:furnace", "minecraft:glowstone", "minecraft:gold_block",
-		"minecraft:gold_ore", "minecraft:hopper", "minecraft:iron_block",
-		"minecraft:iron_ore", "minecraft:ladder", "minecraft:lapis_block",
-		"minecraft:lapis_ore", "minecraft:lava", "minecraft:lodestone",
-		"minecraft:mossy_cobblestone", "minecraft:nether_gold_ore",
-		"minecraft:nether_portal", "minecraft:nether_quartz_ore",
-		"minecraft:raw_copper_block", "minecraft:raw_gold_block",
-		"minecraft:raw_iron_block", "minecraft:redstone_block",
-		"minecraft:redstone_ore", "minecraft:repeating_command_block",
-		"minecraft:sculk_catalyst", "minecraft:sculk_sensor",
-		"minecraft:sculk_shrieker", "minecraft:spawner",
-		"minecraft:suspicious_gravel", "minecraft:suspicious_sand",
-		"minecraft:tnt", "minecraft:torch", "minecraft:trapped_chest",
-		"minecraft:trial_spawner", "minecraft:vault", "minecraft:water");
+		"minecraft:chest", "minecraft:coal_block", "minecraft:coal_ore",
+		"minecraft:command_block", "minecraft:copper_ore", "minecraft:crafter",
+		"minecraft:crafting_table", "minecraft:decorated_pot",
+		"minecraft:deepslate_coal_ore", "minecraft:deepslate_copper_ore",
+		"minecraft:deepslate_diamond_ore", "minecraft:deepslate_emerald_ore",
+		"minecraft:deepslate_gold_ore", "minecraft:deepslate_iron_ore",
+		"minecraft:deepslate_lapis_ore", "minecraft:deepslate_redstone_ore",
+		"minecraft:diamond_block", "minecraft:diamond_ore",
+		"minecraft:dispenser", "minecraft:dropper", "minecraft:emerald_block",
+		"minecraft:emerald_ore", "minecraft:enchanting_table",
+		"minecraft:end_portal", "minecraft:end_portal_frame",
+		"minecraft:ender_chest", "minecraft:furnace", "minecraft:glowstone",
+		"minecraft:gold_block", "minecraft:gold_ore", "minecraft:hopper",
+		"minecraft:iron_block", "minecraft:iron_ore", "minecraft:ladder",
+		"minecraft:lapis_block", "minecraft:lapis_ore", "minecraft:lava",
+		"minecraft:lodestone", "minecraft:mossy_cobblestone",
+		"minecraft:nether_gold_ore", "minecraft:nether_portal",
+		"minecraft:nether_quartz_ore", "minecraft:raw_copper_block",
+		"minecraft:raw_gold_block", "minecraft:raw_iron_block",
+		"minecraft:redstone_block", "minecraft:redstone_ore",
+		"minecraft:repeating_command_block", "minecraft:sculk_catalyst",
+		"minecraft:sculk_sensor", "minecraft:sculk_shrieker",
+		"minecraft:spawner", "minecraft:suspicious_gravel",
+		"minecraft:suspicious_sand", "minecraft:tnt", "minecraft:torch",
+		"minecraft:trapped_chest", "minecraft:trial_spawner", "minecraft:vault",
+		"minecraft:water");
 	
 	private final CheckboxSetting onlyExposed = new CheckboxSetting(
 		"Only show exposed",
@@ -80,11 +83,19 @@ public final class XRayHack extends Hack implements UpdateListener,
 			+ "Remember to restart X-Ray when changing this setting.",
 		false);
 	
+	private final SliderSetting opacity = new SliderSetting("Opacity",
+		"Opacity of non-ore blocks when X-Ray is enabled.\n\n"
+			+ "Does not work when Sodium is installed.\n\n"
+			+ "Remember to restart X-Ray when changing this setting.",
+		0, 0, 0.99, 0.01, ValueDisplay.PERCENTAGE.withLabel(0, "off"));
+	
 	private final String optiFineWarning;
 	private final String renderName =
 		Math.random() < 0.01 ? "X-Wurst" : getName();
 	
 	private ArrayList<String> oreNamesCache;
+	private final ThreadLocal<BlockPos.Mutable> mutablePosForExposedCheck =
+		ThreadLocal.withInitial(BlockPos.Mutable::new);
 	
 	public XRayHack()
 	{
@@ -92,6 +103,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		setCategory(Category.RENDER);
 		addSetting(ores);
 		addSetting(onlyExposed);
+		addSetting(opacity);
 		optiFineWarning = checkOptiFine();
 	}
 	
@@ -165,8 +177,12 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onShouldDrawSide(ShouldDrawSideEvent event)
 	{
-		event.setRendered(
-			isVisible(event.getState().getBlock(), event.getPos()));
+		boolean visible =
+			isVisible(event.getState().getBlock(), event.getPos());
+		if(!visible && opacity.getValue() > 0)
+			return;
+		
+		event.setRendered(visible);
 	}
 	
 	@Override
@@ -177,21 +193,36 @@ public final class XRayHack extends Hack implements UpdateListener,
 			event.cancel();
 	}
 	
-	private boolean isVisible(Block block, BlockPos pos)
+	public boolean isVisible(Block block, BlockPos pos)
 	{
 		String name = BlockUtils.getName(block);
 		int index = Collections.binarySearch(oreNamesCache, name);
 		boolean visible = index >= 0;
 		
 		if(visible && onlyExposed.isChecked() && pos != null)
-			return !BlockUtils.isOpaqueFullCube(pos.up())
-				|| !BlockUtils.isOpaqueFullCube(pos.down())
-				|| !BlockUtils.isOpaqueFullCube(pos.east())
-				|| !BlockUtils.isOpaqueFullCube(pos.west())
-				|| !BlockUtils.isOpaqueFullCube(pos.north())
-				|| !BlockUtils.isOpaqueFullCube(pos.south());
+			return isExposed(pos);
 		
 		return visible;
+	}
+	
+	private boolean isExposed(BlockPos pos)
+	{
+		BlockPos.Mutable mutablePos = mutablePosForExposedCheck.get();
+		for(Direction direction : Direction.values())
+			if(!BlockUtils.isOpaqueFullCube(mutablePos.set(pos, direction)))
+				return true;
+			
+		return false;
+	}
+	
+	public boolean isOpacityMode()
+	{
+		return isEnabled() && opacity.getValue() > 0;
+	}
+	
+	public int getOpacityColorMask()
+	{
+		return (int)(opacity.getValue() * 255) << 24 | 0xFFFFFF;
 	}
 	
 	/**
@@ -215,4 +246,6 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
+	
+	// See AbstractBlockRenderContextMixin, RenderLayersMixin
 }
