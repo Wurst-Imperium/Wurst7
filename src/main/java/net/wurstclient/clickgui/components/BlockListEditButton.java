@@ -33,7 +33,7 @@ public final class BlockListEditButton extends AbstractListEditButton
 	@Override
 	protected String getText()
 	{
-		return setting.getName() + ": " + setting.getBlockNames().size();
+		return setting.getName() + ": " + setting.size();
 	}
 	
 	@Override

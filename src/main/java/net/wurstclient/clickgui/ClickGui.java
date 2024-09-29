@@ -471,6 +471,8 @@ public final class ClickGui
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		// GL11.glShadeModel(GL11.GL_SMOOTH);
 		RenderSystem.lineWidth(1);
+		MatrixStack matrixStack = context.getMatrices();
+		matrixStack.push();
 		
 		tooltip = "";
 		for(Window window : windows)
@@ -495,12 +497,14 @@ public final class ClickGui
 				else
 					window.stopDraggingScrollbar();
 				
+			matrixStack.translate(0, 0, 300);
 			renderWindow(context, window, mouseX, mouseY, partialTicks);
 		}
 		
 		renderPopups(context, mouseX, mouseY);
 		renderTooltip(context, mouseX, mouseY);
 		
+		matrixStack.pop();
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
@@ -598,12 +602,18 @@ public final class ClickGui
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		RenderSystem.lineWidth(1);
+		MatrixStack matrixStack = context.getMatrices();
+		matrixStack.push();
 		
 		for(Window window : windows)
 			if(window.isPinned() && !window.isInvisible())
+			{
+				matrixStack.translate(0, 0, 300);
 				renderWindow(context, window, Integer.MIN_VALUE,
 					Integer.MIN_VALUE, partialTicks);
-			
+			}
+		
+		matrixStack.pop();
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 	}

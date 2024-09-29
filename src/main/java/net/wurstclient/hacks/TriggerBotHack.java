@@ -47,11 +47,8 @@ public final class TriggerBotHack extends Hack
 			100, 0, 1000, 50, ValueDisplay.INTEGER.withPrefix("\u00b1")
 				.withSuffix("ms").withLabel(0, "off"));
 	
-	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How TriggerBot should swing your hand when attacking.\n\n"
-			+ "This setting will be ignored if \"Simulate mouse click\" is"
-			+ " enabled.",
-		SwingHand.CLIENT);
+	private final SwingHandSetting swingHand =
+		new SwingHandSetting(this, SwingHand.CLIENT);
 	
 	private final CheckboxSetting attackWhileBlocking =
 		new CheckboxSetting("Attack while blocking",

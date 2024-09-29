@@ -119,7 +119,7 @@
   "description.wurst.hack.masstpa": "すべてのプレイヤーにTPA（テレポート）リクエストを送信する。",
   "description.wurst.hack.mileycyrus": "腰振りダンスをする。",
   "description.wurst.hack.mobesp": "付近のモブをハイライト表示する。",
-  "description.wurst.hack.mobspawnesp": "モブがスポーンする可能性のあるエリアをハイライト表示する。\n§e黄色§r - モブが夜にスポーンする可能性あり\n§c赤色§r - モブが常時スポーンする可能性あり",
+  "description.wurst.hack.mobspawnesp": "モブがスポーンする可能性のあるエリアをハイライト表示する。",
   "description.wurst.hack.multiaura": "同時に複数のエンティティを攻撃する早いKillaura。",
   "description.wurst.hack.nameprotect": "すべてのプレイヤーの名前を隠す。",
   "description.wurst.hack.nametags": "いつでも読めるようネームタグのサイズを変更し、それに加えしゃがんでいるプレイヤーのネームタグも見えるようになる。",

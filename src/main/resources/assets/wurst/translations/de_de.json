@@ -106,7 +106,7 @@
   "description.wurst.hack.masstpa": "Sendet TPA-Requests an alle Spieler.",
   "description.wurst.hack.mileycyrus": "Lässt dich twerken.",
   "description.wurst.hack.mobesp": "Markiert Mobs in deiner Umgebung.",
-  "description.wurst.hack.mobspawnesp": "Markiert Orte, an denen Mobs spawnen können.\n§eGelb§r - Mobs können nachts spawnen\n§cRot§r - Mobs können jederzeit spawnen",
+  "description.wurst.hack.mobspawnesp": "Markiert Orte, an denen Mobs spawnen können.",
   "description.wurst.hack.multiaura": "Schnellere Killaura, die mehrere Mobs und Spieler gleichzeitig angreifen kann.",
   "description.wurst.hack.nameprotect": "Verbirgt alle Spielernamen.",
   "description.wurst.hack.nametags": "Ändert die Größe der Name-Tags, sodass du sie immer gut lesen kannst. Ermöglicht dir außerdem, die Name-Tags von schleichenden Spielern zu sehen.",

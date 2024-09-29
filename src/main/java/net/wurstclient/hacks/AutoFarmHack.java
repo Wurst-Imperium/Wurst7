@@ -7,7 +7,11 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,7 +19,6 @@ import net.minecraft.block.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -30,7 +33,9 @@ import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
+import net.wurstclient.util.BlockBreakingCache;
 import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 import net.wurstclient.util.BlockUtils;
@@ -61,7 +66,7 @@ public final class AutoFarmHack extends Hack
 	}
 	
 	private final HashMap<BlockPos, Item> plants = new HashMap<>();
-	private final ArrayDeque<Set<BlockPos>> prevBlocks = new ArrayDeque<>();
+	private final BlockBreakingCache cache = new BlockBreakingCache();
 	private BlockPos currentlyHarvesting;
 	
 	private final AutoFarmRenderer renderer = new AutoFarmRenderer();
@@ -100,7 +105,7 @@ public final class AutoFarmHack extends Hack
 			currentlyHarvesting = null;
 		}
 		
-		prevBlocks.clear();
+		cache.reset();
 		overlay.resetProgress();
 		busy = false;
 		
@@ -111,17 +116,17 @@ public final class AutoFarmHack extends Hack
 	public void onUpdate()
 	{
 		currentlyHarvesting = null;
-		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		BlockPos eyesBlock = BlockPos.ofFloored(RotationUtils.getEyesPos());
+		Vec3d eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
 		// get nearby, non-empty blocks
-		ArrayList<BlockPos> blocks = BlockUtils
-			.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
-			.filter(BlockUtils::canBeClicked)
-			.collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<BlockPos> blocks =
+			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
+				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+				.filter(BlockUtils::canBeClicked)
+				.collect(Collectors.toCollection(ArrayList::new));
 		
 		// check for any new plants and add them to the map
 		updatePlants(blocks);
@@ -146,9 +151,9 @@ public final class AutoFarmHack extends Hack
 		
 		// if we can't replant, harvest instead
 		if(!replanting)
-			harvest(blocksToHarvest);
+			harvest(blocksToHarvest.stream());
 		
-		// upate busy state
+		// update busy state
 		busy = replanting || currentlyHarvesting != null;
 		
 		// update renderer
@@ -187,8 +192,8 @@ public final class AutoFarmHack extends Hack
 		ArrayList<BlockPos> blocks)
 	{
 		return blocks.parallelStream().filter(this::shouldBeHarvested)
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+			.sorted(Comparator
+				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
@@ -234,11 +239,11 @@ public final class AutoFarmHack extends Hack
 		BlockPos eyesBlock, double rangeSq, int blockRange)
 	{
 		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
+			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
 			.filter(pos -> BlockUtils.getState(pos).isReplaceable())
 			.filter(pos -> plants.containsKey(pos)).filter(this::canBeReplanted)
-			.sorted(Comparator.comparingDouble(
-				pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos))))
+			.sorted(Comparator
+				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
@@ -303,8 +308,7 @@ public final class AutoFarmHack extends Hack
 				
 				// swing arm
 				if(result.isAccepted() && result.shouldSwingHand())
-					MC.player.networkHandler
-						.sendPacket(new HandSwingC2SPacket(hand));
+					SwingHand.SERVER.swing(hand);
 				
 				// reset cooldown
 				MC.itemUseCooldown = 4;
@@ -330,42 +334,34 @@ public final class AutoFarmHack extends Hack
 		return false;
 	}
 	
-	private void harvest(List<BlockPos> blocksToHarvest)
+	private void harvest(Stream<BlockPos> stream)
 	{
+		// Break all blocks in creative mode
 		if(MC.player.getAbilities().creativeMode)
 		{
-			Stream<BlockPos> stream = blocksToHarvest.parallelStream();
-			for(Set<BlockPos> set : prevBlocks)
-				stream = stream.filter(pos -> !set.contains(pos));
-			List<BlockPos> filteredBlocks = stream.collect(Collectors.toList());
-			
-			prevBlocks.addLast(new HashSet<>(filteredBlocks));
-			while(prevBlocks.size() > 5)
-				prevBlocks.removeFirst();
-			
-			if(!filteredBlocks.isEmpty())
-				currentlyHarvesting = filteredBlocks.get(0);
-			
 			MC.interactionManager.cancelBlockBreaking();
 			overlay.resetProgress();
-			BlockBreaker.breakBlocksWithPacketSpam(filteredBlocks);
+			
+			ArrayList<BlockPos> blocks = cache.filterOutRecentBlocks(stream);
+			if(blocks.isEmpty())
+				return;
+			
+			currentlyHarvesting = blocks.get(0);
+			BlockBreaker.breakBlocksWithPacketSpam(blocks);
 			return;
 		}
 		
-		for(BlockPos pos : blocksToHarvest)
-			if(BlockBreaker.breakOneBlock(pos))
-			{
-				currentlyHarvesting = pos;
-				break;
-			}
+		// Break the first valid block in survival mode
+		currentlyHarvesting =
+			stream.filter(BlockBreaker::breakOneBlock).findFirst().orElse(null);
 		
 		if(currentlyHarvesting == null)
+		{
 			MC.interactionManager.cancelBlockBreaking();
-		
-		if(currentlyHarvesting != null
-			&& BlockUtils.getHardness(currentlyHarvesting) < 1)
-			overlay.updateProgress();
-		else
 			overlay.resetProgress();
+			return;
+		}
+		
+		overlay.updateProgress();
 	}
 }
