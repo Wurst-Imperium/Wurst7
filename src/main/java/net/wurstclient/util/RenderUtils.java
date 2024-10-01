@@ -15,17 +15,21 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.font.TextRenderer.TextLayerType;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.NameTagsHack;
 
 public enum RenderUtils
 {
@@ -756,5 +760,52 @@ public enum RenderUtils
 		}
 		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
+	}
+	
+	public static void renderTag(MatrixStack matrixStack, Text text,
+		Entity entity, VertexConsumerProvider provider, int color,
+		double vOffset, float partialTicks)
+	{
+		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
+		
+		EntityRenderDispatcher dispatcher =
+			WurstClient.MC.getEntityRenderDispatcher();
+		double dist = dispatcher.getSquaredDistanceToCamera(entity);
+		if(dist > 4096 && !nameTags.isUnlimitedRange())
+			return;
+		
+		matrixStack.push();
+		
+		Vec3d camPos = RenderUtils.getCameraPos();
+		Vec3d tagPos = EntityUtils.getLerpedPos(entity, partialTicks)
+			.subtract(camPos).add(0, entity.getHeight() + vOffset, 0);
+		matrixStack.translate(tagPos.x, tagPos.y, tagPos.z);
+		
+		matrixStack.multiply(dispatcher.getRotation());
+		
+		float scale = 0.025F;
+		if(nameTags.isEnabled())
+		{
+			double distance = WurstClient.MC.player.distanceTo(entity);
+			if(distance > 10)
+				scale *= distance / 10;
+		}
+		matrixStack.scale(-scale, -scale, scale);
+		
+		float bgOpacity =
+			WurstClient.MC.options.getTextBackgroundOpacity(0.25f);
+		int bgColor = (int)(bgOpacity * 255F) << 24;
+		
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		TextRenderer tr = WurstClient.MC.textRenderer;
+		int labelX = -tr.getWidth(text) / 2;
+		
+		tr.draw(text, labelX, 0, color, false, matrix, provider,
+			TextLayerType.NORMAL, bgColor, 15728880);
+		
+		tr.draw(text, labelX, 0, -1, false, matrix, provider,
+			TextLayerType.SEE_THROUGH, 0, 15728880);
+		
+		matrixStack.pop();
 	}
 }
