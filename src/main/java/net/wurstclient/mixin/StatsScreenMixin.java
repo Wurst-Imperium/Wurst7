@@ -8,13 +8,13 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.StatsListener;
 import net.minecraft.client.gui.screen.StatsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -23,8 +23,11 @@ import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
 @Mixin(StatsScreen.class)
-public abstract class StatsScreenMixin extends Screen implements StatsListener
+public abstract class StatsScreenMixin extends Screen
 {
+	@Unique
+	private ButtonWidget toggleWurstButton;
+	
 	private StatsScreenMixin(WurstClient wurst, Text title)
 	{
 		super(title);
@@ -36,24 +39,39 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		if(WurstClient.INSTANCE.getOtfs().disableOtf.shouldHideEnableButton())
 			return;
 		
-		ButtonWidget toggleWurstButton =
-			ButtonWidget.builder(Text.literal(""), this::toggleWurst)
-				.dimensions(width / 2 - 152, height - 28, 150, 20).build();
+		toggleWurstButton = ButtonWidget
+			.builder(Text.literal(""), this::toggleWurst).width(150).build();
 		
 		updateWurstButtonText(toggleWurstButton);
 		addDrawableChild(toggleWurstButton);
-		
-		for(ClickableWidget button : Screens.getButtons(this))
-		{
-			if(!button.getMessage().getString()
-				.equals(I18n.translate("gui.done")))
-				continue;
-			
-			button.setX(width / 2 + 2);
-			button.setWidth(150);
-		}
 	}
 	
+	@Inject(at = @At("TAIL"), method = "initTabNavigation()V")
+	private void onInitTabNavigation(CallbackInfo ci)
+	{
+		if(toggleWurstButton == null)
+			return;
+		
+		ClickableWidget doneButton = wurst_getDoneButton();
+		doneButton.setX(width / 2 + 2);
+		doneButton.setWidth(150);
+		
+		toggleWurstButton.setPosition(width / 2 - 152, doneButton.getY());
+	}
+	
+	@Unique
+	private ClickableWidget wurst_getDoneButton()
+	{
+		for(ClickableWidget button : Screens.getButtons(this))
+			if(button.getMessage().getString()
+				.equals(I18n.translate("gui.done")))
+				return button;
+			
+		throw new IllegalStateException(
+			"Can't find the done button on the statistics screen.");
+	}
+	
+	@Unique
 	private void toggleWurst(ButtonWidget button)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
@@ -62,6 +80,7 @@ public abstract class StatsScreenMixin extends Screen implements StatsListener
 		updateWurstButtonText(button);
 	}
 	
+	@Unique
 	private void updateWurstButtonText(ButtonWidget button)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;

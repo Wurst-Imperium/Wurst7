@@ -33,9 +33,9 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
-import net.wurstclient.util.ChunkSearcher.Result;
-import net.wurstclient.util.ChunkSearcherCoordinator;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.chunk.ChunkSearcher.Result;
+import net.wurstclient.util.chunk.ChunkSearcherCoordinator;
 
 public final class PortalEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
@@ -96,7 +96,7 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		groupsUpToDate = false;
 		
@@ -109,7 +109,7 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, coordinator);

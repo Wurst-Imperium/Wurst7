@@ -12,6 +12,8 @@ import java.util.Arrays;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
@@ -77,16 +79,19 @@ public final class ModifyCmd extends Command
 	
 	private void add(ItemStack stack, String[] args) throws CmdError
 	{
-		String nbt = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-		nbt = nbt.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
+		String nbtString =
+			String.join(" ", Arrays.copyOfRange(args, 1, args.length))
+				.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		
-		if(!stack.hasNbt())
-			stack.setNbt(new NbtCompound());
+		NbtCompound itemNbt = stack
+			.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT)
+			.copyNbt();
 		
 		try
 		{
-			NbtCompound tag = StringNbtReader.parse(nbt);
-			stack.getNbt().copyFrom(tag);
+			NbtCompound parsedNbt = StringNbtReader.parse(nbtString);
+			itemNbt.copyFrom(parsedNbt);
+			stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(itemNbt));
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -103,7 +108,7 @@ public final class ModifyCmd extends Command
 		try
 		{
 			NbtCompound tag = StringNbtReader.parse(nbt);
-			stack.setNbt(tag);
+			stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(tag));
 			
 		}catch(CommandSyntaxException e)
 		{
@@ -117,12 +122,15 @@ public final class ModifyCmd extends Command
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
-		NbtPath path = parseNbtPath(stack.getNbt(), args[1]);
+		NbtPath path = parseNbtPath(stack
+			.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT)
+			.copyNbt(), args[1]);
 		
 		if(path == null)
 			throw new CmdError("The path does not exist.");
 		
 		path.base.remove(path.key);
+		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(path.base));
 	}
 	
 	private NbtPath parseNbtPath(NbtCompound tag, String path)

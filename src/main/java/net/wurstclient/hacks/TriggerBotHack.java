@@ -14,17 +14,23 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.UpdateListener;
+import net.wurstclient.events.HandleInputListener;
+import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
 
-@SearchTags({"trigger bot"})
-public final class TriggerBotHack extends Hack implements UpdateListener
+@SearchTags({"trigger bot", "AutoAttack", "auto attack", "AutoClicker",
+	"auto clicker"})
+public final class TriggerBotHack extends Hack
+	implements PreMotionListener, HandleInputListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
@@ -32,13 +38,41 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
 	
-	private final CheckboxSetting attackWhileBlocking = new CheckboxSetting(
-		"Attack while blocking",
-		"Whether or not to attack while blocking with a shield / using items.",
+	private final SliderSetting speedRandMS =
+		new SliderSetting("Speed randomization",
+			"Helps you bypass anti-cheat plugins by varying the delay between"
+				+ " attacks.\n\n" + "\u00b1100ms is recommended for Vulcan.\n\n"
+				+ "0 (off) is fine for NoCheat+, AAC, Grim, Verus, Spartan, and"
+				+ " vanilla servers.",
+			100, 0, 1000, 50, ValueDisplay.INTEGER.withPrefix("\u00b1")
+				.withSuffix("ms").withLabel(0, "off"));
+	
+	private final SwingHandSetting swingHand =
+		new SwingHandSetting(this, SwingHand.CLIENT);
+	
+	private final CheckboxSetting attackWhileBlocking =
+		new CheckboxSetting("Attack while blocking",
+			"Attacks even while you're blocking with a shield or using"
+				+ " items.\n\n"
+				+ "This would not be possible in vanilla and won't work if"
+				+ " \"Simulate mouse click\" is enabled.",
+			false);
+	
+	private final CheckboxSetting simulateMouseClick = new CheckboxSetting(
+		"Simulate mouse click",
+		"Simulates an actual mouse click (or key press) when attacking. Can be"
+			+ " used to trick CPS measuring tools into thinking that you're"
+			+ " attacking manually.\n\n"
+			+ "\u00a7c\u00a7lWARNING:\u00a7r Simulating mouse clicks can lead"
+			+ " to unexpected behavior, like in-game menus clicking themselves."
+			+ " Also, the \"Swing hand\" and \"Attack while blocking\" settings"
+			+ " will not work while this option is enabled.",
 		false);
 	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericCombat();
+	
+	private boolean simulatingMouseClick;
 	
 	public TriggerBotHack()
 	{
@@ -47,13 +81,16 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		
 		addSetting(range);
 		addSetting(speed);
+		addSetting(speedRandMS);
+		addSetting(swingHand);
 		addSetting(attackWhileBlocking);
+		addSetting(simulateMouseClick);
 		
 		entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable other killauras
 		WURST.getHax().clickAuraHack.setEnabled(false);
@@ -65,18 +102,36 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 		WURST.getHax().protectHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
-		speed.resetTimer();
-		EVENTS.add(UpdateListener.class, this);
+		speed.resetTimer(speedRandMS.getValue());
+		EVENTS.add(PreMotionListener.class, this);
+		EVENTS.add(HandleInputListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
-		EVENTS.remove(UpdateListener.class, this);
+		if(simulatingMouseClick)
+		{
+			IKeyBinding.get(MC.options.attackKey).simulatePress(false);
+			simulatingMouseClick = false;
+		}
+		
+		EVENTS.remove(PreMotionListener.class, this);
+		EVENTS.remove(HandleInputListener.class, this);
 	}
 	
 	@Override
-	public void onUpdate()
+	public void onPreMotion()
+	{
+		if(!simulatingMouseClick)
+			return;
+		
+		IKeyBinding.get(MC.options.attackKey).simulatePress(false);
+		simulatingMouseClick = false;
+	}
+	
+	@Override
+	public void onHandleInput()
 	{
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
@@ -87,23 +142,31 @@ public final class TriggerBotHack extends Hack implements UpdateListener
 			return;
 		
 		ClientPlayerEntity player = MC.player;
-		if(player.isUsingItem() && !attackWhileBlocking.isChecked())
+		if(!attackWhileBlocking.isChecked() && player.isUsingItem())
 			return;
 		
 		if(MC.crosshairTarget == null
-			|| !(MC.crosshairTarget instanceof EntityHitResult))
+			|| !(MC.crosshairTarget instanceof EntityHitResult eResult))
 			return;
 		
-		Entity target = ((EntityHitResult)MC.crosshairTarget).getEntity();
+		Entity target = eResult.getEntity();
 		if(!isCorrectEntity(target))
 			return;
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
 		
-		WURST.getHax().criticalsHack.doCritical();
-		MC.interactionManager.attackEntity(player, target);
-		player.swingHand(Hand.MAIN_HAND);
-		speed.resetTimer();
+		if(simulateMouseClick.isChecked())
+		{
+			IKeyBinding.get(MC.options.attackKey).simulatePress(true);
+			simulatingMouseClick = true;
+			
+		}else
+		{
+			MC.interactionManager.attackEntity(player, target);
+			swingHand.swing(Hand.MAIN_HAND);
+		}
+		
+		speed.resetTimer(speedRandMS.getValue());
 	}
 	
 	private boolean isCorrectEntity(Entity entity)

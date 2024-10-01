@@ -13,17 +13,17 @@ import java.util.Set;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.text.WText;
 
 public abstract class Setting
 {
 	private final String name;
-	private final String description;
+	private final WText description;
 	
-	public Setting(String name, String description)
+	public Setting(String name, WText description)
 	{
 		this.name = Objects.requireNonNull(name);
 		this.description = Objects.requireNonNull(description);
@@ -36,17 +36,12 @@ public abstract class Setting
 	
 	public final String getDescription()
 	{
-		return WurstClient.INSTANCE.translate(description);
+		return description.toString();
 	}
 	
 	public final String getWrappedDescription(int width)
 	{
 		return ChatUtils.wrapText(getDescription(), width);
-	}
-	
-	public final String getDescriptionKey()
-	{
-		return description;
 	}
 	
 	public abstract Component getComponent();
@@ -60,7 +55,7 @@ public abstract class Setting
 	 * Wurst Wiki. Must always specify the following properties:
 	 * <ul>
 	 * <li>name
-	 * <li>descriptionKey
+	 * <li>description
 	 * <li>type
 	 * </ul>
 	 */

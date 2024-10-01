@@ -15,6 +15,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -27,7 +28,7 @@ import net.wurstclient.other_features.WurstLogoOtf;
 public final class WurstLogo
 {
 	private static final Identifier texture =
-		new Identifier("wurst", "wurst_128.png");
+		Identifier.of("wurst", "wurst_128.png");
 	
 	public void render(DrawContext context)
 	{
@@ -81,13 +82,12 @@ public final class WurstLogo
 		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+		bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a);
+		bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a);
+		bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a);
+		bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }

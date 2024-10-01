@@ -18,6 +18,7 @@ import java.util.Set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -28,23 +29,28 @@ import net.wurstclient.clickgui.components.ItemListEditButton;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
-import net.wurstclient.util.json.WsonArray;
+import net.wurstclient.util.text.WText;
 
 public final class ItemListSetting extends Setting
 {
 	private final ArrayList<String> itemNames = new ArrayList<>();
 	private final String[] defaultNames;
 	
-	public ItemListSetting(String name, String description, String... items)
+	public ItemListSetting(String name, WText description, String... items)
 	{
 		super(name, description);
 		
 		Arrays.stream(items).parallel()
-			.map(s -> Registries.ITEM.get(new Identifier(s)))
+			.map(s -> Registries.ITEM.get(Identifier.of(s)))
 			.filter(Objects::nonNull)
 			.map(i -> Registries.ITEM.getId(i).toString()).distinct().sorted()
 			.forEachOrdered(s -> itemNames.add(s));
 		defaultNames = itemNames.toArray(new String[0]);
+	}
+	
+	public ItemListSetting(String name, String descriptionKey, String... items)
+	{
+		this(name, WText.translated(descriptionKey), items);
 	}
 	
 	public List<String> getItemNames()
@@ -90,11 +96,18 @@ public final class ItemListSetting extends Setting
 	{
 		try
 		{
-			WsonArray wson = JsonUtils.getAsArray(json);
 			itemNames.clear();
 			
-			wson.getAllStrings().parallelStream()
-				.map(s -> Registries.ITEM.get(new Identifier(s)))
+			// if string "default", load default items
+			if(JsonUtils.getAsString(json, "nope").equals("default"))
+			{
+				itemNames.addAll(Arrays.asList(defaultNames));
+				return;
+			}
+			
+			// otherwise, load the items in the JSON array
+			JsonUtils.getAsArray(json).getAllStrings().parallelStream()
+				.map(s -> Registries.ITEM.get(Identifier.of(s)))
 				.filter(Objects::nonNull)
 				.map(i -> Registries.ITEM.getId(i).toString()).distinct()
 				.sorted().forEachOrdered(s -> itemNames.add(s));
@@ -109,6 +122,10 @@ public final class ItemListSetting extends Setting
 	@Override
 	public JsonElement toJson()
 	{
+		// if itemNames is the same as defaultNames, save string "default"
+		if(itemNames.equals(Arrays.asList(defaultNames)))
+			return new JsonPrimitive("default");
+		
 		JsonArray json = new JsonArray();
 		itemNames.forEach(s -> json.add(s));
 		return json;
@@ -119,7 +136,7 @@ public final class ItemListSetting extends Setting
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "ItemList");
 		
 		JsonArray defaultItems = new JsonArray();

@@ -120,10 +120,10 @@ public enum RotationUtils
 		float pitchChange =
 			Math.abs(MathHelper.wrapDegrees(endPitch - startPitch));
 		
-		float maxChangeYaw =
-			Math.min(maxChange, maxChange * yawChange / pitchChange);
-		float maxChangePitch =
-			Math.min(maxChange, maxChange * pitchChange / yawChange);
+		float maxChangeYaw = pitchChange == 0 ? maxChange
+			: Math.min(maxChange, maxChange * yawChange / pitchChange);
+		float maxChangePitch = yawChange == 0 ? maxChange
+			: Math.min(maxChange, maxChange * pitchChange / yawChange);
 		
 		float nextYaw = limitAngleChange(startYaw, endYaw, maxChangeYaw);
 		float nextPitch =

@@ -129,9 +129,12 @@ public final class FishingSpotManager
 	
 	private void moveToNextSpot()
 	{
+		IKeyBinding forwardKey = IKeyBinding.get(MC.options.forwardKey);
+		IKeyBinding jumpKey = IKeyBinding.get(MC.options.jumpKey);
+		
 		PositionAndRotation nextPosRot = nextSpot.input();
-		((IKeyBinding)MC.options.forwardKey).resetPressedState();
-		((IKeyBinding)MC.options.jumpKey).resetPressedState();
+		forwardKey.resetPressedState();
+		jumpKey.resetPressedState();
 		
 		// match position
 		Vec3d nextPos = nextPosRot.pos();
@@ -149,14 +152,14 @@ public final class FishingSpotManager
 			}
 			
 			// jump if necessary
-			MC.options.jumpKey.setPressed(
+			jumpKey.setPressed(
 				MC.player.isTouchingWater() || MC.player.horizontalCollision);
 			
 			// walk or teleport depending on distance
 			if(distance < 0.2)
 				MC.player.setPosition(nextPos.x, nextPos.y, nextPos.z);
 			else if(distance > 0.7 || MC.player.age % 10 == 0)
-				MC.options.forwardKey.setPressed(true);
+				forwardKey.setPressed(true);
 			return;
 		}
 		

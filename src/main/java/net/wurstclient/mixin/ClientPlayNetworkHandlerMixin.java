@@ -23,7 +23,7 @@ import net.minecraft.network.listener.TickablePacketListener;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkData;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ServerMetadataS2CPacket;
+import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
@@ -42,16 +42,15 @@ public abstract class ClientPlayNetworkHandlerMixin
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "onServerMetadata(Lnet/minecraft/network/packet/s2c/play/ServerMetadataS2CPacket;)V")
-	public void onOnServerMetadata(ServerMetadataS2CPacket packet,
-		CallbackInfo ci)
+		method = "onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
+	public void onOnGameJoin(GameJoinS2CPacket packet, CallbackInfo ci)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
 		if(!wurst.isEnabled())
 			return;
 		
 		// Remove Mojang's dishonest warning toast on safe servers
-		if(!packet.isSecureChatEnforced())
+		if(!packet.enforcesSecureChat())
 		{
 			client.getToastManager().toastQueue.removeIf(toast -> toast
 				.getType() == SystemToast.Type.UNSECURE_SERVER_WARNING);

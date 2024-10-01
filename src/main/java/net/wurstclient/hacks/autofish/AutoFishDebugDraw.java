@@ -16,6 +16,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -117,8 +118,7 @@ public final class AutoFishDebugDraw
 			.subtract(region.toVec3d());
 		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
 		
-		float[] colorF = ddColor.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+		ddColor.setAsShaderColor(0.5F);
 		
 		double vr = validRange.getValue();
 		Box vrBox = new Box(-vr, -1 / 16.0, -vr, vr, 1 / 16.0, vr);
@@ -131,23 +131,21 @@ public final class AutoFishDebugDraw
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		matrixStack.push();
 		matrixStack.translate(lastSoundPos.x - region.x(), lastSoundPos.y,
 			lastSoundPos.z - region.z());
 		
-		float[] colorF = ddColor.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+		ddColor.setAsShaderColor(0.5F);
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, -0.125F, 0, -0.125F).next();
-		bufferBuilder.vertex(matrix, 0.125F, 0, 0.125F).next();
-		bufferBuilder.vertex(matrix, 0.125F, 0, -0.125F).next();
-		bufferBuilder.vertex(matrix, -0.125F, 0, 0.125F).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, -0.125F, 0, -0.125F);
+		bufferBuilder.vertex(matrix, 0.125F, 0, 0.125F);
+		bufferBuilder.vertex(matrix, 0.125F, 0, -0.125F);
+		bufferBuilder.vertex(matrix, -0.125F, 0, 0.125F);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		matrixStack.pop();
 	}
@@ -158,8 +156,7 @@ public final class AutoFishDebugDraw
 		Box noseBox =
 			headBox.offset(0.125, 0.125, 0.5).shrink(0.25, 0.35, 0.45);
 		
-		float[] colorF = ddColor.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.75F);
+		ddColor.setAsShaderColor(0.75F);
 		
 		for(FishingSpot spot : fishingSpots.getFishingSpots())
 		{

@@ -47,7 +47,7 @@ public final class RemoteViewHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// find entity if not already set
 		if(entity == null)
@@ -94,7 +94,7 @@ public final class RemoteViewHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		// remove listener
 		EVENTS.remove(UpdateListener.class, this);

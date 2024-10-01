@@ -26,11 +26,11 @@ public final class ReachHack extends Hack
 		addSetting(range);
 	}
 	
-	public float getReachDistance()
+	public double getReachDistance()
 	{
-		return range.getValueF();
+		return range.getValue();
 	}
 	
-	// See ClientPlayerInteractionManagerMixin.onGetReachDistance() and
-	// ClientPlayerInteractionManagerMixin.hasExtendedReach()
+	// See ClientPlayerEntityMixin.getBlockInteractionRange() and
+	// ClientPlayerEntityMixin.getEntityInteractionRange()
 }

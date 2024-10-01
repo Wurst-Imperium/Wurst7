@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -16,6 +15,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.ai.PathFinder;
@@ -26,18 +26,41 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"anti afk", "AFKBot", "afk bot"})
 @DontSaveState
 public final class AntiAfkHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	private final CheckboxSetting useAi = new CheckboxSetting("Use AI", true);
+	private final CheckboxSetting useAi = new CheckboxSetting("Use AI",
+		"description.wurst.setting.antiafk.use_ai", true);
+	
+	private final SliderSetting aiRange = new SliderSetting("AI range",
+		"description.wurst.setting.antiafk.ai_range", 16, 1, 64, 1,
+		ValueDisplay.AREA_FROM_RADIUS);
+	
+	private final SliderSetting nonAiRange = new SliderSetting("Non-AI range",
+		"description.wurst.setting.antiafk.non-ai_range", 1, 1, 64, 1,
+		ValueDisplay.AREA_FROM_RADIUS);
+	
+	private final SliderSetting waitTime = new SliderSetting("Wait time",
+		"description.wurst.setting.antiafk.wait_time", 2.5, 0, 60, 0.05,
+		ValueDisplay.DECIMAL.withSuffix("s"));
+	
+	private final SliderSetting waitTimeRand = new SliderSetting(
+		"Wait time randomization",
+		"description.wurst.setting.antiafk.wait_time_randomization", 0.5, 0, 60,
+		0.05, ValueDisplay.DECIMAL.withPrefix("\u00b1").withSuffix("s"));
+	
+	private final CheckboxSetting showWaitTime =
+		new CheckboxSetting("Show wait time",
+			"description.wurst.setting.antiafk.show_wait_time", true);
 	
 	private int timer;
-	private Random random = new Random();
+	private Random random = Random.createLocal();
 	private BlockPos start;
 	private BlockPos nextBlock;
 	
@@ -51,14 +74,29 @@ public final class AntiAfkHack extends Hack
 		
 		setCategory(Category.OTHER);
 		addSetting(useAi);
+		addSetting(aiRange);
+		addSetting(nonAiRange);
+		addSetting(waitTime);
+		addSetting(waitTimeRand);
+		addSetting(showWaitTime);
 	}
 	
 	@Override
-	public void onEnable()
+	public String getRenderName()
+	{
+		if(showWaitTime.isChecked() && timer > 0)
+			return getName() + " [" + timer * 50 + "ms]";
+		
+		return getName();
+	}
+	
+	@Override
+	protected void onEnable()
 	{
 		start = BlockPos.ofFloored(MC.player.getPos());
 		nextBlock = null;
-		pathFinder = new RandomPathFinder(start);
+		pathFinder =
+			new RandomPathFinder(randomize(start, aiRange.getValueI(), true));
 		creativeFlying = MC.player.getAbilities().flying;
 		
 		WURST.getHax().autoFishHack.setEnabled(false);
@@ -68,17 +106,13 @@ public final class AntiAfkHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
-		((IKeyBinding)MC.options.forwardKey).resetPressedState();
-		((IKeyBinding)MC.options.jumpKey).resetPressedState();
-		
+		PathProcessor.releaseControls();
 		pathFinder = null;
 		processor = null;
-		PathProcessor.releaseControls();
 	}
 	
 	@Override
@@ -95,12 +129,18 @@ public final class AntiAfkHack extends Hack
 		
 		if(useAi.isChecked())
 		{
+			// prevent drowning
+			if(MC.player.isSubmergedInWater()
+				&& !WURST.getHax().jesusHack.isEnabled())
+			{
+				MC.options.jumpKey.setPressed(true);
+				return;
+			}
+			
 			// update timer
 			if(timer > 0)
 			{
 				timer--;
-				if(!WURST.getHax().jesusHack.isEnabled())
-					MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
 				return;
 			}
 			
@@ -122,7 +162,8 @@ public final class AntiAfkHack extends Hack
 			
 			// check path
 			if(processor != null
-				&& !pathFinder.isPathStillValid(processor.getIndex()))
+				&& !pathFinder.isPathStillValid(processor.getIndex())
+				|| processor.getTicksOffPath() > 20)
 			{
 				pathFinder = new RandomPathFinder(pathFinder);
 				return;
@@ -132,22 +173,20 @@ public final class AntiAfkHack extends Hack
 			if(!processor.isDone())
 				processor.process();
 			else
-				pathFinder = new RandomPathFinder(start);
-			
-			// wait 2 - 3 seconds (40 - 60 ticks)
-			if(processor.isDone())
 			{
+				// reset and wait for timer
 				PathProcessor.releaseControls();
-				timer = 40 + random.nextInt(21);
+				pathFinder = new RandomPathFinder(
+					randomize(start, aiRange.getValueI(), true));
+				setTimer();
 			}
 		}else
 		{
 			// set next block
 			if(timer <= 0 || nextBlock == null)
 			{
-				nextBlock =
-					start.add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
-				timer = 40 + random.nextInt(21);
+				nextBlock = randomize(start, nonAiRange.getValueI(), false);
+				setTimer();
 			}
 			
 			// face block
@@ -181,12 +220,28 @@ public final class AntiAfkHack extends Hack
 			pathCmd.isDepthTest());
 	}
 	
+	private void setTimer()
+	{
+		int baseTime = (int)(waitTime.getValue() * 20);
+		double randTime = waitTimeRand.getValue() * 20;
+		int randOffset = (int)(random.nextGaussian() * randTime);
+		randOffset = Math.max(randOffset, -baseTime);
+		timer = baseTime + randOffset;
+	}
+	
+	private BlockPos randomize(BlockPos pos, int range, boolean includeY)
+	{
+		int x = random.nextInt(2 * range + 1) - range;
+		int y = includeY ? random.nextInt(2 * range + 1) - range : 0;
+		int z = random.nextInt(2 * range + 1) - range;
+		return pos.add(x, y, z);
+	}
+	
 	private class RandomPathFinder extends PathFinder
 	{
 		public RandomPathFinder(BlockPos goal)
 		{
-			super(goal.add(random.nextInt(33) - 16, random.nextInt(33) - 16,
-				random.nextInt(33) - 16));
+			super(goal);
 			setThinkTime(10);
 			setFallingAllowed(false);
 			setDivingAllowed(false);

@@ -11,9 +11,10 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,19 +30,22 @@ import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 {
-	@Redirect(at = @At(value = "INVOKE",
+	/**
+	 * This mixin makes the VelocityFromFluidEvent work, which is used by
+	 * AntiWaterPush. It's set to require 0 because it doesn't work in Forge,
+	 * when using Sinytra Connector.
+	 */
+	@WrapWithCondition(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/entity/Entity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V",
 		opcode = Opcodes.INVOKEVIRTUAL,
 		ordinal = 0),
-		method = "updateMovementInFluid(Lnet/minecraft/registry/tag/TagKey;D)Z")
-	private void setVelocityFromFluid(Entity entity, Vec3d velocity)
+		method = "updateMovementInFluid(Lnet/minecraft/registry/tag/TagKey;D)Z",
+		require = 0)
+	private boolean shouldSetVelocity(Entity instance, Vec3d velocity)
 	{
-		VelocityFromFluidEvent event =
-			new VelocityFromFluidEvent((Entity)(Object)this);
+		VelocityFromFluidEvent event = new VelocityFromFluidEvent(instance);
 		EventManager.fire(event);
-		
-		if(!event.isCancelled())
-			entity.setVelocity(velocity);
+		return !event.isCancelled();
 	}
 	
 	@Inject(at = @At("HEAD"),

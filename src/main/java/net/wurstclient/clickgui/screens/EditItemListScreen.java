@@ -167,6 +167,8 @@ public final class EditItemListScreen extends Screen
 		float partialTicks)
 	{
 		MatrixStack matrixStack = context.getMatrices();
+		renderBackground(context, mouseX, mouseY, partialTicks);
+		
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,
@@ -274,7 +276,7 @@ public final class EditItemListScreen extends Screen
 			int var4, int var5, int var6, float partialTicks)
 		{
 			String name = list.get(index);
-			Item item = Registries.ITEM.get(new Identifier(name));
+			Item item = Registries.ITEM.get(Identifier.of(name));
 			ItemStack stack = new ItemStack(item);
 			TextRenderer tr = mc.textRenderer;
 			

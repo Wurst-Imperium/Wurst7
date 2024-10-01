@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -29,17 +30,17 @@ public class IngameHudMixin
 	@Final
 	private DebugHud debugHud;
 	
-	@Inject(
-		at = @At(value = "INVOKE",
-			target = "Lcom/mojang/blaze3d/systems/RenderSystem;enableBlend()V",
-			remap = false,
-			ordinal = 3),
-		method = "render(Lnet/minecraft/client/gui/DrawContext;F)V")
-	private void onRender(DrawContext context, float tickDelta, CallbackInfo ci)
+	// runs after renderScoreboardSidebar()
+	// and before playerListHud.setVisible()
+	@Inject(at = @At("HEAD"),
+		method = "renderPlayerList(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V")
+	private void onRenderPlayerList(DrawContext context,
+		RenderTickCounter tickCounter, CallbackInfo ci)
 	{
 		if(debugHud.shouldShowDebugHud())
 			return;
 		
+		float tickDelta = tickCounter.getTickDelta(true);
 		EventManager.fire(new GUIRenderEvent(context, tickDelta));
 	}
 	

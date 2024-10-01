@@ -33,17 +33,17 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		timer = 0;
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		((IKeyBinding)MC.options.sneakKey).resetPressedState();
+		IKeyBinding.get(MC.options.sneakKey).resetPressedState();
 	}
 	
 	@Override

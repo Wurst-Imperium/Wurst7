@@ -95,6 +95,7 @@ public final class KeybindList
 		try(Stream<Path> files = Files.list(profilesFolder))
 		{
 			return files.filter(Files::isRegularFile)
+				.filter(path -> path.getFileName().toString().endsWith(".json"))
 				.collect(Collectors.toCollection(ArrayList::new));
 			
 		}catch(IOException e)

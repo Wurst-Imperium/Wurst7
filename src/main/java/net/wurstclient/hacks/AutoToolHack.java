@@ -7,23 +7,36 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.stream.IntStream;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry.Reference;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.BlockBreakingProgressListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.InventoryUtils;
 
 @SearchTags({"auto tool", "AutoSwitch", "auto switch"})
 public final class AutoToolHack extends Hack
@@ -33,18 +46,20 @@ public final class AutoToolHack extends Hack
 		"Uses swords to break leaves, cobwebs, etc.", false);
 	
 	private final CheckboxSetting useHands = new CheckboxSetting("Use hands",
-		"Uses an empty hand or a non-damageable item when no applicable tool is found.",
+		"Uses an empty hand or a non-damageable item when no applicable tool is"
+			+ " found.",
 		true);
 	
 	private final SliderSetting repairMode = new SliderSetting("Repair mode",
-		"Prevents tools from being used when their durability reaches the given threshold, so you can repair them before they break.\n"
-			+ "Can be adjusted from 0 (off) to 100.",
+		"Prevents tools from being used when their durability reaches the given"
+			+ " threshold, so you can repair them before they break.\n"
+			+ "Can be adjusted from 0 (off) to 100 remaining uses.",
 		0, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
-		"Switch back",
-		"After using a tool, automatically switches back to the previously selected slot.",
-		true);
+		"Switch back", "After using a tool, automatically switches back to the"
+			+ " previously selected slot.",
+		false);
 	
 	private int prevSelectedSlot;
 	
@@ -60,7 +75,7 @@ public final class AutoToolHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(BlockBreakingProgressListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
@@ -68,7 +83,7 @@ public final class AutoToolHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(BlockBreakingProgressListener.class, this);
 		EVENTS.remove(UpdateListener.class, this);
@@ -94,6 +109,10 @@ public final class AutoToolHack extends Hack
 		if(prevSelectedSlot == -1 || MC.interactionManager.isBreakingBlock())
 			return;
 		
+		HitResult hitResult = MC.crosshairTarget;
+		if(hitResult != null && hitResult.getType() == HitResult.Type.BLOCK)
+			return;
+		
 		if(switchBack.isChecked())
 			MC.player.getInventory().selectedSlot = prevSelectedSlot;
 		
@@ -116,20 +135,16 @@ public final class AutoToolHack extends Hack
 		if(player.getAbilities().creativeMode)
 			return;
 		
-		int bestSlot = getBestSlot(pos, useSwords, repairMode);
+		ItemStack heldItem = player.getMainHandStack();
+		boolean heldItemDamageable = isDamageable(heldItem);
+		if(heldItemDamageable && isTooDamaged(heldItem, repairMode))
+			putAwayDamagedTool(repairMode);
+		
+		BlockState state = BlockUtils.getState(pos);
+		int bestSlot = getBestSlot(state, useSwords, repairMode);
 		if(bestSlot == -1)
 		{
-			ItemStack heldItem = player.getMainHandStack();
-			if(!isDamageable(heldItem))
-				return;
-			
-			if(isTooDamaged(heldItem, repairMode))
-			{
-				selectFallbackSlot();
-				return;
-			}
-			
-			if(useHands && isWrongTool(heldItem, pos))
+			if(useHands && heldItemDamageable && isWrongTool(heldItem, state))
 				selectFallbackSlot();
 			
 			return;
@@ -138,13 +153,12 @@ public final class AutoToolHack extends Hack
 		player.getInventory().selectedSlot = bestSlot;
 	}
 	
-	private int getBestSlot(BlockPos pos, boolean useSwords, int repairMode)
+	private int getBestSlot(BlockState state, boolean useSwords, int repairMode)
 	{
 		ClientPlayerEntity player = MC.player;
 		PlayerInventory inventory = player.getInventory();
 		ItemStack heldItem = MC.player.getMainHandStack();
 		
-		BlockState state = BlockUtils.getState(pos);
 		float bestSpeed = getMiningSpeed(heldItem, state);
 		if(isTooDamaged(heldItem, repairMode))
 			bestSpeed = 1;
@@ -180,10 +194,18 @@ public final class AutoToolHack extends Hack
 		
 		if(speed > 1)
 		{
-			int efficiency =
-				EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack);
-			if(efficiency > 0 && !stack.isEmpty())
-				speed += efficiency * efficiency + 1;
+			DynamicRegistryManager drm =
+				WurstClient.MC.world.getRegistryManager();
+			Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+			
+			Optional<Reference<Enchantment>> efficiency =
+				registry.getEntry(Enchantments.EFFICIENCY);
+			int effLvl = efficiency
+				.map(entry -> EnchantmentHelper.getLevel(entry, stack))
+				.orElse(0);
+			
+			if(effLvl > 0 && !stack.isEmpty())
+				speed += effLvl * effLvl + 1;
 		}
 		
 		return speed;
@@ -191,7 +213,7 @@ public final class AutoToolHack extends Hack
 	
 	private boolean isDamageable(ItemStack stack)
 	{
-		return !stack.isEmpty() && stack.getItem().isDamageable();
+		return !stack.isEmpty() && stack.isDamageable();
 	}
 	
 	private boolean isTooDamaged(ItemStack stack, int repairMode)
@@ -199,9 +221,49 @@ public final class AutoToolHack extends Hack
 		return stack.getMaxDamage() - stack.getDamage() <= repairMode;
 	}
 	
-	private boolean isWrongTool(ItemStack heldItem, BlockPos pos)
+	private void putAwayDamagedTool(int repairMode)
 	{
-		BlockState state = BlockUtils.getState(pos);
+		PlayerInventory inv = MC.player.getInventory();
+		int selectedSlot = inv.selectedSlot;
+		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		
+		// If there's an empty slot in the main inventory,
+		// shift-click the damaged item out of the hotbar
+		OptionalInt emptySlot = IntStream.range(9, 36)
+			.filter(i -> !inv.getStack(i).isEmpty()).findFirst();
+		if(emptySlot.isPresent())
+		{
+			im.windowClick_QUICK_MOVE(
+				InventoryUtils.toNetworkSlot(selectedSlot));
+			return;
+		}
+		
+		// Failing that, swap with a non-damageable item
+		OptionalInt nonDamageableSlot = IntStream.range(9, 36)
+			.filter(i -> !isDamageable(inv.getStack(i))).findFirst();
+		if(nonDamageableSlot.isPresent())
+		{
+			im.windowClick_SWAP(nonDamageableSlot.getAsInt(), selectedSlot);
+			return;
+		}
+		
+		// Failing that, swap with a less damaged item
+		OptionalInt notTooDamagedSlot = IntStream.range(9, 36)
+			.filter(i -> !isTooDamaged(inv.getStack(i), repairMode))
+			.findFirst();
+		if(notTooDamagedSlot.isPresent())
+		{
+			im.windowClick_SWAP(notTooDamagedSlot.getAsInt(), selectedSlot);
+			return;
+		}
+		
+		// Failing all of the above (whole inventory full of damaged tools),
+		// just swap with the top-left slot
+		im.windowClick_SWAP(0, selectedSlot);
+	}
+	
+	private boolean isWrongTool(ItemStack heldItem, BlockState state)
+	{
 		return getMiningSpeed(heldItem, state) <= 1;
 	}
 	

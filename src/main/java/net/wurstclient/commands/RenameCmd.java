@@ -7,6 +7,7 @@
  */
 package net.wurstclient.commands;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.wurstclient.command.CmdError;
@@ -38,12 +39,12 @@ public final class RenameCmd extends Command
 			message += " " + args[i];
 		
 		message = message.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
-		ItemStack item = MC.player.getInventory().getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getMainHandStack();
 		
-		if(item == null)
+		if(stack == null)
 			throw new CmdError("There is no item in your hand.");
 		
-		item.setCustomName(Text.literal(message));
-		ChatUtils.message("Renamed item to \"" + message + "\u00a7r\".");
+		stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(message));
+		ChatUtils.message("Renamed item to \"\u00a7o" + message + "\u00a7r\".");
 	}
 }

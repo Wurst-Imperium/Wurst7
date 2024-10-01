@@ -14,12 +14,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -152,7 +155,13 @@ public enum MicrosoftLoginManager
 			
 			System.out.println("Getting login cookies...");
 			cookie = "";
-			for(String c : connection.getHeaderFields().get("Set-Cookie"))
+			List<String> cookies =
+				connection.getHeaderFields().get("Set-Cookie");
+			
+			if(cookies == null)
+				cookies = Collections.emptyList();
+			
+			for(String c : cookies)
 			{
 				String cookieTrimmed = c.substring(0, c.indexOf(";") + 1);
 				cookie += cookieTrimmed;
@@ -197,7 +206,7 @@ public enum MicrosoftLoginManager
 		
 		try
 		{
-			URL url = new URL(urlPost);
+			URL url = URI.create(urlPost).toURL();
 			HttpURLConnection connection =
 				(HttpURLConnection)url.openConnection();
 			
@@ -504,7 +513,7 @@ public enum MicrosoftLoginManager
 	{
 		try
 		{
-			return new URL(url);
+			return URI.create(url).toURL();
 			
 		}catch(MalformedURLException e)
 		{

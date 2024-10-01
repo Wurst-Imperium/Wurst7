@@ -29,6 +29,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -162,8 +163,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 0), method = "updateNausea()V")
-	private void beforeUpdateNausea(CallbackInfo ci)
+		ordinal = 0), method = "tickNausea(Z)V")
+	private void beforeTickNausea(boolean fromPortalEffect, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
 			return;
@@ -179,8 +180,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nauseaIntensity:F",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 1), method = "updateNausea()V")
-	private void afterUpdateNausea(CallbackInfo ci)
+		ordinal = 1), method = "tickNausea(Z)V")
+	private void afterTickNausea(boolean fromPortalEffect, CallbackInfo ci)
 	{
 		if(tempCurrentScreen == null)
 			return;
@@ -289,7 +290,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
-	public boolean hasStatusEffect(StatusEffect effect)
+	public boolean hasStatusEffect(RegistryEntry<StatusEffect> effect)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		
@@ -305,5 +306,32 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			return false;
 		
 		return super.hasStatusEffect(effect);
+	}
+	
+	@Override
+	public float getStepHeight()
+	{
+		return WurstClient.INSTANCE.getHax().stepHack
+			.adjustStepHeight(super.getStepHeight());
+	}
+	
+	@Override
+	public double getBlockInteractionRange()
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.reachHack.isEnabled())
+			return super.getBlockInteractionRange();
+		
+		return hax.reachHack.getReachDistance();
+	}
+	
+	@Override
+	public double getEntityInteractionRange()
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.reachHack.isEnabled())
+			return super.getEntityInteractionRange();
+		
+		return hax.reachHack.getReachDistance();
 	}
 }

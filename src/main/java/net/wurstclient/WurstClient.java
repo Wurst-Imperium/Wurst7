@@ -11,17 +11,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.IllegalFormatException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.lwjgl.glfw.GLFW;
-
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.InputUtil;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.altmanager.Encryption;
 import net.wurstclient.analytics.WurstAnalytics;
@@ -41,7 +34,6 @@ import net.wurstclient.hack.HackList;
 import net.wurstclient.hud.IngameHUD;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
-import net.wurstclient.mixinterface.ILanguageManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
@@ -58,8 +50,8 @@ public enum WurstClient
 	public static MinecraftClient MC;
 	public static IMinecraftClient IMC;
 	
-	public static final String VERSION = "7.41.2";
-	public static final String MC_VERSION = "1.20.4";
+	public static final String VERSION = "7.46";
+	public static final String MC_VERSION = "1.21.1";
 	
 	private WurstAnalytics analytics;
 	private EventManager eventManager;
@@ -76,14 +68,13 @@ public enum WurstClient
 	private IngameHUD hud;
 	private RotationFaker rotationFaker;
 	private FriendsList friends;
+	private WurstTranslator translator;
 	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
 	private ProblematicResourcePackDetector problematicPackDetector;
 	private Path wurstFolder;
-	
-	private KeyBinding zoomKey;
 	
 	public void initialize()
 	{
@@ -126,6 +117,8 @@ public enum WurstClient
 		friends = new FriendsList(friendsFile);
 		friends.load();
 		
+		translator = new WurstTranslator();
+		
 		cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
 		
@@ -149,10 +142,6 @@ public enum WurstClient
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
 		Path encFolder = Encryption.chooseEncryptionFolder();
 		altManager = new AltManager(altsFile, encFolder);
-		
-		zoomKey = new KeyBinding("key.wurst.zoom", InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_V, KeyBinding.MISC_CATEGORY);
-		KeyBindingHelper.registerKeyBinding(zoomKey);
 		
 		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
 			"Wurst " + VERSION + " MC" + MC_VERSION);
@@ -178,27 +167,7 @@ public enum WurstClient
 	
 	public String translate(String key, Object... args)
 	{
-		if(otfs.translationsOtf.getForceEnglish().isChecked())
-		{
-			String string = ILanguageManager.getEnglish().get(key);
-			
-			try
-			{
-				return String.format(string, args);
-				
-			}catch(IllegalFormatException e)
-			{
-				return key;
-			}
-		}
-		
-		// This extra check is necessary because I18n.translate() doesn't
-		// always return the key when the translation is missing. If the key
-		// contains a '%', it will return "Format Error: key" instead.
-		if(!I18n.hasTranslation(key))
-			return key;
-		
-		return I18n.translate(key, args);
+		return translator.translate(key, args);
 	}
 	
 	public WurstAnalytics getAnalytics()
@@ -314,6 +283,11 @@ public enum WurstClient
 		return friends;
 	}
 	
+	public WurstTranslator getTranslator()
+	{
+		return translator;
+	}
+	
 	public boolean isEnabled()
 	{
 		return enabled;
@@ -343,11 +317,6 @@ public enum WurstClient
 	public Path getWurstFolder()
 	{
 		return wurstFolder;
-	}
-	
-	public KeyBinding getZoomKey()
-	{
-		return zoomKey;
 	}
 	
 	public AltManager getAltManager()

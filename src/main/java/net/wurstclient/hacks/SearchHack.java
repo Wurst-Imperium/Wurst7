@@ -23,7 +23,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -42,11 +42,11 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.ChunkSearcher;
-import net.wurstclient.util.ChunkSearcherCoordinator;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.chunk.ChunkSearcher;
+import net.wurstclient.util.chunk.ChunkSearcherCoordinator;
 
 @SearchTags({"BlockESP", "block esp"})
 public final class SearchHack extends Hack
@@ -95,7 +95,7 @@ public final class SearchHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		lastBlock = block.getBlock();
 		coordinator.setTargetBlock(lastBlock);
@@ -112,7 +112,7 @@ public final class SearchHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, coordinator);
@@ -193,7 +193,7 @@ public final class SearchHack extends Hack
 		RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
 		
 		float[] rainbow = RenderUtils.getRainbowColor();
-		RenderSystem.setShaderColor(rainbow[0], rainbow[1], rainbow[2], 0.5F);
+		RenderUtils.setShaderColor(rainbow, 0.5F);
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
@@ -257,25 +257,31 @@ public final class SearchHack extends Hack
 	
 	private void setBufferFromTask()
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		
+		ArrayList<int[]> vertices = compileVerticesTask.join();
 		RegionPos region = RenderUtils.getCameraRegion();
-		for(int[] vertex : compileVerticesTask.join())
-			bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
-				vertex[2] - region.z()).next();
-		
-		BuiltBuffer buffer = bufferBuilder.end();
-		
 		if(vertexBuffer != null)
+		{
 			vertexBuffer.close();
+			vertexBuffer = null;
+		}
 		
-		vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		vertexBuffer.bind();
-		vertexBuffer.upload(buffer);
-		VertexBuffer.unbind();
+		if(!vertices.isEmpty())
+		{
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			
+			for(int[] vertex : vertices)
+				bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
+					vertex[2] - region.z());
+			
+			BuiltBuffer buffer = bufferBuilder.endNullable();
+			
+			vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+			vertexBuffer.bind();
+			vertexBuffer.upload(buffer);
+			VertexBuffer.unbind();
+		}
 		
 		bufferUpToDate = true;
 		bufferRegion = region;

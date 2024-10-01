@@ -76,7 +76,7 @@ public final class FollowHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		WURST.getHax().fightBotHack.setEnabled(false);
 		WURST.getHax().protectHack.setEnabled(false);
@@ -115,7 +115,7 @@ public final class FollowHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);

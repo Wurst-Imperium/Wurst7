@@ -29,14 +29,15 @@ public final class FilterSleepingSetting extends EntityFilterCheckbox
 	
 	public static FilterSleepingSetting genericCombat(boolean checked)
 	{
-		return new FilterSleepingSetting("Won't attack sleeping players.\n\n"
-			+ "Useful for servers like Mineplex that place sleeping players on"
-			+ " the ground to make them look like corpses.", checked);
+		return new FilterSleepingSetting(
+			"description.wurst.setting.generic.filter_sleeping_combat",
+			checked);
 	}
 	
 	public static FilterSleepingSetting genericVision(boolean checked)
 	{
-		return new FilterSleepingSetting("Won't show sleeping players.",
+		return new FilterSleepingSetting(
+			"description.wurst.setting.generic.filter_sleeping_vision",
 			checked);
 	}
 }

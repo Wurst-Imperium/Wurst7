@@ -20,6 +20,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
@@ -31,12 +32,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
+import net.wurstclient.events.PlayerAttacksEntityListener.PlayerAttacksEntityEvent;
 import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
-import net.wurstclient.hack.HackList;
-import net.wurstclient.hacks.ReachHack;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
 @Mixin(ClientPlayerInteractionManager.class)
@@ -58,36 +57,21 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getReachDistance()F",
-		cancellable = true)
-	private void onGetReachDistance(CallbackInfoReturnable<Float> ci)
-	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null)
-			return;
-		
-		ReachHack reach = hax.reachHack;
-		if(reach.isEnabled())
-			ci.setReturnValue(reach.getReachDistance());
-	}
-	
-	@Inject(at = @At("HEAD"),
-		method = "hasExtendedReach()Z",
-		cancellable = true)
-	private void hasExtendedReach(CallbackInfoReturnable<Boolean> cir)
-	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.reachHack.isEnabled())
-			return;
-		
-		cir.setReturnValue(true);
-	}
-	
-	@Inject(at = @At("HEAD"),
 		method = "stopUsingItem(Lnet/minecraft/entity/player/PlayerEntity;)V")
 	private void onStopUsingItem(PlayerEntity player, CallbackInfo ci)
 	{
 		EventManager.fire(StopUsingItemEvent.INSTANCE);
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "attackEntity(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/entity/Entity;)V")
+	private void onAttackEntity(PlayerEntity player, Entity target,
+		CallbackInfo ci)
+	{
+		if(player != client.player)
+			return;
+		
+		EventManager.fire(new PlayerAttacksEntityEvent(target));
 	}
 	
 	@Override

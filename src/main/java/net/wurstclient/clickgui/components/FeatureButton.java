@@ -18,6 +18,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -31,6 +32,7 @@ import net.wurstclient.clickgui.SettingsWindow;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.RenderUtils;
 
 public final class FeatureButton extends Component
 {
@@ -167,10 +169,9 @@ public final class FeatureButton extends Component
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		
 		if(feature.isEnabled())
 			// if(feature.isBlocked())
@@ -179,15 +180,15 @@ public final class FeatureButton extends Component
 			RenderSystem.setShaderColor(0, 1, 0,
 				hHack ? opacity * 1.5F : opacity);
 		else
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			RenderUtils.setShaderColor(bgColor,
 				hHack ? opacity * 1.5F : opacity);
 		
-		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.vertex(matrix, x3, y2, 0).next();
-		bufferBuilder.vertex(matrix, x3, y1, 0).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		bufferBuilder.vertex(matrix, x3, y2, 0);
+		bufferBuilder.vertex(matrix, x3, y1, 0);
 		
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawSettingsBackground(MatrixStack matrixStack, int x2, int x3,
@@ -198,17 +199,16 @@ public final class FeatureButton extends Component
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		RenderUtils.setShaderColor(bgColor,
 			hSettings ? opacity * 1.5F : opacity);
-		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.vertex(matrix, x3, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		tessellator.draw();
+		bufferBuilder.vertex(matrix, x3, y1, 0);
+		bufferBuilder.vertex(matrix, x3, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawOutline(MatrixStack matrixStack, int x1, int x2, int y1,
@@ -218,31 +218,29 @@ public final class FeatureButton extends Component
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		RenderUtils.setShaderColor(acColor, 0.5F);
+		bufferBuilder.vertex(matrix, x1, y1, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y1, 0);
+		bufferBuilder.vertex(matrix, x1, y1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		// separator
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.vertex(matrix, x3, y2, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y1, 0);
+		bufferBuilder.vertex(matrix, x3, y2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawSettingsArrow(MatrixStack matrixStack, int x2, int x3,
@@ -256,7 +254,6 @@ public final class FeatureButton extends Component
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		if(isSettingsWindowOpen())
 		{
@@ -272,22 +269,22 @@ public final class FeatureButton extends Component
 		}
 		
 		// arrow
-		bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0);
+		bufferBuilder.vertex(matrix, xa3, ya1, 0);
+		bufferBuilder.vertex(matrix, xa2, ya2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa3, ya1, 0).next();
-		bufferBuilder.vertex(matrix, xa2, ya2, 0).next();
-		bufferBuilder.vertex(matrix, xa1, ya1, 0).next();
-		tessellator.draw();
+		bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0);
+		bufferBuilder.vertex(matrix, xa3, ya1, 0);
+		bufferBuilder.vertex(matrix, xa2, ya2, 0);
+		bufferBuilder.vertex(matrix, xa1, ya1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawName(DrawContext context, int x1, int x3, int y1)

@@ -20,6 +20,7 @@ import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoReconnectHack;
@@ -35,7 +36,7 @@ public class DisconnectedScreenMixin extends Screen
 	
 	@Shadow
 	@Final
-	private Text reason;
+	private DisconnectionInfo info;
 	@Shadow
 	@Final
 	private Screen parent;
@@ -54,6 +55,7 @@ public class DisconnectedScreenMixin extends Screen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
+		Text reason = info.reason();
 		System.out.println("Disconnected: " + reason);
 		
 		if(ForcedChatReportsScreen.isCausedByNoChatReports(reason))
@@ -73,15 +75,14 @@ public class DisconnectedScreenMixin extends Screen
 	
 	private void addReconnectButtons()
 	{
-		ButtonWidget reconnectButton = grid.add(
-			ButtonWidget.builder(Text.literal("Reconnect"),
-				b -> LastServerRememberer.reconnect(parent)).build(),
-			grid.copyPositioner().margin(2).marginTop(-6));
+		ButtonWidget reconnectButton = grid.add(ButtonWidget
+			.builder(Text.literal("Reconnect"),
+				b -> LastServerRememberer.reconnect(parent))
+			.width(200).build());
 		
-		autoReconnectButton = grid.add(
-			ButtonWidget.builder(Text.literal("AutoReconnect"),
-				b -> pressAutoReconnect()).build(),
-			grid.copyPositioner().margin(2));
+		autoReconnectButton = grid.add(ButtonWidget
+			.builder(Text.literal("AutoReconnect"), b -> pressAutoReconnect())
+			.width(200).build());
 		
 		grid.refreshPositions();
 		Stream.of(reconnectButton, autoReconnectButton)

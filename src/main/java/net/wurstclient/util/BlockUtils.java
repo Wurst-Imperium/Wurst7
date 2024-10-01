@@ -71,7 +71,7 @@ public enum BlockUtils
 	{
 		try
 		{
-			return Registries.BLOCK.get(new Identifier(name));
+			return Registries.BLOCK.get(Identifier.of(name));
 			
 		}catch(InvalidIdentifierException e)
 		{
@@ -98,7 +98,7 @@ public enum BlockUtils
 		
 		try
 		{
-			return Registries.BLOCK.getOrEmpty(new Identifier(nameOrId))
+			return Registries.BLOCK.getOrEmpty(Identifier.of(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)
@@ -110,6 +110,11 @@ public enum BlockUtils
 	public static float getHardness(BlockPos pos)
 	{
 		return getState(pos).calcBlockBreakingDelta(MC.player, MC.world, pos);
+	}
+	
+	public static boolean isUnbreakable(BlockPos pos)
+	{
+		return getBlock(pos).getHardness() < 0;
 	}
 	
 	private static VoxelShape getOutlineShape(BlockPos pos)

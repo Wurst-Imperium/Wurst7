@@ -29,13 +29,13 @@ public final class AutoRespawnHack extends Hack implements DeathListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(DeathListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(DeathListener.class, this);
 	}

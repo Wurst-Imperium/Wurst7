@@ -7,8 +7,8 @@
  */
 package net.wurstclient.other_features;
 
+import net.minecraft.network.packet.BrandCustomPayload;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
-import net.minecraft.util.Identifier;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ConnectionPacketOutputListener;
@@ -42,23 +42,20 @@ public final class VanillaSpoofOtf extends OtherFeature
 		if(!(event.getPacket() instanceof CustomPayloadC2SPacket packet))
 			return;
 		
-		Identifier channel = packet.payload().id();
-		
-		if(channel.getNamespace().equals("minecraft")
-			&& channel.getPath().equals("register"))
-			event.cancel();
+		// change client brand "fabric" back to "vanilla"
+		if(packet.payload() instanceof BrandCustomPayload)
+			event.setPacket(
+				new CustomPayloadC2SPacket(new BrandCustomPayload("vanilla")));
 			
-		// Apparently the Minecraft client no longer sends its brand to the
-		// server as of 23w31a
+		// cancel Fabric's "c:version", "c:register" and
+		// "fabric:custom_ingredient_sync" packets
+		// TODO: Something else is needed to prevent the connection from
+		// hanging when these packets are cancelled.
 		
-		// if(packet.getChannel().getNamespace().equals("minecraft")
-		// && packet.getChannel().getPath().equals("brand"))
-		// event.setPacket(new CustomPayloadC2SPacket(
-		// CustomPayloadC2SPacket.BRAND,
-		// new PacketByteBuf(Unpooled.buffer()).writeString("vanilla")));
-		
-		if(channel.getNamespace().equals("fabric"))
-			event.cancel();
+		// Identifier channel = packet.payload().getId().id();
+		// if(channel.getNamespace().equals("fabric")
+		// || channel.getNamespace().equals("c"))
+		// event.cancel();
 	}
 	
 	@Override

@@ -22,6 +22,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
@@ -94,10 +95,11 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable conflicting hacks
 		WURST.getHax().excavatorHack.setEnabled(false);
+		WURST.getHax().templateToolHack.setEnabled(false);
 		
 		// register event listeners
 		EVENTS.add(GUIRenderListener.class, this);
@@ -106,7 +108,7 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(GUIRenderListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
@@ -230,16 +232,13 @@ public final class BowAimbotHack extends Hack
 		matrixStack.scale(v, v, v);
 		
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		float[] colorF = color.getColorF();
 		
 		// draw outline
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
-			0.5F * velocity);
+		color.setAsShaderColor(0.5F * velocity);
 		RenderUtils.drawOutlinedBox(TARGET_BOX, matrixStack);
 		
 		// draw box
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
-			0.25F * velocity);
+		color.setAsShaderColor(0.25F * velocity);
 		RenderUtils.drawSolidBox(TARGET_BOX, matrixStack);
 		
 		matrixStack.pop();
@@ -266,7 +265,6 @@ public final class BowAimbotHack extends Hack
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		
 		String message;
 		if(velocity < 1)
@@ -285,13 +283,13 @@ public final class BowAimbotHack extends Hack
 		// background
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, msgWidth + 3, 0, 0).next();
-		bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0).next();
-		bufferBuilder.vertex(matrix, 0, 10, 0).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, 0, 0, 0);
+		bufferBuilder.vertex(matrix, msgWidth + 3, 0, 0);
+		bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0);
+		bufferBuilder.vertex(matrix, 0, 10, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// text
 		RenderSystem.setShaderColor(1, 1, 1, 1);

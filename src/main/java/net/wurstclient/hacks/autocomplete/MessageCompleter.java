@@ -30,26 +30,27 @@ public abstract class MessageCompleter
 		this.modelSettings = modelSettings;
 	}
 	
-	public final String completeChatMessage(String draftMessage)
+	public final String[] completeChatMessage(String draftMessage,
+		int maxSuggestions)
 	{
 		// build prompt and parameters
 		String prompt = buildPrompt(draftMessage);
-		JsonObject params = buildParams(prompt);
+		JsonObject params = buildParams(prompt, maxSuggestions);
 		System.out.println(params);
 		
 		try
 		{
 			// send request
-			WsonObject response = requestCompletion(params);
+			WsonObject response = requestCompletions(params);
 			System.out.println(response);
 			
 			// read response
-			return extractCompletion(response);
+			return extractCompletions(response);
 			
 		}catch(IOException | JsonException e)
 		{
 			e.printStackTrace();
-			return "";
+			return new String[0];
 		}
 	}
 	
@@ -98,11 +99,12 @@ public abstract class MessageCompleter
 		return prompt;
 	}
 	
-	protected abstract JsonObject buildParams(String prompt);
+	protected abstract JsonObject buildParams(String prompt,
+		int maxSuggestions);
 	
-	protected abstract WsonObject requestCompletion(JsonObject parameters)
+	protected abstract WsonObject requestCompletions(JsonObject parameters)
 		throws IOException, JsonException;
 	
-	protected abstract String extractCompletion(WsonObject response)
+	protected abstract String[] extractCompletions(WsonObject response)
 		throws JsonException;
 }

@@ -27,7 +27,7 @@ public final class DerpHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		// disable incompatible derps
 		WURST.getHax().headRollHack.setEnabled(false);
@@ -37,7 +37,7 @@ public final class DerpHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}

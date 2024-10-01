@@ -8,42 +8,71 @@
 package net.wurstclient.hacks.autolibrarian;
 
 import java.util.Objects;
+import java.util.Optional;
 
-import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.registry.Registries;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
-import net.wurstclient.mixinterface.ILanguageManager;
+import net.wurstclient.WurstClient;
+import net.wurstclient.WurstTranslator;
 
 public record BookOffer(String id, int level, int price)
 	implements Comparable<BookOffer>
 {
 	public static BookOffer create(Enchantment enchantment)
 	{
-		Identifier id = Registries.ENCHANTMENT.getId(enchantment);
+		DynamicRegistryManager drm = WurstClient.MC.world.getRegistryManager();
+		Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+		Identifier id = registry.getId(enchantment);
 		return new BookOffer("" + id, enchantment.getMaxLevel(), 64);
+	}
+	
+	public Optional<? extends RegistryEntry<Enchantment>> getEnchantmentEntry()
+	{
+		if(WurstClient.MC.world == null)
+			return Optional.empty();
+		
+		DynamicRegistryManager drm = WurstClient.MC.world.getRegistryManager();
+		Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+		return registry.getEntry(Identifier.of(id));
 	}
 	
 	public Enchantment getEnchantment()
 	{
-		return Registries.ENCHANTMENT.get(new Identifier(id));
+		return getEnchantmentEntry().map(RegistryEntry::value).orElse(null);
 	}
 	
 	public String getEnchantmentName()
 	{
-		TranslationStorage english = ILanguageManager.getEnglish();
-		Enchantment enchantment = getEnchantment();
-		return english.get(enchantment.getTranslationKey());
+		Text description = getEnchantment().description();
+		if(description.getContent() instanceof TranslatableTextContent tr)
+			return WurstClient.INSTANCE.getTranslator()
+				.translateMcEnglish(tr.getKey());
+		
+		return description.getString();
 	}
 	
 	public String getEnchantmentNameWithLevel()
 	{
-		TranslationStorage english = ILanguageManager.getEnglish();
+		WurstTranslator translator = WurstClient.INSTANCE.getTranslator();
 		Enchantment enchantment = getEnchantment();
-		String name = english.get(enchantment.getTranslationKey());
+		String name;
+		
+		if(enchantment.description()
+			.getContent() instanceof TranslatableTextContent tr)
+			name = translator.translateMcEnglish(tr.getKey());
+		else
+			name = enchantment.description().getString();
 		
 		if(enchantment.getMaxLevel() > 1)
-			name += " " + english.get("enchantment.level." + level);
+			name += " "
+				+ translator.translateMcEnglish("enchantment.level." + level);
 		
 		return name;
 	}
@@ -53,12 +82,26 @@ public record BookOffer(String id, int level, int price)
 		return price + " emerald" + (price == 1 ? "" : "s");
 	}
 	
-	public boolean isValid()
+	/**
+	 * Fully validates the book offer using the dynamic enchantment registry.
+	 * Will return false if called while the user is not in a world or server.
+	 */
+	public boolean isFullyValid()
 	{
-		Enchantment enchantment = getEnchantment();
-		return enchantment != null
-			&& enchantment.isAvailableForEnchantedBookOffer() && level >= 1
-			&& level <= enchantment.getMaxLevel() && price >= 1 && price <= 64;
+		return isMostlyValid() && getEnchantmentEntry()
+			.map(entry -> entry.isIn(EnchantmentTags.TRADEABLE)
+				&& level <= entry.value().getMaxLevel())
+			.orElse(false);
+	}
+	
+	/**
+	 * Tries to validate the book offer without using dynamic registries, which
+	 * aren't loaded until the user enters a world or server.
+	 */
+	public boolean isMostlyValid()
+	{
+		return Identifier.tryParse(id) != null && level >= 1 && price >= 1
+			&& price <= 64;
 	}
 	
 	@Override
