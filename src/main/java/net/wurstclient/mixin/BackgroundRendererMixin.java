@@ -52,7 +52,7 @@ public abstract class BackgroundRendererMixin
 		if(BackgroundRenderer.getFogModifier(entity, tickDelta) != null)
 			return original.call(start, end, shape, red, green, blue, alpha);
 		
-		return original.call(start, end, shape, 0, 0, 0, 0);
+		return original.call(start, end, shape, 0F, 0F, 0F, 0F);
 	}
 	
 	@Inject(at = @At("HEAD"),
