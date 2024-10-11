@@ -89,7 +89,12 @@ public enum RotationUtils
 	public static double getAngleToLastReportedLookVec(Rotation rotation)
 	{
 		ClientPlayerEntity player = MC.player;
-		Rotation lastReported = new Rotation(player.lastYaw, player.lastPitch);
+		
+		// lastYaw/Pitch do not get updated when the player is in a vehicle
+		Rotation lastReported = player.hasVehicle()
+			? new Rotation(player.getYaw(), player.getPitch())
+			: new Rotation(player.lastYaw, player.lastPitch);
+		
 		return lastReported.getAngleTo(rotation);
 	}
 	

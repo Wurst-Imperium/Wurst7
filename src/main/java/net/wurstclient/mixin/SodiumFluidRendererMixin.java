@@ -22,7 +22,7 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
 @Pseudo
 @Mixin(targets = {
-	// current target
+	// < Sodium 0.6.0-beta.1
 	"me.jellysquid.mods.sodium.client.render.chunk.compile.pipeline.FluidRenderer",
 	// < Sodium 0.4.9
 	"me.jellysquid.mods.sodium.client.render.pipeline.FluidRenderer"},
