@@ -61,6 +61,8 @@
     "SimpleOptionMixin",
     "SodiumBlockOcclusionCacheMixin",
     "SodiumFluidRendererMixin",
+    "SodiumOldBlockOcclusionCacheMixin",
+    "SodiumOldFluidRendererMixin",
     "StatsScreenMixin",
     "StatusEffectInstanceMixin",
     "TelemetryManagerMixin",

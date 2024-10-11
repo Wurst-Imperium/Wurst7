@@ -36,8 +36,7 @@
   "breaks": {
     "wi_zoom": "*",
     "wi-zoom": "*",
-    "vulkanmod": "*",
-    "sodium": "<0.6.0-beta.1"
+    "vulkanmod": "*"
   },
   "custom": {
     "modmenu": {
