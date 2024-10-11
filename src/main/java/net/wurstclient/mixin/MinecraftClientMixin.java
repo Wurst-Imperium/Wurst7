@@ -8,7 +8,6 @@
 package net.wurstclient.mixin;
 
 import java.io.File;
-import java.util.UUID;
 
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -29,7 +28,6 @@ import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.util.ProfileKeys;
-import net.minecraft.client.util.ProfileKeysImpl;
 import net.minecraft.client.util.Session;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -64,7 +62,7 @@ public abstract class MinecraftClientMixin
 	private YggdrasilAuthenticationService authenticationService;
 	
 	private Session wurstSession;
-	private ProfileKeysImpl wurstProfileKeys;
+	private ProfileKeys wurstProfileKeys;
 	
 	private MinecraftClientMixin(WurstClient wurst, String name)
 	{
@@ -214,10 +212,11 @@ public abstract class MinecraftClientMixin
 		wurstSession = session;
 		
 		UserApiService userApiService =
-			wurst_createUserApiService(session.getAccessToken());
-		UUID uuid = wurstSession.getProfile().getId();
+			session.getAccountType() == Session.AccountType.MSA
+				? wurst_createUserApiService(session.getAccessToken())
+				: UserApiService.OFFLINE;
 		wurstProfileKeys =
-			new ProfileKeysImpl(userApiService, uuid, runDirectory.toPath());
+			ProfileKeys.create(userApiService, session, runDirectory.toPath());
 	}
 	
 	private UserApiService wurst_createUserApiService(String accessToken)
