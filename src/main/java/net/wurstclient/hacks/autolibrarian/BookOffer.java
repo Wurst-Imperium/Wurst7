@@ -10,7 +10,6 @@ package net.wurstclient.hacks.autolibrarian;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registry;
@@ -21,7 +20,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.ILanguageManager;
+import net.wurstclient.WurstTranslator;
 
 public record BookOffer(String id, int level, int price)
 	implements Comparable<BookOffer>
@@ -53,28 +52,27 @@ public record BookOffer(String id, int level, int price)
 	{
 		Text description = getEnchantment().description();
 		if(description.getContent() instanceof TranslatableTextContent tr)
-		{
-			TranslationStorage english = ILanguageManager.getEnglish();
-			return english.get(tr.getKey());
-		}
+			return WurstClient.INSTANCE.getTranslator()
+				.translateMcEnglish(tr.getKey());
 		
 		return description.getString();
 	}
 	
 	public String getEnchantmentNameWithLevel()
 	{
-		TranslationStorage english = ILanguageManager.getEnglish();
+		WurstTranslator translator = WurstClient.INSTANCE.getTranslator();
 		Enchantment enchantment = getEnchantment();
 		String name;
 		
 		if(enchantment.description()
 			.getContent() instanceof TranslatableTextContent tr)
-			name = english.get(tr.getKey());
+			name = translator.translateMcEnglish(tr.getKey());
 		else
 			name = enchantment.description().getString();
 		
 		if(enchantment.getMaxLevel() > 1)
-			name += " " + english.get("enchantment.level." + level);
+			name += " "
+				+ translator.translateMcEnglish("enchantment.level." + level);
 		
 		return name;
 	}

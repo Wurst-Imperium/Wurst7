@@ -471,6 +471,8 @@ public final class ClickGui
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		// GL11.glShadeModel(GL11.GL_SMOOTH);
 		RenderSystem.lineWidth(1);
+		MatrixStack matrixStack = context.getMatrices();
+		matrixStack.push();
 		
 		tooltip = "";
 		for(Window window : windows)
@@ -495,12 +497,14 @@ public final class ClickGui
 				else
 					window.stopDraggingScrollbar();
 				
+			matrixStack.translate(0, 0, 300);
 			renderWindow(context, window, mouseX, mouseY, partialTicks);
 		}
 		
 		renderPopups(context, mouseX, mouseY);
 		renderTooltip(context, mouseX, mouseY);
 		
+		matrixStack.pop();
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
@@ -562,8 +566,7 @@ public final class ClickGui
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// background
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			ttOpacity);
+		RenderUtils.setShaderColor(bgColor, ttOpacity);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xt1, yt1, 0);
@@ -573,7 +576,7 @@ public final class ClickGui
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xt1, yt1, 0);
@@ -599,12 +602,18 @@ public final class ClickGui
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		RenderSystem.lineWidth(1);
+		MatrixStack matrixStack = context.getMatrices();
+		matrixStack.push();
 		
 		for(Window window : windows)
 			if(window.isPinned() && !window.isInvisible())
+			{
+				matrixStack.translate(0, 0, 300);
 				renderWindow(context, window, Integer.MIN_VALUE,
 					Integer.MIN_VALUE, partialTicks);
-			
+			}
+		
+		matrixStack.pop();
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
@@ -673,8 +682,7 @@ public final class ClickGui
 				int ys4 = ys3 + (int)scrollbarHeight;
 				
 				// window background
-				RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-					opacity);
+				RenderUtils.setShaderColor(bgColor, opacity);
 				
 				BufferBuilder bufferBuilder = tessellator
 					.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
@@ -696,7 +704,7 @@ public final class ClickGui
 					&& mouseX < xs2 && mouseY < ys4;
 				
 				// scrollbar
-				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
+				RenderUtils.setShaderColor(acColor,
 					hovering ? opacity * 1.5F : opacity);
 				
 				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
@@ -708,8 +716,7 @@ public final class ClickGui
 				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 				
 				// outline
-				RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-					0.5F);
+				RenderUtils.setShaderColor(acColor, 0.5F);
 				
 				bufferBuilder =
 					tessellator.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
@@ -729,8 +736,7 @@ public final class ClickGui
 			
 			// window background
 			// left & right
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-				opacity);
+			RenderUtils.setShaderColor(bgColor, opacity);
 			
 			BufferBuilder bufferBuilder = tessellator
 				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
@@ -754,8 +760,7 @@ public final class ClickGui
 			matrixStack.translate(x1, y4, 0);
 			matrix = matrixStack.peek().getPositionMatrix();
 			
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-				opacity);
+			RenderUtils.setShaderColor(bgColor, opacity);
 			bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION);
 			
@@ -808,7 +813,7 @@ public final class ClickGui
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 		// window outline
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		
 		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
@@ -862,8 +867,7 @@ public final class ClickGui
 		
 		// title bar background
 		// above & below buttons
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-			opacity);
+		RenderUtils.setShaderColor(acColor, opacity);
 		
 		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
@@ -906,7 +910,7 @@ public final class ClickGui
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		// button background
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+		RenderUtils.setShaderColor(bgColor,
 			hovering ? opacity * 1.5F : opacity);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
@@ -917,8 +921,7 @@ public final class ClickGui
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// background between buttons
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-			opacity);
+		RenderUtils.setShaderColor(acColor, opacity);
 		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x2, y1, 0);
@@ -928,7 +931,7 @@ public final class ClickGui
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// button outline
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x1, y1, 0);

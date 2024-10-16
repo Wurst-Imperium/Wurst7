@@ -26,12 +26,14 @@ public final class FilterVillagersSetting extends EntityFilterCheckbox
 	public static FilterVillagersSetting genericCombat(boolean checked)
 	{
 		return new FilterVillagersSetting(
-			"Won't attack villagers and wandering traders.", checked);
+			"description.wurst.setting.generic.filter_villagers_combat",
+			checked);
 	}
 	
 	public static FilterVillagersSetting genericVision(boolean checked)
 	{
 		return new FilterVillagersSetting(
-			"Won't show villagers and wandering traders.", checked);
+			"description.wurst.setting.generic.filter_villagers_vision",
+			checked);
 	}
 }

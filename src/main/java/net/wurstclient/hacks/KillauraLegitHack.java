@@ -83,8 +83,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	
 	private final SwingHandSetting swingHand =
 		SwingHandSetting.withoutOffOption(
-			"How KillauraLegit should swing your hand when attacking.",
-			SwingHand.CLIENT);
+			SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",
@@ -224,7 +223,6 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 			return;
 		
 		// attack entity
-		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(MC.player, target);
 		swingHand.swing(Hand.MAIN_HAND);
 		speed.resetTimer(speedRandMS.getValue());

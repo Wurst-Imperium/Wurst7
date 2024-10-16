@@ -44,11 +44,11 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.ChunkSearcher;
-import net.wurstclient.util.ChunkSearcherCoordinator;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.chunk.ChunkSearcher;
+import net.wurstclient.util.chunk.ChunkSearcherCoordinator;
 
 @SearchTags({"cave finder"})
 public final class CaveFinderHack extends Hack
@@ -186,8 +186,7 @@ public final class CaveFinderHack extends Hack
 		if(opacity.getValue() > 0)
 			alpha = opacity.getValueF();
 		
-		float[] colorF = color.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], alpha);
+		color.setAsShaderColor(alpha);
 		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();

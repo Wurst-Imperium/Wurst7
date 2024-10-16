@@ -50,8 +50,6 @@ public final class FilterFlyingSetting extends SliderSetting
 	public static FilterFlyingSetting genericCombat(double value)
 	{
 		return new FilterFlyingSetting(
-			"Won't attack players that are at least the given distance above ground.\n\n"
-				+ "Useful for servers that try to detect your hacks by placing a flying bot near you.",
-			value);
+			"description.wurst.setting.generic.filter_flying_combat", value);
 	}
 }

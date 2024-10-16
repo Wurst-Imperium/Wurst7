@@ -102,8 +102,9 @@ public final class ExcavatorHack extends Hack
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().nukerLegitHack.setEnabled(false);
 		WURST.getHax().speedNukerHack.setEnabled(false);
-		// WURST.getHax().templateToolHack.setEnabled(false);
+		WURST.getHax().templateToolHack.setEnabled(false);
 		WURST.getHax().tunnellerHack.setEnabled(false);
+		WURST.getHax().veinMinerHack.setEnabled(false);
 		
 		step = Step.START_POS;
 		

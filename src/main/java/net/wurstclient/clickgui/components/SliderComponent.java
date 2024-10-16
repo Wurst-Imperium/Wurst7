@@ -29,6 +29,7 @@ import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.screens.EditSliderScreen;
 import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.util.RenderUtils;
 
 public final class SliderComponent extends Component
 {
@@ -175,8 +176,7 @@ public final class SliderComponent extends Component
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		
@@ -238,8 +238,7 @@ public final class SliderComponent extends Component
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// background
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			hSlider ? opacity * 1.5F : opacity);
+		RenderUtils.setShaderColor(bgColor, hSlider ? opacity * 1.5F : opacity);
 		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xl1, y4, 0);
@@ -249,7 +248,7 @@ public final class SliderComponent extends Component
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
+		RenderUtils.setShaderColor(acColor, 0.5F);
 		bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, x3, y4, 0);
@@ -276,10 +275,9 @@ public final class SliderComponent extends Component
 		if(renderAsDisabled)
 			RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 0.75F);
 		else
-		{
-			float[] c = setting.getKnobColor();
-			RenderSystem.setShaderColor(c[0], c[1], c[2], hSlider ? 1 : 0.75F);
-		}
+			RenderUtils.setShaderColor(setting.getKnobColor(),
+				hSlider ? 1 : 0.75F);
+		
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		bufferBuilder.vertex(matrix, xk1, yk1, 0);

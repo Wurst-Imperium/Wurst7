@@ -143,9 +143,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 				
 				GL11.glEnable(GL11.GL_BLEND);
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				float[] colorF = color.getColorF();
-				RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2],
-					0.5F);
+				color.setAsShaderColor(0.5F);
 				RenderUtils.drawOutlinedBox(new Box(-0.5, 0, -0.5, 0.5, 1, 0.5),
 					matrixStack);
 				
@@ -164,8 +162,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		float[] colorF = color.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], 0.5F);
+		color.setAsShaderColor(0.5F);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();

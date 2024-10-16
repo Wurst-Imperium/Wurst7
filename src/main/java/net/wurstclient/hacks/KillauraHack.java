@@ -77,8 +77,7 @@ public final class KillauraHack extends Hack
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How Killaura should swing your hand when attacking.",
-		SwingHand.CLIENT);
+		SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",
@@ -192,7 +191,6 @@ public final class KillauraHack extends Hack
 		if(target == null)
 			return;
 		
-		WURST.getHax().criticalsHack.doCritical();
 		MC.interactionManager.attackEntity(MC.player, target);
 		swingHand.swing(Hand.MAIN_HAND);
 		

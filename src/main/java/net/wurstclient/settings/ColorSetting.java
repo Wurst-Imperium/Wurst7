@@ -15,6 +15,7 @@ import java.util.Set;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
@@ -23,22 +24,28 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.ColorUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public final class ColorSetting extends Setting
 {
 	private Color color;
 	private final Color defaultColor;
 	
-	public ColorSetting(String name, String description, Color color)
+	public ColorSetting(String name, WText description, Color color)
 	{
 		super(name, description);
 		this.color = Objects.requireNonNull(color);
 		defaultColor = color;
 	}
 	
+	public ColorSetting(String name, String descriptionKey, Color color)
+	{
+		this(name, WText.translated(descriptionKey), color);
+	}
+	
 	public ColorSetting(String name, Color color)
 	{
-		this(name, "", color);
+		this(name, WText.empty(), color);
 	}
 	
 	public Color getColor()
@@ -54,9 +61,20 @@ public final class ColorSetting extends Setting
 		return new float[]{red, green, blue};
 	}
 	
+	public void setAsShaderColor(float opacity)
+	{
+		float[] rgb = getColorF();
+		RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], opacity);
+	}
+	
 	public int getColorI()
 	{
-		return color.getRGB();
+		return color.getRGB() | 0xFF000000;
+	}
+	
+	public int getColorI(int alpha)
+	{
+		return color.getRGB() & 0x00FFFFFF | alpha << 24;
 	}
 	
 	public int getRed()
@@ -119,7 +137,7 @@ public final class ColorSetting extends Setting
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "Color");
 		json.addProperty("defaultColor", ColorUtils.toHex(defaultColor));
 		return json;

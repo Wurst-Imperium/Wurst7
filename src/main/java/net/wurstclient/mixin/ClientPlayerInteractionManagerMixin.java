@@ -20,6 +20,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
@@ -33,6 +34,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
+import net.wurstclient.events.PlayerAttacksEntityListener.PlayerAttacksEntityEvent;
 import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
@@ -59,6 +61,17 @@ public abstract class ClientPlayerInteractionManagerMixin
 	private void onStopUsingItem(PlayerEntity player, CallbackInfo ci)
 	{
 		EventManager.fire(StopUsingItemEvent.INSTANCE);
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "attackEntity(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/entity/Entity;)V")
+	private void onAttackEntity(PlayerEntity player, Entity target,
+		CallbackInfo ci)
+	{
+		if(player != client.player)
+			return;
+		
+		EventManager.fire(new PlayerAttacksEntityEvent(target));
 	}
 	
 	@Override

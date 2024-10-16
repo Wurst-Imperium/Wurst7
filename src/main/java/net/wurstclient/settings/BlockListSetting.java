@@ -30,13 +30,14 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
-public final class BlockListSetting extends Setting
+public class BlockListSetting extends Setting
 {
 	private final ArrayList<String> blockNames = new ArrayList<>();
 	private final String[] defaultNames;
 	
-	public BlockListSetting(String name, String description, String... blocks)
+	public BlockListSetting(String name, WText description, String... blocks)
 	{
 		super(name, description);
 		
@@ -47,9 +48,40 @@ public final class BlockListSetting extends Setting
 		defaultNames = blockNames.toArray(new String[0]);
 	}
 	
+	public BlockListSetting(String name, String descriptionKey,
+		String... blocks)
+	{
+		this(name, WText.translated(descriptionKey), blocks);
+	}
+	
 	public List<String> getBlockNames()
 	{
 		return Collections.unmodifiableList(blockNames);
+	}
+	
+	public int indexOf(String name)
+	{
+		return Collections.binarySearch(blockNames, name);
+	}
+	
+	public int indexOf(Block block)
+	{
+		return indexOf(BlockUtils.getName(block));
+	}
+	
+	public boolean contains(String name)
+	{
+		return indexOf(name) >= 0;
+	}
+	
+	public boolean contains(Block block)
+	{
+		return indexOf(block) >= 0;
+	}
+	
+	public int size()
+	{
+		return blockNames.size();
 	}
 	
 	public void add(Block block)
@@ -130,7 +162,7 @@ public final class BlockListSetting extends Setting
 		JsonObject json = new JsonObject();
 		
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "BlockList");
 		
 		JsonArray defaultBlocksJson = new JsonArray();
