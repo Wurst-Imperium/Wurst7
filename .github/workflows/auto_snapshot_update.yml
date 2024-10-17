@@ -115,5 +115,5 @@ jobs:
         git config --global user.email 'contact.wurstimperium@gmail.com'
         git add .
         git commit -m "[Wurst-Bot] Update to ${{ github.event.inputs.mc_version }}"
-        git push
+        git push --set-upstream origin ${{ github.event.inputs.mc_version }}
       shell: bash
