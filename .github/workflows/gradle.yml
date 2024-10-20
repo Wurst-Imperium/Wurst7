@@ -47,8 +47,8 @@ jobs:
       if: ${{ github.event_name == 'push' }}
       uses: gradle/actions/dependency-submission@v4
 
-    - name: Execute Gradle build
-      run: ./gradlew spotlessCheck build --stacktrace --warning-mode=fail
+    - name: Run tests and build
+      run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: VirusTotal scan
       if: ${{ github.event_name == 'push' }}
