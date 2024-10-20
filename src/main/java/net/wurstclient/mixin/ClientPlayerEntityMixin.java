@@ -270,7 +270,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	protected boolean clipAtLedge()
 	{
 		return super.clipAtLedge()
-			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
+			|| WurstClient.INSTANCE.getHax().safeWalkHack.shouldClip();
 	}
 	
 	/**
@@ -283,8 +283,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		Vec3d result = super.adjustMovementForSneaking(movement, type);
 		
 		if(movement != null)
-			WurstClient.INSTANCE.getHax().safeWalkHack
-				.onClipAtLedge(!movement.equals(result));
+			WurstClient.INSTANCE.getHax().safeWalkHack.onClipAtLedge();
 		
 		return result;
 	}
@@ -315,7 +314,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			.adjustStepHeight(super.getStepHeight());
 	}
 	
-	// getter for GENERIC_BLOCK_INTERACTION_RANGE
 	@Override
 	public double getBlockInteractionRange()
 	{
@@ -326,7 +324,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		return hax.reachHack.getReachDistance();
 	}
 	
-	// getter for GENERIC_ENTITY_INTERACTION_RANGE
 	@Override
 	public double getEntityInteractionRange()
 	{

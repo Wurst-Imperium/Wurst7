@@ -50,7 +50,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		Priority.values(), Priority.ANGLE);
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How TP-Aura should swing your hand when attacking.", SwingHand.CLIENT);
+		SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
 	
 	private final PauseAttackOnContainersSetting pauseOnContainers =
 		new PauseAttackOnContainersSetting(true);

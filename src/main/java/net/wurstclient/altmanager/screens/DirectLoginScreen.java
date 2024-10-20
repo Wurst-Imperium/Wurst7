@@ -24,7 +24,8 @@ public final class DirectLoginScreen extends AltEditorScreen
 	@Override
 	protected String getDoneButtonText()
 	{
-		return "Login";
+		return getPassword().isEmpty() ? "Change Cracked Name"
+			: "Login with Password";
 	}
 	
 	@Override

@@ -12,6 +12,10 @@ import java.util.stream.Stream;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.AxeItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.item.SwordItem;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.MouseUpdateListener;
@@ -50,6 +54,10 @@ public final class AimAssistHack extends Hack
 			"description.wurst.setting.aimassist.ignore_mouse_input", 0, 0, 1,
 			0.01, ValueDisplay.PERCENTAGE);
 	
+	private final CheckboxSetting onlyHoldingWeapon = new CheckboxSetting(
+		"Only if holding weapon",
+		"Won't aim if not holding a weapon (Swords, axes & sticks.)", false);
+	
 	private final CheckboxSetting checkLOS =
 		new CheckboxSetting("Check line of sight",
 			"description.wurst.setting.aimassist.check_line_of_sight", true);
@@ -60,6 +68,8 @@ public final class AimAssistHack extends Hack
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
+			FilterTeammatesSetting.genericCombat(false),
+			FilterNpcLikeSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),
 			FilterFlyingSetting.genericCombat(0),
 			FilterHostileSetting.genericCombat(false),
@@ -103,6 +113,7 @@ public final class AimAssistHack extends Hack
 		addSetting(ignoreMouseInput);
 		addSetting(checkLOS);
 		addSetting(aimWhileBlocking);
+		addSetting(onlyHoldingWeapon);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -141,6 +152,14 @@ public final class AimAssistHack extends Hack
 		// don't aim when a container/inventory screen is open
 		if(MC.currentScreen instanceof HandledScreen)
 			return;
+		
+		Item itemInHand = MC.player.getInventory().getMainHandStack().getItem();
+		if(onlyHoldingWeapon.isChecked() && !(itemInHand instanceof SwordItem
+			|| itemInHand instanceof AxeItem || itemInHand == Items.STICK))
+		{
+			target = null;
+			return;
+		}
 		
 		if(!aimWhileBlocking.isChecked() && MC.player.isUsingItem())
 			return;

@@ -77,8 +77,7 @@ public final class KillauraHack extends Hack
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How Killaura should swing your hand when attacking.",
-		SwingHand.CLIENT);
+		SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",

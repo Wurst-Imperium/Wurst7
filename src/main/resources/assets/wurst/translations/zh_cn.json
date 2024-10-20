@@ -103,7 +103,7 @@
   "description.wurst.hack.masstpa": "给每个人发送 TPA 请求。\n\n§c§l警告：§r当在国内服务器使用会因为 Wurst 无法判断中文返回消息而导致 TPA 请求继续。",
   "description.wurst.hack.mileycyrus": "类似疯狂按 Shift 潜行。",
   "description.wurst.hack.mobesp": "高亮附近的生物。",
-  "description.wurst.hack.mobspawnesp": "高亮生物可以生成的区域。\n§e黄色§r 可以在夜间生成\n§c红色§r - 可以在任意时候生成",
+  "description.wurst.hack.mobspawnesp": "高亮生物可以生成的区域。",
   "description.wurst.hack.multiaura": "比 Killaura 更高级，能同时攻击多个实体。",
   "description.wurst.hack.nameprotect": "隐藏所有玩家的名字。",
   "description.wurst.hack.nametags": "改变名字大小使你更容易看到他们，同时也能让你看到那些潜行玩家的名字。",

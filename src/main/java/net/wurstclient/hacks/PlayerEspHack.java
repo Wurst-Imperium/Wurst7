@@ -77,6 +77,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	@Override
 	protected void onEnable()
 	{
+		WURST.getHax().teamEspHack.setEnabled(false);
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
