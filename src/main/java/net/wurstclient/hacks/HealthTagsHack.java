@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -49,13 +48,13 @@ public final class HealthTagsHack extends Hack implements RenderListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(RenderListener.class, this);
 	}
@@ -66,8 +65,8 @@ public final class HealthTagsHack extends Hack implements RenderListener
 		if(!mobs.isChecked())
 			return;
 		
-		VertexConsumerProvider.Immediate immediate = VertexConsumerProvider
-			.immediate(Tessellator.getInstance().getBuffer());
+		VertexConsumerProvider.Immediate immediate =
+			MC.getBufferBuilders().getEntityVertexConsumers();
 		
 		for(Entity e : MC.world.getEntities())
 		{

@@ -8,6 +8,7 @@
 package net.wurstclient.util;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
@@ -19,6 +20,7 @@ import net.minecraft.client.font.TextRenderer.TextLayerType;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -781,7 +783,8 @@ public enum RenderUtils
 			.subtract(camPos).add(0, entity.getHeight() + vOffset, 0);
 		matrixStack.translate(tagPos.x, tagPos.y, tagPos.z);
 		
-		matrixStack.multiply(dispatcher.getRotation());
+		matrixStack.multiply(dispatcher.getRotation().rotateY((float)Math.PI,
+			new Quaternionf()));
 		
 		float scale = 0.025F;
 		if(nameTags.isEnabled())
