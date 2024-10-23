@@ -49,6 +49,51 @@ loom {
 	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
 }
 
+configurations {
+	productionRuntime {
+		extendsFrom configurations.minecraftLibraries
+		extendsFrom configurations.loaderLibraries
+		extendsFrom configurations.minecraftRuntimeLibraries
+	}
+}
+
+dependencies {
+	productionRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
+	productionRuntime "net.fabricmc:intermediary:${project.minecraft_version}"
+}
+
+import net.fabricmc.loom.util.Platform
+tasks.register('runEndToEndTest', JavaExec) {
+	dependsOn remapJar, downloadAssets
+	classpath.from configurations.productionRuntime
+	mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient"
+	workingDir = file("run")
+
+	doFirst {
+		classpath.from loom.minecraftProvider.minecraftClientJar
+		workingDir.mkdirs()
+
+		args(
+			"--assetIndex", loom.minecraftProvider.versionInfo.assetIndex().fabricId(loom.minecraftProvider.minecraftVersion()),
+			"--assetsDir", new File(loom.files.userCache, "assets").absolutePath,
+			"--gameDir", workingDir.absolutePath
+		)
+
+		if (Platform.CURRENT.operatingSystem.isMacOS()) {
+			jvmArgs("-XstartOnFirstThread")
+		}
+
+		jvmArgs(
+			"-Dfabric.addMods=${configurations.modImplementation.find { it.name.contains('fabric-api') }.absolutePath}${File.pathSeparator}${remapJar.archiveFile.get().asFile.absolutePath}",
+			"-Dwurst.e2eTest",
+			"-Dfabric-tag-conventions-v2.missingTagTranslationWarning=fail",
+			"-Dfabric-tag-conventions-v1.legacyTagWarning=fail",
+			"-Dmixin.debug.verify=true",
+			"-Dmixin.debug.countInjections=true"
+		)
+	}
+}
+
 processResources {
 	inputs.property "version", project.version
 	
