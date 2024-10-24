@@ -184,7 +184,7 @@ public class PathFinder
 		}
 		
 		// up
-		if(pos.getY() < MC.world.getTopY() && canGoThrough(up.up())
+		if(pos.getY() < MC.world.getTopYInclusive() && canGoThrough(up.up())
 			&& (flying || onGround || canClimbUpAt(pos))
 			&& (flying || canClimbUpAt(pos) || goal.equals(up)
 				|| canSafelyStandOn(north) || canSafelyStandOn(east)

@@ -31,17 +31,16 @@ public final class LsdHack extends Hack
 			return;
 		}
 		
-		if(MC.gameRenderer.getPostProcessor() != null)
-			MC.gameRenderer.disablePostProcessor();
+		if(MC.gameRenderer.getPostProcessorId() != null)
+			MC.gameRenderer.clearPostProcessor();
 		
-		MC.gameRenderer
-			.loadPostProcessor(Identifier.of("shaders/post/lsd.json"));
+		MC.gameRenderer.setPostProcessor(Identifier.of("wurst", "lsd"));
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		if(MC.gameRenderer.getPostProcessor() != null)
-			MC.gameRenderer.disablePostProcessor();
+		if(MC.gameRenderer.getPostProcessorId() != null)
+			MC.gameRenderer.clearPostProcessor();
 	}
 }

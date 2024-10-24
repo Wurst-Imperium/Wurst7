@@ -148,9 +148,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		boolean noButtons = Screens.getButtons(this).isEmpty();
 		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		
-		// scissor box
-		RenderUtils.scissorBox(bgx1, bgy1, bgx2, bgy3);
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.enableScissor(context, bgx1, bgy1, bgx2, bgy3);
 		
 		// possible keybinds
 		hoveredKey = "";
@@ -204,8 +202,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		}
 		GL11.glEnable(GL11.GL_BLEND);
 		
-		// scissor box
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.disableScissor(context);
 		
 		// buttons below scissor box
 		for(ClickableWidget button : Screens.getButtons(this))

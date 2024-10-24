@@ -16,9 +16,9 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
@@ -176,7 +176,8 @@ public final class FeedAuraHack extends Hack
 		if(!actionResult.isAccepted())
 			actionResult = im.interactEntity(player, target, hand);
 		
-		if(actionResult.isAccepted() && actionResult.shouldSwingHand())
+		if(actionResult instanceof ActionResult.Success success
+			&& success.swingSource() == ActionResult.SwingSource.CLIENT)
 			player.swingHand(hand);
 		
 		target = null;
@@ -219,7 +220,7 @@ public final class FeedAuraHack extends Hack
 		matrixStack.scale(p, p, p);
 		matrixStack.translate(-0.5, -0.5, -0.5);
 		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(box, matrixStack);

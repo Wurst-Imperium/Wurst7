@@ -14,11 +14,11 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -244,7 +244,7 @@ public abstract class NavigatorScreen extends Screen
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
@@ -269,7 +269,7 @@ public abstract class NavigatorScreen extends Screen
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// outline
 		RenderUtils.setShaderColor(acColor, 0.5F);
@@ -288,7 +288,7 @@ public abstract class NavigatorScreen extends Screen
 		yi1 -= 0.9;
 		yi2 += 0.9;
 		
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
@@ -337,7 +337,7 @@ public abstract class NavigatorScreen extends Screen
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// outline
 		float yi1 = y1 + 0.1F;
@@ -349,7 +349,7 @@ public abstract class NavigatorScreen extends Screen
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// shadow
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);

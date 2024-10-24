@@ -55,20 +55,22 @@ public final class AntiHungerHack extends Hack implements PacketOutputListener
 		double z = oldPacket.getZ(-1);
 		float yaw = oldPacket.getYaw(-1);
 		float pitch = oldPacket.getPitch(-1);
+		boolean horizontalCollision = oldPacket.horizontalCollision();
 		
 		Packet<?> newPacket;
 		if(oldPacket.changesPosition())
 			if(oldPacket.changesLook())
-				newPacket =
-					new PlayerMoveC2SPacket.Full(x, y, z, yaw, pitch, false);
+				newPacket = new PlayerMoveC2SPacket.Full(x, y, z, yaw, pitch,
+					false, horizontalCollision);
 			else
-				newPacket =
-					new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, false);
+				newPacket = new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z,
+					false, horizontalCollision);
 		else if(oldPacket.changesLook())
-			newPacket =
-				new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, false);
+			newPacket = new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch,
+				false, horizontalCollision);
 		else
-			newPacket = new PlayerMoveC2SPacket.OnGroundOnly(false);
+			newPacket = new PlayerMoveC2SPacket.OnGroundOnly(false,
+				horizontalCollision);
 		
 		event.setPacket(newPacket);
 	}

@@ -18,7 +18,7 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -262,7 +262,7 @@ public final class VeinMinerHack extends Hack
 		Box box = new Box(boxMin, boxMin, boxMin, boxMax, boxMax, boxMax)
 			.offset(region.negate().toVec3d());
 		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
 		for(BlockPos pos : currentVein)
 			RenderUtils.drawOutlinedBox(box.offset(pos), matrixStack);

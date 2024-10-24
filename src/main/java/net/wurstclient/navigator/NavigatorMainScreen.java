@@ -17,12 +17,12 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -254,8 +254,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(!clickTimerRunning)
 			hoveredFeature = -1;
 		
-		RenderUtils.scissorBox(0, 59, width, height - 42);
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.enableScissor(context, 0, 59, width, height - 42);
 		
 		for(int i = Math.max(-scroll * 3 / 20 - 3, 0); i < navigatorDisplayList
 			.size(); i++)
@@ -272,7 +271,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				featureY);
 		}
 		
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.disableScissor(context);
 		
 		// tooltip
 		if(tooltip != null)
@@ -298,7 +297,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			RenderSystem.setShader(GameRenderer::getPositionProgram);
+			RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			
 			// background
 			RenderUtils.setShaderColor(bgColor, 0.75F);
@@ -418,7 +417,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// separator
 		int bx1 = area.x + area.width - area.height;
@@ -467,7 +466,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// text
 		if(!clickTimerRunning)
 		{
-			RenderSystem.setShader(GameRenderer::getPositionProgram);
+			RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			String buttonText = feature.getName();
 			context.drawText(client.textRenderer, buttonText, area.x + 4,

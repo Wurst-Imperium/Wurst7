@@ -17,13 +17,13 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -150,7 +150,7 @@ public abstract class ListWidget extends AbstractParentElement
 			RenderSystem.enableBlend();
 			RenderSystem.setShaderTexture(0, MENU_LIST_BACKGROUND_TEXTURE);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
-			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+			RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
 			
 			BufferBuilder bufferBuilder =
 				tessellator.begin(VertexFormat.DrawMode.QUADS,
@@ -219,7 +219,7 @@ public abstract class ListWidget extends AbstractParentElement
 				if(p < top)
 					p = top;
 				
-				RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+				RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 					VertexFormats.POSITION_COLOR);
 				bufferBuilder.vertex(i, bottom, 0).color(0, 0, 0, 255);
@@ -374,7 +374,6 @@ public abstract class ListWidget extends AbstractParentElement
 		float f)
 	{
 		int m = getItemCount();
-		Tessellator tessellator = Tessellator.getInstance();
 		
 		for(int n = 0; n < m; ++n)
 		{
@@ -383,30 +382,16 @@ public abstract class ListWidget extends AbstractParentElement
 			if(o > bottom || o + p < top)
 				updateItemPosition(n, i, o, f);
 			
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			if(renderSelection && isSelectedItem(n))
 			{
 				int q = left + width / 2 - getRowWidth() / 2;
 				int r = left + width / 2 + getRowWidth() / 2;
-				float g = isFocused() ? 1 : 0.5F;
-				RenderSystem.setShaderColor(g, g, g, 1);
-				BufferBuilder bufferBuilder = tessellator
-					.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-				bufferBuilder.vertex(q, o + p + 2, 0);
-				bufferBuilder.vertex(r, o + p + 2, 0);
-				bufferBuilder.vertex(r, o - 2, 0);
-				bufferBuilder.vertex(q, o - 2, 0);
-				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-				RenderSystem.setShaderColor(0, 0, 0, 1);
-				bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
-					VertexFormats.POSITION);
-				bufferBuilder.vertex(q + 1, o + p + 1, 0);
-				bufferBuilder.vertex(r - 1, o + p + 1, 0);
-				bufferBuilder.vertex(r - 1, o - 1, 0);
-				bufferBuilder.vertex(q + 1, o - 1, 0);
-				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+				context.fill(q, o - 2, r, o + p + 2,
+					isFocused() ? 0xFFFFFFFF : 0xFF808080);
+				context.fill(q + 1, o - 1, r - 1, o + p + 1, 0xFF000000);
 			}
 			
-			RenderSystem.setShaderColor(1, 1, 1, 1);
 			renderItem(context, n, i, o, p, k, l, f);
 		}
 		
@@ -430,7 +415,7 @@ public abstract class ListWidget extends AbstractParentElement
 		RenderSystem.enableBlend();
 		RenderSystem.setShaderTexture(0, MENU_LIST_BACKGROUND_TEXTURE);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
 		
 		BufferBuilder bufferBuilder = tessellator.begin(
 			VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
@@ -458,7 +443,7 @@ public abstract class ListWidget extends AbstractParentElement
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 1);
 		BufferBuilder bufferBuilder = tessellator

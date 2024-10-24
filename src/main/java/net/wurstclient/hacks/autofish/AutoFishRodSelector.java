@@ -136,25 +136,26 @@ public final class AutoFishRodSelector
 			return -1;
 		
 		DynamicRegistryManager drm = MC.world.getRegistryManager();
-		Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+		Registry<Enchantment> registry =
+			drm.getOrThrow(RegistryKeys.ENCHANTMENT);
 		
 		Optional<Reference<Enchantment>> luckOTS =
-			registry.getEntry(Enchantments.LUCK_OF_THE_SEA);
+			registry.getOptional(Enchantments.LUCK_OF_THE_SEA);
 		int luckOTSLvl = luckOTS
 			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
 		
 		Optional<Reference<Enchantment>> lure =
-			registry.getEntry(Enchantments.LURE);
+			registry.getOptional(Enchantments.LURE);
 		int lureLvl = lure
 			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
 		
 		Optional<Reference<Enchantment>> unbreaking =
-			registry.getEntry(Enchantments.UNBREAKING);
+			registry.getOptional(Enchantments.UNBREAKING);
 		int unbreakingLvl = unbreaking
 			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
 		
 		Optional<Reference<Enchantment>> mending =
-			registry.getEntry(Enchantments.MENDING);
+			registry.getOptional(Enchantments.MENDING);
 		int mendingBonus = mending
 			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
 		
