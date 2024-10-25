@@ -47,7 +47,7 @@ dependencies {
 	// Override vulnerable msal4j dependency until Minecraft updates to a newer version
 	constraints {
 		// v1.15.0, used by Minecraft 1.21.3, is vulnerable to CVE-2024-35255
-		implementation('com.microsoft.azure:msal4j:1.15.1') {
+		implementation('com.microsoft.azure:msal4j:1.17.2') {
 			force = true
 		}
 	}
