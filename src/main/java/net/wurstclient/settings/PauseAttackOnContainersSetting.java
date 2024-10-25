@@ -8,8 +8,9 @@
 package net.wurstclient.settings;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.wurstclient.WurstClient;
 
 public final class PauseAttackOnContainersSetting extends CheckboxSetting
@@ -35,6 +36,7 @@ public final class PauseAttackOnContainersSetting extends CheckboxSetting
 		Screen screen = WurstClient.MC.currentScreen;
 		
 		return screen instanceof HandledScreen
-			&& !(screen instanceof AbstractInventoryScreen);
+			&& !(screen instanceof InventoryScreen
+				|| screen instanceof CreativeInventoryScreen);
 	}
 }

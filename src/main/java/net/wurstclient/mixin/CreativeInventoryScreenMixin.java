@@ -12,9 +12,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen.CreativeScreenHandler;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
@@ -22,7 +22,7 @@ import net.wurstclient.WurstClient;
 
 @Mixin(CreativeInventoryScreen.class)
 public abstract class CreativeInventoryScreenMixin
-	extends AbstractInventoryScreen<CreativeScreenHandler>
+	extends HandledScreen<CreativeInventoryScreen.CreativeScreenHandler>
 {
 	private CreativeInventoryScreenMixin(WurstClient wurst,
 		CreativeScreenHandler screenHandler, PlayerInventory inventory,

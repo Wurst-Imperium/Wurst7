@@ -22,14 +22,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.block.TorchBlock;
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -210,7 +211,7 @@ public final class TunnellerHack extends Hack
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		for(int i = 0; i < vertexBuffers.length; i++)
 		{
@@ -270,7 +271,7 @@ public final class TunnellerHack extends Hack
 		if(vertexBuffers[0] != null)
 			vertexBuffers[0].close();
 		
-		vertexBuffers[0] = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		vertexBuffers[0] = new VertexBuffer(GlUsage.STATIC_WRITE);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator
@@ -417,7 +418,7 @@ public final class TunnellerHack extends Hack
 			BuiltBuffer buffer = bufferBuilder.endNullable();
 			if(buffer != null)
 			{
-				vertexBuffers[1] = new VertexBuffer(VertexBuffer.Usage.STATIC);
+				vertexBuffers[1] = new VertexBuffer(GlUsage.STATIC_WRITE);
 				vertexBuffers[1].bind();
 				vertexBuffers[1].upload(buffer);
 				VertexBuffer.unbind();
@@ -518,7 +519,7 @@ public final class TunnellerHack extends Hack
 				for(BlockPos pos : blocks)
 					RenderUtils.drawOutlinedBox(box.offset(pos), bufferBuilder);
 				
-				vertexBuffers[2] = new VertexBuffer(VertexBuffer.Usage.STATIC);
+				vertexBuffers[2] = new VertexBuffer(GlUsage.STATIC_WRITE);
 				vertexBuffers[2].bind();
 				vertexBuffers[2].upload(bufferBuilder.end());
 				VertexBuffer.unbind();
@@ -666,7 +667,7 @@ public final class TunnellerHack extends Hack
 				
 				BuiltBuffer buffer = bufferBuilder.end();
 				
-				vertexBuffers[3] = new VertexBuffer(VertexBuffer.Usage.STATIC);
+				vertexBuffers[3] = new VertexBuffer(GlUsage.STATIC_WRITE);
 				vertexBuffers[3].bind();
 				vertexBuffers[3].upload(buffer);
 				VertexBuffer.unbind();
@@ -753,7 +754,7 @@ public final class TunnellerHack extends Hack
 			Vec3d torchVec =
 				Vec3d.ofBottomCenter(nextTorch).subtract(region.toVec3d());
 			
-			vertexBuffers[4] = new VertexBuffer(VertexBuffer.Usage.STATIC);
+			vertexBuffers[4] = new VertexBuffer(GlUsage.STATIC_WRITE);
 			RenderUtils.drawArrow(torchVec, torchVec.add(0, 0.5, 0),
 				vertexBuffers[4]);
 			

@@ -16,6 +16,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.util.math.BlockPos;
@@ -83,7 +84,7 @@ public final class ChunkVertexBufferCoordinator extends AbstractChunkCoordinator
 		if(buffer == null)
 			return;
 		
-		VertexBuffer vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		VertexBuffer vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();

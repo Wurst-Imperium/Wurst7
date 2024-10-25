@@ -105,7 +105,7 @@ public final class ChooseNameScreen extends Screen
 		float partialTicks)
 	{
 		// super.render(context, mouseX, mouseY, partialTicks);
-		applyBlur(partialTicks);
+		applyBlur();
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		

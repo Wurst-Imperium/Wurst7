@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -201,7 +201,7 @@ public final class AutoBuildHack extends Hack
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		double boxStart = 1 / 16.0;
 		double boxEnd = 15 / 16.0;

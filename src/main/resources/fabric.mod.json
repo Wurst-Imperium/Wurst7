@@ -17,7 +17,8 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "net.wurstclient.WurstInitializer"
+      "net.wurstclient.WurstInitializer",
+      "net.wurstclient.test.WurstE2ETestClient"
     ]
   },
   "mixins": [
@@ -25,9 +26,9 @@
   ],
   "accessWidener": "wurst.accesswidener",
   "depends": {
-    "fabricloader": ">=0.15.10",
-    "fabric-api": ">=0.99.5",
-    "minecraft": "~1.21-beta.1",
+    "fabricloader": ">=0.16.3",
+    "fabric-api": ">=0.105.3",
+    "minecraft": "~1.21.2-alpha.24.40.a",
     "java": ">=21"
   },
   "suggests": {

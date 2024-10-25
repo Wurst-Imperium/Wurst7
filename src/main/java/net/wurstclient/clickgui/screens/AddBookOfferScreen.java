@@ -360,7 +360,8 @@ public final class AddBookOfferScreen extends Screen
 			this.screen = screen;
 			DynamicRegistryManager drm =
 				WurstClient.MC.world.getRegistryManager();
-			Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+			Registry<Enchantment> registry =
+				drm.getOrThrow(RegistryKeys.ENCHANTMENT);
 			list = registry.stream().map(BookOffer::create)
 				.filter(BookOffer::isFullyValid).sorted()
 				.collect(Collectors.toList());

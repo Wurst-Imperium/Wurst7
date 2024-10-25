@@ -41,7 +41,7 @@ public final class NoFallHack extends Hack implements UpdateListener
 		if(player == null)
 			return getName();
 		
-		if(player.isFallFlying() && !allowElytra.isChecked())
+		if(player.isGliding() && !allowElytra.isChecked())
 			return getName() + " (paused)";
 		
 		if(player.isCreative())
@@ -75,7 +75,7 @@ public final class NoFallHack extends Hack implements UpdateListener
 			return;
 		
 		// pause when flying with elytra, unless allowed
-		boolean fallFlying = player.isFallFlying();
+		boolean fallFlying = player.isGliding();
 		if(fallFlying && !allowElytra.isChecked())
 			return;
 		
@@ -96,7 +96,8 @@ public final class NoFallHack extends Hack implements UpdateListener
 			return;
 		
 		// send packet to stop fall damage
-		player.networkHandler.sendPacket(new OnGroundOnly(true));
+		player.networkHandler
+			.sendPacket(new OnGroundOnly(true, MC.player.horizontalCollision));
 	}
 	
 	private boolean isHoldingMace(ClientPlayerEntity player)

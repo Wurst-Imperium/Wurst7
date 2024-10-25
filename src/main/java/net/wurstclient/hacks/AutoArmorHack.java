@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Optional;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -18,10 +19,9 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.AnimalArmorItem;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorItem.Type;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -37,6 +37,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.InventoryUtils;
+import net.wurstclient.util.ItemUtils;
 
 @SearchTags({"auto armor"})
 public final class AutoArmorHack extends Hack
@@ -106,20 +108,22 @@ public final class AutoArmorHack extends Hack
 			return;
 		
 		// store slots and values of best armor pieces
-		int[] bestArmorSlots = new int[4];
-		int[] bestArmorValues = new int[4];
+		EnumMap<EquipmentSlot, ArmorData> bestArmor =
+			new EnumMap<>(EquipmentSlot.class);
+		ArrayList<EquipmentSlot> armorTypes =
+			new ArrayList<>(Arrays.asList(EquipmentSlot.FEET,
+				EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD));
 		
 		// initialize with currently equipped armor
-		for(int type = 0; type < 4; type++)
+		for(EquipmentSlot type : armorTypes)
 		{
-			bestArmorSlots[type] = -1;
+			bestArmor.put(type, new ArmorData(-1, 0));
 			
-			ItemStack stack = inventory.getArmorStack(type);
-			if(!(stack.getItem() instanceof ArmorItem item)
-				|| item instanceof AnimalArmorItem)
+			ItemStack stack = inventory.getArmorStack(type.getEntitySlotId());
+			if(!MC.player.canEquip(stack, type))
 				continue;
 			
-			bestArmorValues[type] = getArmorValue(item, stack);
+			bestArmor.put(type, new ArmorData(-1, getArmorValue(stack)));
 		}
 		
 		// search inventory for better armor
@@ -127,44 +131,39 @@ public final class AutoArmorHack extends Hack
 		{
 			ItemStack stack = inventory.getStack(slot);
 			
-			if(!(stack.getItem() instanceof ArmorItem item)
-				|| item instanceof AnimalArmorItem)
+			EquipmentSlot armorType = ItemUtils.getArmorSlot(stack.getItem());
+			if(armorType == null)
 				continue;
 			
-			int armorType = item.getSlotType().getEntitySlotId();
-			int armorValue = getArmorValue(item, stack);
+			int armorValue = getArmorValue(stack);
+			ArmorData data = bestArmor.get(armorType);
 			
-			if(armorValue > bestArmorValues[armorType])
-			{
-				bestArmorSlots[armorType] = slot;
-				bestArmorValues[armorType] = armorValue;
-			}
+			if(data == null || armorValue > data.armorValue())
+				bestArmor.put(armorType, new ArmorData(slot, armorValue));
 		}
 		
 		// equip better armor in random order
-		ArrayList<Integer> types = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
-		Collections.shuffle(types);
-		for(int type : types)
+		Collections.shuffle(armorTypes);
+		for(EquipmentSlot type : armorTypes)
 		{
 			// check if better armor was found
-			int slot = bestArmorSlots[type];
-			if(slot == -1)
+			ArmorData data = bestArmor.get(type);
+			if(data == null || data.invSlot() == -1)
 				continue;
 				
 			// check if armor can be swapped
 			// needs 1 free slot where it can put the old armor
-			ItemStack oldArmor = inventory.getArmorStack(type);
+			ItemStack oldArmor =
+				inventory.getArmorStack(type.getEntitySlotId());
 			if(!oldArmor.isEmpty() && inventory.getEmptySlot() == -1)
 				continue;
 			
-			// hotbar fix
-			if(slot < 9)
-				slot += 36;
-			
 			// swap armor
 			if(!oldArmor.isEmpty())
-				IMC.getInteractionManager().windowClick_QUICK_MOVE(8 - type);
-			IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
+				IMC.getInteractionManager()
+					.windowClick_QUICK_MOVE(8 - type.getEntitySlotId());
+			IMC.getInteractionManager().windowClick_QUICK_MOVE(
+				InventoryUtils.toNetworkSlot(data.invSlot()));
 			
 			break;
 		}
@@ -177,35 +176,30 @@ public final class AutoArmorHack extends Hack
 			timer = delay.getValueI();
 	}
 	
-	private int getArmorValue(ArmorItem item, ItemStack stack)
+	private int getArmorValue(ItemStack stack)
 	{
-		int armorPoints = item.getProtection();
+		Item item = stack.getItem();
+		int armorPoints = (int)ItemUtils.getArmorPoints(item);
 		int prtPoints = 0;
-		int armorToughness = (int)item.getToughness();
-		int armorType = item.getMaterial().value().getProtection(Type.LEGGINGS);
+		int armorToughness = (int)ItemUtils.getToughness(item);
 		
 		if(useEnchantments.isChecked())
 		{
 			DynamicRegistryManager drm =
 				WurstClient.MC.world.getRegistryManager();
-			Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+			Registry<Enchantment> registry =
+				drm.getOrThrow(RegistryKeys.ENCHANTMENT);
 			
 			Optional<Reference<Enchantment>> protection =
-				registry.getEntry(Enchantments.PROTECTION);
-			int prtLvl = protection
+				registry.getOptional(Enchantments.PROTECTION);
+			prtPoints = protection
 				.map(entry -> EnchantmentHelper.getLevel(entry, stack))
 				.orElse(0);
-			
-			// ClientPlayerEntity player = MC.player;
-			// DamageSource dmgSource =
-			// player.getDamageSources().playerAttack(player);
-			// prtPoints = protection.getProtectionAmount(prtLvl, dmgSource);
-			
-			// Only the server can calculate protection amount as of
-			// 24w18a (1.21). Related bug: MC-196250
-			prtPoints = prtLvl;
 		}
 		
-		return armorPoints * 5 + prtPoints * 3 + armorToughness + armorType;
+		return armorPoints * 5 + prtPoints * 3 + armorToughness;
 	}
+	
+	private record ArmorData(int invSlot, int armorValue)
+	{}
 }

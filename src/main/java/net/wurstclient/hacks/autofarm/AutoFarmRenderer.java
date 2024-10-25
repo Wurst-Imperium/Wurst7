@@ -17,11 +17,12 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -56,7 +57,7 @@ public final class AutoFarmRenderer
 		
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 		ShaderProgram shader = RenderSystem.getShader();
@@ -121,7 +122,7 @@ public final class AutoFarmRenderer
 		if(blocksToHarvest.isEmpty())
 			return;
 		
-		greenBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		greenBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
@@ -149,7 +150,7 @@ public final class AutoFarmRenderer
 		if(plants.isEmpty())
 			return;
 		
-		cyanBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		cyanBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
@@ -177,7 +178,7 @@ public final class AutoFarmRenderer
 		if(blocksToReplant.isEmpty())
 			return;
 		
-		redBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		redBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		

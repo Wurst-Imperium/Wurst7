@@ -9,12 +9,12 @@ package net.wurstclient.util;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
@@ -33,18 +33,29 @@ public enum RenderUtils
 	
 	private static final Box DEFAULT_BOX = new Box(0, 0, 0, 1, 1, 1);
 	
-	public static void scissorBox(int startX, int startY, int endX, int endY)
+	/**
+	 * Enables a new scissor box with the given coordinates, while avoiding the
+	 * strange side-effects of Minecraft's own enableScissor() method.
+	 */
+	public static void enableScissor(DrawContext context, int x1, int y1,
+		int x2, int y2)
 	{
-		int width = endX - startX;
-		int height = endY - startY;
-		int bottomY = WurstClient.MC.currentScreen.height - endY;
-		double factor = WurstClient.MC.getWindow().getScaleFactor();
-		
-		int scissorX = (int)(startX * factor);
-		int scissorY = (int)(bottomY * factor);
-		int scissorWidth = (int)(width * factor);
-		int scissorHeight = (int)(height * factor);
-		GL11.glScissor(scissorX, scissorY, scissorWidth, scissorHeight);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		context.enableScissor(x1, y1, x2, y2);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+	}
+	
+	/**
+	 * Disables the current scissor box, while avoiding the strange side-effects
+	 * of Minecraft's own disableScissor() method.
+	 */
+	public static void disableScissor(DrawContext context)
+	{
+		context.disableScissor();
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
 	}
 	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack)
@@ -69,17 +80,6 @@ public enum RenderUtils
 	{
 		Vec3d camPos = getCameraPos();
 		matrixStack.translate(-camPos.x, -camPos.y, -camPos.z);
-	}
-	
-	public static void applyCameraRotationOnly()
-	{
-		// no longer necessary for some reason
-		
-		// Camera camera =
-		// WurstClient.MC.getBlockEntityRenderDispatcher().camera;
-		// GL11.glRotated(MathHelper.wrapDegrees(camera.getPitch()), 1, 0, 0);
-		// GL11.glRotated(MathHelper.wrapDegrees(camera.getYaw() + 180.0), 0, 1,
-		// 0);
 	}
 	
 	public static Vec3d getCameraPos()
@@ -137,7 +137,7 @@ public enum RenderUtils
 		float maxZ = (float)bb.maxZ;
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
@@ -237,7 +237,7 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
@@ -462,7 +462,7 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		double midX = (bb.minX + bb.maxX) / 2;
 		double midY = (bb.minY + bb.maxY) / 2;
@@ -574,7 +574,7 @@ public enum RenderUtils
 	
 	public static void drawArrow(Vec3d from, Vec3d to, MatrixStack matrixStack)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator

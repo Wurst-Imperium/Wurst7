@@ -33,6 +33,9 @@ public abstract class StatsScreenMixin extends Screen
 		super(title);
 	}
 	
+	/**
+	 * Adds the hidden "Enable/Disable Wurst" button on the Statistics screen.
+	 */
 	@Inject(at = @At("TAIL"), method = "createButtons()V")
 	private void onCreateButtons(CallbackInfo ci)
 	{
@@ -42,25 +45,18 @@ public abstract class StatsScreenMixin extends Screen
 		toggleWurstButton = ButtonWidget
 			.builder(Text.literal(""), this::toggleWurst).width(150).build();
 		
-		updateWurstButtonText(toggleWurstButton);
-		addDrawableChild(toggleWurstButton);
-	}
-	
-	@Inject(at = @At("TAIL"), method = "initTabNavigation()V")
-	private void onInitTabNavigation(CallbackInfo ci)
-	{
-		if(toggleWurstButton == null)
-			return;
-		
-		ClickableWidget doneButton = wurst_getDoneButton();
+		ClickableWidget doneButton = getDoneButton();
 		doneButton.setX(width / 2 + 2);
 		doneButton.setWidth(150);
 		
 		toggleWurstButton.setPosition(width / 2 - 152, doneButton.getY());
+		
+		updateWurstButtonText(toggleWurstButton);
+		addDrawableChild(toggleWurstButton);
 	}
 	
 	@Unique
-	private ClickableWidget wurst_getDoneButton()
+	private ClickableWidget getDoneButton()
 	{
 		for(ClickableWidget button : Screens.getButtons(this))
 			if(button.getMessage().getString()

@@ -13,10 +13,11 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -61,7 +62,8 @@ public final class WurstLogo
 		// draw Wurst logo
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_BLEND);
-		context.drawTexture(texture, 0, 3, 0, 0, 72, 18, 72, 18);
+		context.drawTexture(RenderLayer::getGuiTextured, texture, 0, 3, 0, 0,
+			72, 18, 72, 18);
 	}
 	
 	private String getVersionString()
@@ -79,7 +81,7 @@ public final class WurstLogo
 		float r, float g, float b, float a)
 	{
 		Matrix4f matrix = matrices.peek().getPositionMatrix();
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		BufferBuilder bufferBuilder = tessellator

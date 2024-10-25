@@ -27,7 +27,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.SelectMerchantTradeC2SPacket;
@@ -359,7 +358,8 @@ public final class AutoLibrarianHack extends Hack
 			hand, params.toHitResult());
 		
 		// swing hand
-		if(result.isAccepted() && result.shouldSwingHand())
+		if(result instanceof ActionResult.Success success
+			&& success.swingSource() == ActionResult.SwingSource.CLIENT)
 			swingHand.swing(hand);
 		
 		// reset sneak
@@ -401,7 +401,8 @@ public final class AutoLibrarianHack extends Hack
 			im.interactEntity(player, villager, hand);
 		
 		// swing hand
-		if(actionResult.isAccepted() && actionResult.shouldSwingHand())
+		if(actionResult instanceof ActionResult.Success success
+			&& success.swingSource() == ActionResult.SwingSource.CLIENT)
 			swingHand.swing(hand);
 		
 		// set cooldown
@@ -419,7 +420,7 @@ public final class AutoLibrarianHack extends Hack
 		for(TradeOffer tradeOffer : tradeOffers)
 		{
 			ItemStack stack = tradeOffer.getSellItem();
-			if(!(stack.getItem() instanceof EnchantedBookItem))
+			if(stack.getItem() != Items.ENCHANTED_BOOK)
 				continue;
 			
 			Set<Entry<RegistryEntry<Enchantment>>> enchantmentLevelMap =
