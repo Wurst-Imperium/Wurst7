@@ -26,6 +26,14 @@ repositories {
 	// for more information about repositories.
 }
 
+// Override vulnerable msal4j dependency until Minecraft updates to a newer version
+configurations.all {
+	resolutionStrategy {
+		// v1.15.0, used by Minecraft 1.21.3, is vulnerable to CVE-2024-35255
+		force 'com.microsoft.azure:msal4j:1.17.2'
+	}
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -68,21 +76,21 @@ tasks.register('runEndToEndTest', JavaExec) {
 	classpath.from configurations.productionRuntime
 	mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient"
 	workingDir = file("run")
-
+	
 	doFirst {
 		classpath.from loom.minecraftProvider.minecraftClientJar
 		workingDir.mkdirs()
-
+		
 		args(
 			"--assetIndex", loom.minecraftProvider.versionInfo.assetIndex().fabricId(loom.minecraftProvider.minecraftVersion()),
 			"--assetsDir", new File(loom.files.userCache, "assets").absolutePath,
 			"--gameDir", workingDir.absolutePath
 		)
-
+		
 		if (Platform.CURRENT.operatingSystem.isMacOS()) {
 			jvmArgs("-XstartOnFirstThread")
 		}
-
+		
 		jvmArgs(
 			"-Dfabric.addMods=${configurations.modImplementation.find { it.name.contains('fabric-api') }.absolutePath}${File.pathSeparator}${remapJar.archiveFile.get().asFile.absolutePath}",
 			"-Dwurst.e2eTest",
