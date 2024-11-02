@@ -50,13 +50,15 @@ jobs:
     - name: Run tests and build
       run: ./gradlew build --stacktrace --warning-mode=fail
 
-    - name: VirusTotal scan
-      if: ${{ github.event_name == 'push' }}
+    - name: Upload to VirusTotal for analysis
+      if: ${{ github.event_name == 'push' && secrets.VIRUSTOTAL_API_KEY != '' }}
       uses: crazy-max/ghaction-virustotal@v4
       with:
         vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
         files: |
           ./build/libs/*.jar
+      # An error in this step means that the upload failed, not that a false
+      # positive was detected.
       continue-on-error: true
 
     - name: Run the mod and take screenshots
