@@ -51,7 +51,7 @@ jobs:
       run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: Upload to VirusTotal for analysis
-      if: ${{ github.event_name == 'push' && github.secrets.VIRUSTOTAL_API_KEY != '' }}
+      if: ${{ github.secrets.VIRUSTOTAL_API_KEY }}
       uses: crazy-max/ghaction-virustotal@v4
       with:
         vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
