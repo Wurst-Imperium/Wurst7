@@ -6,13 +6,13 @@ on:
       - "**.java"
       - "**.json"
       - "gradle**"
-      - "build.gradle"
+      - "*.gradle"
   pull_request:
     paths:
       - "**.java"
       - "**.json"
       - "gradle**"
-      - "build.gradle"
+      - "*.gradle"
   workflow_dispatch:
 
 permissions:
