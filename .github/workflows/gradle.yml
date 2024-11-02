@@ -57,8 +57,6 @@ jobs:
       uses: crazy-max/ghaction-virustotal@v4
       with:
         vt_api_key: ${{ env.VIRUSTOTAL_API_KEY }}
-        vt_monitor: true
-        monitor_path: /Wurst7
         files: |
           ./build/libs/*.jar
       # An error in this step means that the upload failed, not that a false
