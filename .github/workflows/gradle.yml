@@ -3,25 +3,27 @@ name: Java CI with Gradle
 on:
   push:
     paths:
-      - '**.java'
-      - '**.json'
-      - 'gradle**'
-      - 'build.gradle'
+      - "**.java"
+      - "**.json"
+      - "gradle**"
+      - "*.gradle"
   pull_request:
     paths:
-      - '**.java'
-      - '**.json'
-      - 'gradle**'
-      - 'build.gradle'
-  # Makes it possible to run this workflow manually from the Actions tab
+      - "**.java"
+      - "**.json"
+      - "gradle**"
+      - "*.gradle"
   workflow_dispatch:
 
 permissions:
+  # Required for Gradle dependency submission
   contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
 
     steps:
     - name: Checkout repository
@@ -30,8 +32,8 @@ jobs:
     - name: Set up Java 21
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
-        distribution: 'microsoft'
+        java-version: "21"
+        distribution: "microsoft"
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -50,13 +52,15 @@ jobs:
     - name: Run tests and build
       run: ./gradlew build --stacktrace --warning-mode=fail
 
-    - name: VirusTotal scan
-      if: ${{ github.event_name == 'push' }}
+    - name: Upload to VirusTotal for analysis
+      if: ${{ env.VIRUSTOTAL_API_KEY }}
       uses: crazy-max/ghaction-virustotal@v4
       with:
-        vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
+        vt_api_key: ${{ env.VIRUSTOTAL_API_KEY }}
         files: |
           ./build/libs/*.jar
+      # An error in this step means that the upload failed, not that a false
+      # positive was detected.
       continue-on-error: true
 
     - name: Run the mod and take screenshots
