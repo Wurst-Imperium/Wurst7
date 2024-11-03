@@ -89,7 +89,7 @@ jobs:
       if: always() && ${{ env.IMGUR_CLIENT_ID }}
       shell: bash
       run: |
-        echo "<details>" >> $GITHUB_STEP_SUMMARY
+        echo "<details open>" >> $GITHUB_STEP_SUMMARY
         echo "<summary>📸 Test Screenshots</summary>" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
 
