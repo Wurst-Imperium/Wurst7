@@ -49,7 +49,22 @@ jobs:
       if: ${{ github.event_name == 'push' }}
       uses: gradle/actions/dependency-submission@v4
 
-    - name: Run tests and build
+    - name: Compile Java code
+      run: ./gradlew remapJar --stacktrace --warning-mode=fail
+
+    - name: Validate JSON files
+      run: ./gradlew spotlessJsonCheck || (echo "::error::JSON validation failed! Run './gradlew spotlessApply' to fix style issues, or check the full error message for syntax errors." && exit 1)
+
+    - name: Validate Java code style
+      run: ./gradlew spotlessCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
+
+    - name: Run unit tests
+      run: ./gradlew test --stacktrace --warning-mode=fail
+
+    - name: Validate access widener
+      run: ./gradlew validateAccessWidener --stacktrace --warning-mode=fail
+
+    - name: Build
       run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: Upload to VirusTotal for analysis
