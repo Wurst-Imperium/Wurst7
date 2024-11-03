@@ -96,7 +96,8 @@ jobs:
         for img in run/screenshots/*.png; do
           if [ -f "$img" ]; then
             filename=$(basename "$img")
-            name_without_ext="${filename%.*}"
+            # Remove timestamp and extension
+            simplified_name=$(echo "${filename%.*}" | cut -c 21-)
 
             # Upload to Imgur
             response=$(curl -s -X POST \
@@ -109,9 +110,9 @@ jobs:
 
             if [ ! -z "$url" ]; then
               # Convert underscores to spaces and capitalize first letter of each word
-              title=$(echo "$name_without_ext" | tr '_' ' ' | awk '{for(i=1;i<=NF;i++)sub(/./,toupper(substr($i,1,1)),$i)}1')
+              title=$(echo "$simplified_name" | tr '_' ' ' | awk '{for(i=1;i<=NF;i++)sub(/./,toupper(substr($i,1,1)),$i)}1')
               echo "### $title" >> $GITHUB_STEP_SUMMARY
-              echo "![${name_without_ext}]($url)" >> $GITHUB_STEP_SUMMARY
+              echo "![${simplified_name}]($url)" >> $GITHUB_STEP_SUMMARY
               echo "" >> $GITHUB_STEP_SUMMARY
             else
               echo "Failed to upload $filename" >> $GITHUB_STEP_SUMMARY
