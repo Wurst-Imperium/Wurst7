@@ -80,8 +80,9 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         IFS=',' read -ra ANALYSIS <<< "${{ steps.virustotal.outputs.analysis }}"
         for i in "${ANALYSIS[@]}"; do
-          filename=$(echo $i | cut -d'=' -f1)
-          url=$(echo $i | cut -d'=' -f2)
+          filepath=${i%%=*}
+          url=${i#*=}
+          filename=$(basename "$filepath")
           echo "- [$filename]($url)" >> $GITHUB_STEP_SUMMARY
         done
 
