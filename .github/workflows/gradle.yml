@@ -20,8 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
-
     steps:
+
     - name: Checkout repository
       uses: actions/checkout@v4
 
