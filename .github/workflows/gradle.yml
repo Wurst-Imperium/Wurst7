@@ -71,7 +71,7 @@ jobs:
       continue-on-error: true
 
     - name: Run the mod and take screenshots
-      uses: modmuss50/xvfb-action@v1
+      uses: modmuss50/xvfb-action@c56c7da0c8fc9a7cb5df2e50dd2a43a80b64c5cb
       with:
         run: ./gradlew runEndToEndTest --stacktrace --warning-mode=fail
 
