@@ -76,7 +76,8 @@ jobs:
       if: ${{ env.VIRUSTOTAL_API_KEY && steps.virustotal.outputs.analysis }}
       shell: bash
       run: |
-        echo "## 🛡️ VirusTotal Scans" >> $GITHUB_STEP_SUMMARY
+        echo "<details open>" >> $GITHUB_STEP_SUMMARY
+        echo "<summary>🛡️ VirusTotal Scans</summary>" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         IFS=',' read -ra ANALYSIS <<< "${{ steps.virustotal.outputs.analysis }}"
         for i in "${ANALYSIS[@]}"; do
@@ -85,6 +86,7 @@ jobs:
           filename=$(basename "$filepath")
           echo "- [$filename]($url)" >> $GITHUB_STEP_SUMMARY
         done
+        echo "</details>" >> $GITHUB_STEP_SUMMARY
 
     - name: Run the mod and take screenshots
       uses: modmuss50/xvfb-action@c56c7da0c8fc9a7cb5df2e50dd2a43a80b64c5cb
