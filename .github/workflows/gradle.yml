@@ -15,10 +15,6 @@ on:
       - "*.gradle"
   workflow_dispatch:
 
-permissions:
-  # Required for Gradle dependency submission
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,10 +40,6 @@ jobs:
         build-scan-publish: true
         build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
         build-scan-terms-of-use-agree: "yes"
-
-    - name: Generate and submit dependency graph
-      if: ${{ github.event_name == 'push' }}
-      uses: gradle/actions/dependency-submission@v4
 
     - name: Compile Java code
       run: ./gradlew remapJar --stacktrace --warning-mode=fail
