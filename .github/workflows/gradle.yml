@@ -61,6 +61,7 @@ jobs:
       run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: Upload to VirusTotal for analysis
+      id: virustotal
       if: ${{ env.VIRUSTOTAL_API_KEY }}
       uses: crazy-max/ghaction-virustotal@v4
       with:
@@ -70,6 +71,19 @@ jobs:
       # An error in this step means that the upload failed, not that a false
       # positive was detected.
       continue-on-error: true
+
+    - name: Add VirusTotal links to build summary
+      if: ${{ env.VIRUSTOTAL_API_KEY && steps.virustotal.outputs.analysis }}
+      shell: bash
+      run: |
+        echo "## 🛡️ VirusTotal Scans" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        IFS=',' read -ra ANALYSIS <<< "${{ steps.virustotal.outputs.analysis }}"
+        for i in "${ANALYSIS[@]}"; do
+          filename=$(echo $i | cut -d'=' -f1)
+          url=$(echo $i | cut -d'=' -f2)
+          echo "- [$filename]($url)" >> $GITHUB_STEP_SUMMARY
+        done
 
     - name: Run the mod and take screenshots
       uses: modmuss50/xvfb-action@c56c7da0c8fc9a7cb5df2e50dd2a43a80b64c5cb
