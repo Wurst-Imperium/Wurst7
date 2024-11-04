@@ -49,6 +49,7 @@ import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 
 // Provides thread safe utils for interacting with a running game.
 public final class FabricClientTestHelper
@@ -108,9 +109,12 @@ public final class FabricClientTestHelper
 		waitFor(delay);
 		
 		submitAndWait(client -> {
+			// Added timestamp to start of screenshot name
+			String time = Util.getFormattedCurrentTime();
 			ScreenshotRecorder.saveScreenshot(
-				FabricLoader.getInstance().getGameDir().toFile(), name + ".png",
-				client.getFramebuffer(), message -> {});
+				FabricLoader.getInstance().getGameDir().toFile(),
+				time + "_" + name + ".png", client.getFramebuffer(),
+				message -> {});
 			return null;
 		});
 	}
