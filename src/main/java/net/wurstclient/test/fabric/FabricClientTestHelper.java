@@ -113,7 +113,8 @@ public final class FabricClientTestHelper
 		
 		submitAndWait(client -> {
 			// Added a counter so that screenshots show up in the correct order
-			int count = screenshotCount.incrementAndGet();
+			String count =
+				String.format("%02d", screenshotCount.incrementAndGet());
 			String filename = count + "_" + name + ".png";
 			ScreenshotRecorder.saveScreenshot(
 				FabricLoader.getInstance().getGameDir().toFile(), filename,
