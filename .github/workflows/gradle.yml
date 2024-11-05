@@ -103,7 +103,7 @@ jobs:
         path: run/screenshots
 
     - name: Create test screenshot gallery
-      if: always() && ${{ env.IMGUR_CLIENT_ID }}
+      if: ${{ env.IMGUR_CLIENT_ID && (success() || failure()) }}
       shell: bash
       run: |
         echo "<details open>" >> $GITHUB_STEP_SUMMARY
