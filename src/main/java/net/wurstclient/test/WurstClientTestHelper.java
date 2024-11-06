@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.tutorial.TutorialStep;
 
 public enum WurstClientTestHelper
 {
@@ -91,6 +92,14 @@ public enum WurstClientTestHelper
 			
 			// Command is valid, send it
 			netHandler.sendChatCommand(command);
+			return null;
+		});
+	}
+	
+	public static void dismissTutorialToasts()
+	{
+		submitAndWait(mc -> {
+			mc.getTutorialManager().setStep(TutorialStep.NONE);
 			return null;
 		});
 	}
