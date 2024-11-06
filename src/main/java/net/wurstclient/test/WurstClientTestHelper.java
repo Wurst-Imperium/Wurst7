@@ -14,8 +14,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.tutorial.TutorialStep;
@@ -70,6 +72,32 @@ public enum WurstClientTestHelper
 				+ expectedY + ", actual Y: " + button.getY());
 	}
 	
+	public static void setTextfieldText(int index, String text)
+	{
+		waitFor("Set textfield " + index + " to " + text, mc -> {
+			Screen screen = mc.currentScreen;
+			if(screen == null)
+				return false;
+			
+			int currentIndex = 0;
+			for(Drawable drawable : screen.drawables)
+			{
+				if(!(drawable instanceof TextFieldWidget textField))
+					continue;
+				
+				if(currentIndex == index)
+				{
+					textField.setText(text);
+					return true;
+				}
+				
+				currentIndex++;
+			}
+			
+			return false;
+		});
+	}
+	
 	public static void runChatCommand(String command)
 	{
 		submitAndWait(mc -> {
@@ -92,6 +120,14 @@ public enum WurstClientTestHelper
 			
 			// Command is valid, send it
 			netHandler.sendChatCommand(command);
+			return null;
+		});
+	}
+	
+	public static void clearChat()
+	{
+		submitAndWait(mc -> {
+			mc.inGameHud.getChatHud().clear(true);
 			return null;
 		});
 	}
