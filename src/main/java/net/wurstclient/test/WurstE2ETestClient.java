@@ -7,6 +7,7 @@
  */
 package net.wurstclient.test;
 
+import static net.wurstclient.test.WurstClientTestHelper.*;
 import static net.wurstclient.test.fabric.FabricClientTestHelper.*;
 
 import java.time.Duration;
@@ -80,7 +81,9 @@ public final class WurstE2ETestClient implements ModInitializer
 		System.out.println("Creating test world");
 		clickScreenButton("selectWorld.create");
 		
-		waitForWorldTicks(200);
+		waitForWorldTicks(180);
+		runChatCommand("seed");
+		waitForWorldTicks(20);
 		System.out.println("Reached singleplayer world");
 		takeScreenshot("in_game", Duration.ZERO);
 		
