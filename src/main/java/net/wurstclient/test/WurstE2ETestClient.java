@@ -87,6 +87,7 @@ public final class WurstE2ETestClient implements ModInitializer
 		waitForWorldTicks(20);
 		System.out.println("Reached singleplayer world");
 		takeScreenshot("in_game", Duration.ZERO);
+		clearChat();
 		
 		System.out.println("Opening debug menu");
 		enableDebugHud();

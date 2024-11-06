@@ -96,6 +96,14 @@ public enum WurstClientTestHelper
 		});
 	}
 	
+	public static void clearChat()
+	{
+		submitAndWait(mc -> {
+			mc.inGameHud.getChatHud().clear(true);
+			return null;
+		});
+	}
+	
 	public static void dismissTutorialToasts()
 	{
 		submitAndWait(mc -> {
