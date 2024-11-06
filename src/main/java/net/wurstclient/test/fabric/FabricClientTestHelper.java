@@ -29,6 +29,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -53,6 +54,9 @@ import net.minecraft.text.Text;
 // Provides thread safe utils for interacting with a running game.
 public final class FabricClientTestHelper
 {
+	// Added a counter so that screenshots show up in the correct order
+	private static final AtomicInteger screenshotCount = new AtomicInteger(0);
+	
 	public static void waitForLoadingComplete()
 	{
 		waitFor("Loading to complete", client -> client.getOverlay() == null,
@@ -108,8 +112,12 @@ public final class FabricClientTestHelper
 		waitFor(delay);
 		
 		submitAndWait(client -> {
+			// Added a counter so that screenshots show up in the correct order
+			String count =
+				String.format("%02d", screenshotCount.incrementAndGet());
+			String filename = count + "_" + name + ".png";
 			ScreenshotRecorder.saveScreenshot(
-				FabricLoader.getInstance().getGameDir().toFile(), name + ".png",
+				FabricLoader.getInstance().getGameDir().toFile(), filename,
 				client.getFramebuffer(), message -> {});
 			return null;
 		});

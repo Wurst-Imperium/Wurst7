@@ -7,11 +7,18 @@
  */
 package net.wurstclient.test;
 
+import static net.wurstclient.test.fabric.FabricClientTestHelper.*;
+
+import com.mojang.brigadier.ParseResults;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.tutorial.TutorialStep;
 
 public enum WurstClientTestHelper
 {
@@ -61,5 +68,39 @@ public enum WurstClientTestHelper
 			throw new RuntimeException(buttonName
 				+ " button is at the wrong Y coordinate. Expected Y: "
 				+ expectedY + ", actual Y: " + button.getY());
+	}
+	
+	public static void runChatCommand(String command)
+	{
+		submitAndWait(mc -> {
+			ClientPlayNetworkHandler netHandler = mc.getNetworkHandler();
+			
+			// Validate command using client-side command dispatcher
+			ParseResults<?> results = netHandler.getCommandDispatcher()
+				.parse(command, netHandler.getCommandSource());
+			
+			// Command is invalid, fail the test
+			if(!results.getExceptions().isEmpty())
+			{
+				StringBuilder errors =
+					new StringBuilder("Invalid command: " + command);
+				for(CommandSyntaxException e : results.getExceptions().values())
+					errors.append("\n").append(e.getMessage());
+				
+				throw new RuntimeException(errors.toString());
+			}
+			
+			// Command is valid, send it
+			netHandler.sendChatCommand(command);
+			return null;
+		});
+	}
+	
+	public static void dismissTutorialToasts()
+	{
+		submitAndWait(mc -> {
+			mc.getTutorialManager().setStep(TutorialStep.NONE);
+			return null;
+		});
 	}
 }
