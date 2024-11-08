@@ -15,6 +15,7 @@ import java.time.Duration;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
@@ -73,6 +74,8 @@ public final class WurstE2ETestClient implements ModInitializer
 		waitForScreen(CreateWorldScreen.class);
 		System.out.println("Reached create world screen");
 		
+		// Set MC version as world name
+		setTextfieldText(0, SharedConstants.getGameVersion().getName());
 		// Select creative mode
 		clickScreenButton("selectWorld.gameMode");
 		clickScreenButton("selectWorld.gameMode");
@@ -87,6 +90,7 @@ public final class WurstE2ETestClient implements ModInitializer
 		waitForWorldTicks(20);
 		System.out.println("Reached singleplayer world");
 		takeScreenshot("in_game", Duration.ZERO);
+		clearChat();
 		
 		System.out.println("Opening debug menu");
 		enableDebugHud();

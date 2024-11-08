@@ -212,13 +212,13 @@ public final class FabricClientTestHelper
 		});
 	}
 	
-	private static void waitFor(String what,
+	public static void waitFor(String what,
 		Predicate<MinecraftClient> predicate)
 	{
 		waitFor(what, predicate, Duration.ofSeconds(10));
 	}
 	
-	private static void waitFor(String what,
+	public static void waitFor(String what,
 		Predicate<MinecraftClient> predicate, Duration timeout)
 	{
 		final LocalDateTime end = LocalDateTime.now().plus(timeout);
