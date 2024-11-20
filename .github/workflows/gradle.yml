@@ -2,15 +2,21 @@ name: Java CI with Gradle
 
 on:
   push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
     paths:
       - "**.java"
       - "**.json"
+      - "**.yml"
       - "gradle**"
       - "*.gradle"
   pull_request:
     paths:
       - "**.java"
       - "**.json"
+      - "**.yml"
       - "gradle**"
       - "*.gradle"
   workflow_dispatch:
