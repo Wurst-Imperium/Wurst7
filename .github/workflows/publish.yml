@@ -1,5 +1,9 @@
 name: Publish Release
 
+permissions:
+  # Needed to push the tag.
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
