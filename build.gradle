@@ -152,7 +152,7 @@ test {
 }
 
 def getGhVersion() {
-	return "v" + version.substring(0, version.indexOf("-MC"))
+	return version.substring(0, version.indexOf("-MC"))
 }
 
 def getChangelogUrl() {
