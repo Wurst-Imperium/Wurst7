@@ -225,6 +225,11 @@ public final class XRayHack extends Hack implements UpdateListener,
 		return (int)(opacity.getValue() * 255) << 24 | 0xFFFFFF;
 	}
 	
+	public float getOpacityFloat()
+	{
+		return opacity.getValueF();
+	}
+	
 	/**
 	 * Checks if OptiFine/OptiFabric is installed and returns a warning message
 	 * if it is.
