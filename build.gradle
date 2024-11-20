@@ -129,7 +129,7 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename {"${it}_${project.base.archivesName.get()}"}
+		rename {"${it}_${base.archivesName.get()}"}
 	}
 }
 
@@ -151,6 +151,15 @@ test {
 	useJUnitPlatform()
 }
 
+def getGhVersion() {
+	return "v" + version.substring(0, version.indexOf("-MC"))
+}
+
+def getChangelogUrl() {
+	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
+	return "https://www.wurstclient.net/updates/wurst-${versionSlug}/"
+}
+
 import org.kohsuke.github.GHReleaseBuilder
 import org.kohsuke.github.GitHub
 
@@ -162,7 +171,7 @@ task github(dependsOn: build) {
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repository = github.getRepository("Wurst-Imperium/Wurst-MCX2")
-		def ghVersion = version.substring(0, version.indexOf("-"))
+		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
@@ -173,5 +182,72 @@ task github(dependsOn: build) {
 		
 		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
+	}
+}
+
+import java.time.LocalDate
+import org.kohsuke.github.GHIssueState
+import org.kohsuke.github.GHMilestoneState
+import java.time.ZoneId
+
+task closeMilestone {
+	onlyIf {
+		ENV.GITHUB_TOKEN
+	}
+	
+	doLast {
+		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
+		def repository = github.getRepository("Wurst-Imperium/Wurst7")
+		def ghVersion = getGhVersion()
+		
+		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
+		def milestone = repository.listMilestones(GHIssueState.ALL).find { it.title == ghVersion }
+		if (milestone == null) {
+			milestone = repository.createMilestone(ghVersion, "")
+		}
+		
+		if (milestone.getState() != GHMilestoneState.CLOSED) {
+			milestone.setDueOn(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()))
+			milestone.setDescription(getChangelogUrl())
+			milestone.close()
+		}
+	}
+}
+
+task uploadBackups {
+	dependsOn build
+	
+	onlyIf {
+		ENV.WI_BACKUPS_API_KEY
+	}
+	
+	doLast {
+		def shortVersion = getGhVersion().substring(1)
+		def backupUrl = "https://api.wurstclient.net/artifact-backups/Wurst/${shortVersion}"
+		
+		def connection = new URL(backupUrl).openConnection() as HttpURLConnection
+		def boundary = UUID.randomUUID().toString()
+		connection.setRequestMethod("POST")
+		connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
+		connection.setRequestProperty("Accept", "application/json")
+		connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+		connection.doOutput = true
+		
+		def output = connection.outputStream
+		[remapJar, remapSourcesJar].each { jarTask ->
+			def file = jarTask.archiveFile.get().asFile
+			output << "--${boundary}\r\n"
+			output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
+			output << "Content-Type: application/java-archive\r\n\r\n"
+			file.withInputStream { input -> 
+				output << input
+			}
+			output << "\r\n"
+		}
+		output << "--${boundary}--\r\n"
+		output.flush()
+		
+		if(connection.responseCode != 200)
+			throw new GradleException("Failed to upload backups: ${connection.responseCode} ${connection.responseMessage}")
 	}
 }
