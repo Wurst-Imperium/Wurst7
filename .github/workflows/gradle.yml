@@ -1,4 +1,5 @@
 name: Java CI with Gradle
+run-name: "Test changes in ${{ github.ref_name }}"
 
 on:
   push:
