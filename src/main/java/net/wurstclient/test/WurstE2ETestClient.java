@@ -99,7 +99,8 @@ public final class WurstE2ETestClient implements ModInitializer
 		System.out.println("Checking for broken mixins");
 		MixinEnvironment.getCurrentEnvironment().audit();
 		
-		// TODO: Test some Wurst hacks
+		GiveCmdTest.testGiveCmd();
+		// TODO: Test more Wurst hacks
 		
 		System.out.println("Opening inventory");
 		openInventory();

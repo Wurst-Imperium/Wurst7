@@ -35,6 +35,9 @@ import net.minecraft.client.option.Perspective;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.tutorial.TutorialStep;
 import net.minecraft.client.util.ScreenshotRecorder;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.wurstclient.WurstClient;
 
 public enum WurstClientTestHelper
 {
@@ -343,6 +346,7 @@ public enum WurstClientTestHelper
 	 */
 	public static void runChatCommand(String command)
 	{
+		System.out.println("Running command: /" + command);
 		submitAndWait(mc -> {
 			ClientPlayNetworkHandler netHandler = mc.getNetworkHandler();
 			
@@ -363,6 +367,32 @@ public enum WurstClientTestHelper
 			
 			// Command is valid, send it
 			netHandler.sendChatCommand(command);
+		});
+	}
+	
+	/**
+	 * Runs the given Wurst command, or fails after 10 seconds.
+	 *
+	 * <p>
+	 * Do not put a . at the start of the command.
+	 */
+	public static void runWurstCommand(String command)
+	{
+		System.out.println("Running command: ." + command);
+		submitAndWait(mc -> {
+			WurstClient.INSTANCE.getCmdProcessor().process(command);
+		});
+	}
+	
+	public static void assertOneItemInSlot(int slot, Item item)
+	{
+		submitAndWait(mc -> {
+			ItemStack stack = mc.player.getInventory().getStack(slot);
+			if(!stack.isOf(item) || stack.getCount() != 1)
+				throw new RuntimeException(
+					"Expected 1 " + item.getName().getString() + " at slot "
+						+ slot + ", found " + stack.getCount() + " "
+						+ stack.getItem().getName().getString() + " instead");
 		});
 	}
 }

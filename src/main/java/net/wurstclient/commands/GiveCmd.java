@@ -118,6 +118,7 @@ public final class GiveCmd extends Command
 			if(!MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
+			MC.player.getInventory().main.set(i, stack);
 			MC.player.networkHandler.sendPacket(
 				new CreativeInventoryActionC2SPacket(36 + i, stack));
 			return true;
