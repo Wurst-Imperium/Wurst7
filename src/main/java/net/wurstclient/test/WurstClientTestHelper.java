@@ -92,8 +92,11 @@ public enum WurstClientTestHelper
 		{
 			if(submitAndGet(condition::test))
 			{
-				System.out.println("Waiting until " + event + " took "
-					+ Duration.between(startTime, LocalDateTime.now()));
+				double seconds =
+					Duration.between(startTime, LocalDateTime.now()).toMillis()
+						/ 1000.0;
+				System.out.println(
+					"Waiting until " + event + " took " + seconds + "s");
 				break;
 			}
 			
