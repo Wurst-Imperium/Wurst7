@@ -40,7 +40,10 @@ on:
         required: true
 
 permissions:
+  # To push changes to the new snapshot branch.
   contents: write
+  # To trigger the CI workflow.
+  actions: write
 
 jobs:
   update:
