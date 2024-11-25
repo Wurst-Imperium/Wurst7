@@ -118,3 +118,12 @@ jobs:
         git commit -m "[Wurst-Bot] Update to ${{ github.event.inputs.mc_version }}"
         git push --set-upstream origin ${{ github.event.inputs.mc_version }}
       shell: bash
+
+    # For some reason the commit above doesn't automatically trigger the CI
+    # workflow, so we need to explicitly start it here.
+    - name: Trigger CI on the new branch
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh workflow run gradle.yml --ref ${{ github.event.inputs.mc_version }}
+      shell: bash
