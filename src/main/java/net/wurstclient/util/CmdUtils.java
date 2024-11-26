@@ -9,9 +9,11 @@ package net.wurstclient.util;
 
 import java.util.stream.Stream;
 
+import net.minecraft.item.Item;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.command.CmdError;
+import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.settings.Setting;
 
 public enum CmdUtils
@@ -43,5 +45,16 @@ public enum CmdUtils
 				+ "\" could not be found in " + feature.getName() + ".");
 		
 		return setting;
+	}
+	
+	public static Item parseItem(String nameOrId) throws CmdSyntaxError
+	{
+		Item item = ItemUtils.getItemFromNameOrID(nameOrId);
+		
+		if(item == null)
+			throw new CmdSyntaxError(
+				"\"" + nameOrId + "\" is not a valid item.");
+		
+		return item;
 	}
 }
