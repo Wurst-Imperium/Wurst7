@@ -18,9 +18,11 @@ public enum GiveCmdTest
 	public static void testGiveCmd()
 	{
 		System.out.println("Testing .give command");
-		runChatCommand("clear");
 		runWurstCommand("give diamond");
 		assertOneItemInSlot(0, Items.DIAMOND);
+		
+		// Clean up
 		runChatCommand("clear");
+		clearChat();
 	}
 }

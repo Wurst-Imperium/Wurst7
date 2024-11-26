@@ -153,13 +153,16 @@ public enum WurstClientTestHelper
 			Duration.ofMinutes(5));
 	}
 	
-	public static void waitForWorldTicks(int ticks)
+	public static void waitForWorldLoad()
 	{
 		waitUntil("world is loaded",
 			mc -> mc.world != null
 				&& !(mc.currentScreen instanceof LevelLoadingScreen),
 			Duration.ofMinutes(30));
-		
+	}
+	
+	public static void waitForWorldTicks(int ticks)
+	{
 		long startTicks = submitAndGet(mc -> mc.world.getTime());
 		waitUntil(ticks + " world ticks have passed",
 			mc -> mc.world.getTime() >= startTicks + ticks,
@@ -368,6 +371,7 @@ public enum WurstClientTestHelper
 			// Command is valid, send it
 			netHandler.sendChatCommand(command);
 		});
+		waitForWorldTicks(1);
 	}
 	
 	/**

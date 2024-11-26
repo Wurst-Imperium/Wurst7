@@ -81,10 +81,10 @@ public final class WurstE2ETestClient implements ModInitializer
 		System.out.println("Creating test world");
 		clickButton("selectWorld.create");
 		
-		waitForWorldTicks(180);
+		waitForWorldLoad();
+		waitForWorldTicks(199);
 		dismissTutorialToasts();
 		runChatCommand("seed");
-		waitForWorldTicks(20);
 		System.out.println("Reached singleplayer world");
 		takeScreenshot("in_game", Duration.ZERO);
 		clearChat();
@@ -98,6 +98,10 @@ public final class WurstE2ETestClient implements ModInitializer
 		
 		System.out.println("Checking for broken mixins");
 		MixinEnvironment.getCurrentEnvironment().audit();
+		
+		// Clear inventory and chat before running tests
+		runChatCommand("clear");
+		clearChat();
 		
 		GiveCmdTest.testGiveCmd();
 		// TODO: Test more Wurst hacks
