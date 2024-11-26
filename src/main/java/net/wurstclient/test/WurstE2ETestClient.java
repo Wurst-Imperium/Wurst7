@@ -104,6 +104,7 @@ public final class WurstE2ETestClient implements ModInitializer
 		clearChat();
 		
 		GiveCmdTest.testGiveCmd();
+		ModifyCmdTest.testModifyCmd();
 		// TODO: Test more Wurst hacks
 		
 		System.out.println("Opening inventory");
