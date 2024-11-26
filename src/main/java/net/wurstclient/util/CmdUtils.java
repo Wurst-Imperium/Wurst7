@@ -9,7 +9,11 @@ package net.wurstclient.util;
 
 import java.util.stream.Stream;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.command.CmdError;
@@ -19,6 +23,8 @@ import net.wurstclient.settings.Setting;
 public enum CmdUtils
 {
 	;
+	
+	private static final MinecraftClient MC = WurstClient.MC;
 	
 	public static Feature findFeature(String name) throws CmdError
 	{
@@ -56,5 +62,19 @@ public enum CmdUtils
 				"\"" + nameOrId + "\" is not a valid item.");
 		
 		return item;
+	}
+	
+	public static void giveItem(ItemStack stack) throws CmdError
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		int slot = inventory.getEmptySlot();
+		if(slot < 0)
+			throw new CmdError("Cannot give item. Your inventory is full.");
+		
+		inventory.setStack(slot, stack);
+		CreativeInventoryActionC2SPacket packet =
+			new CreativeInventoryActionC2SPacket(
+				InventoryUtils.toNetworkSlot(slot), stack);
+		MC.player.networkHandler.sendPacket(packet);
 	}
 }

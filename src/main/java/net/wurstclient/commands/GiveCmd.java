@@ -17,7 +17,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
-import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -85,24 +84,7 @@ public final class GiveCmd extends Command
 			}
 		
 		// give item
-		if(!placeStackInHotbar(stack))
-			throw new CmdError("Please clear a slot in your hotbar.");
+		CmdUtils.giveItem(stack);
 		ChatUtils.message("Item" + (amount > 1 ? "s" : "") + " created.");
-	}
-	
-	private boolean placeStackInHotbar(ItemStack stack)
-	{
-		for(int i = 0; i < 9; i++)
-		{
-			if(!MC.player.getInventory().getStack(i).isEmpty())
-				continue;
-			
-			MC.player.getInventory().main.set(i, stack);
-			MC.player.networkHandler.sendPacket(
-				new CreativeInventoryActionC2SPacket(36 + i, stack));
-			return true;
-		}
-		
-		return false;
 	}
 }
