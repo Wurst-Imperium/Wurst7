@@ -391,7 +391,7 @@ public enum WurstClientTestHelper
 	
 	/**
 	 * Uses the currently held item and/or targeted block/entity, then waits
-	 * one tick for the action to complete.
+	 * two ticks for the action to complete.
 	 *
 	 * <p>
 	 * This won't work for right clicking in menus.
@@ -399,7 +399,7 @@ public enum WurstClientTestHelper
 	public static void rightClickInGame()
 	{
 		submitAndWait(mc -> mc.doItemUse());
-		waitForWorldTicks(1);
+		waitForWorldTicks(2);
 	}
 	
 	public static void assertOneItemInSlot(int slot, Item item)
