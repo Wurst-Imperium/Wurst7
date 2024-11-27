@@ -82,8 +82,8 @@ public final class WurstE2ETestClient implements ModInitializer
 		clickButton("selectWorld.create");
 		
 		waitForWorldLoad();
-		waitForWorldTicks(199);
 		dismissTutorialToasts();
+		waitForWorldTicks(200);
 		runChatCommand("seed");
 		System.out.println("Reached singleplayer world");
 		takeScreenshot("in_game", Duration.ZERO);
