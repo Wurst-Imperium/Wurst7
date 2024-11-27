@@ -103,6 +103,7 @@ public final class WurstE2ETestClient implements ModInitializer
 		runChatCommand("clear");
 		clearChat();
 		
+		CopyItemCmdTest.testCopyItemCmd();
 		GiveCmdTest.testGiveCmd();
 		ModifyCmdTest.testModifyCmd();
 		// TODO: Test more Wurst hacks
