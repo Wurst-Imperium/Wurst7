@@ -342,7 +342,7 @@ public enum WurstClientTestHelper
 	}
 	
 	/**
-	 * Runs the given chat command and waits one tick for the action to
+	 * Runs the given chat command and waits two ticks for the action to
 	 * complete.
 	 *
 	 * <p>
@@ -372,7 +372,7 @@ public enum WurstClientTestHelper
 			// Command is valid, send it
 			netHandler.sendChatCommand(command);
 		});
-		waitForWorldTicks(1);
+		waitForWorldTicks(2);
 	}
 	
 	/**
