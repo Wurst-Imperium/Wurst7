@@ -22,8 +22,7 @@ public enum CopyItemCmdTest
 		setPerspective(Perspective.THIRD_PERSON_FRONT);
 		
 		// Put on a golden helmet
-		runChatCommand("give @s golden_helmet");
-		rightClickInGame();
+		runChatCommand("item replace entity @s armor.head with golden_helmet");
 		takeScreenshot("copyitem_command_setup");
 		assertOneItemInSlot(39, Items.GOLDEN_HELMET);
 		assertNoItemInSlot(0);
