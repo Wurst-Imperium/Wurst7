@@ -19,16 +19,18 @@ public enum CopyItemCmdTest
 	public static void testCopyItemCmd()
 	{
 		System.out.println("Testing .copyitem command");
+		setPerspective(Perspective.THIRD_PERSON_FRONT);
 		
 		// Put on a golden helmet
 		runChatCommand("give @s golden_helmet");
 		rightClickInGame();
 		assertOneItemInSlot(39, Items.GOLDEN_HELMET);
+		assertNoItemInSlot(0);
+		takeScreenshot("copyitem_command_setup");
 		
 		// .copyitem the helmet
 		String playerName = submitAndGet(mc -> mc.player.getName().getString());
 		runWurstCommand("copyitem " + playerName + " head");
-		setPerspective(Perspective.THIRD_PERSON_FRONT);
 		takeScreenshot("copyitem_command_result");
 		assertOneItemInSlot(0, Items.GOLDEN_HELMET);
 		

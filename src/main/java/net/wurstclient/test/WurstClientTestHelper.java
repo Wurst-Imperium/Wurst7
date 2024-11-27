@@ -413,4 +413,15 @@ public enum WurstClientTestHelper
 						+ stack.getItem().getName().getString() + " instead");
 		});
 	}
+	
+	public static void assertNoItemInSlot(int slot)
+	{
+		submitAndWait(mc -> {
+			ItemStack stack = mc.player.getInventory().getStack(slot);
+			if(!stack.isEmpty())
+				throw new RuntimeException("Expected no item in slot " + slot
+					+ ", found " + stack.getCount() + " "
+					+ stack.getItem().getName().getString() + " instead");
+		});
+	}
 }
