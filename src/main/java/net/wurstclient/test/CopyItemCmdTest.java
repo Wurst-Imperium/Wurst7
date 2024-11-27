@@ -24,9 +24,9 @@ public enum CopyItemCmdTest
 		// Put on a golden helmet
 		runChatCommand("give @s golden_helmet");
 		rightClickInGame();
+		takeScreenshot("copyitem_command_setup");
 		assertOneItemInSlot(39, Items.GOLDEN_HELMET);
 		assertNoItemInSlot(0);
-		takeScreenshot("copyitem_command_setup");
 		
 		// .copyitem the helmet
 		String playerName = submitAndGet(mc -> mc.player.getName().getString());
