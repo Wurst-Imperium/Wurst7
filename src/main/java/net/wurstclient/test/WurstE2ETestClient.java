@@ -100,15 +100,6 @@ public final class WurstE2ETestClient implements ModInitializer
 		System.out.println("Checking for broken mixins");
 		MixinEnvironment.getCurrentEnvironment().audit();
 		
-		// Clear inventory and chat before running tests
-		runChatCommand("clear");
-		clearChat();
-		
-		CopyItemCmdTest.testCopyItemCmd();
-		GiveCmdTest.testGiveCmd();
-		ModifyCmdTest.testModifyCmd();
-		// TODO: Test more Wurst hacks
-		
 		System.out.println("Opening inventory");
 		openInventory();
 		takeScreenshot("inventory");
@@ -117,6 +108,15 @@ public final class WurstE2ETestClient implements ModInitializer
 		closeScreen();
 		
 		// TODO: Open ClickGUI and Navigator
+		
+		// Clear inventory and chat before running tests
+		runChatCommand("clear");
+		clearChat();
+		
+		CopyItemCmdTest.testCopyItemCmd();
+		GiveCmdTest.testGiveCmd();
+		ModifyCmdTest.testModifyCmd();
+		// TODO: Test more Wurst hacks
 		
 		System.out.println("Opening game menu");
 		openGameMenu();
