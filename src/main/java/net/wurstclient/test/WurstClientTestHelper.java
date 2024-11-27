@@ -342,7 +342,7 @@ public enum WurstClientTestHelper
 	}
 	
 	/**
-	 * Runs the given chat command and waits two ticks for the action to
+	 * Runs the given chat command and waits one tick for the action to
 	 * complete.
 	 *
 	 * <p>
@@ -372,7 +372,7 @@ public enum WurstClientTestHelper
 			// Command is valid, send it
 			netHandler.sendChatCommand(command);
 		});
-		waitForWorldTicks(2);
+		waitForWorldTicks(1);
 	}
 	
 	/**
@@ -391,7 +391,7 @@ public enum WurstClientTestHelper
 	
 	/**
 	 * Uses the currently held item and/or targeted block/entity, then waits
-	 * two ticks for the action to complete.
+	 * one tick for the action to complete.
 	 *
 	 * <p>
 	 * This won't work for right clicking in menus.
@@ -399,7 +399,7 @@ public enum WurstClientTestHelper
 	public static void rightClickInGame()
 	{
 		submitAndWait(mc -> mc.doItemUse());
-		waitForWorldTicks(2);
+		waitForWorldTicks(1);
 	}
 	
 	public static void assertOneItemInSlot(int slot, Item item)
