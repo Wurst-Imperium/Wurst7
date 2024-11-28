@@ -133,7 +133,7 @@ spotless {
 	}
 	json {
 		target "src/**/*.json"
-		gson().indentWithSpaces(2).version("2.10.1")
+		gson().indentWithSpaces(2).version("2.11.0")
 	}
 }
 
