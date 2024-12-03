@@ -179,6 +179,7 @@ import java.time.LocalDate
 import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHMilestoneState
 import java.time.ZoneId
+import java.time.Instant
 
 task closeMilestone {
 	onlyIf {
@@ -197,7 +198,7 @@ task closeMilestone {
 		}
 		
 		if (milestone.getState() != GHMilestoneState.CLOSED) {
-			milestone.setDueOn(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()))
+			milestone.setDueOn(Date.from(Instant.now()))
 			milestone.setDescription(getChangelogUrl())
 			milestone.close()
 		}
