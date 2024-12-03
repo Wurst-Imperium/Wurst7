@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
+    "AbstractBlockRenderContextMixin",
     "AbstractBlockStateMixin",
     "AbstractSignEditScreenMixin",
     "AllowedAddressResolverMixin",
@@ -13,6 +14,7 @@
     "BlockEntityRenderDispatcherMixin",
     "BlockMixin",
     "BlockModelRendererMixin",
+    "BlockRenderInfoMixin",
     "CactusBlockMixin",
     "CameraMixin",
     "ChatHudMixin",
