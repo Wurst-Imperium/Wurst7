@@ -4,6 +4,8 @@ run-name: "Publish release from ${{ github.ref_name }} branch"
 permissions:
   # Needed to push the tag.
   contents: write
+  # Needed to close the milestone.
+  issues: write
 
 on:
   workflow_dispatch:
