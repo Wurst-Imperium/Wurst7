@@ -146,7 +146,7 @@ def getGhVersion() {
 }
 
 def getChangelogUrl() {
-	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
+	def versionSlug = version.substring(1, version.indexOf("-MC")).replace(".", "-")
 	return "https://www.wurstclient.net/updates/wurst-${versionSlug}/"
 }
 
