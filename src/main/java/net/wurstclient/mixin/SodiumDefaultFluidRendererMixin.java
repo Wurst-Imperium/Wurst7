@@ -26,7 +26,7 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 @Mixin(targets = {
 	"net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.DefaultFluidRenderer"},
 	remap = false)
-public class SodiumFluidRendererMixin
+public class SodiumDefaultFluidRendererMixin
 {
 	@Unique
 	private ThreadLocal<BlockPos.Mutable> mutablePosForExposedCheck =
