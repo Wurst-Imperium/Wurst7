@@ -24,9 +24,14 @@ import net.wurstclient.WurstClient;
 @Mixin(HeldItemRenderer.class)
 public abstract class HeldItemRendererMixin
 {
-	@Inject(at = {@At(value = "INVOKE",
+	/**
+	 * This mixin is injected into the `BLOCK` case of the `item.getUseAction()`
+	 * switch.
+	 */
+	@Inject(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/item/HeldItemRenderer;applyEquipOffset(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Arm;F)V",
-		ordinal = 4)}, method = "renderFirstPersonItem")
+		ordinal = 4),
+		method = "renderFirstPersonItem(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/util/Hand;FLnet/minecraft/item/ItemStack;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	private void onApplyEquipOffsetBlocking(AbstractClientPlayerEntity player,
 		float tickDelta, float pitch, Hand hand, float swingProgress,
 		ItemStack item, float equipProgress, MatrixStack matrices,
@@ -38,9 +43,14 @@ public abstract class HeldItemRendererMixin
 				.adjustShieldPosition(matrices, true);
 	}
 	
-	@Inject(at = {@At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/item/HeldItemRenderer;applySwingOffset(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Arm;F)V",
-		ordinal = 1)}, method = "renderFirstPersonItem")
+	/**
+	 * This mixin is injected into the last `else` block of
+	 * renderFirstPersonItem(), right after `else if(player.isUsingRiptide())`.
+	 */
+	@Inject(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/render/item/HeldItemRenderer;swingArm(FFLnet/minecraft/client/util/math/MatrixStack;ILnet/minecraft/util/Arm;)V",
+		ordinal = 2),
+		method = "renderFirstPersonItem(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/util/Hand;FLnet/minecraft/item/ItemStack;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
 	private void onApplySwingOffsetNotBlocking(
 		AbstractClientPlayerEntity player, float tickDelta, float pitch,
 		Hand hand, float swingProgress, ItemStack item, float equipProgress,
