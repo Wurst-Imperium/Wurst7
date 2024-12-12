@@ -36,6 +36,8 @@
     "EntityMixin",
     "EntityRenderDispatcherMixin",
     "EntityRendererMixin",
+    "FabricTestMinecraftClientMixin",
+    "FabricTestMinecraftServerMixin",
     "FluidRendererMixin",
     "GameMenuScreenMixin",
     "GameRendererMixin",

@@ -9,8 +9,6 @@ package net.wurstclient.test;
 
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
-import java.time.Duration;
-
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import net.fabricmc.api.ModInitializer;
@@ -19,20 +17,20 @@ import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.wurstclient.test.fabric.ThreadingImpl;
 
 public final class WurstE2ETestClient implements ModInitializer
 {
+	public static final boolean IS_AUTO_TEST =
+		System.getProperty("wurst.e2eTest") != null;
+	
 	@Override
 	public void onInitialize()
 	{
-		if(System.getProperty("wurst.e2eTest") == null)
+		if(!IS_AUTO_TEST)
 			return;
 		
-		Thread.ofVirtual().name("Wurst End-to-End Test")
-			.uncaughtExceptionHandler((t, e) -> {
-				e.printStackTrace();
-				System.exit(1);
-			}).start(this::runTests);
+		ThreadingImpl.runTestThread(this::runTests);
 	}
 	
 	private void runTests()
@@ -51,7 +49,7 @@ public final class WurstE2ETestClient implements ModInitializer
 		waitForScreen(TitleScreen.class);
 		waitForTitleScreenFade();
 		System.out.println("Reached title screen");
-		takeScreenshot("title_screen", Duration.ZERO);
+		takeScreenshot("title_screen", 0);
 		
 		submitAndWait(AltManagerTest::testAltManagerButton);
 		// TODO: Test more of AltManager
@@ -64,7 +62,8 @@ public final class WurstE2ETestClient implements ModInitializer
 			System.out.println("World list is not empty. Waiting for it");
 			waitForScreen(SelectWorldScreen.class);
 			System.out.println("Reached select world screen");
-			takeScreenshot("select_world_screen");
+			// TODO: Wait until the world list is actually loaded
+			takeScreenshot("select_world_screen", 20);
 			clickButton("selectWorld.create");
 		}
 		
@@ -84,10 +83,10 @@ public final class WurstE2ETestClient implements ModInitializer
 		
 		waitForWorldLoad();
 		dismissTutorialToasts();
-		waitForWorldTicks(200);
+		runTicks(200);
 		runChatCommand("seed");
 		System.out.println("Reached singleplayer world");
-		takeScreenshot("in_game", Duration.ZERO);
+		takeScreenshot("in_game", 0);
 		clearChat();
 		
 		System.out.println("Opening debug menu");
