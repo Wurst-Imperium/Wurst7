@@ -8,18 +8,17 @@
 package net.wurstclient.test;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
-
-import org.apache.commons.lang3.function.FailableConsumer;
-import org.apache.commons.lang3.function.FailableFunction;
-import org.apache.commons.lang3.mutable.MutableObject;
 
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.GameMenuScreen;
@@ -39,7 +38,6 @@ import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.wurstclient.WurstClient;
-import net.wurstclient.test.fabric.ThreadingImpl;
 
 public enum WurstClientTestHelper
 {
@@ -51,34 +49,35 @@ public enum WurstClientTestHelper
 	 * Runs the given consumer on Minecraft's main thread and waits for it to
 	 * complete.
 	 */
-	public static <E extends Throwable> void submitAndWait(
-		FailableConsumer<MinecraftClient, E> action) throws E
+	public static void submitAndWait(Consumer<MinecraftClient> consumer)
 	{
-		ThreadingImpl
-			.runOnClient(() -> action.accept(MinecraftClient.getInstance()));
+		MinecraftClient mc = MinecraftClient.getInstance();
+		mc.submit(() -> consumer.accept(mc)).join();
 	}
 	
 	/**
 	 * Runs the given function on Minecraft's main thread, waits for it to
 	 * complete, and returns the result.
 	 */
-	public static <T, E extends Throwable> T submitAndGet(
-		FailableFunction<MinecraftClient, T, E> action) throws E
+	public static <T> T submitAndGet(Function<MinecraftClient, T> function)
 	{
-		MutableObject<T> result = new MutableObject<>();
-		submitAndWait(client -> result.setValue(action.apply(client)));
-		return result.getValue();
+		MinecraftClient mc = MinecraftClient.getInstance();
+		return mc.submit(() -> function.apply(mc)).join();
 	}
 	
-	public static void runTick()
+	/**
+	 * Waits for the given duration.
+	 */
+	public static void wait(Duration duration)
 	{
-		runTicks(1);
-	}
-	
-	public static void runTicks(int ticks)
-	{
-		for(int i = 0; i < ticks; i++)
-			ThreadingImpl.runTick();
+		try
+		{
+			Thread.sleep(duration.toMillis());
+			
+		}catch(InterruptedException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -86,21 +85,30 @@ public enum WurstClientTestHelper
 	 * reached.
 	 */
 	public static void waitUntil(String event,
-		Predicate<MinecraftClient> condition, int timeoutTicks)
+		Predicate<MinecraftClient> condition, Duration maxDuration)
 	{
+		LocalDateTime startTime = LocalDateTime.now();
+		LocalDateTime timeout = startTime.plus(maxDuration);
 		System.out.println("Waiting until " + event);
-		int ticksPassed = 0;
 		
-		for(; ticksPassed < timeoutTicks
-			&& !submitAndGet(condition::test); ticksPassed++)
-			runTick();
-		
-		if(ticksPassed >= timeoutTicks && !submitAndGet(condition::test))
-			throw new RuntimeException(
-				"Waiting until " + event + " took too long");
-		
-		System.out.println(
-			"Waiting until " + event + " took " + ticksPassed + " ticks");
+		while(true)
+		{
+			if(submitAndGet(condition::test))
+			{
+				double seconds =
+					Duration.between(startTime, LocalDateTime.now()).toMillis()
+						/ 1000.0;
+				System.out.println(
+					"Waiting until " + event + " took " + seconds + "s");
+				break;
+			}
+			
+			if(startTime.isAfter(timeout))
+				throw new RuntimeException(
+					"Waiting until " + event + " took too long");
+			
+			wait(Duration.ofMillis(50));
+		}
 	}
 	
 	/**
@@ -109,7 +117,7 @@ public enum WurstClientTestHelper
 	public static void waitUntil(String event,
 		Predicate<MinecraftClient> condition)
 	{
-		waitUntil(event, condition, 10 * SharedConstants.TICKS_PER_SECOND);
+		waitUntil(event, condition, Duration.ofSeconds(10));
 	}
 	
 	/**
@@ -141,23 +149,8 @@ public enum WurstClientTestHelper
 	 */
 	public static void waitForResourceLoading()
 	{
-		// When the client is not ticking and can't accept tasks, waitUntil
-		// doesn't work, so we'll do this until then
-		while(!ThreadingImpl.clientCanAcceptTasks)
-		{
-			runTick();
-			
-			try
-			{
-				Thread.sleep(50);
-			}catch(InterruptedException e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-		
 		waitUntil("loading is complete", mc -> mc.getOverlay() == null,
-			5 * SharedConstants.TICKS_PER_MINUTE);
+			Duration.ofMinutes(5));
 	}
 	
 	public static void waitForWorldLoad()
@@ -165,7 +158,15 @@ public enum WurstClientTestHelper
 		waitUntil("world is loaded",
 			mc -> mc.world != null
 				&& !(mc.currentScreen instanceof LevelLoadingScreen),
-			30 * SharedConstants.TICKS_PER_MINUTE);
+			Duration.ofMinutes(30));
+	}
+	
+	public static void waitForWorldTicks(int ticks)
+	{
+		long startTicks = submitAndGet(mc -> mc.world.getTime());
+		waitUntil(ticks + " world ticks have passed",
+			mc -> mc.world.getTime() >= startTicks + ticks,
+			Duration.ofMillis(ticks * 100).plusMinutes(5));
 	}
 	
 	/**
@@ -173,16 +174,16 @@ public enum WurstClientTestHelper
 	 */
 	public static void takeScreenshot(String name)
 	{
-		takeScreenshot(name, 1);
+		takeScreenshot(name, Duration.ofMillis(50));
 	}
 	
 	/**
 	 * Waits for the given delay and then takes a screenshot with the given
 	 * name.
 	 */
-	public static void takeScreenshot(String name, int delayTicks)
+	public static void takeScreenshot(String name, Duration delay)
 	{
-		runTicks(delayTicks);
+		wait(delay);
 		
 		String count =
 			String.format("%02d", screenshotCounter.incrementAndGet());
@@ -371,7 +372,7 @@ public enum WurstClientTestHelper
 			// Command is valid, send it
 			netHandler.sendChatCommand(command);
 		});
-		runTick();
+		waitForWorldTicks(1);
 	}
 	
 	/**
@@ -398,7 +399,7 @@ public enum WurstClientTestHelper
 	public static void rightClickInGame()
 	{
 		submitAndWait(MinecraftClient::doItemUse);
-		runTick();
+		waitForWorldTicks(1);
 	}
 	
 	public static void assertOneItemInSlot(int slot, Item item)

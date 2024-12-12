@@ -41,7 +41,7 @@ public enum ModifyCmdTest
 				throw new RuntimeException("NBT data is incorrect");
 		});
 		runWurstCommand("viewnbt");
-		takeScreenshot("modify_command_result", 3);
+		takeScreenshot("modify_command_result");
 		
 		// Clean up
 		runChatCommand("clear");
