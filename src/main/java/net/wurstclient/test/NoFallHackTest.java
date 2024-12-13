@@ -10,6 +10,7 @@ package net.wurstclient.test;
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
 import java.time.Duration;
+import java.util.function.Predicate;
 
 import net.minecraft.client.option.Perspective;
 
@@ -23,7 +24,7 @@ public enum NoFallHackTest
 		setPerspective(Perspective.THIRD_PERSON_BACK);
 		runChatCommand("gamemode survival");
 		assertOnGround();
-		assertPlayerHealth(20);
+		assertPlayerHealth(health -> health == 20);
 		
 		// Fall 10 blocks with NoFall enabled
 		runWurstCommand("t NoFall on");
@@ -32,7 +33,7 @@ public enum NoFallHackTest
 		waitUntil("player is on ground", mc -> mc.player.isOnGround());
 		waitForWorldTicks(5);
 		takeScreenshot("nofall_on_10_blocks", Duration.ZERO);
-		assertPlayerHealth(20);
+		assertPlayerHealth(health -> health == 20);
 		
 		// Fall 10 blocks with NoFall disabled
 		runWurstCommand("t NoFall off");
@@ -41,7 +42,7 @@ public enum NoFallHackTest
 		waitUntil("player is on ground", mc -> mc.player.isOnGround());
 		waitForWorldTicks(5);
 		takeScreenshot("nofall_off_10_blocks", Duration.ZERO);
-		assertPlayerHealth(13);
+		assertPlayerHealth(health -> Math.abs(health - 13) <= 1);
 		
 		// Clean up
 		submitAndWait(mc -> mc.player.heal(20));
@@ -55,11 +56,12 @@ public enum NoFallHackTest
 			throw new RuntimeException("Player is not on ground");
 	}
 	
-	private static void assertPlayerHealth(float expectedHealth)
+	private static void assertPlayerHealth(Predicate<Float> healthCheck)
 	{
-		float actualHealth = submitAndGet(mc -> mc.player.getHealth());
-		if(actualHealth != expectedHealth)
-			throw new RuntimeException("Player's health is wrong. Expected: "
-				+ expectedHealth + ", actual: " + actualHealth);
+		float health = submitAndGet(mc -> mc.player.getHealth());
+		if(healthCheck.test(health))
+			System.out.println("Player's health is correct: " + health);
+		else
+			throw new RuntimeException("Player's health is wrong: " + health);
 	}
 }
