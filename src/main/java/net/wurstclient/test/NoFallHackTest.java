@@ -28,16 +28,18 @@ public enum NoFallHackTest
 		// Fall 10 blocks with NoFall enabled
 		runWurstCommand("t NoFall on");
 		runChatCommand("tp ~ ~10 ~");
+		waitForWorldTicks(5);
 		waitUntil("player is on ground", mc -> mc.player.isOnGround());
-		waitForWorldTicks(1);
+		waitForWorldTicks(5);
 		takeScreenshot("nofall_on_10_blocks", Duration.ZERO);
 		assertPlayerHealth(20);
 		
 		// Fall 10 blocks with NoFall disabled
 		runWurstCommand("t NoFall off");
 		runChatCommand("tp ~ ~10 ~");
+		waitForWorldTicks(5);
 		waitUntil("player is on ground", mc -> mc.player.isOnGround());
-		waitForWorldTicks(1);
+		waitForWorldTicks(5);
 		takeScreenshot("nofall_off_10_blocks", Duration.ZERO);
 		assertPlayerHealth(13);
 		
