@@ -28,10 +28,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -563,7 +563,7 @@ public final class ClickGui
 		matrixStack.translate(0, 0, 300);
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// background
 		RenderUtils.setShaderColor(bgColor, ttOpacity);
@@ -647,7 +647,7 @@ public final class ClickGui
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		if(window.isMinimized())
 			y2 = y3;
@@ -750,11 +750,7 @@ public final class ClickGui
 			bufferBuilder.vertex(matrix, x4, y3, 0);
 			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
-			net.minecraft.client.util.Window sr = MC.getWindow();
-			int sf = (int)sr.getScaleFactor();
-			GL11.glScissor(x1 * sf, (sr.getScaledHeight() - y2) * sf,
-				window.getWidth() * sf, (y2 - y3) * sf);
-			GL11.glEnable(GL11.GL_SCISSOR_TEST);
+			RenderUtils.enableScissor(context, x1, y3, x2, y2);
 			
 			matrixStack.push();
 			matrixStack.translate(x1, y4, 0);
@@ -806,11 +802,11 @@ public final class ClickGui
 			
 			matrixStack.pop();
 			matrix = matrixStack.peek().getPositionMatrix();
-			GL11.glDisable(GL11.GL_SCISSOR_TEST);
+			RenderUtils.disableScissor(context);
 		}
 		
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
 		
 		// window outline
 		RenderUtils.setShaderColor(acColor, 0.5F);
@@ -907,7 +903,7 @@ public final class ClickGui
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// button background
 		RenderUtils.setShaderColor(bgColor,

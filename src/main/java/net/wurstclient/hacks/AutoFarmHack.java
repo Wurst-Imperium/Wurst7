@@ -307,9 +307,11 @@ public final class AutoFarmHack extends Hack
 					.interactBlock(MC.player, hand, params.toHitResult());
 				
 				// swing arm
-				if(result.isAccepted() && result.shouldSwingHand())
-					SwingHand.SERVER.swing(hand);
-				
+				// Note: All SwingHand types correspond to SwingSource.CLIENT
+				if(result instanceof ActionResult.Success success
+					&& success.swingSource() == ActionResult.SwingSource.CLIENT)
+					SwingHand.SERVER.swing(hand); // intentional use of SERVER
+					
 				// reset cooldown
 				MC.itemUseCooldown = 4;
 				return true;

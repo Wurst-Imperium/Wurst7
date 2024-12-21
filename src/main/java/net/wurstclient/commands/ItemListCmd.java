@@ -22,7 +22,6 @@ import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.CmdUtils;
-import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.MathUtils;
 
 @DontBlock
@@ -80,11 +79,7 @@ public final class ItemListCmd extends Command
 		if(args.length != 4)
 			throw new CmdSyntaxError();
 		
-		String inputItemName = args[3];
-		Item item = ItemUtils.getItemFromNameOrID(inputItemName);
-		if(item == null)
-			throw new CmdSyntaxError(
-				"\"" + inputItemName + "\" is not a valid item.");
+		Item item = CmdUtils.parseItem(args[3]);
 		
 		String itemName = Registries.ITEM.getId(item).toString();
 		int index = Collections.binarySearch(setting.getItemNames(), itemName);
@@ -101,11 +96,7 @@ public final class ItemListCmd extends Command
 		if(args.length != 4)
 			throw new CmdSyntaxError();
 		
-		String inputItemName = args[3];
-		Item item = ItemUtils.getItemFromNameOrID(inputItemName);
-		if(item == null)
-			throw new CmdSyntaxError(
-				"\"" + inputItemName + "\" is not a valid item.");
+		Item item = CmdUtils.parseItem(args[3]);
 		
 		String itemName = Registries.ITEM.getId(item).toString();
 		int index = Collections.binarySearch(setting.getItemNames(), itemName);

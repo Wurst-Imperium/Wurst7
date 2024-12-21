@@ -142,11 +142,11 @@ public final class JesusHack extends Hack
 		// create new packet
 		Packet<?> newPacket;
 		if(packet instanceof PlayerMoveC2SPacket.PositionAndOnGround)
-			newPacket =
-				new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, true);
+			newPacket = new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z,
+				true, MC.player.horizontalCollision);
 		else
 			newPacket = new PlayerMoveC2SPacket.Full(x, y, z, packet.getYaw(0),
-				packet.getPitch(0), true);
+				packet.getPitch(0), true, MC.player.horizontalCollision);
 		
 		// send new packet
 		MC.player.networkHandler.getConnection().send(newPacket);

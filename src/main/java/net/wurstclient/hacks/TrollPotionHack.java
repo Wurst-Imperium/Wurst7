@@ -124,7 +124,7 @@ public final class TrollPotionHack extends Hack
 			
 			stack.set(DataComponentTypes.POTION_CONTENTS,
 				new PotionContentsComponent(Optional.empty(), Optional.empty(),
-					effects));
+					effects, Optional.empty()));
 			
 			String name = "\u00a7f" + itemName + " of Trolling";
 			stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(name));

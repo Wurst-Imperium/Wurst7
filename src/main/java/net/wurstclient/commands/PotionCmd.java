@@ -96,7 +96,7 @@ public final class PotionCmd extends Command
 		
 		stack.set(DataComponentTypes.POTION_CONTENTS,
 			new PotionContentsComponent(potion, oldContents.customColor(),
-				effects));
+				effects, oldContents.customName()));
 		ChatUtils.message("Potion modified.");
 	}
 	
@@ -128,7 +128,7 @@ public final class PotionCmd extends Command
 				: oldContents.potion();
 		stack.set(DataComponentTypes.POTION_CONTENTS,
 			new PotionContentsComponent(newPotion, oldContents.customColor(),
-				newEffects));
+				newEffects, oldContents.customName()));
 		
 		ChatUtils.message("Effect removed.");
 	}

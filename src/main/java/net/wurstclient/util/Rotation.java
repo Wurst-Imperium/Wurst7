@@ -29,13 +29,16 @@ public record Rotation(float yaw, float pitch)
 	
 	public void sendPlayerLookPacket()
 	{
-		sendPlayerLookPacket(MC.player.isOnGround());
+		sendPlayerLookPacket(MC.player.isOnGround(),
+			MC.player.horizontalCollision);
 	}
 	
-	public void sendPlayerLookPacket(boolean onGround)
+	public void sendPlayerLookPacket(boolean onGround,
+		boolean horizontalCollision)
 	{
-		MC.player.networkHandler.sendPacket(
-			new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, onGround));
+		MC.player.networkHandler
+			.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch,
+				onGround, horizontalCollision));
 	}
 	
 	public double getAngleTo(Rotation other)

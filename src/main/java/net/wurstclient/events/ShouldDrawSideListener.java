@@ -24,7 +24,7 @@ public interface ShouldDrawSideListener extends Listener
 	{
 		private final BlockState state;
 		private final BlockPos pos;
-		private Boolean rendered;
+		private Boolean rendered; // null if unchanged
 		
 		public ShouldDrawSideEvent(BlockState state, BlockPos pos)
 		{

@@ -17,10 +17,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -36,6 +36,7 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.mobspawnesp.HitboxCheckSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ChunkAreaSetting.ChunkArea;
@@ -68,6 +69,8 @@ public final class MobSpawnEspHack extends Hack
 	private final CheckboxSetting depthTest =
 		new CheckboxSetting("Depth test", true);
 	
+	private final HitboxCheckSetting hitboxCheck = new HitboxCheckSetting();
+	
 	private final ChunkVertexBufferCoordinator coordinator =
 		new ChunkVertexBufferCoordinator(this::isSpawnable, this::buildBuffer,
 			drawDistance);
@@ -84,6 +87,7 @@ public final class MobSpawnEspHack extends Hack
 		addSetting(dayColor);
 		addSetting(opacity);
 		addSetting(depthTest);
+		addSetting(hitboxCheck);
 	}
 	
 	@Override
@@ -132,7 +136,7 @@ public final class MobSpawnEspHack extends Hack
 		if(!depthTest)
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 		RenderSystem.setShaderColor(1, 1, 1, opacity.getValueF());
 		
 		for(Entry<ChunkPos, VertexBuffer> entry : coordinator.getBuffers())
@@ -167,11 +171,9 @@ public final class MobSpawnEspHack extends Hack
 		if(!SpawnRestriction.isSpawnPosAllowed(EntityType.CREEPER, MC.world,
 			pos))
 			return false;
-			
+		
 		// Check for hitbox collisions
-		// (using a creeper because it's shorter than a zombie)
-		if(!MC.world.isSpaceEmpty(EntityType.CREEPER
-			.getSpawnBox(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5)))
+		if(!hitboxCheck.isSpaceEmpty(pos))
 			return false;
 		
 		// Check block light level

@@ -25,6 +25,7 @@ import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -81,9 +82,13 @@ public abstract class GameMenuScreenMixin extends Screen
 		int fh = 16;
 		float u = 0;
 		float v = 0;
-		context.drawTexture(WURST_TEXTURE, x, y, u, v, w, h, fw, fh);
+		context.drawTexture(RenderLayer::getGuiTextured, WURST_TEXTURE, x, y, u,
+			v, w, h, fw, fh);
 		
 		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthMask(true);
+		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 	
 	@Unique

@@ -116,7 +116,7 @@ public final class KillPotionHack extends Hack
 			
 			PotionContentsComponent potionContents =
 				new PotionContentsComponent(Optional.empty(), Optional.empty(),
-					List.of(effect));
+					List.of(effect), Optional.empty());
 			
 			stack.set(DataComponentTypes.POTION_CONTENTS, potionContents);
 			
