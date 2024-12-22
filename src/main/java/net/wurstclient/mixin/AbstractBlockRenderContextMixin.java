@@ -29,7 +29,7 @@ public abstract class AbstractBlockRenderContextMixin
 	
 	/**
 	 * Applies X-Ray's opacity mask to the block color after all the normal
-	 * coloring and shading is done.
+	 * coloring and shading is done, if Indigo is running.
 	 */
 	@Inject(at = @At("RETURN"),
 		method = "shadeQuad(Lnet/fabricmc/fabric/impl/client/indigo/renderer/mesh/MutableQuadViewImpl;ZZZ)V")

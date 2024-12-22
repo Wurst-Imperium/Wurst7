@@ -7,20 +7,19 @@
  */
 package net.wurstclient.test;
 
-import static net.wurstclient.test.fabric.FabricClientTestHelper.*;
+import static net.wurstclient.test.WurstClientTestHelper.*;
 
 import java.time.Duration;
 
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 
-// It would be cleaner to have this test in src/test/java, but remapping that
-// into a separate testmod is a whole can of worms.
 public final class WurstE2ETestClient implements ModInitializer
 {
 	@Override
@@ -33,20 +32,20 @@ public final class WurstE2ETestClient implements ModInitializer
 			.uncaughtExceptionHandler((t, e) -> {
 				e.printStackTrace();
 				System.exit(1);
-			}).start(this::runTest);
+			}).start(this::runTests);
 	}
 	
-	private void runTest()
+	private void runTests()
 	{
-		System.out.println("Starting Wurst End-to-End Test");
-		waitForLoadingComplete();
+		System.out.println("Starting Wurst End-to-End Tests");
+		waitForResourceLoading();
 		
-		if(submitAndWait(mc -> mc.options.onboardAccessibility))
+		if(submitAndGet(mc -> mc.options.onboardAccessibility))
 		{
 			System.out.println("Onboarding is enabled. Waiting for it");
 			waitForScreen(AccessibilityOnboardingScreen.class);
 			System.out.println("Reached onboarding screen");
-			clickScreenButton("gui.continue");
+			clickButton("gui.continue");
 		}
 		
 		waitForScreen(TitleScreen.class);
@@ -54,47 +53,52 @@ public final class WurstE2ETestClient implements ModInitializer
 		System.out.println("Reached title screen");
 		takeScreenshot("title_screen", Duration.ZERO);
 		
-		submitAndWait(WurstClientTestHelper::testAltManagerButton);
+		submitAndWait(AltManagerTest::testAltManagerButton);
 		// TODO: Test more of AltManager
 		
 		System.out.println("Clicking singleplayer button");
-		clickScreenButton("menu.singleplayer");
+		clickButton("menu.singleplayer");
 		
-		if(submitAndWait(mc -> !mc.getLevelStorage().getLevelList().isEmpty()))
+		if(submitAndGet(mc -> !mc.getLevelStorage().getLevelList().isEmpty()))
 		{
 			System.out.println("World list is not empty. Waiting for it");
 			waitForScreen(SelectWorldScreen.class);
 			System.out.println("Reached select world screen");
 			takeScreenshot("select_world_screen");
-			clickScreenButton("selectWorld.create");
+			clickButton("selectWorld.create");
 		}
 		
 		waitForScreen(CreateWorldScreen.class);
 		System.out.println("Reached create world screen");
 		
+		// Set MC version as world name
+		setTextFieldText(0,
+			"E2E Test " + SharedConstants.getGameVersion().getName());
 		// Select creative mode
-		clickScreenButton("selectWorld.gameMode");
-		clickScreenButton("selectWorld.gameMode");
+		clickButton("selectWorld.gameMode");
+		clickButton("selectWorld.gameMode");
 		takeScreenshot("create_world_screen");
 		
 		System.out.println("Creating test world");
-		clickScreenButton("selectWorld.create");
+		clickButton("selectWorld.create");
 		
+		waitForWorldLoad();
+		dismissTutorialToasts();
 		waitForWorldTicks(200);
+		runChatCommand("seed");
 		System.out.println("Reached singleplayer world");
 		takeScreenshot("in_game", Duration.ZERO);
+		clearChat();
 		
 		System.out.println("Opening debug menu");
-		enableDebugHud();
+		toggleDebugHud();
 		takeScreenshot("debug_menu");
 		
 		System.out.println("Closing debug menu");
-		enableDebugHud();// bad name, it actually toggles
+		toggleDebugHud();
 		
 		System.out.println("Checking for broken mixins");
 		MixinEnvironment.getCurrentEnvironment().audit();
-		
-		// TODO: Test some Wurst hacks
 		
 		System.out.println("Opening inventory");
 		openInventory();
@@ -105,6 +109,15 @@ public final class WurstE2ETestClient implements ModInitializer
 		
 		// TODO: Open ClickGUI and Navigator
 		
+		// Clear inventory and chat before running tests
+		runChatCommand("clear");
+		clearChat();
+		
+		CopyItemCmdTest.testCopyItemCmd();
+		GiveCmdTest.testGiveCmd();
+		ModifyCmdTest.testModifyCmd();
+		// TODO: Test more Wurst hacks
+		
 		System.out.println("Opening game menu");
 		openGameMenu();
 		takeScreenshot("game_menu");
@@ -112,10 +125,10 @@ public final class WurstE2ETestClient implements ModInitializer
 		// TODO: Check Wurst Options
 		
 		System.out.println("Returning to title screen");
-		clickScreenButton("menu.returnToMenu");
+		clickButton("menu.returnToMenu");
 		waitForScreen(TitleScreen.class);
 		
 		System.out.println("Stopping the game");
-		clickScreenButton("menu.quit");
+		clickButton("menu.quit");
 	}
 }
