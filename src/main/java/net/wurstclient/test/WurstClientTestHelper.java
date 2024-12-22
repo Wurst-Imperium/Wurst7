@@ -398,7 +398,7 @@ public enum WurstClientTestHelper
 	 */
 	public static void rightClickInGame()
 	{
-		submitAndWait(mc -> mc.doItemUse());
+		submitAndWait(MinecraftClient::doItemUse);
 		waitForWorldTicks(1);
 	}
 	
