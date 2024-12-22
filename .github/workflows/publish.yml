@@ -87,18 +87,44 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.OLD_MCX_PUBLISH_TOKEN }}
         run: ./gradlew github --stacktrace
 
-      - name: Trigger website update
+      - name: Build website update inputs
+        id: website_inputs
         if: ${{ inputs.update_website }}
-        env:
-          GH_TOKEN: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
         run: |
           MOD_VERSION=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
           WURST_VERSION=$(echo "$MOD_VERSION" | sed 's/^v//' | sed 's/-MC.*$//')
           MC_VERSION=$(grep "minecraft_version" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
           FAPI_VERSION=$(grep "fabric_version" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
-          gh workflow run add_wurst_port.yml \
-            -R Wurst-Imperium/WurstClient.net \
-            -f wurst_version="$WURST_VERSION" \
-            -f mc_version="$MC_VERSION" \
-            -f fapi_version="$FAPI_VERSION"
-            -f announce=${{ inputs.announce_backport }}
+          JSON_STRING=$(cat << EOF
+          {
+            "wurst_version": "$WURST_VERSION",
+            "mc_version": "$MC_VERSION",
+            "fapi_version": "$FAPI_VERSION",
+            "announce": "${{ inputs.announce_backport }}"
+          }
+          EOF
+          )
+          # Convert to single line and escape quotes
+          echo "json=${JSON_STRING//$'\n'/}" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger website update
+        id: website_dispatch
+        if: ${{ inputs.update_website }}
+        uses: codex-/return-dispatch@v2
+        with:
+          token: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
+          owner: Wurst-Imperium
+          repo: WurstClient.net
+          ref: gh-pages
+          workflow: add_wurst_port.yml
+          workflow_inputs: ${{ steps.website_inputs.outputs.json }}
+
+      - name: Wait for website update to finish (run ${{ steps.website_dispatch.outputs.run_id }})
+        if: ${{ inputs.update_website }}
+        uses: codex-/await-remote-run@v1
+        with:
+          token: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
+          owner: Wurst-Imperium
+          repo: WurstClient.net
+          run_id: ${{ steps.website_dispatch.outputs.run_id }}
+          run_timeout_seconds: 600  # 10 minutes
