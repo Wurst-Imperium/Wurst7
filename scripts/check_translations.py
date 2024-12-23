@@ -28,7 +28,7 @@ def check_extra_keys(en_us: dict, translations: dict):
 				util.add_github_summary(f"- {key}")
 	if extra_keys_found:
 		raise Exception("Found extra keys in one or more translation files, see summary")
-	print("✅ No extra keys found")
+	util.add_github_summary("✅ No extra keys found")
 
 
 def check_untranslated_strings(en_us: dict, translations: dict):
@@ -64,7 +64,7 @@ def check_untranslated_strings(en_us: dict, translations: dict):
 
 	if untranslated_strings_found:
 		raise Exception("Found untranslated strings in one or more translation files, see summary")
-	print("✅ No accidentally untranslated strings found")
+	util.add_github_summary("✅ No accidentally untranslated strings found")
 
 
 def check_order_of_strings(en_us: dict, translations: dict):
@@ -74,7 +74,7 @@ def check_order_of_strings(en_us: dict, translations: dict):
 		translation_keys_present_in_en_us = [key for key in data.keys() if key in en_us.keys()]
 		if en_us_keys_present_in_translation != translation_keys_present_in_en_us:
 			raise Exception(f"⚠ The order of strings in {lang}.json is different from en_us.json")
-	print("✅ The order of strings in each translation file matches en_us.json")
+	util.add_github_summary("✅ The order of strings in each translation file matches en_us.json")
 
 
 def main():
