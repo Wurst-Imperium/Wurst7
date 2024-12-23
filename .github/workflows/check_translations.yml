@@ -8,9 +8,11 @@ on:
       - "**"
     paths:
       - "src/main/resources/assets/wurst/translations/**.json"
+      - "src/main/resources/intentionally_untranslated.json"
   pull_request:
     paths:
       - "src/main/resources/assets/wurst/translations/**.json"
+      - "src/main/resources/intentionally_untranslated.json"
   workflow_dispatch:
 
 jobs:

@@ -121,6 +121,8 @@ jar {
 	from("LICENSE") {
 		rename {"${it}_${base.archivesName.get()}"}
 	}
+	
+	exclude("intentionally_untranslated.json")
 }
 
 spotless {

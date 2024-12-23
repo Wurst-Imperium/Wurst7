@@ -30,6 +30,41 @@ def check_extra_keys(en_us: dict, translations: dict):
 		raise Exception("Found extra keys in one or more translation files, see summary")
 
 
+def check_untranslated_strings(en_us: dict, translations: dict):
+	"""Check if any translation files contain untranslated strings."""
+	untranslated_strings_found = False
+	intentionally_untranslated = util.read_json_file(
+		Path("src") / "main" / "resources" / "intentionally_untranslated.json"
+	)
+
+	for lang, data in translations.items():
+		untranslated_strings = set()
+		for key, value in data.items():
+			if value == en_us[key]:
+				if lang in intentionally_untranslated and key in intentionally_untranslated[lang]:
+					continue
+				untranslated_strings.add(key)
+		if untranslated_strings:
+			untranslated_strings_found = True
+			util.add_github_summary(
+				f"⚠ {lang}.json contains strings that are identical to en_us.json ({len(untranslated_strings)} found):"
+			)
+			for key in untranslated_strings:
+				util.add_github_summary(f"- {key}: {en_us[key]}")
+			util.add_github_summary(
+				"\nIf this is intentional, add the affected key(s) to intentionally_untranslated.json:"
+			)
+			util.add_github_summary("```json")
+			util.add_github_summary(f'  "{lang}": [')
+			for key in untranslated_strings:
+				util.add_github_summary(f'    "{key}"')
+			util.add_github_summary("  ]")
+			util.add_github_summary("```")
+
+	if untranslated_strings_found:
+		raise Exception("Found untranslated strings in one or more translation files, see summary")
+
+
 def main():
 	en_us = util.read_json_file(translations_dir / "en_us.json")
 	translations = {}
@@ -41,6 +76,7 @@ def main():
 
 	show_translation_stats(en_us, translations)
 	check_extra_keys(en_us, translations)
+	check_untranslated_strings(en_us, translations)
 
 
 if __name__ == "__main__":
