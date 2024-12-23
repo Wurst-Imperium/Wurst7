@@ -20,6 +20,8 @@ public enum CopyItemCmdTest
 	{
 		System.out.println("Testing .copyitem command");
 		setPerspective(Perspective.THIRD_PERSON_FRONT);
+		runChatCommand("clear");
+		clearChat();
 		
 		// Put on a golden helmet
 		runChatCommand("item replace entity @s armor.head with golden_helmet");
