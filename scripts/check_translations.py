@@ -67,6 +67,16 @@ def check_untranslated_strings(en_us: dict, translations: dict):
 	print("✅ No accidentally untranslated strings found")
 
 
+def check_order_of_strings(en_us: dict, translations: dict):
+	"""Check if the strings in each translation file are in the same order as in en_us.json."""
+	for lang, data in translations.items():
+		en_us_keys_present_in_translation = [key for key in en_us.keys() if key in data.keys()]
+		translation_keys_present_in_en_us = [key for key in data.keys() if key in en_us.keys()]
+		if en_us_keys_present_in_translation != translation_keys_present_in_en_us:
+			raise Exception(f"⚠ The order of strings in {lang}.json is different from en_us.json")
+	print("✅ The order of strings in each translation file matches en_us.json")
+
+
 def main():
 	en_us = util.read_json_file(translations_dir / "en_us.json")
 	translations = {}
@@ -79,6 +89,7 @@ def main():
 	show_translation_stats(en_us, translations)
 	check_extra_keys(en_us, translations)
 	check_untranslated_strings(en_us, translations)
+	check_order_of_strings(en_us, translations)
 
 
 if __name__ == "__main__":
