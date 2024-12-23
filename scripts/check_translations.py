@@ -77,6 +77,63 @@ def check_order_of_strings(en_us: dict, translations: dict):
 	util.add_github_summary("✅ The order of strings in each translation file matches en_us.json")
 
 
+def check_known_issues(en_us: dict, translations: dict):
+	"""Check if any translation files contain known issues."""
+	issues_found = False
+
+	# Typos
+	known_typos = {
+		"Anchoraura": "AnchorAura",
+		"Autobuild": "AutoBuild",
+		"Clickaura": "ClickAura",
+		"KillAura": "Killaura",
+		"LegitNuker": "Nuker",
+		"LegitKillaura": "KillauraLegit",
+		"Nofall": "NoFall",
+		"Triggerbot": "TriggerBot",
+	}
+	for lang, data in translations.items():
+		for key, value in data.items():
+			for typo, correct in known_typos.items():
+				if typo in value:
+					issues_found = True
+					util.add_github_summary(
+						f"⚠ In {lang}.json string {key}, the word '{correct}' is incorrectly translated as '{typo}':"
+					)
+					util.add_github_summary("```json")
+					util.add_github_summary(f'  "{key}": "{value}"')
+					util.add_github_summary("```")
+
+	# Difficult strings
+	for lang, data in translations.items():
+		# Boatfly
+		boatfly_key = "description.wurst.hack.boatfly"
+		if boatfly_key in data and "shift" in data[boatfly_key].lower():
+			issues_found = True
+			util.add_github_summary(
+				f"⚠ In {lang}.json, the translation for {boatfly_key} incorrectly suggests using the shift (sneak) key instead of ctrl (sprint) to descend"
+			)
+		# Radar
+		radar_key = "description.wurst.hack.radar"
+		if radar_key in data and (
+			"§cred§r" in data[radar_key]
+			# Not checking orange because it appears in the French translation
+			or "§agreen§r" in data[radar_key]
+			or "§7gray§r" in data[radar_key]
+		):
+			issues_found = True
+			util.add_github_summary(
+				f"⚠ In {lang}.json, the translation for {radar_key} contains untranslated colors:"
+			)
+			util.add_github_summary("```json")
+			util.add_github_summary(f'  "{radar_key}": "{data[radar_key]}"')
+			util.add_github_summary("```")
+
+	if issues_found:
+		raise Exception("Found known issues in one or more translation files, see summary")
+	util.add_github_summary("✅ No known issues found in any translation files")
+
+
 def main():
 	en_us = util.read_json_file(translations_dir / "en_us.json")
 	translations = {}
@@ -90,6 +147,7 @@ def main():
 	check_extra_keys(en_us, translations)
 	check_untranslated_strings(en_us, translations)
 	check_order_of_strings(en_us, translations)
+	check_known_issues(en_us, translations)
 
 
 if __name__ == "__main__":
