@@ -33,7 +33,7 @@ def check_extra_keys(en_us: dict, translations: dict):
 def main():
 	en_us = util.read_json_file(translations_dir / "en_us.json")
 	translations = {}
-	for path in translations_dir.rglob("*.json"):
+	for path in sorted(translations_dir.rglob("*.json"), key=lambda x: x.name):
 		if path.is_file() and path.name != "en_us.json":
 			lang = path.name.removesuffix(".json")
 			data = util.read_json_file(path)
