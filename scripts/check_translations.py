@@ -28,6 +28,7 @@ def check_extra_keys(en_us: dict, translations: dict):
 				util.add_github_summary(f"- {key}")
 	if extra_keys_found:
 		raise Exception("Found extra keys in one or more translation files, see summary")
+	print("✅ No extra keys found")
 
 
 def check_untranslated_strings(en_us: dict, translations: dict):
@@ -63,6 +64,7 @@ def check_untranslated_strings(en_us: dict, translations: dict):
 
 	if untranslated_strings_found:
 		raise Exception("Found untranslated strings in one or more translation files, see summary")
+	print("✅ No accidentally untranslated strings found")
 
 
 def main():
