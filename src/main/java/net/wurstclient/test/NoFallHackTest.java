@@ -59,9 +59,9 @@ public enum NoFallHackTest
 	private static void assertPlayerHealth(Predicate<Float> healthCheck)
 	{
 		float health = submitAndGet(mc -> mc.player.getHealth());
-		if(healthCheck.test(health))
-			System.out.println("Player's health is correct: " + health);
-		else
+		if(!healthCheck.test(health))
 			throw new RuntimeException("Player's health is wrong: " + health);
+		
+		System.out.println("Player's health is correct: " + health);
 	}
 }
