@@ -118,6 +118,7 @@ public final class WurstE2ETestClient implements ModInitializer
 		clearChat();
 		
 		// Test Wurst hacks
+		AutoMineHackTest.testAutoMineHack();
 		NoFallHackTest.testNoFallHack();
 		
 		// Test Wurst commands
