@@ -103,7 +103,7 @@ public enum WurstClientTestHelper
 				break;
 			}
 			
-			if(startTime.isAfter(timeout))
+			if(LocalDateTime.now().isAfter(timeout))
 				throw new RuntimeException(
 					"Waiting until " + event + " took too long");
 			
