@@ -9,6 +9,8 @@ package net.wurstclient.test;
 
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
+import java.time.Duration;
+
 import net.minecraft.block.Blocks;
 
 public enum PistonTest
@@ -21,17 +23,17 @@ public enum PistonTest
 			"Testing that a piston can extend and retract without crashing the game");
 		
 		// Place a redstone block and piston
-		runChatCommand("setblock ~ ~ ~2 minecraft:redstone_block");
 		runChatCommand("setblock ~ ~1 ~2 minecraft:piston[facing=up]");
-		waitForBlock(0, 0, 2, Blocks.REDSTONE_BLOCK);
 		waitForBlock(0, 1, 2, Blocks.PISTON);
-		takeScreenshot("piston_extending");
+		runChatCommand("setblock ~ ~ ~2 minecraft:redstone_block");
+		waitForBlock(0, 0, 2, Blocks.REDSTONE_BLOCK);
+		takeScreenshot("piston_extending", Duration.ZERO);
 		waitForWorldTicks(3);
 		
 		// Destroy the redstone block
 		runChatCommand("setblock ~ ~ ~2 minecraft:air");
 		waitForBlock(0, 0, 2, Blocks.AIR);
-		takeScreenshot("piston_retracting");
+		takeScreenshot("piston_retracting", Duration.ZERO);
 		waitForWorldTicks(3);
 		
 		// Clean up
