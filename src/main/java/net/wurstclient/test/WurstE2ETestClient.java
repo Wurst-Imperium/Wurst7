@@ -110,8 +110,8 @@ public final class WurstE2ETestClient implements ModInitializer
 		// TODO: Open ClickGUI and Navigator
 		
 		// Build a test platform and clear out the space above it
-		runChatCommand("fill ~-5 ~-1 ~-5 ~5 ~-1 ~5 stone");
-		runChatCommand("fill ~-5 ~ ~-5 ~5 ~30 ~5 air");
+		runChatCommand("fill ~-7 ~-1 ~-7 ~7 ~-1 ~7 stone");
+		runChatCommand("fill ~-7 ~ ~-7 ~7 ~30 ~7 air");
 		
 		// Clear inventory and chat before running tests
 		runChatCommand("clear");
@@ -120,6 +120,7 @@ public final class WurstE2ETestClient implements ModInitializer
 		// Test Wurst hacks
 		AutoMineHackTest.testAutoMineHack();
 		NoFallHackTest.testNoFallHack();
+		XRayHackTest.testXRayHack();
 		
 		// Test Wurst commands
 		CopyItemCmdTest.testCopyItemCmd();
