@@ -9,6 +9,8 @@ package net.wurstclient.test;
 
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
+import java.time.Duration;
+
 import net.wurstclient.mixinterface.IKeyBinding;
 
 public enum FreecamHackTest
@@ -22,7 +24,7 @@ public enum FreecamHackTest
 		// Enable Freecam with default settings
 		runWurstCommand("setcheckbox Freecam tracer off");
 		runWurstCommand("t Freecam on");
-		takeScreenshot("freecam_default");
+		takeScreenshot("freecam_default", Duration.ofMillis(100));
 		clearChat();
 		
 		// Press shift to fly down a bit
@@ -31,12 +33,12 @@ public enum FreecamHackTest
 		waitForWorldTicks(5);
 		submitAndWait(
 			mc -> IKeyBinding.get(mc.options.sneakKey).simulatePress(false));
-		takeScreenshot("freecam_down");
+		takeScreenshot("freecam_down", Duration.ofMillis(300));
 		clearChat();
 		
 		// Tracer
 		runWurstCommand("setcheckbox Freecam tracer on");
-		takeScreenshot("freecam_tracer");
+		takeScreenshot("freecam_tracer", Duration.ofMillis(100));
 		clearChat();
 		
 		// Clean up
