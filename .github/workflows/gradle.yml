@@ -138,6 +138,7 @@ jobs:
               echo "" >> $GITHUB_STEP_SUMMARY
             else
               echo "Failed to upload $filename" >> $GITHUB_STEP_SUMMARY
+              echo "Imgur upload response for $filename: $response"
             fi
           fi
         done
