@@ -56,7 +56,7 @@ public abstract class BlockModelRendererMixin implements ItemConvertible
 		if(event.isRendered() != null)
 			return event.isRendered();
 		
-		return original.call(state, world.getBlockState(otherPos), side);
+		return original.call(state, world, pos, side, otherPos);
 	}
 	
 	/**
