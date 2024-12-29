@@ -37,7 +37,9 @@ public abstract class BlockModelRendererMixin implements ItemConvertible
 		ThreadLocal.withInitial(() -> 1F);
 	
 	/**
-	 * Makes X-Ray work when neither Sodium nor Indigo are running.
+	 * Makes X-Ray work when neither Sodium nor Indigo are running. Also gets
+	 * called while Indigo is running when breaking a block in survival mode or
+	 * seeing a piston retract.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/block/Block;shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z"),
