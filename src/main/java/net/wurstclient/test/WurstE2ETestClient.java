@@ -112,6 +112,7 @@ public final class WurstE2ETestClient implements ModInitializer
 		// Build a test platform and clear out the space above it
 		runChatCommand("fill ~-7 ~-1 ~-7 ~7 ~-1 ~7 stone");
 		runChatCommand("fill ~-7 ~ ~-7 ~7 ~30 ~7 air");
+		runChatCommand("kill @e[type=!player,distance=..10]");
 		
 		// Clear inventory and chat before running tests
 		runChatCommand("clear");
