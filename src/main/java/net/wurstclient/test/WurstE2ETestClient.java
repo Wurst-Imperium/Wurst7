@@ -128,6 +128,9 @@ public final class WurstE2ETestClient implements ModInitializer
 		
 		// TODO: Test more Wurst features
 		
+		// Test special cases
+		PistonTest.testPistonDoesntCrash();
+		
 		System.out.println("Opening game menu");
 		openGameMenu();
 		takeScreenshot("game_menu");

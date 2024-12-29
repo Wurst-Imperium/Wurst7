@@ -9,9 +9,7 @@ package net.wurstclient.test;
 
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
 
 public enum AutoMineHackTest
 {
@@ -35,15 +33,5 @@ public enum AutoMineHackTest
 		runChatCommand("kill @e[type=item]");
 		runChatCommand("clear");
 		clearChat();
-	}
-	
-	private static void waitForBlock(int relX, int relY, int relZ, Block block)
-	{
-		BlockPos pos =
-			submitAndGet(mc -> mc.player.getBlockPos().add(relX, relY, relZ));
-		waitUntil(
-			"block at ~" + relX + " ~" + relY + " ~" + relZ + " ("
-				+ pos.toShortString() + ") is " + block,
-			mc -> mc.world.getBlockState(pos).getBlock() == block);
 	}
 }
