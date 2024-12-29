@@ -25,7 +25,7 @@ public enum XRayHackTest
 		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand("setslider X-Ray opacity 0");
 		runWurstCommand("t X-Ray on");
-		takeScreenshot("xray_default", Duration.ofMillis(250));
+		takeScreenshot("xray_default", Duration.ofMillis(300));
 		runWurstCommand("t X-Ray off");
 		clearChat();
 		
@@ -33,7 +33,7 @@ public enum XRayHackTest
 		runWurstCommand("setcheckbox X-Ray only_show_exposed on");
 		runWurstCommand("setslider X-Ray opacity 0");
 		runWurstCommand("t X-Ray on");
-		takeScreenshot("xray_exposed_only", Duration.ofMillis(250));
+		takeScreenshot("xray_exposed_only", Duration.ofMillis(300));
 		runWurstCommand("t X-Ray off");
 		clearChat();
 		
@@ -41,7 +41,7 @@ public enum XRayHackTest
 		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand("setslider X-Ray opacity 0.5");
 		runWurstCommand("t X-Ray on");
-		takeScreenshot("xray_opacity", Duration.ofMillis(250));
+		takeScreenshot("xray_opacity", Duration.ofMillis(300));
 		runWurstCommand("t X-Ray off");
 		clearChat();
 		
@@ -49,7 +49,7 @@ public enum XRayHackTest
 		runWurstCommand("setcheckbox X-Ray only_show_exposed on");
 		runWurstCommand("setslider X-Ray opacity 0.5");
 		runWurstCommand("t X-Ray on");
-		takeScreenshot("xray_exposed_only_opacity", Duration.ofMillis(250));
+		takeScreenshot("xray_exposed_only_opacity", Duration.ofMillis(300));
 		runWurstCommand("t X-Ray off");
 		clearChat();
 		

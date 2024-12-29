@@ -9,8 +9,6 @@ package net.wurstclient.test;
 
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
-import java.time.Duration;
-
 import net.minecraft.block.Blocks;
 
 public enum PistonTest
@@ -27,13 +25,13 @@ public enum PistonTest
 		waitForBlock(0, 1, 2, Blocks.PISTON);
 		runChatCommand("setblock ~ ~ ~2 minecraft:redstone_block");
 		waitForBlock(0, 0, 2, Blocks.REDSTONE_BLOCK);
-		takeScreenshot("piston_extending", Duration.ZERO);
+		takeScreenshot("piston_extending");
 		waitForWorldTicks(3);
 		
 		// Destroy the redstone block
 		runChatCommand("setblock ~ ~ ~2 minecraft:air");
 		waitForBlock(0, 0, 2, Blocks.AIR);
-		takeScreenshot("piston_retracting", Duration.ZERO);
+		takeScreenshot("piston_retracting");
 		waitForWorldTicks(3);
 		
 		// Clean up
