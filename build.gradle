@@ -134,7 +134,7 @@ spotless {
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
 	}
-	format("license_header") {
+	format("licenseHeader") {
 		target("src/*/java/**/*.java", "src/test/java/**/*.java")
 		targetExclude("src/main/java/net/wurstclient/analytics/dmurph/**/*.java")
 		def header_file = file("codestyle/license_header.txt")
