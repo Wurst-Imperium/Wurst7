@@ -58,7 +58,7 @@ jobs:
       run: ./gradlew spotlessJavaCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
 
     - name: Validate license headers
-      run: ./gradlew licenseHeaderCheck || (echo "::error::License headers are missing or malformed in some files! Run './gradlew spotlessApply' to fix this, or check the full error message for details." && exit 1)
+      run: ./gradlew spotlessLicenseHeaderCheck || (echo "::error::License headers are missing or malformed in some files! Run './gradlew spotlessApply' to fix this, or check the full error message for details." && exit 1)
 
     - name: Run unit tests
       run: ./gradlew test --stacktrace --warning-mode=fail
