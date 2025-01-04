@@ -113,7 +113,9 @@ jobs:
 
     - name: Create test screenshot gallery
       if: ${{ env.IMGUR_CLIENT_ID && (success() || failure()) }}
-      shell: bash
+      # Imgur uploads randomly fail sometimes, probably because of the low rate limit.
+      # TODO: Find a better place to upload the screenshots.
+      continue-on-error: true
       run: |
         echo "<details open>" >> $GITHUB_STEP_SUMMARY
         echo "<summary>📸 Test Screenshots</summary>" >> $GITHUB_STEP_SUMMARY
