@@ -19,6 +19,7 @@ public enum GiveCmdTest
 	{
 		System.out.println("Testing .give command");
 		runWurstCommand("give diamond");
+		waitForWorldTicks(1);
 		assertOneItemInSlot(0, Items.DIAMOND);
 		
 		// Clean up
