@@ -98,7 +98,7 @@ jobs:
         echo "</details>" >> $GITHUB_STEP_SUMMARY
 
     - name: Run the mod and take screenshots
-      uses: modmuss50/xvfb-action@c56c7da0c8fc9a7cb5df2e50dd2a43a80b64c5cb
+      uses: GabrielBB/xvfb-action@v1.7
       with:
         run: ./gradlew runEndToEndTest --stacktrace --warning-mode=fail
 
