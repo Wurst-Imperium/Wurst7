@@ -38,6 +38,9 @@ on:
       fapi_version:
         description: "Fabric API version"
         required: true
+      distinct_id:
+        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
+        required: false
 
 permissions:
   # To push changes to the new snapshot branch.
@@ -49,6 +52,9 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
+
+    - name: Echo distinct ID ${{ github.event.inputs.distinct_id }}
+      run: echo ${{ github.event.inputs.distinct_id }}
 
     - name: Checkout repository
       uses: actions/checkout@v4
