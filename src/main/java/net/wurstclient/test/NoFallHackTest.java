@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -59,9 +59,9 @@ public enum NoFallHackTest
 	private static void assertPlayerHealth(Predicate<Float> healthCheck)
 	{
 		float health = submitAndGet(mc -> mc.player.getHealth());
-		if(healthCheck.test(health))
-			System.out.println("Player's health is correct: " + health);
-		else
+		if(!healthCheck.test(health))
 			throw new RuntimeException("Player's health is wrong: " + health);
+		
+		System.out.println("Player's health is correct: " + health);
 	}
 }

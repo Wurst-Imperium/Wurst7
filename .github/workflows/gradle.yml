@@ -57,6 +57,9 @@ jobs:
     - name: Validate Java code style
       run: ./gradlew spotlessJavaCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
 
+    - name: Validate license headers
+      run: ./gradlew spotlessLicenseHeaderCheck || (echo "::error::License headers are missing or malformed in some files! Run './gradlew spotlessApply' to fix this, or check the full error message for details." && exit 1)
+
     - name: Run unit tests
       run: ./gradlew test --stacktrace --warning-mode=fail
 
@@ -95,7 +98,7 @@ jobs:
         echo "</details>" >> $GITHUB_STEP_SUMMARY
 
     - name: Run the mod and take screenshots
-      uses: modmuss50/xvfb-action@c56c7da0c8fc9a7cb5df2e50dd2a43a80b64c5cb
+      uses: GabrielBB/xvfb-action@v1.7
       with:
         run: ./gradlew runEndToEndTest --stacktrace --warning-mode=fail
 
@@ -110,7 +113,9 @@ jobs:
 
     - name: Create test screenshot gallery
       if: ${{ env.IMGUR_CLIENT_ID && (success() || failure()) }}
-      shell: bash
+      # Imgur uploads randomly fail sometimes, probably because of the low rate limit.
+      # TODO: Find a better place to upload the screenshots.
+      continue-on-error: true
       run: |
         echo "<details open>" >> $GITHUB_STEP_SUMMARY
         echo "<summary>📸 Test Screenshots</summary>" >> $GITHUB_STEP_SUMMARY
@@ -138,6 +143,7 @@ jobs:
               echo "" >> $GITHUB_STEP_SUMMARY
             else
               echo "Failed to upload $filename" >> $GITHUB_STEP_SUMMARY
+              echo "Imgur upload response for $filename: $response"
             fi
           fi
         done

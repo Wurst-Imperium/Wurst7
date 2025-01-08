@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
 	id "fabric-loom" version "1.9-SNAPSHOT"
-	id "com.diffplug.spotless" version "6.25.0"
+	id "com.diffplug.spotless" version "7.0.1"
 }
 
 def ENV = System.getenv()
@@ -125,6 +125,7 @@ jar {
 	exclude("intentionally_untranslated.json")
 }
 
+import com.diffplug.spotless.generic.LicenseHeaderStep
 spotless {
 	lineEndings("WINDOWS")
 	java {
@@ -132,6 +133,13 @@ spotless {
 		indentWithTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
+	}
+	format("licenseHeader") {
+		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		targetExclude("src/main/java/net/wurstclient/analytics/dmurph/**/*.java")
+		def header_file = file("codestyle/license_header.txt")
+		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
+		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
 	}
 	json {
 		target "src/**/*.json"
