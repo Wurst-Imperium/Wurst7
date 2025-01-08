@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -22,11 +22,12 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -271,7 +272,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			return;
 		}
 		
-		Rectangle area = new Rectangle(width / 2 - 154, 60, 308, height - 103);
+		boolean noButtons = Screens.getButtons(this).isEmpty();
+		Rectangle area = new Rectangle(width / 2 - 154, 60, 308,
+			height - 60 - (noButtons ? 43 : 67));
 		if(!area.contains(x, y))
 			return;
 		
@@ -349,9 +352,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			bgx2, bgy2);
 		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);
 		
-		// scissor box
-		RenderUtils.scissorBox(bgx1, bgy1, bgx2, bgy3);
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.enableScissor(context, bgx1, bgy1, bgx2, bgy3);
 		
 		// settings
 		gui.setTooltip("");
@@ -372,26 +373,25 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionProgram);
+			RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			
 			// window background
 			// left & right
 			setColorToBackground();
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, x1, y3, 0).next();
-			bufferBuilder.vertex(matrix, x1, y2, 0).next();
-			bufferBuilder.vertex(matrix, x3, y2, 0).next();
-			bufferBuilder.vertex(matrix, x3, y3, 0).next();
-			bufferBuilder.vertex(matrix, x5, y3, 0).next();
-			bufferBuilder.vertex(matrix, x5, y2, 0).next();
-			bufferBuilder.vertex(matrix, x2, y2, 0).next();
-			bufferBuilder.vertex(matrix, x2, y3, 0).next();
-			tessellator.draw();
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, x1, y3, 0);
+			bufferBuilder.vertex(matrix, x1, y2, 0);
+			bufferBuilder.vertex(matrix, x3, y2, 0);
+			bufferBuilder.vertex(matrix, x3, y3, 0);
+			bufferBuilder.vertex(matrix, x5, y3, 0);
+			bufferBuilder.vertex(matrix, x5, y2, 0);
+			bufferBuilder.vertex(matrix, x2, y2, 0);
+			bufferBuilder.vertex(matrix, x2, y3, 0);
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			setColorToBackground();
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+			bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 				VertexFormats.POSITION);
 			
 			// window background
@@ -402,10 +402,15 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			{
 				int yc1 = window.getChild(i).getY();
 				int yc2 = yc1 - 2;
-				bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
-				bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
-				bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
-				bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
+				if(yc1 < bgy1 - windowY1)
+					continue;
+				if(yc2 > bgy3 - windowY1)
+					break;
+				
+				bufferBuilder.vertex(matrix, xc1, yc2, 0);
+				bufferBuilder.vertex(matrix, xc1, yc1, 0);
+				bufferBuilder.vertex(matrix, xc2, yc1, 0);
+				bufferBuilder.vertex(matrix, xc2, yc2, 0);
 			}
 			
 			// window background
@@ -420,17 +425,25 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				yc1 = lastChild.getY() + lastChild.getHeight();
 			}
 			int yc2 = yc1 + 2;
-			bufferBuilder.vertex(matrix, xc1, yc2, 0).next();
-			bufferBuilder.vertex(matrix, xc1, yc1, 0).next();
-			bufferBuilder.vertex(matrix, xc2, yc1, 0).next();
-			bufferBuilder.vertex(matrix, xc2, yc2, 0).next();
+			bufferBuilder.vertex(matrix, xc1, yc2, 0);
+			bufferBuilder.vertex(matrix, xc1, yc1, 0);
+			bufferBuilder.vertex(matrix, xc2, yc1, 0);
+			bufferBuilder.vertex(matrix, xc2, yc2, 0);
 			
-			tessellator.draw();
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)
-			window.getChild(i).render(context, mouseX - bgx1, mouseY - windowY1,
+		{
+			Component child = window.getChild(i);
+			if(child.getY() + child.getHeight() < bgy1 - windowY1)
+				continue;
+			if(child.getY() > bgy3 - windowY1)
+				break;
+			
+			child.render(context, mouseX - bgx1, mouseY - windowY1,
 				partialTicks);
+		}
 		matrixStack.pop();
 		
 		// buttons
@@ -455,7 +468,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			}else
 				alpha = 0.375F;
 			float[] rgb = buttonData.color.getColorComponents(null);
-			RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], alpha);
+			RenderUtils.setShaderColor(rgb, alpha);
 			
 			// button
 			drawBox(matrixStack, x1, y1, x2, y2);
@@ -479,8 +492,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		}
 		GL11.glEnable(GL11.GL_BLEND);
 		
-		// scissor box
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.disableScissor(context);
 		
 		// buttons below scissor box
 		for(ClickableWidget button : Screens.getButtons(this))

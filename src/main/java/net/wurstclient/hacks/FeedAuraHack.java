@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,9 +16,9 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
@@ -33,7 +33,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.PostMotionListener;
+import net.wurstclient.events.HandleInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -49,7 +49,7 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"feed aura", "BreedAura", "breed aura", "AutoBreeder",
 	"auto breeder"})
 public final class FeedAuraHack extends Hack
-	implements UpdateListener, PostMotionListener, RenderListener
+	implements UpdateListener, HandleInputListener, RenderListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
 		"Determines how far FeedAura will reach to feed animals.\n"
@@ -67,8 +67,9 @@ public final class FeedAuraHack extends Hack
 	private final CheckboxSetting filterHorses = new CheckboxSetting(
 		"Filter horse-like animals",
 		"Won't feed horses, llamas, donkeys, etc.\n"
-			+ "Recommended due to Minecraft bug MC-233276, which causes these animals to consume items indefinitely.",
-		true);
+			+ "Recommended in Minecraft versions before 1.20.3 due to MC-233276,"
+			+ "which causes these animals to consume items indefinitely.",
+		false);
 	
 	private final Random random = new Random();
 	private AnimalEntity target;
@@ -97,7 +98,7 @@ public final class FeedAuraHack extends Hack
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(PostMotionListener.class, this);
+		EVENTS.add(HandleInputListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
@@ -105,7 +106,7 @@ public final class FeedAuraHack extends Hack
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(PostMotionListener.class, this);
+		EVENTS.remove(HandleInputListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
 		target = null;
@@ -150,7 +151,7 @@ public final class FeedAuraHack extends Hack
 	}
 	
 	@Override
-	public void onPostMotion()
+	public void onHandleInput()
 	{
 		if(target == null)
 			return;
@@ -158,6 +159,9 @@ public final class FeedAuraHack extends Hack
 		ClientPlayerInteractionManager im = MC.interactionManager;
 		ClientPlayerEntity player = MC.player;
 		Hand hand = Hand.MAIN_HAND;
+		
+		if(im.isBreakingBlock() || player.isRiding())
+			return;
 		
 		// create realistic hit result
 		Box box = target.getBoundingBox();
@@ -172,7 +176,8 @@ public final class FeedAuraHack extends Hack
 		if(!actionResult.isAccepted())
 			actionResult = im.interactEntity(player, target, hand);
 		
-		if(actionResult.isAccepted() && actionResult.shouldSwingHand())
+		if(actionResult instanceof ActionResult.Success success
+			&& success.swingSource() == ActionResult.SwingSource.CLIENT)
 			player.swingHand(hand);
 		
 		target = null;
@@ -215,7 +220,7 @@ public final class FeedAuraHack extends Hack
 		matrixStack.scale(p, p, p);
 		matrixStack.translate(-0.5, -0.5, -0.5);
 		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(box, matrixStack);

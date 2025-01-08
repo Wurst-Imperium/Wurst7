@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,22 +7,31 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
+import java.util.OptionalDouble;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.EquippableComponent;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import net.wurstclient.WurstClient;
 
 public enum ItemUtils
 {
 	;
+	
+	private static final MinecraftClient MC = WurstClient.MC;
 	
 	/**
 	 * @param nameOrId
@@ -34,8 +43,8 @@ public enum ItemUtils
 	{
 		if(MathUtils.isInteger(nameOrId))
 		{
-			// There is no getOrEmpty() for raw IDs, so this detects when the
-			// Registry defaults and returns null instead
+			// There is no getOptionalValue() for raw IDs, so this detects when
+			// the registry defaults and returns null instead
 			int id = Integer.parseInt(nameOrId);
 			Item item = Registries.ITEM.get(id);
 			if(id != 0 && Registries.ITEM.getRawId(item) == 0)
@@ -46,7 +55,9 @@ public enum ItemUtils
 		
 		try
 		{
-			return Registries.ITEM.getOrEmpty(new Identifier(nameOrId))
+			// getOptionalValue() returns null instead of Items.AIR if the
+			// requested item doesn't exist
+			return Registries.ITEM.getOptionalValue(Identifier.of(nameOrId))
 				.orElse(null);
 			
 		}catch(InvalidIdentifierException e)
@@ -55,32 +66,88 @@ public enum ItemUtils
 		}
 	}
 	
-	public static float getAttackSpeed(Item item)
+	// TODO: Update AutoSword to use calculateModifiedAttribute() instead,
+	// then remove this method.
+	public static OptionalDouble getAttribute(Item item,
+		RegistryEntry<EntityAttribute> attribute)
 	{
-		return (float)item.getAttributeModifiers(EquipmentSlot.MAINHAND)
-			.get(EntityAttributes.GENERIC_ATTACK_SPEED).stream().findFirst()
-			.orElseThrow().getValue();
+		return item.getComponents()
+			.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS,
+				AttributeModifiersComponent.DEFAULT)
+			.modifiers().stream()
+			.filter(modifier -> modifier.attribute() == attribute)
+			.mapToDouble(modifier -> modifier.modifier().value()).findFirst();
 	}
 	
-	/**
-	 * Adds the specified enchantment to the specified item stack. Unlike
-	 * {@link ItemStack#addEnchantment(Enchantment, int)}, this method doesn't
-	 * limit the level to 127.
-	 */
-	public static void addEnchantment(ItemStack stack, Enchantment enchantment,
-		int level)
+	public static double calculateModifiedAttribute(Item item,
+		RegistryEntry<EntityAttribute> attribute, double base,
+		EquipmentSlot slot)
 	{
-		Identifier id = EnchantmentHelper.getEnchantmentId(enchantment);
-		NbtList nbt = getOrCreateNbtList(stack, ItemStack.ENCHANTMENTS_KEY);
-		nbt.add(EnchantmentHelper.createNbt(id, level));
-	}
-	
-	public static NbtList getOrCreateNbtList(ItemStack stack, String key)
-	{
-		NbtCompound nbt = stack.getOrCreateNbt();
-		if(!nbt.contains(key, NbtElement.LIST_TYPE))
-			nbt.put(key, new NbtList());
+		AttributeModifiersComponent modifiers = item.getComponents()
+			.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS,
+				AttributeModifiersComponent.DEFAULT);
 		
-		return nbt.getList(key, NbtElement.COMPOUND_TYPE);
+		double result = base;
+		for(AttributeModifiersComponent.Entry entry : modifiers.modifiers())
+		{
+			if(entry.attribute() != attribute || !entry.slot().matches(slot))
+				continue;
+			
+			double value = entry.modifier().value();
+			result += switch(entry.modifier().operation())
+			{
+				case ADD_VALUE -> value;
+				case ADD_MULTIPLIED_BASE -> value * base;
+				case ADD_MULTIPLIED_TOTAL -> value * result;
+			};
+		}
+		
+		return result;
+	}
+	
+	public static double getArmorAttribute(Item item,
+		RegistryEntry<EntityAttribute> attribute)
+	{
+		EquippableComponent equippable =
+			item.getComponents().get(DataComponentTypes.EQUIPPABLE);
+		
+		double base = MC.player.getAttributeBaseValue(attribute);
+		if(equippable == null)
+			return base;
+		
+		return calculateModifiedAttribute(item, attribute, base,
+			equippable.slot());
+	}
+	
+	public static double getArmorPoints(Item item)
+	{
+		return getArmorAttribute(item, EntityAttributes.ARMOR);
+	}
+	
+	public static double getToughness(Item item)
+	{
+		return getArmorAttribute(item, EntityAttributes.ARMOR_TOUGHNESS);
+	}
+	
+	public static EquipmentSlot getArmorSlot(Item item)
+	{
+		EquippableComponent equippable =
+			item.getComponents().get(DataComponentTypes.EQUIPPABLE);
+		
+		return equippable != null ? equippable.slot() : null;
+	}
+	
+	public static boolean hasEffect(ItemStack stack,
+		RegistryEntry<StatusEffect> effect)
+	{
+		PotionContentsComponent potionContents = stack.getComponents()
+			.getOrDefault(DataComponentTypes.POTION_CONTENTS,
+				PotionContentsComponent.DEFAULT);
+		
+		for(StatusEffectInstance effectInstance : potionContents.getEffects())
+			if(effectInstance.getEffectType() == effect)
+				return true;
+			
+		return false;
 	}
 }

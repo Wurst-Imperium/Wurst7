@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,15 +7,22 @@
  */
 package net.wurstclient.hacks.autofish;
 
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.EnchantmentEffectComponentTypes;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry.Reference;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoFishHack;
 import net.wurstclient.settings.CheckboxSetting;
@@ -115,7 +122,7 @@ public final class AutoFishRodSelector
 		}
 		
 		// check if selected rod is still the best one
-		if(MC.player.getInventory().selectedSlot == bestRodSlot)
+		if(selectedSlot == bestRodSlot)
 			return true;
 		
 		// change selected rod and wait until the next tick
@@ -128,14 +135,32 @@ public final class AutoFishRodSelector
 		if(stack.isEmpty() || !(stack.getItem() instanceof FishingRodItem))
 			return -1;
 		
-		int luckOTSLvl =
-			EnchantmentHelper.getLevel(Enchantments.LUCK_OF_THE_SEA, stack);
-		int lureLvl = EnchantmentHelper.getLevel(Enchantments.LURE, stack);
-		int unbreakingLvl =
-			EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
-		int mendingBonus =
-			EnchantmentHelper.getLevel(Enchantments.MENDING, stack);
-		int noVanishBonus = EnchantmentHelper.hasVanishingCurse(stack) ? 0 : 1;
+		DynamicRegistryManager drm = MC.world.getRegistryManager();
+		Registry<Enchantment> registry =
+			drm.getOrThrow(RegistryKeys.ENCHANTMENT);
+		
+		Optional<Reference<Enchantment>> luckOTS =
+			registry.getOptional(Enchantments.LUCK_OF_THE_SEA);
+		int luckOTSLvl = luckOTS
+			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+		
+		Optional<Reference<Enchantment>> lure =
+			registry.getOptional(Enchantments.LURE);
+		int lureLvl = lure
+			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+		
+		Optional<Reference<Enchantment>> unbreaking =
+			registry.getOptional(Enchantments.UNBREAKING);
+		int unbreakingLvl = unbreaking
+			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+		
+		Optional<Reference<Enchantment>> mending =
+			registry.getOptional(Enchantments.MENDING);
+		int mendingBonus = mending
+			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+		
+		int noVanishBonus = EnchantmentHelper.hasAnyEnchantmentsWith(stack,
+			EnchantmentEffectComponentTypes.PREVENT_EQUIPMENT_DROP) ? 0 : 1;
 		
 		return luckOTSLvl * 9 + lureLvl * 9 + unbreakingLvl * 2 + mendingBonus
 			+ noVanishBonus;

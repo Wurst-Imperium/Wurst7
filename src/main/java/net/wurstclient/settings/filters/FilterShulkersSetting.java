@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -25,11 +25,15 @@ public final class FilterShulkersSetting extends EntityFilterCheckbox
 	
 	public static FilterShulkersSetting genericCombat(boolean checked)
 	{
-		return new FilterShulkersSetting("Won't attack shulkers.", checked);
+		return new FilterShulkersSetting(
+			"description.wurst.setting.generic.filter_shulkers_combat",
+			checked);
 	}
 	
 	public static FilterShulkersSetting genericVision(boolean checked)
 	{
-		return new FilterShulkersSetting("Won't show shulkers.", checked);
+		return new FilterShulkersSetting(
+			"description.wurst.setting.generic.filter_shulkers_vision",
+			checked);
 	}
 }

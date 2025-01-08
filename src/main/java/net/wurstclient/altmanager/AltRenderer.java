@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,11 +16,11 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -64,20 +64,16 @@ public final class AltRenderer
 		float vOverFh = v / fh;
 		float vPlusHOverFh = (v + h) / fh;
 		
-		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX);
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION_TEXTURE);
-		bufferBuilder.vertex(matrix4f, x, y, z).texture(uOverFw, vOverFh)
-			.next();
-		bufferBuilder.vertex(matrix4f, x, y2, z).texture(uOverFw, vPlusHOverFh)
-			.next();
-		bufferBuilder.vertex(matrix4f, x2, y2, z)
-			.texture(uPlusWOverFw, vPlusHOverFh).next();
-		bufferBuilder.vertex(matrix4f, x2, y, z).texture(uPlusWOverFw, vOverFh)
-			.next();
+		BufferBuilder bufferBuilder = Tessellator.getInstance()
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		bufferBuilder.vertex(matrix4f, x, y, z).texture(uOverFw, vOverFh);
+		bufferBuilder.vertex(matrix4f, x, y2, z).texture(uOverFw, vPlusHOverFh);
+		bufferBuilder.vertex(matrix4f, x2, y2, z).texture(uPlusWOverFw,
+			vPlusHOverFh);
+		bufferBuilder.vertex(matrix4f, x2, y, z).texture(uPlusWOverFw, vOverFh);
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	

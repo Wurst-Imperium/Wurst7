@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,9 +14,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -25,6 +26,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.util.RenderUtils;
 
 public abstract class AbstractListEditButton extends Component
 {
@@ -83,43 +85,40 @@ public abstract class AbstractListEditButton extends Component
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// tooltip
 		if(hText)
 			gui.setTooltip(getSetting().getWrappedDescription(200));
 		
 		// background
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y1, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0).next();
-		bufferBuilder.vertex(matrix, x3, y2, 0).next();
-		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		tessellator.draw();
+		RenderUtils.setShaderColor(bgColor, opacity);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x1, y1, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0);
+		bufferBuilder.vertex(matrix, x3, y2, 0);
+		bufferBuilder.vertex(matrix, x3, y1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// box
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			hBox ? opacity * 1.5F : opacity);
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		RenderUtils.setShaderColor(bgColor, hBox ? opacity * 1.5F : opacity);
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.vertex(matrix, x3, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		tessellator.draw();
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		bufferBuilder.vertex(matrix, x3, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0).next();
-		bufferBuilder.vertex(matrix, x3, y1, 0).next();
-		tessellator.draw();
+		bufferBuilder.vertex(matrix, x3, y1, 0);
+		bufferBuilder.vertex(matrix, x3, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		RenderUtils.setShaderColor(acColor, 0.5F);
+		bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, x3, y1, 0);
+		bufferBuilder.vertex(matrix, x3, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y2, 0);
+		bufferBuilder.vertex(matrix, x2, y1, 0);
+		bufferBuilder.vertex(matrix, x3, y1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// setting name
 		RenderSystem.setShaderColor(1, 1, 1, 1);

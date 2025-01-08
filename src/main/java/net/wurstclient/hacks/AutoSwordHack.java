@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,15 +7,14 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.MaceItem;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.SwordItem;
-import net.minecraft.item.ToolItem;
 import net.minecraft.item.TridentItem;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -62,14 +61,14 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		oldSlot = -1;
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		resetSlot();
@@ -147,24 +146,30 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	private float getValue(ItemStack stack, Entity entity)
 	{
 		Item item = stack.getItem();
-		if(!(item instanceof ToolItem || item instanceof TridentItem))
+		if(!(item instanceof SwordItem || item instanceof MiningToolItem
+			|| item instanceof TridentItem || item instanceof MaceItem))
 			return Integer.MIN_VALUE;
 		
 		switch(priority.getSelected())
 		{
 			case SPEED:
-			return ItemUtils.getAttackSpeed(item);
+			return (float)ItemUtils
+				.getAttribute(item, EntityAttributes.ATTACK_SPEED)
+				.orElseThrow();
 			
+			// Client-side item-specific attack damage calculation no
+			// longer exists as of 24w18a (1.21). Related bug: MC-196250
 			case DAMAGE:
-			EntityGroup group = entity instanceof LivingEntity le
-				? le.getGroup() : EntityGroup.DEFAULT;
-			float dmg = EnchantmentHelper.getAttackDamage(stack, group);
-			if(item instanceof SwordItem sword)
-				dmg += sword.getAttackDamage();
-			if(item instanceof MiningToolItem tool)
-				dmg += tool.getAttackDamage();
-			if(item instanceof TridentItem)
-				dmg += TridentItem.ATTACK_DAMAGE;
+			// EntityType<?> group = entity.getType();
+			float dmg = (float)ItemUtils
+				.getAttribute(item, EntityAttributes.ATTACK_DAMAGE)
+				.orElseThrow();
+			
+			// Check for mace, get bonus damage from fall
+			if(item instanceof MaceItem mace)
+				dmg = mace.getBonusAttackDamage(MC.player, dmg,
+					entity.getDamageSources().playerAttack(MC.player));
+			// dmg += EnchantmentHelper.getAttackDamage(stack, group);
 			return dmg;
 		}
 		

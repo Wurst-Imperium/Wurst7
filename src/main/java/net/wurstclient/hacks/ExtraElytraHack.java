@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,10 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ElytraItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -53,14 +49,14 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 		jumpTimer = 0;
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}
@@ -71,11 +67,10 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		if(jumpTimer > 0)
 			jumpTimer--;
 		
-		ItemStack chest = MC.player.getEquippedStack(EquipmentSlot.CHEST);
-		if(chest.getItem() != Items.ELYTRA)
+		if(!MC.player.canGlide())
 			return;
 		
-		if(MC.player.isFallFlying())
+		if(MC.player.isGliding())
 		{
 			if(stopInWater.isChecked() && MC.player.isTouchingWater())
 			{
@@ -88,7 +83,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(ElytraItem.isUsable(chest) && MC.options.jumpKey.isPressed())
+		if(MC.options.jumpKey.isPressed())
 			doInstantFly();
 	}
 	

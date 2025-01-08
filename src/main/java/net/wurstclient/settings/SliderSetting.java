@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,6 +21,7 @@ import net.wurstclient.clickgui.components.SliderComponent;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.text.WText;
 
 public class SliderSetting extends Setting implements SliderLock
 {
@@ -36,7 +37,7 @@ public class SliderSetting extends Setting implements SliderLock
 	private double usableMin;
 	private double usableMax;
 	
-	public SliderSetting(String name, String description, double value,
+	public SliderSetting(String name, WText description, double value,
 		double minimum, double maximum, double increment, ValueDisplay display)
 	{
 		super(name, description);
@@ -53,10 +54,17 @@ public class SliderSetting extends Setting implements SliderLock
 		this.display = display;
 	}
 	
+	public SliderSetting(String name, String descriptionKey, double value,
+		double minimum, double maximum, double increment, ValueDisplay display)
+	{
+		this(name, WText.translated(descriptionKey), value, minimum, maximum,
+			increment, display);
+	}
+	
 	public SliderSetting(String name, double value, double minimum,
 		double maximum, double increment, ValueDisplay display)
 	{
-		this(name, "", value, minimum, maximum, increment, display);
+		this(name, WText.empty(), value, minimum, maximum, increment, display);
 	}
 	
 	@Override
@@ -272,7 +280,7 @@ public class SliderSetting extends Setting implements SliderLock
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "Slider");
 		
 		json.addProperty("defaultValue", defaultValue);
@@ -303,8 +311,10 @@ public class SliderSetting extends Setting implements SliderLock
 	{
 		public static final ValueDisplay INTEGER = v -> (int)v + "";
 		
-		public static final ValueDisplay DECIMAL =
-			v -> Math.round(v * 1e6) / 1e6 + "";
+		public static final ValueDisplay DECIMAL = v -> {
+			String s = Math.round(v * 1e6) / 1e6 + "";
+			return s.endsWith(".0") ? s.substring(0, s.length() - 2) : s;
+		};
 		
 		public static final ValueDisplay PERCENTAGE =
 			v -> (int)(Math.round(v * 1e8) / 1e6) + "%";
@@ -322,6 +332,19 @@ public class SliderSetting extends Setting implements SliderLock
 		};
 		
 		public static final ValueDisplay DEGREES = INTEGER.withSuffix("\u00b0");
+		
+		public static final ValueDisplay ROUNDING_PRECISION =
+			v -> (int)v == 0 ? "1" : "0." + "0".repeat((int)v - 1) + "1";
+		
+		/**
+		 * Treats the stored value as a radius from the center block and
+		 * displays the resulting area. For example, a value of 1 will display
+		 * "3x3", 2 will display "5x5", and so on.
+		 */
+		public static final ValueDisplay AREA_FROM_RADIUS = v -> {
+			int d = 2 * (int)v + 1;
+			return d + "x" + d;
+		};
 		
 		public static final ValueDisplay NONE = v -> "";
 		

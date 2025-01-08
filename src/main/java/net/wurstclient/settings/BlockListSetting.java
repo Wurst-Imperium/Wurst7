@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,6 +18,7 @@ import java.util.Set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import net.minecraft.block.Block;
 import net.minecraft.registry.Registries;
@@ -29,27 +30,58 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
-import net.wurstclient.util.json.WsonArray;
+import net.wurstclient.util.text.WText;
 
-public final class BlockListSetting extends Setting
+public class BlockListSetting extends Setting
 {
 	private final ArrayList<String> blockNames = new ArrayList<>();
 	private final String[] defaultNames;
 	
-	public BlockListSetting(String name, String description, String... blocks)
+	public BlockListSetting(String name, WText description, String... blocks)
 	{
 		super(name, description);
 		
 		Arrays.stream(blocks).parallel()
-			.map(s -> Registries.BLOCK.get(new Identifier(s)))
+			.map(s -> Registries.BLOCK.get(Identifier.of(s)))
 			.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 			.sorted().forEachOrdered(s -> blockNames.add(s));
 		defaultNames = blockNames.toArray(new String[0]);
 	}
 	
+	public BlockListSetting(String name, String descriptionKey,
+		String... blocks)
+	{
+		this(name, WText.translated(descriptionKey), blocks);
+	}
+	
 	public List<String> getBlockNames()
 	{
 		return Collections.unmodifiableList(blockNames);
+	}
+	
+	public int indexOf(String name)
+	{
+		return Collections.binarySearch(blockNames, name);
+	}
+	
+	public int indexOf(Block block)
+	{
+		return indexOf(BlockUtils.getName(block));
+	}
+	
+	public boolean contains(String name)
+	{
+		return indexOf(name) >= 0;
+	}
+	
+	public boolean contains(Block block)
+	{
+		return indexOf(block) >= 0;
+	}
+	
+	public int size()
+	{
+		return blockNames.size();
 	}
 	
 	public void add(Block block)
@@ -90,11 +122,18 @@ public final class BlockListSetting extends Setting
 	{
 		try
 		{
-			WsonArray wson = JsonUtils.getAsArray(json);
 			blockNames.clear();
 			
-			wson.getAllStrings().parallelStream()
-				.map(s -> Registries.BLOCK.get(new Identifier(s)))
+			// if string "default", load default blocks
+			if(JsonUtils.getAsString(json, "nope").equals("default"))
+			{
+				blockNames.addAll(Arrays.asList(defaultNames));
+				return;
+			}
+			
+			// otherwise, load the blocks in the JSON array
+			JsonUtils.getAsArray(json).getAllStrings().parallelStream()
+				.map(s -> Registries.BLOCK.get(Identifier.of(s)))
 				.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 				.sorted().forEachOrdered(s -> blockNames.add(s));
 			
@@ -108,6 +147,10 @@ public final class BlockListSetting extends Setting
 	@Override
 	public JsonElement toJson()
 	{
+		// if blockNames is the same as defaultNames, save string "default"
+		if(blockNames.equals(Arrays.asList(defaultNames)))
+			return new JsonPrimitive("default");
+		
 		JsonArray json = new JsonArray();
 		blockNames.forEach(s -> json.add(s));
 		return json;
@@ -119,7 +162,7 @@ public final class BlockListSetting extends Setting
 		JsonObject json = new JsonObject();
 		
 		json.addProperty("name", getName());
-		json.addProperty("descriptionKey", getDescriptionKey());
+		json.addProperty("description", getDescription());
 		json.addProperty("type", "BlockList");
 		
 		JsonArray defaultBlocksJson = new JsonArray();

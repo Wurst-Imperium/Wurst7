@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,11 +21,12 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -44,11 +45,11 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.ChunkSearcher;
-import net.wurstclient.util.ChunkSearcherCoordinator;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.chunk.ChunkSearcher;
+import net.wurstclient.util.chunk.ChunkSearcherCoordinator;
 
 @SearchTags({"cave finder"})
 public final class CaveFinderHack extends Hack
@@ -96,7 +97,7 @@ public final class CaveFinderHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		prevLimit = limit.getValueI();
 		notify = true;
@@ -111,7 +112,7 @@ public final class CaveFinderHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, coordinator);
@@ -186,9 +187,8 @@ public final class CaveFinderHack extends Hack
 		if(opacity.getValue() > 0)
 			alpha = opacity.getValueF();
 		
-		float[] colorF = color.getColorF();
-		RenderSystem.setShaderColor(colorF[0], colorF[1], colorF[2], alpha);
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		color.setAsShaderColor(alpha);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
@@ -254,25 +254,31 @@ public final class CaveFinderHack extends Hack
 	
 	private void setBufferFromTask()
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		
+		ArrayList<int[]> vertices = compileVerticesTask.join();
 		RegionPos region = RenderUtils.getCameraRegion();
-		for(int[] vertex : compileVerticesTask.join())
-			bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
-				vertex[2] - region.z()).next();
-		
-		BuiltBuffer buffer = bufferBuilder.end();
-		
 		if(vertexBuffer != null)
+		{
 			vertexBuffer.close();
+			vertexBuffer = null;
+		}
 		
-		vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		vertexBuffer.bind();
-		vertexBuffer.upload(buffer);
-		VertexBuffer.unbind();
+		if(!vertices.isEmpty())
+		{
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			
+			for(int[] vertex : vertices)
+				bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
+					vertex[2] - region.z());
+			
+			BuiltBuffer buffer = bufferBuilder.end();
+			
+			vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+			vertexBuffer.bind();
+			vertexBuffer.upload(buffer);
+			VertexBuffer.unbind();
+		}
 		
 		bufferUpToDate = true;
 		bufferRegion = region;

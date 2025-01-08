@@ -1,23 +1,22 @@
 buildscript {
 	dependencies {
-		classpath 'org.kohsuke:github-api:1.135'
+		classpath "org.kohsuke:github-api:1.326"
 	}
 }
 
 plugins {
-	id 'fabric-loom' version '1.5-SNAPSHOT'
-	id 'maven-publish'
-	id 'com.diffplug.spotless' version '6.23.3'
+	id "fabric-loom" version "1.9-SNAPSHOT"
+	id "com.diffplug.spotless" version "7.0.1"
 }
 
 def ENV = System.getenv()
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -32,7 +31,8 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
+	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
+	
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
@@ -42,11 +42,56 @@ dependencies {
 	//
 	// In other words, Wurst won't compile without this library,
 	// even though it's Minecraft that actually uses it.
-	modImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+	modImplementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 loom {
 	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
+}
+
+configurations {
+	productionRuntime {
+		extendsFrom configurations.minecraftLibraries
+		extendsFrom configurations.loaderLibraries
+		extendsFrom configurations.minecraftRuntimeLibraries
+	}
+}
+
+dependencies {
+	productionRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
+	productionRuntime "net.fabricmc:intermediary:${project.minecraft_version}"
+}
+
+import net.fabricmc.loom.util.Platform
+tasks.register('runEndToEndTest', JavaExec) {
+	dependsOn remapJar, downloadAssets
+	classpath.from configurations.productionRuntime
+	mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient"
+	workingDir = file("run")
+	
+	doFirst {
+		classpath.from loom.minecraftProvider.minecraftClientJar
+		workingDir.mkdirs()
+		
+		args(
+			"--assetIndex", loom.minecraftProvider.versionInfo.assetIndex().fabricId(loom.minecraftProvider.minecraftVersion()),
+			"--assetsDir", new File(loom.files.userCache, "assets").absolutePath,
+			"--gameDir", workingDir.absolutePath
+		)
+		
+		if (Platform.CURRENT.operatingSystem.isMacOS()) {
+			jvmArgs("-XstartOnFirstThread")
+		}
+		
+		jvmArgs(
+			"-Dfabric.addMods=${configurations.modImplementation.find { it.name.contains('fabric-api') }.absolutePath}${File.pathSeparator}${remapJar.archiveFile.get().asFile.absolutePath}",
+			"-Dwurst.e2eTest",
+			"-Dfabric-tag-conventions-v2.missingTagTranslationWarning=fail",
+			"-Dfabric-tag-conventions-v1.legacyTagWarning=fail",
+			"-Dmixin.debug.verify=true",
+			"-Dmixin.debug.countInjections=true"
+		)
+	}
 }
 
 processResources {
@@ -58,8 +103,8 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
+	// Minecraft 1.20.5 (24w14a) upwards uses Java 21.
+	it.options.release = 21
 }
 
 java {
@@ -67,70 +112,143 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
+	
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename {"${it}_${base.archivesName.get()}"}
 	}
+	
+	exclude("intentionally_untranslated.json")
 }
 
+import com.diffplug.spotless.generic.LicenseHeaderStep
 spotless {
+	lineEndings("WINDOWS")
 	java {
 		removeUnusedImports()
 		indentWithTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
-		lineEndings('WINDOWS')
+	}
+	format("licenseHeader") {
+		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		targetExclude("src/main/java/net/wurstclient/analytics/dmurph/**/*.java")
+		def header_file = file("codestyle/license_header.txt")
+		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
+		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
+	}
+	json {
+		target "src/**/*.json"
+		gson().indentWithSpaces(2).version("2.11.0")
 	}
 }
 
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-	
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
+test {
+	useJUnitPlatform()
 }
 
-task moveDevLibs(dependsOn: [remapJar, remapSourcesJar]) {
-	doLast {
-		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
-		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
-	}
+def getGhVersion() {
+	return version.substring(0, version.indexOf("-MC"))
+}
+
+def getChangelogUrl() {
+	def versionSlug = version.substring(1, version.indexOf("-MC")).replace(".", "-")
+	return "https://www.wurstclient.net/updates/wurst-${versionSlug}/"
 }
 
 import org.kohsuke.github.GHReleaseBuilder
 import org.kohsuke.github.GitHub
 
-task github(dependsOn: moveDevLibs) {
+task github(dependsOn: build) {
 	onlyIf {
 		ENV.GITHUB_TOKEN
 	}
-
+	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repository = github.getRepository("Wurst-Imperium/Wurst-MCX2")
-		def ghVersion = version.substring(0, version.indexOf("-"))
+		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
+			releaseBuilder.prerelease(ghVersion.contains("pre"))
 			ghRelease = releaseBuilder.create()
 		}
 		
 		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar"), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar"), "application/java-archive")
+	}
+}
+
+import java.time.LocalDate
+import org.kohsuke.github.GHIssueState
+import org.kohsuke.github.GHMilestoneState
+import java.time.ZoneId
+import java.time.Instant
+
+task closeMilestone {
+	onlyIf {
+		ENV.GITHUB_TOKEN
+	}
+	
+	doLast {
+		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
+		def repository = github.getRepository("Wurst-Imperium/Wurst7")
+		def ghVersion = getGhVersion()
+		
+		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
+		def milestone = repository.listMilestones(GHIssueState.ALL).find { it.title == ghVersion }
+		if (milestone == null) {
+			milestone = repository.createMilestone(ghVersion, "")
+		}
+		
+		if (milestone.getState() != GHMilestoneState.CLOSED) {
+			milestone.setDueOn(Date.from(Instant.now()))
+			milestone.setDescription(getChangelogUrl())
+			milestone.close()
+		}
+	}
+}
+
+task uploadBackups {
+	dependsOn build
+	
+	onlyIf {
+		ENV.WI_BACKUPS_API_KEY
+	}
+	
+	doLast {
+		def shortVersion = getGhVersion().substring(1)
+		def backupUrl = "https://api.wurstclient.net/artifact-backups/Wurst/${shortVersion}"
+		
+		def connection = new URL(backupUrl).openConnection() as HttpURLConnection
+		def boundary = UUID.randomUUID().toString()
+		connection.setRequestMethod("POST")
+		connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
+		connection.setRequestProperty("Accept", "application/json")
+		connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+		connection.doOutput = true
+		
+		def output = connection.outputStream
+		[remapJar, remapSourcesJar].each { jarTask ->
+			def file = jarTask.archiveFile.get().asFile
+			output << "--${boundary}\r\n"
+			output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
+			output << "Content-Type: application/java-archive\r\n\r\n"
+			file.withInputStream { input -> 
+				output << input
+			}
+			output << "\r\n"
+		}
+		output << "--${boundary}--\r\n"
+		output.flush()
+		
+		if(connection.responseCode != 200)
+			throw new GradleException("Failed to upload backups: ${connection.responseCode} ${connection.responseMessage}")
 	}
 }

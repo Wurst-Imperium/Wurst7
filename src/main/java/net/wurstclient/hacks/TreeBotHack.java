@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -40,6 +40,7 @@ import net.wurstclient.settings.FacingSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
@@ -55,7 +56,7 @@ public final class TreeBotHack extends Hack
 		ValueDisplay.DECIMAL);
 	
 	private final FacingSetting facing = FacingSetting.withoutPacketSpam(
-		"How to face the logs and leaves when breaking them.\n\n"
+		"How TreeBot should face the logs and leaves when breaking them.\n\n"
 			+ "\u00a7lOff\u00a7r - Don't face the blocks at all. Will be"
 			+ " detected by anti-cheat plugins.\n\n"
 			+ "\u00a7lServer-side\u00a7r - Face the blocks on the"
@@ -65,14 +66,8 @@ public final class TreeBotHack extends Hack
 			+ " camera on the client-side. This is the most legit option, but"
 			+ " can be disorienting to look at.");
 	
-	private final SwingHandSetting swingHand = new SwingHandSetting(
-		"How TreeBot should swing your hand when breaking logs and leaves.\n\n"
-			+ "\u00a7lOff\u00a7r - Don't swing your hand at all. Will be detected"
-			+ " by anti-cheat plugins.\n\n"
-			+ "\u00a7lServer-side\u00a7r - Swing your hand on the server-side,"
-			+ " without playing the animation on the client-side.\n\n"
-			+ "\u00a7lClient-side\u00a7r - Swing your hand on the client-side."
-			+ " This is the most legit option.");
+	private final SwingHandSetting swingHand =
+		new SwingHandSetting(this, SwingHand.SERVER);
 	
 	private TreeFinder treeFinder;
 	private AngleFinder angleFinder;
@@ -107,7 +102,7 @@ public final class TreeBotHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		treeFinder = new TreeFinder();
 		
@@ -116,7 +111,7 @@ public final class TreeBotHack extends Hack
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
@@ -250,7 +245,7 @@ public final class TreeBotHack extends Hack
 		// damage block and swing hand
 		if(MC.interactionManager.updateBlockBreakingProgress(pos,
 			params.side()))
-			swingHand.getSelected().swing(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 		
 		// update progress
 		overlay.updateProgress();
@@ -261,7 +256,7 @@ public final class TreeBotHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		
 		if(treeFinder != null)

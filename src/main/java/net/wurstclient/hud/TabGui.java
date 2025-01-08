@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -16,13 +16,13 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
@@ -32,6 +32,7 @@ import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.hacks.TooManyHaxHack;
 import net.wurstclient.other_features.TabGuiOtf;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.RenderUtils;
 
 public final class TabGui implements KeyPressListener
 {
@@ -128,27 +129,25 @@ public final class TabGui implements KeyPressListener
 		if(tabGuiOtf.isHidden())
 			return;
 		
+		// CURSED: TabGUI renders behind HackList without this
+		context.draw();
+		
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.disableCull();
 		
 		matrixStack.push();
-		Window sr = WurstClient.MC.getWindow();
 		
 		int x = 2;
 		int y = 23;
 		
-		matrixStack.translate(x, y, 0);
+		matrixStack.translate(x, y, 100);
 		drawBox(matrixStack, 0, 0, width, height);
 		
-		double factor = sr.getScaleFactor();
-		GL11.glScissor((int)(x * factor),
-			(int)((sr.getScaledHeight() - height - y) * factor),
-			(int)(width * factor), (int)(height * factor));
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.enableScissor(context, x, y, x + width, y + height);
 		
 		int textY = 1;
 		
@@ -162,8 +161,8 @@ public final class TabGui implements KeyPressListener
 				txtColor, false);
 			textY += 10;
 		}
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		
+		RenderUtils.disableScissor(context);
 		
 		if(tabOpened)
 		{
@@ -176,10 +175,8 @@ public final class TabGui implements KeyPressListener
 			matrixStack.translate(width + 2, 0, 0);
 			drawBox(matrixStack, 0, 0, tab.width, tab.height);
 			
-			GL11.glScissor((int)(tabX * factor),
-				(int)((sr.getScaledHeight() - tab.height - tabY) * factor),
-				(int)(tab.width * factor), (int)(tab.height * factor));
-			GL11.glEnable(GL11.GL_SCISSOR_TEST);
+			RenderUtils.enableScissor(context, tabX, tabY, tabX + tab.width,
+				tabY + tab.height);
 			
 			int tabTextY = 1;
 			for(int i = 0; i < tab.features.size(); i++)
@@ -197,8 +194,8 @@ public final class TabGui implements KeyPressListener
 					tabTextY, txtColor, false);
 				tabTextY += 10;
 			}
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glDisable(GL11.GL_SCISSOR_TEST);
+			
+			RenderUtils.disableScissor(context);
 			
 			matrixStack.pop();
 		}
@@ -217,23 +214,21 @@ public final class TabGui implements KeyPressListener
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// color
-		RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-			opacity);
+		RenderUtils.setShaderColor(bgColor, opacity);
 		
 		// box
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		{
-			bufferBuilder.vertex(matrix, x1, y1, 0).next();
-			bufferBuilder.vertex(matrix, x2, y1, 0).next();
-			bufferBuilder.vertex(matrix, x2, y2, 0).next();
-			bufferBuilder.vertex(matrix, x1, y2, 0).next();
+			bufferBuilder.vertex(matrix, x1, y1, 0);
+			bufferBuilder.vertex(matrix, x2, y1, 0);
+			bufferBuilder.vertex(matrix, x2, y2, 0);
+			bufferBuilder.vertex(matrix, x1, y2, 0);
 		}
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// outline positions
 		float xi1 = x1 - 0.1F;
@@ -243,17 +238,17 @@ public final class TabGui implements KeyPressListener
 		
 		// outline
 		GL11.glLineWidth(1);
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
+		RenderUtils.setShaderColor(acColor, 0.5F);
+		bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
 		{
-			bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
-			bufferBuilder.vertex(matrix, xi2, yi1, 0).next();
-			bufferBuilder.vertex(matrix, xi2, yi2, 0).next();
-			bufferBuilder.vertex(matrix, xi1, yi2, 0).next();
-			bufferBuilder.vertex(matrix, xi1, yi1, 0).next();
+			bufferBuilder.vertex(matrix, xi1, yi1, 0);
+			bufferBuilder.vertex(matrix, xi2, yi1, 0);
+			bufferBuilder.vertex(matrix, xi2, yi2, 0);
+			bufferBuilder.vertex(matrix, xi1, yi2, 0);
+			bufferBuilder.vertex(matrix, xi1, yi1, 0);
 		}
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// shadow positions
 		xi1 -= 0.9;
@@ -261,46 +256,46 @@ public final class TabGui implements KeyPressListener
 		yi1 -= 0.9;
 		yi2 += 0.9;
 		
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		// top left
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
 			VertexFormats.POSITION_COLOR);
 		
 		// top
-		bufferBuilder.vertex(matrix, x1, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, x1, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x2, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0);
 		
 		// left
-		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x1, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
+		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x1, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
 		
 		// right
-		bufferBuilder.vertex(matrix, x2, y2, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0).next();
+		bufferBuilder.vertex(matrix, x2, y2, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x2, y1, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0);
 		
 		// bottom
-		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0).next();
-		bufferBuilder.vertex(matrix, x1, y2, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0)
-			.color(acColor[0], acColor[1], acColor[2], 0.75F).next();
+		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0);
+		bufferBuilder.vertex(matrix, x1, y2, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
+		bufferBuilder.vertex(matrix, x2, y2, 0).color(acColor[0], acColor[1],
+			acColor[2], 0.75F);
 		
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private static final class Tab

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,10 +12,11 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -41,7 +42,13 @@ public final class NewChunksRenderer
 	
 	public void updateBuffer(int i, BuiltBuffer buffer)
 	{
-		vertexBuffers[i] = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		if(buffer == null)
+		{
+			vertexBuffers[i] = null;
+			return;
+		}
+		
+		vertexBuffers[i] = new VertexBuffer(GlUsage.STATIC_WRITE);
 		vertexBuffers[i].bind();
 		vertexBuffers[i].upload(buffer);
 		VertexBuffer.unbind();
@@ -70,14 +77,12 @@ public final class NewChunksRenderer
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 		ShaderProgram shader = RenderSystem.getShader();
 		
 		float alpha = opacity.getValueF();
-		float[] newColorF = newChunksColor.getColorF();
-		float[] oldColorF = oldChunksColor.getColorF();
 		double altitudeD = altitude.getValue();
 		
 		for(int i = 0; i < vertexBuffers.length; i++)
@@ -91,11 +96,9 @@ public final class NewChunksRenderer
 				matrixStack.translate(0, altitudeD, 0);
 			
 			if(i < 2)
-				RenderSystem.setShaderColor(newColorF[0], newColorF[1],
-					newColorF[2], alpha);
+				newChunksColor.setAsShaderColor(alpha);
 			else
-				RenderSystem.setShaderColor(oldColorF[0], oldColorF[1],
-					oldColorF[2], alpha);
+				oldChunksColor.setAsShaderColor(alpha);
 			
 			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 			buffer.bind();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -21,19 +21,20 @@ public final class AntiKnockbackHack extends Hack implements KnockbackListener
 	private final SliderSetting hStrength =
 		new SliderSetting("Horizontal Strength",
 			"How far to reduce horizontal knockback.\n"
+				+ "-100% = double knockback\n" + "0% = normal knockback\n"
 				+ "100% = no knockback\n" + ">100% = reverse knockback",
-			1, 0.01, 2, 0.01, ValueDisplay.PERCENTAGE);
+			1, -1, 2, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private final SliderSetting vStrength =
 		new SliderSetting("Vertical Strength",
-			"How far to reduce vertical knockback.\n" + "100% = no knockback\n"
-				+ ">100% = reverse knockback",
-			1, 0.01, 2, 0.01, ValueDisplay.PERCENTAGE);
+			"How far to reduce vertical knockback.\n"
+				+ "-100% = double knockback\n" + "0% = normal knockback\n"
+				+ "100% = no knockback\n" + ">100% = reverse knockback",
+			1, -1, 2, 0.01, ValueDisplay.PERCENTAGE);
 	
 	public AntiKnockbackHack()
 	{
 		super("AntiKnockback");
-		
 		setCategory(Category.COMBAT);
 		addSetting(hStrength);
 		addSetting(vStrength);

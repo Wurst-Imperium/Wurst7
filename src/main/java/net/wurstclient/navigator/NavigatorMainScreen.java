@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,11 +17,12 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -253,8 +254,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(!clickTimerRunning)
 			hoveredFeature = -1;
 		
-		RenderUtils.scissorBox(0, 59, width, height - 42);
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.enableScissor(context, 0, 59, width, height - 42);
 		
 		for(int i = Math.max(-scroll * 3 / 20 - 3, 0); i < navigatorDisplayList
 			.size(); i++)
@@ -271,7 +271,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				featureY);
 		}
 		
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		// CURSED: disableScissor() causes weird artifacts if you don't draw
+		// some text after it.
+		RenderUtils.disableScissor(context);
+		context.drawText(textRenderer, ".", -100, -100, 0xFFFFFF, false);
 		
 		// tooltip
 		if(tooltip != null)
@@ -297,31 +300,28 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			
 			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionProgram);
+			RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			
 			// background
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
-				0.75F);
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
-			tessellator.draw();
+			RenderUtils.setShaderColor(bgColor, 0.75F);
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xt1, yt1, 0);
+			bufferBuilder.vertex(matrix, xt1, yt2, 0);
+			bufferBuilder.vertex(matrix, xt2, yt2, 0);
+			bufferBuilder.vertex(matrix, xt2, yt1, 0);
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			// outline
-			RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2],
-				0.5F);
-			bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			bufferBuilder.vertex(matrix, xt1, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt2, 0).next();
-			bufferBuilder.vertex(matrix, xt2, yt1, 0).next();
-			bufferBuilder.vertex(matrix, xt1, yt1, 0).next();
-			tessellator.draw();
+			RenderUtils.setShaderColor(acColor, 0.5F);
+			bufferBuilder = tessellator.begin(
+				VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, xt1, yt1, 0);
+			bufferBuilder.vertex(matrix, xt1, yt2, 0);
+			bufferBuilder.vertex(matrix, xt2, yt2, 0);
+			bufferBuilder.vertex(matrix, xt2, yt1, 0);
+			bufferBuilder.vertex(matrix, xt1, yt1, 0);
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
@@ -397,7 +397,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderSystem.setShaderColor(0, 1, 0,
 				renderAsHovered ? opacity * 1.5F : opacity);
 		else
-			RenderSystem.setShaderColor(bgColor[0], bgColor[1], bgColor[2],
+			RenderUtils.setShaderColor(bgColor,
 				renderAsHovered ? opacity * 1.5F : opacity);
 		
 		// tooltip
@@ -420,20 +420,19 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// separator
 		int bx1 = area.x + area.width - area.height;
 		int by1 = area.y + 2;
 		int by2 = by1 + area.height - 4;
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
-		RenderSystem.setShaderColor(acColor[0], acColor[1], acColor[2], 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, bx1, by1, 0).next();
-		bufferBuilder.vertex(matrix, bx1, by2, 0).next();
-		tessellator.draw();
+		RenderUtils.setShaderColor(acColor, 0.5F);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, bx1, by1, 0);
+		bufferBuilder.vertex(matrix, bx1, by2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// hovering
 		if(hovering)
@@ -450,27 +449,27 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		// arrow
 		RenderSystem.setShaderColor(0, hovering ? 1 : 0.85F, 0, 1);
-		bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES,
+		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLES,
 			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, ax1, ay1, 0).next();
-		bufferBuilder.vertex(matrix, ax2, ay1, 0).next();
-		bufferBuilder.vertex(matrix, ax3, ay2, 0).next();
-		tessellator.draw();
+		bufferBuilder.vertex(matrix, ax1, ay1, 0);
+		bufferBuilder.vertex(matrix, ax2, ay1, 0);
+		bufferBuilder.vertex(matrix, ax3, ay2, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// arrow shadow
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, ax1, ay1, 0).next();
-		bufferBuilder.vertex(matrix, ax2, ay1, 0).next();
-		bufferBuilder.vertex(matrix, ax3, ay2, 0).next();
-		bufferBuilder.vertex(matrix, ax1, ay1, 0).next();
-		tessellator.draw();
+		bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, ax1, ay1, 0);
+		bufferBuilder.vertex(matrix, ax2, ay1, 0);
+		bufferBuilder.vertex(matrix, ax3, ay2, 0);
+		bufferBuilder.vertex(matrix, ax1, ay1, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// text
 		if(!clickTimerRunning)
 		{
-			RenderSystem.setShader(GameRenderer::getPositionProgram);
+			RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			String buttonText = feature.getName();
 			context.drawText(client.textRenderer, buttonText, area.x + 4,

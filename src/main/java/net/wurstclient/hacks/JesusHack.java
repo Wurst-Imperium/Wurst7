@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -46,14 +46,14 @@ public final class JesusHack extends Hack
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketOutputListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketOutputListener.class, this);
@@ -142,11 +142,11 @@ public final class JesusHack extends Hack
 		// create new packet
 		Packet<?> newPacket;
 		if(packet instanceof PlayerMoveC2SPacket.PositionAndOnGround)
-			newPacket =
-				new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, true);
+			newPacket = new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z,
+				true, MC.player.horizontalCollision);
 		else
 			newPacket = new PlayerMoveC2SPacket.Full(x, y, z, packet.getYaw(0),
-				packet.getPitch(0), true);
+				packet.getPitch(0), true, MC.player.horizontalCollision);
 		
 		// send new packet
 		MC.player.networkHandler.getConnection().send(newPacket);

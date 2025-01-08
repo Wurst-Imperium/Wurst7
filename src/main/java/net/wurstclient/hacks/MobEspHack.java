@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,10 +17,12 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -92,19 +94,19 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		
-		mobBox = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		mobBox = new VertexBuffer(GlUsage.STATIC_WRITE);
 		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
 		RenderUtils.drawOutlinedBox(bb, mobBox);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
@@ -169,7 +171,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		RegionPos region)
 	{
 		float extraSize = boxSize.getExtraSize();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		for(LivingEntity e : mobs)
 		{
@@ -199,15 +201,17 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+		if(mobs.isEmpty())
+			return;
+		
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION_COLOR);
+		BufferBuilder bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 		
 		Vec3d regionVec = region.toVec3d();
 		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
@@ -224,13 +228,13 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			
 			bufferBuilder
 				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
-				.color(r, g, 0, 0.5F).next();
+				.color(r, g, 0, 0.5F);
 			
 			bufferBuilder
 				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
-				.color(r, g, 0, 0.5F).next();
+				.color(r, g, 0, 0.5F);
 		}
 		
-		tessellator.draw();
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }

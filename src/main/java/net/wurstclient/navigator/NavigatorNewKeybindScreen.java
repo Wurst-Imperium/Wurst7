@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -176,9 +176,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		boolean noButtons = Screens.getButtons(this).isEmpty();
 		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		
-		// scissor box
-		RenderUtils.scissorBox(bgx1, bgy1, bgx2, bgy3);
-		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.enableScissor(context, bgx1, bgy1, bgx2, bgy3);
 		
 		// possible keybinds
 		if(!choosingKey)
@@ -233,8 +231,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		}
 		GL11.glEnable(GL11.GL_BLEND);
 		
-		// scissor box
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		RenderUtils.disableScissor(context);
 		
 		// buttons below scissor box
 		for(ClickableWidget button : Screens.getButtons(this))

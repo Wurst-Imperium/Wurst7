@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,6 +23,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.settings.ColorSetting;
@@ -42,7 +43,7 @@ public final class EditColorScreen extends Screen
 	private ButtonWidget doneButton;
 	
 	private final Identifier paletteIdentifier =
-		new Identifier("wurst", "colorpalette.png");
+		Identifier.of("wurst", "colorpalette.png");
 	private BufferedImage paletteAsBufferedImage;
 	
 	private int paletteX = 0;
@@ -175,7 +176,8 @@ public final class EditColorScreen extends Screen
 		int fh = paletteHeight;
 		float u = 0;
 		float v = 0;
-		context.drawTexture(paletteIdentifier, x, y, u, v, w, h, fw, fh);
+		context.drawTexture(RenderLayer::getGuiTextured, paletteIdentifier, x,
+			y, u, v, w, h, fw, fh);
 		
 		// RGB letters
 		context.drawText(tr, "#", fieldsX - 3 - tr.getWidth("#"), fieldsY + 6,

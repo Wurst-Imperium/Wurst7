@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,10 +14,11 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -46,7 +47,7 @@ public class Tree implements AutoCloseable
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		
-		vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+		vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
 		
 		double boxMin = 1 / 16.0;
 		double boxMax = 15 / 16.0;
@@ -55,9 +56,8 @@ public class Tree implements AutoCloseable
 			.offset(regionOffset);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		RenderUtils.drawCrossBox(box.offset(stump), bufferBuilder);
 		

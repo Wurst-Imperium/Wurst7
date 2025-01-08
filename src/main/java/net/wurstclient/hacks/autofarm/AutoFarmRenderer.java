@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,11 +17,13 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilder.BuiltBuffer;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
@@ -55,7 +57,7 @@ public final class AutoFarmRenderer
 		
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
 		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
 		ShaderProgram shader = RenderSystem.getShader();
@@ -95,9 +97,7 @@ public final class AutoFarmRenderer
 	public void updateVertexBuffers(List<BlockPos> blocksToHarvest,
 		Set<BlockPos> plants, List<BlockPos> blocksToReplant)
 	{
-		BufferBuilder bufferBuilder =
-			RenderSystem.renderThreadTesselator().getBuffer();
-		
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		Vec3d regionOffset = RenderUtils.getCameraRegion().negate().toVec3d();
 		
 		double boxMin = 1 / 16.0;
@@ -105,20 +105,26 @@ public final class AutoFarmRenderer
 		Box box = new Box(boxMin, boxMin, boxMin, boxMax, boxMax, boxMax);
 		Box node = new Box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
 		
-		updateGreenBuffer(blocksToHarvest, bufferBuilder, box, regionOffset);
-		updateCyanBuffer(plants, bufferBuilder, node, regionOffset);
-		updateRedBuffer(blocksToReplant, bufferBuilder, box, regionOffset);
+		updateGreenBuffer(blocksToHarvest, tessellator, box, regionOffset);
+		updateCyanBuffer(plants, tessellator, node, regionOffset);
+		updateRedBuffer(blocksToReplant, tessellator, box, regionOffset);
 	}
 	
 	private void updateGreenBuffer(List<BlockPos> blocksToHarvest,
-		BufferBuilder bufferBuilder, Box box, Vec3d regionOffset)
+		Tessellator tessellator, Box box, Vec3d regionOffset)
 	{
 		if(greenBuffer != null)
+		{
 			greenBuffer.close();
+			greenBuffer = null;
+		}
 		
-		greenBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		if(blocksToHarvest.isEmpty())
+			return;
+		
+		greenBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(BlockPos pos : blocksToHarvest)
 		{
@@ -132,15 +138,21 @@ public final class AutoFarmRenderer
 		VertexBuffer.unbind();
 	}
 	
-	private void updateCyanBuffer(Set<BlockPos> plants,
-		BufferBuilder bufferBuilder, Box node, Vec3d regionOffset)
+	private void updateCyanBuffer(Set<BlockPos> plants, Tessellator tessellator,
+		Box node, Vec3d regionOffset)
 	{
 		if(cyanBuffer != null)
+		{
 			cyanBuffer.close();
+			cyanBuffer = null;
+		}
 		
-		cyanBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		if(plants.isEmpty())
+			return;
+		
+		cyanBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(BlockPos pos : plants)
 		{
@@ -155,14 +167,20 @@ public final class AutoFarmRenderer
 	}
 	
 	private void updateRedBuffer(List<BlockPos> blocksToReplant,
-		BufferBuilder bufferBuilder, Box box, Vec3d regionOffset)
+		Tessellator tessellator, Box box, Vec3d regionOffset)
 	{
 		if(redBuffer != null)
+		{
 			redBuffer.close();
+			redBuffer = null;
+		}
 		
-		redBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES,
-			VertexFormats.POSITION);
+		if(blocksToReplant.isEmpty())
+			return;
+		
+		redBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
 		for(BlockPos pos : blocksToReplant)
 		{

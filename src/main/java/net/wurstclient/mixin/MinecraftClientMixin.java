@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,7 +8,6 @@
 package net.wurstclient.mixin;
 
 import java.io.File;
-import java.util.UUID;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,13 +26,14 @@ import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.session.ProfileKeys;
-import net.minecraft.client.session.ProfileKeysImpl;
 import net.minecraft.client.session.Session;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
+import net.wurstclient.events.HandleBlockBreakingListener.HandleBlockBreakingEvent;
+import net.wurstclient.events.HandleInputListener.HandleInputEvent;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
@@ -57,11 +57,28 @@ public abstract class MinecraftClientMixin
 	private YggdrasilAuthenticationService authenticationService;
 	
 	private Session wurstSession;
-	private ProfileKeysImpl wurstProfileKeys;
+	private ProfileKeys wurstProfileKeys;
 	
 	private MinecraftClientMixin(WurstClient wurst, String name)
 	{
 		super(name);
+	}
+	
+	/**
+	 * Runs just before {@link MinecraftClient#handleInputEvents()}, bypassing
+	 * the <code>overlay == null && currentScreen == null</code> check in
+	 * {@link MinecraftClient#tick()}.
+	 */
+	@Inject(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/MinecraftClient;overlay:Lnet/minecraft/client/gui/screen/Overlay;",
+		ordinal = 0), method = "tick()V")
+	private void onHandleInputEvents(CallbackInfo ci)
+	{
+		// Make sure this event is not fired outside of gameplay
+		if(player == null)
+			return;
+		
+		EventManager.fire(HandleInputEvent.INSTANCE);
 	}
 	
 	@Inject(at = @At(value = "FIELD",
@@ -102,6 +119,22 @@ public abstract class MinecraftClientMixin
 			return;
 		
 		WurstClient.INSTANCE.getFriends().middleClick(eHitResult.getEntity());
+	}
+	
+	/**
+	 * Allows hacks to cancel vanilla block breaking and replace it with their
+	 * own. Useful for Nuker-like hacks.
+	 */
+	@Inject(at = @At("HEAD"),
+		method = "handleBlockBreaking(Z)V",
+		cancellable = true)
+	private void onHandleBlockBreaking(boolean breaking, CallbackInfo ci)
+	{
+		HandleBlockBreakingEvent event = new HandleBlockBreakingEvent();
+		EventManager.fire(event);
+		
+		if(event.isCancelled())
+			ci.cancel();
 	}
 	
 	@Inject(at = @At("HEAD"),
@@ -178,10 +211,12 @@ public abstract class MinecraftClientMixin
 	{
 		wurstSession = session;
 		
-		UserApiService userApiService = authenticationService
-			.createUserApiService(session.getAccessToken());
-		UUID uuid = wurstSession.getUuidOrNull();
+		UserApiService userApiService =
+			session.getAccountType() == Session.AccountType.MSA
+				? authenticationService.createUserApiService(
+					session.getAccessToken())
+				: UserApiService.OFFLINE;
 		wurstProfileKeys =
-			new ProfileKeysImpl(userApiService, uuid, runDirectory.toPath());
+			ProfileKeys.create(userApiService, session, runDirectory.toPath());
 	}
 }

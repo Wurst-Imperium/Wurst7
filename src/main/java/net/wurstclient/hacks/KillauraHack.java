@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,8 +15,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -26,7 +25,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.PostMotionListener;
+import net.wurstclient.events.HandleInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -36,6 +35,8 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
@@ -46,7 +47,7 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"kill aura", "ForceField", "force field", "CrystalAura",
 	"crystal aura", "AutoCrystal", "auto crystal"})
 public final class KillauraHack extends Hack
-	implements UpdateListener, PostMotionListener, RenderListener
+	implements UpdateListener, HandleInputListener, RenderListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
 		"Determines how far Killaura will reach to attack entities.\n"
@@ -55,6 +56,15 @@ public final class KillauraHack extends Hack
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
+	
+	private final SliderSetting speedRandMS =
+		new SliderSetting("Speed randomization",
+			"Helps you bypass anti-cheat plugins by varying the delay between"
+				+ " attacks.\n\n" + "\u00b1100ms is recommended for Vulcan.\n\n"
+				+ "0 (off) is fine for NoCheat+, AAC, Grim, Verus, Spartan, and"
+				+ " vanilla servers.",
+			100, 0, 1000, 50, ValueDisplay.INTEGER.withPrefix("\u00b1")
+				.withSuffix("ms").withLabel(0, "off"));
 	
 	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
 		"Determines which entity will be attacked first.\n"
@@ -65,6 +75,9 @@ public final class KillauraHack extends Hack
 	
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	
+	private final SwingHandSetting swingHand = new SwingHandSetting(
+		SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",
@@ -93,8 +106,10 @@ public final class KillauraHack extends Hack
 		
 		addSetting(range);
 		addSetting(speed);
+		addSetting(speedRandMS);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(swingHand);
 		addSetting(damageIndicator);
 		addSetting(pauseOnContainers);
 		addSetting(checkLOS);
@@ -116,9 +131,9 @@ public final class KillauraHack extends Hack
 		WURST.getHax().triggerBotHack.setEnabled(false);
 		WURST.getHax().tpAuraHack.setEnabled(false);
 		
-		speed.resetTimer();
+		speed.resetTimer(speedRandMS.getValue());
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(PostMotionListener.class, this);
+		EVENTS.add(HandleInputListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
 	
@@ -126,7 +141,7 @@ public final class KillauraHack extends Hack
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(PostMotionListener.class, this);
+		EVENTS.remove(HandleInputListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
 		target = null;
@@ -144,7 +159,7 @@ public final class KillauraHack extends Hack
 			return;
 		
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = range.getValueSq();
 		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
@@ -171,18 +186,16 @@ public final class KillauraHack extends Hack
 	}
 	
 	@Override
-	public void onPostMotion()
+	public void onHandleInput()
 	{
 		if(target == null)
 			return;
 		
-		WURST.getHax().criticalsHack.doCritical();
-		ClientPlayerEntity player = MC.player;
-		MC.interactionManager.attackEntity(player, target);
-		player.swingHand(Hand.MAIN_HAND);
+		MC.interactionManager.attackEntity(MC.player, target);
+		swingHand.swing(Hand.MAIN_HAND);
 		
 		target = null;
-		speed.resetTimer();
+		speed.resetTimer(speedRandMS.getValue());
 	}
 	
 	@Override
@@ -225,7 +238,7 @@ public final class KillauraHack extends Hack
 			matrixStack.translate(-0.5, -0.5, -0.5);
 		}
 		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		RenderSystem.setShaderColor(red, green, 0, 0.25F);
 		RenderUtils.drawSolidBox(box, matrixStack);

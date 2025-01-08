@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,12 +11,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import com.mojang.datafixers.util.Pair;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ConsumableComponent;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -25,9 +26,11 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.FoodComponent;
-import net.minecraft.item.FoodComponents;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.consume.ApplyEffectsConsumeEffect;
+import net.minecraft.item.consume.ConsumeEffect;
+import net.minecraft.item.consume.TeleportRandomlyConsumeEffect;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -108,13 +111,14 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
+		WURST.getHax().autoSoupHack.setEnabled(false);
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		
@@ -216,21 +220,21 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			.forEach(i -> slots.add(i));
 		
 		Comparator<FoodComponent> comparator =
-			Comparator.comparingDouble(FoodComponent::getSaturationModifier);
+			Comparator.comparingDouble(FoodComponent::saturation);
 		
 		for(int slot : slots)
 		{
-			Item item = inventory.getStack(slot).getItem();
+			ItemStack stack = inventory.getStack(slot);
 			
 			// filter out non-food items
-			if(!item.isFood())
+			if(!stack.contains(DataComponentTypes.FOOD))
 				continue;
 			
-			FoodComponent food = item.getFoodComponent();
-			if(!isAllowedFood(food))
+			if(!isAllowedFood(stack.get(DataComponentTypes.CONSUMABLE)))
 				continue;
 			
-			if(maxPoints >= 0 && food.getHunger() > maxPoints)
+			FoodComponent food = stack.get(DataComponentTypes.FOOD);
+			if(maxPoints >= 0 && food.nutrition() > maxPoints)
 				continue;
 			
 			// compare to previously found food
@@ -269,20 +273,28 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		oldSlot = -1;
 	}
 	
-	private boolean isAllowedFood(FoodComponent food)
+	private boolean isAllowedFood(ConsumableComponent consumable)
 	{
-		if(!allowChorus.isChecked() && food == FoodComponents.CHORUS_FRUIT)
-			return false;
-		
-		for(Pair<StatusEffectInstance, Float> pair : food.getStatusEffects())
+		for(ConsumeEffect consumeEffect : consumable.onConsumeEffects())
 		{
-			StatusEffect effect = pair.getFirst().getEffectType();
-			
-			if(!allowHunger.isChecked() && effect == StatusEffects.HUNGER)
+			if(!allowChorus.isChecked()
+				&& consumeEffect instanceof TeleportRandomlyConsumeEffect)
 				return false;
 			
-			if(!allowPoison.isChecked() && effect == StatusEffects.POISON)
-				return false;
+			if(!(consumeEffect instanceof ApplyEffectsConsumeEffect applyEffectsConsumeEffect))
+				continue;
+			
+			for(StatusEffectInstance effect : applyEffectsConsumeEffect
+				.effects())
+			{
+				RegistryEntry<StatusEffect> entry = effect.getEffectType();
+				
+				if(!allowHunger.isChecked() && entry == StatusEffects.HUNGER)
+					return false;
+				
+				if(!allowPoison.isChecked() && entry == StatusEffects.POISON)
+					return false;
+			}
 		}
 		
 		return true;

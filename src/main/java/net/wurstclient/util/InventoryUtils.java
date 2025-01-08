@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -68,6 +68,64 @@ public enum InventoryUtils
 	public static int indexOf(Predicate<ItemStack> predicate, int maxInvSlot,
 		boolean includeOffhand)
 	{
+		return getMatchingSlots(predicate, maxInvSlot, includeOffhand)
+			.findFirst().orElse(-1);
+	}
+	
+	public static int count(Item item)
+	{
+		return count(stack -> stack.isOf(item), 36, false);
+	}
+	
+	public static int count(Item item, int maxInvSlot)
+	{
+		return count(stack -> stack.isOf(item), maxInvSlot, false);
+	}
+	
+	public static int count(Item item, int maxInvSlot, boolean includeOffhand)
+	{
+		return count(stack -> stack.isOf(item), maxInvSlot, includeOffhand);
+	}
+	
+	public static int count(Predicate<ItemStack> predicate)
+	{
+		return count(predicate, 36, false);
+	}
+	
+	public static int count(Predicate<ItemStack> predicate, int maxInvSlot)
+	{
+		return count(predicate, maxInvSlot, false);
+	}
+	
+	/**
+	 * Counts the number of items in the player's inventory that match the given
+	 * predicate, searching from slot 0 to {@code maxInvSlot-1}.
+	 *
+	 * <p>
+	 * Note: Attempting to count empty slots will always return 0.
+	 *
+	 * @param predicate
+	 *            checks if an item should be counted
+	 * @param maxInvSlot
+	 *            the maximum slot to search (exclusive), usually 9 for the
+	 *            hotbar or 36 for the whole inventory
+	 * @param includeOffhand
+	 *            also search the offhand (slot 40), even if maxInvSlot is lower
+	 * @return
+	 *         the number of matching items in the player's inventory
+	 */
+	public static int count(Predicate<ItemStack> predicate, int maxInvSlot,
+		boolean includeOffhand)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		
+		return getMatchingSlots(predicate, maxInvSlot, includeOffhand)
+			.map(slot -> inventory.getStack(slot).getCount()).sum();
+	}
+	
+	private static IntStream getMatchingSlots(Predicate<ItemStack> predicate,
+		int maxInvSlot, boolean includeOffhand)
+	{
 		PlayerInventory inventory = MC.player.getInventory();
 		
 		// create a stream of all slots that we want to search
@@ -75,11 +133,8 @@ public enum InventoryUtils
 		if(includeOffhand)
 			stream = IntStream.concat(stream, IntStream.of(40));
 		
-		// find the slot of the item we want
-		int slot = stream.filter(i -> predicate.test(inventory.getStack(i)))
-			.findFirst().orElse(-1);
-		
-		return slot;
+		// filter out the slots we don't want
+		return stream.filter(i -> predicate.test(inventory.getStack(i)));
 	}
 	
 	public static boolean selectItem(Item item)
@@ -172,7 +227,7 @@ public enum InventoryUtils
 		return true;
 	}
 	
-	private static int toNetworkSlot(int slot)
+	public static int toNetworkSlot(int slot)
 	{
 		// hotbar
 		if(slot >= 0 && slot < 9)

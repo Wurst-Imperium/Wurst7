@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,9 +13,11 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -27,7 +29,7 @@ import net.wurstclient.other_features.WurstLogoOtf;
 public final class WurstLogo
 {
 	private static final Identifier texture =
-		new Identifier("wurst", "wurst_128.png");
+		Identifier.of("wurst", "wurst_128.png");
 	
 	public void render(DrawContext context)
 	{
@@ -60,7 +62,8 @@ public final class WurstLogo
 		// draw Wurst logo
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_BLEND);
-		context.drawTexture(texture, 0, 3, 0, 0, 72, 18, 72, 18);
+		context.drawTexture(RenderLayer::getGuiTextured, texture, 0, 3, 0, 0,
+			72, 18, 72, 18);
 	}
 	
 	private String getVersionString()
@@ -78,16 +81,15 @@ public final class WurstLogo
 		float r, float g, float b, float a)
 	{
 		Matrix4f matrix = matrices.peek().getPositionMatrix();
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 		
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a).next();
-		bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a).next();
-		tessellator.draw();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+		bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a);
+		bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a);
+		bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a);
+		bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }

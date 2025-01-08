@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.ItemGroups;
@@ -58,13 +58,13 @@ public final class InvWalkHack extends Hack implements UpdateListener
 	}
 	
 	@Override
-	public void onEnable()
+	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
 	}
 	
 	@Override
-	public void onDisable()
+	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}
@@ -93,12 +93,13 @@ public final class InvWalkHack extends Hack implements UpdateListener
 			keys.add(MC.options.jumpKey);
 		
 		for(KeyBinding key : keys)
-			((IKeyBinding)key).resetPressedState();
+			IKeyBinding.get(key).resetPressedState();
 	}
 	
 	private boolean isAllowedScreen(Screen screen)
 	{
-		if(screen instanceof AbstractInventoryScreen
+		if((screen instanceof InventoryScreen
+			|| screen instanceof CreativeInventoryScreen)
 			&& !isCreativeSearchBarOpen(screen))
 			return true;
 		

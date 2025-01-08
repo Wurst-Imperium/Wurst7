@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -31,11 +31,14 @@ public class BasicBakedModelMixin
 	 * This mixin hides blocks like grass and snow when using X-Ray. It works
 	 * with and without Sodium installed.
 	 */
-	@Inject(at = @At("HEAD"), method = "getQuads", cancellable = true)
-	private void getQuads(@Nullable BlockState state, @Nullable Direction face,
-		Random random, CallbackInfoReturnable<List<BakedQuad>> cir)
+	@Inject(at = @At("HEAD"),
+		method = "getQuads(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/random/Random;)Ljava/util/List;",
+		cancellable = true)
+	private void onGetQuads(@Nullable BlockState state,
+		@Nullable Direction face, Random random,
+		CallbackInfoReturnable<List<BakedQuad>> cir)
 	{
-		if(face != null || state == null
+		if(state == null || face != null
 			|| !WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
 			return;
 		

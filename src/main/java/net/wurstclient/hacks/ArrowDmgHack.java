@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,7 +13,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.PositionAndOnGround;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.StopUsingItemListener;
@@ -25,9 +26,9 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 @SearchTags({"arrow dmg", "ArrowDamage", "arrow damage"})
 public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 {
-	private final SliderSetting packets = new SliderSetting("Packets",
-		"description.wurst.setting.arrowdmg.packets", 200, 2, 7000, 20,
-		ValueDisplay.INTEGER);
+	private final SliderSetting strength = new SliderSetting("Strength",
+		"description.wurst.setting.arrowdmg.strength", 10, 0.1, 10, 0.1,
+		ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting yeetTridents =
 		new CheckboxSetting("Trident yeet mode",
@@ -37,7 +38,7 @@ public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 	{
 		super("ArrowDMG");
 		setCategory(Category.COMBAT);
-		addSetting(packets);
+		addSetting(strength);
 		addSetting(yeetTridents);
 	}
 	
@@ -69,13 +70,22 @@ public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 		double y = player.getY();
 		double z = player.getZ();
 		
-		for(int i = 0; i < packets.getValueI() / 2; i++)
-		{
-			netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(x,
-				y - 1e-10, z, true));
-			netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(x,
-				y + 1e-10, z, false));
-		}
+		// See ServerPlayNetworkHandler.onPlayerMove()
+		// for why it's using these numbers.
+		// Also, let me know if you find a way to bypass that check in 1.21.
+		double adjustedStrength = strength.getValue() / 10.0 * Math.sqrt(500);
+		Vec3d lookVec = player.getRotationVec(1).multiply(adjustedStrength);
+		for(int i = 0; i < 4; i++)
+			sendPos(x, y, z, true);
+		sendPos(x - lookVec.x, y, z - lookVec.z, true);
+		sendPos(x, y, z, false);
+	}
+	
+	private void sendPos(double x, double y, double z, boolean onGround)
+	{
+		ClientPlayNetworkHandler netHandler = MC.player.networkHandler;
+		netHandler.sendPacket(new PositionAndOnGround(x, y, z, onGround,
+			MC.player.horizontalCollision));
 	}
 	
 	private boolean isValidItem(Item item)

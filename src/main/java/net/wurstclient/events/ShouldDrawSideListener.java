@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -24,7 +24,7 @@ public interface ShouldDrawSideListener extends Listener
 	{
 		private final BlockState state;
 		private final BlockPos pos;
-		private Boolean rendered;
+		private Boolean rendered; // null if unchanged
 		
 		public ShouldDrawSideEvent(BlockState state, BlockPos pos)
 		{

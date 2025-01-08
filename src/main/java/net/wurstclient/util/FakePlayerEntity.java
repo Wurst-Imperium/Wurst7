@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,8 +7,14 @@
  */
 package net.wurstclient.util;
 
+import java.util.UUID;
+
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.data.DataTracker;
@@ -19,10 +25,12 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 {
 	private final ClientPlayerEntity player = WurstClient.MC.player;
 	private final ClientWorld world = WurstClient.MC.world;
+	private PlayerListEntry playerListEntry;
 	
 	public FakePlayerEntity()
 	{
 		super(WurstClient.MC.world, WurstClient.MC.player.getGameProfile());
+		setUuid(UUID.randomUUID());
 		copyPositionAndRotation(player);
 		
 		copyInventory();
@@ -31,6 +39,16 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 		resetCapeMovement();
 		
 		spawn();
+	}
+	
+	@Override
+	protected @Nullable PlayerListEntry getPlayerListEntry()
+	{
+		if(playerListEntry == null)
+			playerListEntry = MinecraftClient.getInstance().getNetworkHandler()
+				.getPlayerListEntry(getGameProfile().getId());
+		
+		return playerListEntry;
 	}
 	
 	private void copyInventory()
