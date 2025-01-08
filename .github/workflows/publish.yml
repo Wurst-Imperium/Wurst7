@@ -67,7 +67,7 @@ jobs:
 
       - name: Create and push tag
         run: |
-          MOD_VERSION=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
+          MOD_VERSION=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
           git config --global user.name "Wurst-Bot"
           git config --global user.email "contact.wurstimperium@gmail.com"
           git tag "$MOD_VERSION"
@@ -91,10 +91,10 @@ jobs:
         id: website_inputs
         if: ${{ inputs.update_website }}
         run: |
-          MOD_VERSION=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
+          MOD_VERSION=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
           WURST_VERSION=$(echo "$MOD_VERSION" | sed 's/^v//' | sed 's/-MC.*$//')
-          MC_VERSION=$(grep "minecraft_version" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
-          FAPI_VERSION=$(grep "fabric_version" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
+          MC_VERSION=$(grep "^minecraft_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
+          FAPI_VERSION=$(grep "^fabric_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
           JSON_STRING=$(cat << EOF
           {
             "wurst_version": "$WURST_VERSION",
