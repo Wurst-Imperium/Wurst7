@@ -7,15 +7,13 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MaceItem;
-import net.minecraft.item.MiningToolItem;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.TridentItem;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.wurstclient.Category;
@@ -146,8 +144,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	private float getValue(ItemStack stack, Entity entity)
 	{
 		Item item = stack.getItem();
-		if(!(item instanceof SwordItem || item instanceof MiningToolItem
-			|| item instanceof TridentItem || item instanceof MaceItem))
+		if(stack.get(DataComponentTypes.TOOL) == null
+			&& stack.get(DataComponentTypes.WEAPON) == null)
 			return Integer.MIN_VALUE;
 		
 		switch(priority.getSelected())

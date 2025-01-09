@@ -46,7 +46,7 @@
     "KeyBindingMixin",
     "KeyboardMixin",
     "LanguageManagerMixin",
-    "LightmapTextureManagerMixin",
+    "LivingEntityMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MobEntityRendererMixin",

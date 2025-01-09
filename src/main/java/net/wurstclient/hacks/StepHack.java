@@ -64,8 +64,7 @@ public final class StepHack extends Hack implements UpdateListener
 			|| player.isTouchingWater() || player.isInLava())
 			return;
 		
-		if(player.input.movementForward == 0
-			&& player.input.movementSideways == 0)
+		if(player.input.getMovementInput().length() <= 1e-5F)
 			return;
 		
 		if(player.jumping)

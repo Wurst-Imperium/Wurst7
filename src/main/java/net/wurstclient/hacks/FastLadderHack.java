@@ -43,8 +43,7 @@ public final class FastLadderHack extends Hack implements UpdateListener
 		if(!player.isClimbing() || !player.horizontalCollision)
 			return;
 		
-		if(player.input.movementForward == 0
-			&& player.input.movementSideways == 0)
+		if(player.input.getMovementInput().length() <= 1e-5F)
 			return;
 		
 		Vec3d velocity = player.getVelocity();

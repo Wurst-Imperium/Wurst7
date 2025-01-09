@@ -486,8 +486,8 @@ public final class TemplateToolHack extends Hack
 			
 			// show success message
 			MutableText message = Text.literal("Saved template as ");
-			ClickEvent event = new ClickEvent(ClickEvent.Action.OPEN_FILE,
-				file.getParentFile().getAbsolutePath());
+			ClickEvent event =
+				new ClickEvent.OpenFile(file.getParentFile().getAbsolutePath());
 			MutableText link = Text.literal(file.getName())
 				.styled(s -> s.withUnderline(true).withClickEvent(event));
 			message.append(link);
