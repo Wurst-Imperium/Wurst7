@@ -5,6 +5,7 @@ on:
     - cron: "30 1 * * 1-5"
 
 permissions:
+  # Both needed by the stale action.
   issues: write
   pull-requests: write
 
@@ -13,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Run stale bot
+    - name: Run stale action
       uses: actions/stale@v9
       with:
         stale-issue-message: |
