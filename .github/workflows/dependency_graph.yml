@@ -13,10 +13,11 @@ on:
   workflow_dispatch:
 
 permissions:
+  # Needed by the dependency-submission action.
   contents: write
 
 jobs:
-  dependency-submission:
+  dependency_graph:
     runs-on: ubuntu-latest
     steps:
 
