@@ -128,11 +128,21 @@ jobs:
         git push --set-upstream origin ${{ github.event.inputs.mc_version }}
       shell: bash
 
-    # For some reason the commit above doesn't automatically trigger the CI
-    # workflow, so we need to explicitly start it here.
     - name: Trigger CI on the new branch
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        gh workflow run gradle.yml --ref ${{ github.event.inputs.mc_version }}
-      shell: bash
+      id: ci_dispatch
+      uses: codex-/return-dispatch@v2
+      with:
+        token: ${{ github.token }}
+        owner: Wurst-Imperium
+        repo: Wurst7
+        ref: ${{ github.event.inputs.mc_version }}
+        workflow: gradle.yml
+
+    - name: Wait for CI to finish (run ${{ steps.ci_dispatch.outputs.run_id }})
+      uses: codex-/await-remote-run@v1
+      with:
+        token: ${{ github.token }}
+        owner: Wurst-Imperium
+        repo: Wurst7
+        run_id: ${{ steps.ci_dispatch.outputs.run_id }}
+        run_timeout_seconds: 600  # 10 minutes

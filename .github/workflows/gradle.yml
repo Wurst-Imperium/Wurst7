@@ -20,6 +20,10 @@ on:
       - "gradle**"
       - "*.gradle"
   workflow_dispatch:
+    inputs:
+      distinct_id:
+        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
+        required: false
 
 jobs:
   build:
@@ -28,6 +32,9 @@ jobs:
       VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
       IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
     steps:
+
+    - name: Echo distinct ID ${{ github.event.inputs.distinct_id }}
+      run: echo ${{ github.event.inputs.distinct_id }}
 
     - name: Checkout repository
       uses: actions/checkout@v4
