@@ -78,13 +78,13 @@ public final class KaboomHack extends Hack implements UpdateListener
 		{
 			float soundPitch =
 				(1F + (random.nextFloat() - random.nextFloat()) * 0.2F) * 0.7F;
-			MC.world.playSound(x, y, z,
+			MC.world.playSoundClient(x, y, z,
 				SoundEvents.ENTITY_GENERIC_EXPLODE.value(),
 				SoundCategory.BLOCKS, 4, soundPitch, false);
 		}
 		if(particles.isChecked())
-			MC.world.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 1, 0,
-				0);
+			MC.world.addParticleClient(ParticleTypes.EXPLOSION_EMITTER, x, y, z,
+				1, 0, 0);
 		
 		// Break all blocks
 		ArrayList<BlockPos> blocks = getBlocksByDistanceReversed();
