@@ -25,10 +25,11 @@ public class LivingEntityMixin
 	 * Stops the other darkness effect in caves when AntiBlind is enabled.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "method_66279(Lnet/minecraft/registry/entry/RegistryEntry;F)F",
+		method = "getEffectFadeFactor(Lnet/minecraft/registry/entry/RegistryEntry;F)F",
 		cancellable = true)
-	private void onGetDarknessFactor(RegistryEntry<StatusEffect> registryEntry,
-		float delta, CallbackInfoReturnable<Float> cir)
+	private void onGetEffectFadeFactor(
+		RegistryEntry<StatusEffect> registryEntry, float delta,
+		CallbackInfoReturnable<Float> cir)
 	{
 		if(registryEntry != StatusEffects.DARKNESS)
 			return;
