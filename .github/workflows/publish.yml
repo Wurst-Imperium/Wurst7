@@ -1,12 +1,6 @@
 name: Publish Release
 run-name: "Publish release from ${{ github.ref_name }} branch"
 
-permissions:
-  # Needed to push the tag.
-  contents: write
-  # Needed to close the milestone.
-  issues: write
-
 on:
   workflow_dispatch:
     inputs:
@@ -38,6 +32,12 @@ on:
       distinct_id:
         description: "Automatically set by the return-dispatch action (leave blank if running manually)"
         required: false
+
+permissions:
+  # Needed to push the tag.
+  contents: write
+  # Needed to close the milestone.
+  issues: write
 
 jobs:
   publish:
