@@ -226,29 +226,48 @@ task uploadBackups {
 		def shortVersion = getGhVersion().substring(1)
 		def backupUrl = "https://api.wurstclient.net/artifact-backups/Wurst/${shortVersion}"
 		
-		def connection = new URL(backupUrl).openConnection() as HttpURLConnection
-		def boundary = UUID.randomUUID().toString()
-		connection.setRequestMethod("POST")
-		connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
-		connection.setRequestProperty("Accept", "application/json")
-		connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
-		connection.doOutput = true
+		def maxRetries = 3
+		def retryCount = 0
+		def success = false
 		
-		def output = connection.outputStream
-		[remapJar, remapSourcesJar].each { jarTask ->
-			def file = jarTask.archiveFile.get().asFile
-			output << "--${boundary}\r\n"
-			output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
-			output << "Content-Type: application/java-archive\r\n\r\n"
-			file.withInputStream { input -> 
-				output << input
+		while (!success && retryCount < maxRetries) {
+			try {
+				def connection = new URL(backupUrl).openConnection() as HttpURLConnection
+				def boundary = UUID.randomUUID().toString()
+				connection.setRequestMethod("POST")
+				connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
+				connection.setRequestProperty("Accept", "application/json")
+				connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+				connection.doOutput = true
+				
+				def output = connection.outputStream
+				[remapJar, remapSourcesJar].each { jarTask ->
+					def file = jarTask.archiveFile.get().asFile
+					output << "--${boundary}\r\n"
+					output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
+					output << "Content-Type: application/java-archive\r\n\r\n"
+					file.withInputStream { input -> 
+						output << input
+					}
+					output << "\r\n"
+				}
+				output << "--${boundary}--\r\n"
+				output.flush()
+				
+				if(connection.responseCode != 200) {
+					throw new IOException("HTTP ${connection.responseCode}: ${connection.responseMessage}")
+				}
+				
+				success = true
+				
+			} catch (Exception e) {
+				retryCount++
+				if (retryCount >= maxRetries) {
+					throw new GradleException("Failed to upload backups after ${maxRetries} attempts: ${e.message}")
+				}
+				println "Upload attempt ${retryCount} failed: ${e.message}. Retrying in 5 seconds..."
+				Thread.sleep(5000)
 			}
-			output << "\r\n"
 		}
-		output << "--${boundary}--\r\n"
-		output.flush()
-		
-		if(connection.responseCode != 200)
-			throw new GradleException("Failed to upload backups: ${connection.responseCode} ${connection.responseMessage}")
 	}
 }
