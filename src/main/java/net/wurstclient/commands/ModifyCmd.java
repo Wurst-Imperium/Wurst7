@@ -89,7 +89,7 @@ public final class ModifyCmd extends Command
 		
 		try
 		{
-			NbtCompound parsedNbt = StringNbtReader.parse(nbtString);
+			NbtCompound parsedNbt = StringNbtReader.method_67315(nbtString);
 			itemNbt.copyFrom(parsedNbt);
 			stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(itemNbt));
 			
@@ -107,7 +107,7 @@ public final class ModifyCmd extends Command
 		
 		try
 		{
-			NbtCompound tag = StringNbtReader.parse(nbt);
+			NbtCompound tag = StringNbtReader.method_67315(nbt);
 			stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(tag));
 			
 		}catch(CommandSyntaxException e)
