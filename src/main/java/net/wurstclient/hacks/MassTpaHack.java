@@ -56,12 +56,16 @@ public final class MassTpaHack extends Hack
 		"Stop when accepted", "Whether to stop sending more teleportation"
 			+ " requests when someone accepts one of them.",
 		true);
-	
+
+	private final CheckboxSetting isActiveMassTpaFlooding = new CheckboxSetting(
+			"TPA Flood", "Re-request TPA from all players except my friend",
+			false);
+
 	private final Random random = new Random();
 	private final ArrayList<String> players = new ArrayList<>();
 	
 	private String command;
-	private int index;
+	private int sendTpaCount;
 	private int timer;
 	
 	public MassTpaHack()
@@ -72,6 +76,7 @@ public final class MassTpaHack extends Hack
 		addSetting(delay);
 		addSetting(ignoreErrors);
 		addSetting(stopWhenAccepted);
+		addSetting(isActiveMassTpaFlooding);
 	}
 	
 	@Override
@@ -79,37 +84,38 @@ public final class MassTpaHack extends Hack
 	{
 		// reset state
 		players.clear();
-		index = 0;
+		sendTpaCount = 0;
 		timer = 0;
-		
+
 		// cache command in case the setting is changed mid-run
 		command = commandSetting.getValue().substring(1);
-		
+
 		// collect player names
 		String playerName = MC.getSession().getUsername();
-		for(PlayerListEntry info : MC.player.networkHandler.getPlayerList())
-		{
+		for (PlayerListEntry info : MC.player.networkHandler.getPlayerList()) {
 			String name = info.getProfile().getName();
 			name = StringHelper.stripTextFormat(name);
-			
-			if(name.equalsIgnoreCase(playerName))
+
+			if (isActiveMassTpaFlooding.isChecked() && WURST.getFriends().contains(name))
 				continue;
-			
+
+			if (name.equalsIgnoreCase(playerName))
+				continue;
+
 			players.add(name);
 		}
-		
+
 		Collections.shuffle(players, random);
-		
+
 		EVENTS.add(ChatInputListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
-		
-		if(players.isEmpty())
-		{
+
+		if (players.isEmpty()) {
 			ChatUtils.error("Couldn't find any players.");
 			setEnabled(false);
 		}
 	}
-	
+
 	@Override
 	protected void onDisable()
 	{
@@ -125,17 +131,29 @@ public final class MassTpaHack extends Hack
 			timer--;
 			return;
 		}
-		
-		if(index >= players.size())
+
+		if (isActiveMassTpaFlooding.isChecked() && sendTpaCount >= players.size())
 		{
+			sendTpaCount = 0;
+
+			if (command.equals("tpa"))
+				command = "tpacancel";
+
+			else if (command.equals("tpacancel"))
+				command = "tpa";
+		}
+
+		if(!isActiveMassTpaFlooding.isChecked() && sendTpaCount >= players.size())
+		{
+			command = "/tpa";
 			setEnabled(false);
 			return;
 		}
 		
 		MC.getNetworkHandler()
-			.sendChatCommand(command + " " + players.get(index));
+			.sendChatCommand(command + " " + players.get(sendTpaCount));
 		
-		index++;
+		sendTpaCount++;
 		timer = delay.getValueI() - 1;
 	}
 	
