@@ -149,7 +149,7 @@ public final class MassTpaHack extends Hack
 		if(!isActiveMassTpaFlooding.isChecked()
 			&& sendTpaCount >= players.size())
 		{
-			command = "/tpa";
+			command = commandSetting.getValue().substring(1);
 			setEnabled(false);
 			return;
 		}
