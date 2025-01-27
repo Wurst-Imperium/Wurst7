@@ -56,7 +56,7 @@ public final class MassTpaHack extends Hack
 		"Stop when accepted", "Whether to stop sending more teleportation"
 			+ " requests when someone accepts one of them.",
 		true);
-
+	
 	private final CheckboxSetting isActiveMassTpaFlooding = new CheckboxSetting(
 		"TPA Flood", "Re-request TPA from all players except my friend", false);
 	
