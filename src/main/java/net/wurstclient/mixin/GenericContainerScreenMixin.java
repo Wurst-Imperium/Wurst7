@@ -10,6 +10,7 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -32,8 +33,10 @@ public abstract class GenericContainerScreenMixin
 	@Final
 	private int rows;
 	
+	@Unique
 	private final AutoStealHack autoSteal =
 		WurstClient.INSTANCE.getHax().autoStealHack;
+	@Unique
 	private int mode;
 	
 	public GenericContainerScreenMixin(WurstClient wurst,
@@ -66,16 +69,19 @@ public abstract class GenericContainerScreenMixin
 			steal();
 	}
 	
+	@Unique
 	private void steal()
 	{
 		runInThread(() -> shiftClickSlots(0, rows * 9, 1));
 	}
 	
+	@Unique
 	private void store()
 	{
 		runInThread(() -> shiftClickSlots(rows * 9, rows * 9 + 44, 2));
 	}
 	
+	@Unique
 	private void runInThread(Runnable r)
 	{
 		new Thread(() -> {
@@ -90,6 +96,7 @@ public abstract class GenericContainerScreenMixin
 		}).start();
 	}
 	
+	@Unique
 	private void shiftClickSlots(int from, int to, int mode)
 	{
 		this.mode = mode;
@@ -108,6 +115,7 @@ public abstract class GenericContainerScreenMixin
 		}
 	}
 	
+	@Unique
 	private void waitForDelay()
 	{
 		try
