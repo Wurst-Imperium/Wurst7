@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.GenericContainerScreenHandler;
@@ -27,7 +26,6 @@ import net.wurstclient.hacks.AutoStealHack;
 @Mixin(GenericContainerScreen.class)
 public abstract class GenericContainerScreenMixin
 	extends HandledScreen<GenericContainerScreenHandler>
-	implements ScreenHandlerProvider<GenericContainerScreenHandler>
 {
 	@Shadow
 	@Final
