@@ -2,36 +2,41 @@ name: Java CI with Gradle
 
 on:
   push:
+    branches-ignore:
+      - "dependabot/**"
+    tags-ignore:
+      - "**"
     paths:
-      - '**.java'
-      - '**.json'
-      - 'gradle**'
-      - 'build.gradle'
+      - "**.java"
+      - "**.json"
+      - "**.yml"
+      - "gradle**"
+      - "*.gradle"
   pull_request:
     paths:
-      - '**.java'
-      - '**.json'
-      - 'gradle**'
-      - 'build.gradle'
-  # Makes it possible to run this workflow manually from the Actions tab
+      - "**.java"
+      - "**.json"
+      - "**.yml"
+      - "gradle**"
+      - "*.gradle"
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+      IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
     steps:
+
     - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Set up Java 21
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
-        distribution: 'microsoft'
+        java-version: "21"
+        distribution: "microsoft"
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -43,18 +48,98 @@ jobs:
         build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
         build-scan-terms-of-use-agree: "yes"
 
-    - name: Generate and submit dependency graph
-      if: ${{ github.event_name == 'push' }}
-      uses: gradle/actions/dependency-submission@v4
+    - name: Compile Java code
+      run: ./gradlew remapJar --stacktrace --warning-mode=fail
 
-    - name: Execute Gradle build
-      run: ./gradlew spotlessCheck build --stacktrace --warning-mode=fail
+    - name: Validate JSON files
+      run: ./gradlew spotlessJsonCheck || (echo "::error::JSON validation failed! Run './gradlew spotlessApply' to fix style issues, or check the full error message for syntax errors." && exit 1)
 
-    - name: VirusTotal scan
-      if: ${{ github.event_name == 'push' }}
+    - name: Validate Java code style
+      run: ./gradlew spotlessJavaCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
+
+    - name: Run unit tests
+      run: ./gradlew test --stacktrace --warning-mode=fail
+
+    - name: Validate access widener
+      run: ./gradlew validateAccessWidener --stacktrace --warning-mode=fail
+
+    - name: Build
+      run: ./gradlew build --stacktrace --warning-mode=fail
+
+    - name: Upload to VirusTotal for analysis
+      id: virustotal
+      if: ${{ env.VIRUSTOTAL_API_KEY }}
       uses: crazy-max/ghaction-virustotal@v4
       with:
-        vt_api_key: ${{ secrets.VIRUSTOTAL_API_KEY }}
+        vt_api_key: ${{ env.VIRUSTOTAL_API_KEY }}
         files: |
           ./build/libs/*.jar
+      # An error in this step means that the upload failed, not that a false
+      # positive was detected.
       continue-on-error: true
+
+    - name: Add VirusTotal links to build summary
+      if: ${{ env.VIRUSTOTAL_API_KEY && steps.virustotal.outputs.analysis }}
+      shell: bash
+      run: |
+        echo "<details open>" >> $GITHUB_STEP_SUMMARY
+        echo "<summary>🛡️ VirusTotal Scans</summary>" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        IFS=',' read -ra ANALYSIS <<< "${{ steps.virustotal.outputs.analysis }}"
+        for i in "${ANALYSIS[@]}"; do
+          filepath=${i%%=*}
+          url=${i#*=}
+          filename=$(basename "$filepath")
+          echo "- [$filename]($url)" >> $GITHUB_STEP_SUMMARY
+        done
+        echo "</details>" >> $GITHUB_STEP_SUMMARY
+
+    - name: Run the mod and take screenshots
+      uses: modmuss50/xvfb-action@c56c7da0c8fc9a7cb5df2e50dd2a43a80b64c5cb
+      with:
+        run: ./gradlew runEndToEndTest --stacktrace --warning-mode=fail
+
+    # Needed because the screenshot gallery won't be created on pull requests.
+    # Also useful if Imgur uploads fail.
+    - name: Upload Test Screenshots.zip artifact
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: Test Screenshots
+        path: run/screenshots
+
+    - name: Create test screenshot gallery
+      if: ${{ env.IMGUR_CLIENT_ID && (success() || failure()) }}
+      shell: bash
+      run: |
+        echo "<details open>" >> $GITHUB_STEP_SUMMARY
+        echo "<summary>📸 Test Screenshots</summary>" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        for img in run/screenshots/*.png; do
+          if [ -f "$img" ]; then
+            filename=$(basename "$img")
+            name_without_ext="${filename%.*}"
+
+            # Upload to Imgur
+            response=$(curl -s -X POST \
+              -H "Authorization: Client-ID $IMGUR_CLIENT_ID" \
+              -F "image=@$img" \
+              https://api.imgur.com/3/image)
+
+            # Extract the URL from the response
+            url=$(echo $response | grep -o '"link":"[^"]*"' | cut -d'"' -f4)
+
+            if [ ! -z "$url" ]; then
+              # Convert underscores to spaces and capitalize first letter of each word
+              title=$(echo "$name_without_ext" | tr '_' ' ' | awk '{for(i=1;i<=NF;i++)sub(/./,toupper(substr($i,1,1)),$i)}1')
+              echo "### $title" >> $GITHUB_STEP_SUMMARY
+              echo "![${name_without_ext}]($url)" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "Failed to upload $filename" >> $GITHUB_STEP_SUMMARY
+              echo "Imgur upload response for $filename: $response"
+            fi
+          fi
+        done
+        echo "</details>" >> $GITHUB_STEP_SUMMARY

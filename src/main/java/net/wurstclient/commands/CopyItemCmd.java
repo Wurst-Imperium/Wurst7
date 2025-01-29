@@ -9,12 +9,12 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.CmdUtils;
 
 public final class CopyItemCmd extends Command
 {
@@ -38,7 +38,7 @@ public final class CopyItemCmd extends Command
 		
 		AbstractClientPlayerEntity player = getPlayer(args[0]);
 		ItemStack item = getItem(player, args[1]);
-		giveItem(item);
+		CmdUtils.giveItem(item);
 		
 		ChatUtils.message("Item copied.");
 	}
@@ -79,19 +79,5 @@ public final class CopyItemCmd extends Command
 			default:
 			throw new CmdSyntaxError();
 		}
-	}
-	
-	private void giveItem(ItemStack stack) throws CmdError
-	{
-		int slot = MC.player.getInventory().getEmptySlot();
-		if(slot < 0)
-			throw new CmdError("Cannot give item. Your inventory is full.");
-		
-		if(slot < 9)
-			slot += 36;
-		
-		CreativeInventoryActionC2SPacket packet =
-			new CreativeInventoryActionC2SPacket(slot, stack);
-		MC.player.networkHandler.sendPacket(packet);
 	}
 }

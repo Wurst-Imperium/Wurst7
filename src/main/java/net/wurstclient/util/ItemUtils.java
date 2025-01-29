@@ -48,6 +48,8 @@ public enum ItemUtils
 		
 		try
 		{
+			// getOrEmpty() returns null instead of Items.AIR if the
+			// requested item doesn't exist
 			return Registries.ITEM.getOrEmpty(Identifier.of(nameOrId))
 				.orElse(null);
 			
@@ -57,6 +59,8 @@ public enum ItemUtils
 		}
 	}
 	
+	// TODO: Update AutoSword to use calculateModifiedAttribute() instead,
+	// then remove this method.
 	public static OptionalDouble getAttribute(Item item,
 		RegistryEntry<EntityAttribute> attribute)
 	{

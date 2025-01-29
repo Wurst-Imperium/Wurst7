@@ -7,13 +7,13 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.PacketUtils;
 
 @DontSaveState
 @SearchTags({"anti hunger"})
@@ -41,7 +41,7 @@ public final class AntiHungerHack extends Hack implements PacketOutputListener
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
-		if(!(event.getPacket() instanceof PlayerMoveC2SPacket oldPacket))
+		if(!(event.getPacket() instanceof PlayerMoveC2SPacket packet))
 			return;
 		
 		if(!MC.player.isOnGround() || MC.player.fallDistance > 0.5)
@@ -50,26 +50,6 @@ public final class AntiHungerHack extends Hack implements PacketOutputListener
 		if(MC.interactionManager.isBreakingBlock())
 			return;
 		
-		double x = oldPacket.getX(-1);
-		double y = oldPacket.getY(-1);
-		double z = oldPacket.getZ(-1);
-		float yaw = oldPacket.getYaw(-1);
-		float pitch = oldPacket.getPitch(-1);
-		
-		Packet<?> newPacket;
-		if(oldPacket.changesPosition())
-			if(oldPacket.changesLook())
-				newPacket =
-					new PlayerMoveC2SPacket.Full(x, y, z, yaw, pitch, false);
-			else
-				newPacket =
-					new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, false);
-		else if(oldPacket.changesLook())
-			newPacket =
-				new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, false);
-		else
-			newPacket = new PlayerMoveC2SPacket.OnGroundOnly(false);
-		
-		event.setPacket(newPacket);
+		event.setPacket(PacketUtils.modifyOnGround(packet, false));
 	}
 }
