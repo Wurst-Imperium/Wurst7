@@ -37,7 +37,7 @@ public abstract class ShulkerBoxScreenMixin
 	}
 	
 	@Override
-	protected void init()
+	public void init()
 	{
 		super.init();
 		

@@ -44,7 +44,7 @@ public abstract class GenericContainerScreenMixin
 	}
 	
 	@Override
-	protected void init()
+	public void init()
 	{
 		super.init();
 		
