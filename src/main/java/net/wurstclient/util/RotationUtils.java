@@ -93,7 +93,7 @@ public enum RotationUtils
 		// lastYaw/Pitch do not get updated when the player is in a vehicle
 		Rotation lastReported = player.hasVehicle()
 			? new Rotation(player.getYaw(), player.getPitch())
-			: new Rotation(player.lastYaw, player.lastPitch);
+			: new Rotation(player.lastYawClient, player.lastPitchClient);
 		
 		return lastReported.getAngleTo(rotation);
 	}
@@ -116,8 +116,8 @@ public enum RotationUtils
 	 */
 	public static Rotation slowlyTurnTowards(Rotation end, float maxChange)
 	{
-		float startYaw = MC.player.lastYaw;
-		float startPitch = MC.player.lastPitch;
+		float startYaw = MC.player.lastYawClient;
+		float startPitch = MC.player.lastPitchClient;
 		float endYaw = end.yaw();
 		float endPitch = end.pitch();
 		

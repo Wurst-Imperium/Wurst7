@@ -40,7 +40,7 @@ public class IngameHudMixin
 		if(debugHud.shouldShowDebugHud())
 			return;
 		
-		float tickDelta = tickCounter.getTickDelta(true);
+		float tickDelta = tickCounter.getTickProgress(true);
 		EventManager.fire(new GUIRenderEvent(context, tickDelta));
 	}
 	

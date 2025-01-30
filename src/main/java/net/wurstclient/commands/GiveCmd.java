@@ -74,7 +74,7 @@ public final class GiveCmd extends Command
 		if(nbt != null)
 			try
 			{
-				NbtCompound tag = StringNbtReader.method_67315(nbt);
+				NbtCompound tag = StringNbtReader.readCompound(nbt);
 				NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, tag);
 				
 			}catch(CommandSyntaxException e)
