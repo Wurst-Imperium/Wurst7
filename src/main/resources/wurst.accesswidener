@@ -15,8 +15,8 @@ accessible	field	net/minecraft/client/gui/screen/option/ControlsListWidget$KeyBi
 accessible	field	net/minecraft/client/gui/widget/CyclingButtonWidget	optionText	Lnet/minecraft/text/Text;
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePacker	Lnet/minecraft/network/message/MessageChain$Packer;
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	session	Lnet/minecraft/network/encryption/ClientPlayerSession;
-accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastPitch	F
-accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastYaw	F
+accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastPitchClient	F
+accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastYawClient	F
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	blockBreakingCooldown	I
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	breakingBlock	Z
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	currentBreakingProgress	F

@@ -21,7 +21,7 @@ import net.wurstclient.WurstClient;
 public abstract class RenderTickCounterDynamicMixin
 {
 	@Shadow
-	public float lastFrameDuration;
+	public float dynamicDeltaTicks;
 	
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/render/RenderTickCounter$Dynamic;lastTimeMillis:J",
@@ -30,7 +30,7 @@ public abstract class RenderTickCounterDynamicMixin
 	public void onBeginRenderTick(long timeMillis,
 		CallbackInfoReturnable<Integer> cir)
 	{
-		lastFrameDuration *=
+		dynamicDeltaTicks *=
 			WurstClient.INSTANCE.getHax().timerHack.getTimerSpeed();
 	}
 }
