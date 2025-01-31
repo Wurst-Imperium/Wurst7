@@ -37,7 +37,9 @@ jobs:
     - name: Convert branches input to JSON array
       id: set_branches
       run: |
-        JSON_ARRAY=$(echo "[\"$(echo ${{ inputs.branches }} | tr ' ' '\",\"')\"]")
+        branches_array=(${{ inputs.branches }})
+        quoted_branches=$(printf '"%s",' "${branches_array[@]}")
+        JSON_ARRAY="[${quoted_branches%,}]"
         echo "branches=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
         echo "Branches: $JSON_ARRAY" >> "$GITHUB_STEP_SUMMARY"
 
