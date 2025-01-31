@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -81,13 +81,6 @@ public final class NoFallHack extends Hack implements UpdateListener
 		
 		// pause when holding a mace, if enabled
 		if(pauseForMace.isChecked() && isHoldingMace(player))
-			return;
-			
-		// ignore small falls that can't cause damage,
-		// unless CreativeFlight is enabled in survival mode
-		boolean creativeFlying = WURST.getHax().creativeFlightHack.isEnabled()
-			&& player.getAbilities().flying;
-		if(!creativeFlying && player.fallDistance <= (fallFlying ? 1 : 2))
 			return;
 		
 		// attempt to fix elytra weirdness, if allowed

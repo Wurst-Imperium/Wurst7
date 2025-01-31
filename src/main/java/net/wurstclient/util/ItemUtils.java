@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -43,8 +43,8 @@ public enum ItemUtils
 	{
 		if(MathUtils.isInteger(nameOrId))
 		{
-			// There is no getOrEmpty() for raw IDs, so this detects when the
-			// Registry defaults and returns null instead
+			// There is no getOptionalValue() for raw IDs, so this detects when
+			// the registry defaults and returns null instead
 			int id = Integer.parseInt(nameOrId);
 			Item item = Registries.ITEM.get(id);
 			if(id != 0 && Registries.ITEM.getRawId(item) == 0)
@@ -55,6 +55,8 @@ public enum ItemUtils
 		
 		try
 		{
+			// getOptionalValue() returns null instead of Items.AIR if the
+			// requested item doesn't exist
 			return Registries.ITEM.getOptionalValue(Identifier.of(nameOrId))
 				.orElse(null);
 			

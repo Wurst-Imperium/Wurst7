@@ -5,8 +5,8 @@ buildscript {
 }
 
 plugins {
-	id "fabric-loom" version "1.8-SNAPSHOT"
-	id "com.diffplug.spotless" version "6.25.0"
+	id "fabric-loom" version "1.9-SNAPSHOT"
+	id "com.diffplug.spotless" version "7.0.2"
 }
 
 def ENV = System.getenv()
@@ -24,6 +24,16 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+}
+
+// Override vulnerable dependencies until Minecraft updates to newer versions
+configurations.all {
+	resolutionStrategy {
+		// v1.15.0, used by Minecraft 1.21.2 and 1.21.3, is vulnerable to CVE-2024-35255
+		force "com.microsoft.azure:msal4j:1.17.2"
+		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2024-47535
+		force "io.netty:netty-common:4.1.115.Final"
+	}
 }
 
 dependencies {
@@ -68,21 +78,21 @@ tasks.register('runEndToEndTest', JavaExec) {
 	classpath.from configurations.productionRuntime
 	mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient"
 	workingDir = file("run")
-
+	
 	doFirst {
 		classpath.from loom.minecraftProvider.minecraftClientJar
 		workingDir.mkdirs()
-
+		
 		args(
 			"--assetIndex", loom.minecraftProvider.versionInfo.assetIndex().fabricId(loom.minecraftProvider.minecraftVersion()),
 			"--assetsDir", new File(loom.files.userCache, "assets").absolutePath,
 			"--gameDir", workingDir.absolutePath
 		)
-
+		
 		if (Platform.CURRENT.operatingSystem.isMacOS()) {
 			jvmArgs("-XstartOnFirstThread")
 		}
-
+		
 		jvmArgs(
 			"-Dfabric.addMods=${configurations.modImplementation.find { it.name.contains('fabric-api') }.absolutePath}${File.pathSeparator}${remapJar.archiveFile.get().asFile.absolutePath}",
 			"-Dwurst.e2eTest",
@@ -119,17 +129,27 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename {"${it}_${project.base.archivesName.get()}"}
+		rename {"${it}_${base.archivesName.get()}"}
 	}
+	
+	exclude("intentionally_untranslated.json")
 }
 
+import com.diffplug.spotless.generic.LicenseHeaderStep
 spotless {
 	lineEndings("WINDOWS")
 	java {
 		removeUnusedImports()
-		indentWithTabs()
+		leadingSpacesToTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
+	}
+	format("licenseHeader") {
+		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		targetExclude("src/main/java/net/wurstclient/analytics/dmurph/**/*.java")
+		def header_file = file("codestyle/license_header.txt")
+		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
+		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
 	}
 	json {
 		target "src/**/*.json"
@@ -141,18 +161,19 @@ test {
 	useJUnitPlatform()
 }
 
-task moveDevLibs(dependsOn: [remapJar, remapSourcesJar]) {
-	doLast {
-		def archivesName = project.base.archivesName.get() as String
-		ant.move(file:"${project.buildDir}/devlibs/${archivesName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesName}-${version}-dev.jar")
-		ant.move(file:"${project.buildDir}/devlibs/${archivesName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesName}-${version}-sources-dev.jar")
+def getGhVersion() {
+	return version.substring(0, version.indexOf("-MC"))
 	}
+
+def getChangelogUrl() {
+	def versionSlug = version.substring(1, version.indexOf("-MC")).replace(".", "-")
+	return "https://www.wurstclient.net/updates/wurst-${versionSlug}/"
 }
 
 import org.kohsuke.github.GHReleaseBuilder
 import org.kohsuke.github.GitHub
 
-task github(dependsOn: moveDevLibs) {
+task github(dependsOn: build) {
 	onlyIf {
 		ENV.GITHUB_TOKEN
 	}
@@ -160,8 +181,7 @@ task github(dependsOn: moveDevLibs) {
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repository = github.getRepository("Wurst-Imperium/Wurst-MCX2")
-		def ghVersion = version.substring(0, version.indexOf("-"))
-		def archivesName = project.base.archivesName.get() as String
+		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
@@ -172,7 +192,91 @@ task github(dependsOn: moveDevLibs) {
 		
 		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesName}-${version}-dev.jar"), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesName}-${version}-sources-dev.jar"), "application/java-archive")
+	}
+}
+import java.time.LocalDate
+import org.kohsuke.github.GHIssueState
+import org.kohsuke.github.GHMilestoneState
+import java.time.ZoneId
+import java.time.Instant
+
+task closeMilestone {
+	onlyIf {
+		ENV.GITHUB_TOKEN
+	}
+	
+	doLast {
+		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
+		def repository = github.getRepository("Wurst-Imperium/Wurst7")
+		def ghVersion = getGhVersion()
+		
+		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
+		def milestone = repository.listMilestones(GHIssueState.ALL).find { it.title == ghVersion }
+		if (milestone == null) {
+			milestone = repository.createMilestone(ghVersion, "")
+		}
+		
+		if (milestone.getState() != GHMilestoneState.CLOSED) {
+			milestone.setDueOn(Date.from(Instant.now()))
+			milestone.setDescription(getChangelogUrl())
+			milestone.close()
+		}
+	}
+}
+
+task uploadBackups {
+	dependsOn build
+	
+	onlyIf {
+		ENV.WI_BACKUPS_API_KEY
+	}
+	
+	doLast {
+		def shortVersion = getGhVersion().substring(1)
+		def backupUrl = "https://api.wurstclient.net/artifact-backups/Wurst/${shortVersion}"
+		
+		def maxRetries = 3
+		def retryCount = 0
+		def success = false
+		
+		while (!success && retryCount < maxRetries) {
+			try {
+				def connection = new URL(backupUrl).openConnection() as HttpURLConnection
+				def boundary = UUID.randomUUID().toString()
+				connection.setRequestMethod("POST")
+				connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
+				connection.setRequestProperty("Accept", "application/json")
+				connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+				connection.doOutput = true
+				
+				def output = connection.outputStream
+				[remapJar, remapSourcesJar].each { jarTask ->
+					def file = jarTask.archiveFile.get().asFile
+					output << "--${boundary}\r\n"
+					output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
+					output << "Content-Type: application/java-archive\r\n\r\n"
+					file.withInputStream { input -> 
+						output << input
+					}
+					output << "\r\n"
+				}
+				output << "--${boundary}--\r\n"
+				output.flush()
+				
+				if(connection.responseCode != 200) {
+					throw new IOException("HTTP ${connection.responseCode}: ${connection.responseMessage}")
+				}
+				
+				success = true
+				
+			} catch (Exception e) {
+				retryCount++
+				if (retryCount >= maxRetries) {
+					throw new GradleException("Failed to upload backups after ${maxRetries} attempts: ${e.message}")
+				}
+				println "Upload attempt ${retryCount} failed: ${e.message}. Retrying in 5 seconds..."
+				Thread.sleep(5000)
+			}
+		}
 	}
 }

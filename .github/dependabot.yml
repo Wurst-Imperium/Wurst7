@@ -1,0 +1,18 @@
+# Dependabot version updates, see:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+- package-ecosystem: "gradle"
+  directory: "/"
+  schedule:
+    interval: "daily"
+    time: "06:00"
+    timezone: "Europe/Berlin"
+- package-ecosystem: "github-actions"
+  # Directory should be `/` instead of `/.github/workflows` according to the docs.
+  directory: "/"
+  schedule:
+    interval: "daily"
+    time: "06:00"
+    timezone: "Europe/Berlin"

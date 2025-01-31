@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,18 +15,14 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
-import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.CmdUtils;
 import net.wurstclient.util.MathUtils;
 
 public final class GiveCmd extends Command
@@ -50,13 +46,7 @@ public final class GiveCmd extends Command
 			throw new CmdError("Creative mode only.");
 		
 		// id/name
-		Item item = getItem(args[0]);
-		
-		if(item == Items.AIR && MathUtils.isInteger(args[0]))
-			item = Item.byRawId(Integer.parseInt(args[0]));
-		
-		if(item == Items.AIR)
-			throw new CmdError("Item \"" + args[0] + "\" could not be found.");
+		Item item = CmdUtils.parseItem(args[0]);
 		
 		// amount
 		int amount = 1;
@@ -94,35 +84,7 @@ public final class GiveCmd extends Command
 			}
 		
 		// give item
-		if(!placeStackInHotbar(stack))
-			throw new CmdError("Please clear a slot in your hotbar.");
+		CmdUtils.giveItem(stack);
 		ChatUtils.message("Item" + (amount > 1 ? "s" : "") + " created.");
-	}
-	
-	private Item getItem(String id) throws CmdSyntaxError
-	{
-		try
-		{
-			return Registries.ITEM.get(Identifier.of(id));
-			
-		}catch(InvalidIdentifierException e)
-		{
-			throw new CmdSyntaxError("Invalid item: " + id);
-		}
-	}
-	
-	private boolean placeStackInHotbar(ItemStack stack)
-	{
-		for(int i = 0; i < 9; i++)
-		{
-			if(!MC.player.getInventory().getStack(i).isEmpty())
-				continue;
-			
-			MC.player.networkHandler.sendPacket(
-				new CreativeInventoryActionC2SPacket(36 + i, stack));
-			return true;
-		}
-		
-		return false;
 	}
 }

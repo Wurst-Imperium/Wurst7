@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -48,8 +48,13 @@ public enum RenderUtils
 	}
 	
 	/**
-	 * Disables the current scissor box, while avoiding the strange side-effects
-	 * of Minecraft's own disableScissor() method.
+	 * Disables the current scissor box, while avoiding most of the strange
+	 * side-effects of Minecraft's own disableScissor() method.
+	 *
+	 * <p>
+	 * <b>Note:</b> You have to draw some text after calling this method,
+	 * otherwise there will be some weird colors in the sky. It's unclear why
+	 * this happens.
 	 */
 	public static void disableScissor(DrawContext context)
 	{
