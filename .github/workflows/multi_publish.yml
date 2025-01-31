@@ -115,7 +115,7 @@ jobs:
         token: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
         owner: Wurst-Imperium
         repo: WurstClient.net
-        ref: master
+        ref: gh-pages
         workflow: announce_wurst_ports.yml
         workflow_inputs: ${{ steps.announce_inputs.outputs.json }}
     - name: Wait for announce workflow to finish (run ${{ steps.announce_dispatch.outputs.run_id }})
