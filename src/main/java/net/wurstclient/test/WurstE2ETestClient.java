@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -109,14 +109,30 @@ public final class WurstE2ETestClient implements ModInitializer
 		
 		// TODO: Open ClickGUI and Navigator
 		
+		// Build a test platform and clear out the space above it
+		runChatCommand("fill ~-7 ~-5 ~-7 ~7 ~-1 ~7 stone");
+		runChatCommand("fill ~-7 ~ ~-7 ~7 ~30 ~7 air");
+		runChatCommand("kill @e[type=!player,distance=..10]");
+		
 		// Clear inventory and chat before running tests
 		runChatCommand("clear");
 		clearChat();
 		
+		// Test Wurst hacks
+		AutoMineHackTest.testAutoMineHack();
+		FreecamHackTest.testFreecamHack();
+		NoFallHackTest.testNoFallHack();
+		XRayHackTest.testXRayHack();
+		
+		// Test Wurst commands
 		CopyItemCmdTest.testCopyItemCmd();
 		GiveCmdTest.testGiveCmd();
 		ModifyCmdTest.testModifyCmd();
-		// TODO: Test more Wurst hacks
+		
+		// TODO: Test more Wurst features
+		
+		// Test special cases
+		PistonTest.testPistonDoesntCrash();
 		
 		System.out.println("Opening game menu");
 		openGameMenu();

@@ -1,13 +1,9 @@
 name: Java CI with Gradle
-run-name: |
-  ${{ github.event_name == 'pull_request'
-  && format('Test changes in PR #{0}: {1}', github.event.pull_request.number, github.event.pull_request.title)
-  || format('Test changes in {0}: {1}', github.ref_name, github.event.head_commit.message) }}
 
 on:
   push:
-    branches:
-      - "**"
+    branches-ignore:
+      - "dependabot/**"
     tags-ignore:
       - "**"
     paths:
@@ -24,6 +20,10 @@ on:
       - "gradle**"
       - "*.gradle"
   workflow_dispatch:
+    inputs:
+      distinct_id:
+        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
+        required: false
 
 jobs:
   build:
@@ -32,6 +32,9 @@ jobs:
       VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
       IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
     steps:
+
+    - name: Echo distinct ID ${{ github.event.inputs.distinct_id }}
+      run: echo ${{ github.event.inputs.distinct_id }}
 
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -59,7 +62,10 @@ jobs:
       run: ./gradlew spotlessJsonCheck || (echo "::error::JSON validation failed! Run './gradlew spotlessApply' to fix style issues, or check the full error message for syntax errors." && exit 1)
 
     - name: Validate Java code style
-      run: ./gradlew spotlessCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
+      run: ./gradlew spotlessJavaCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
+
+    - name: Validate license headers
+      run: ./gradlew spotlessLicenseHeaderCheck || (echo "::error::License headers are missing or malformed in some files! Run './gradlew spotlessApply' to fix this, or check the full error message for details." && exit 1)
 
     - name: Run unit tests
       run: ./gradlew test --stacktrace --warning-mode=fail
@@ -84,7 +90,6 @@ jobs:
 
     - name: Add VirusTotal links to build summary
       if: ${{ env.VIRUSTOTAL_API_KEY && steps.virustotal.outputs.analysis }}
-      shell: bash
       run: |
         echo "<details open>" >> $GITHUB_STEP_SUMMARY
         echo "<summary>🛡️ VirusTotal Scans</summary>" >> $GITHUB_STEP_SUMMARY
@@ -99,7 +104,7 @@ jobs:
         echo "</details>" >> $GITHUB_STEP_SUMMARY
 
     - name: Run the mod and take screenshots
-      uses: modmuss50/xvfb-action@c56c7da0c8fc9a7cb5df2e50dd2a43a80b64c5cb
+      uses: GabrielBB/xvfb-action@v1.7
       with:
         run: ./gradlew runEndToEndTest --stacktrace --warning-mode=fail
 
@@ -114,26 +119,24 @@ jobs:
 
     - name: Create test screenshot gallery
       if: ${{ env.IMGUR_CLIENT_ID && (success() || failure()) }}
-      shell: bash
+      # Imgur uploads randomly fail sometimes, probably because of the low rate limit.
+      # TODO: Find a better place to upload the screenshots.
+      continue-on-error: true
       run: |
         echo "<details open>" >> $GITHUB_STEP_SUMMARY
         echo "<summary>📸 Test Screenshots</summary>" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-
         for img in run/screenshots/*.png; do
           if [ -f "$img" ]; then
             filename=$(basename "$img")
             name_without_ext="${filename%.*}"
-
             # Upload to Imgur
             response=$(curl -s -X POST \
               -H "Authorization: Client-ID $IMGUR_CLIENT_ID" \
               -F "image=@$img" \
               https://api.imgur.com/3/image)
-
             # Extract the URL from the response
             url=$(echo $response | grep -o '"link":"[^"]*"' | cut -d'"' -f4)
-
             if [ ! -z "$url" ]; then
               # Convert underscores to spaces and capitalize first letter of each word
               title=$(echo "$name_without_ext" | tr '_' ' ' | awk '{for(i=1;i<=NF;i++)sub(/./,toupper(substr($i,1,1)),$i)}1')
@@ -142,6 +145,7 @@ jobs:
               echo "" >> $GITHUB_STEP_SUMMARY
             else
               echo "Failed to upload $filename" >> $GITHUB_STEP_SUMMARY
+              echo "Imgur upload response for $filename: $response"
             fi
           fi
         done

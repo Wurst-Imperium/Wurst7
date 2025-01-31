@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,13 +7,13 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.PacketUtils;
 
 @DontSaveState
 @SearchTags({"anti hunger"})
@@ -41,7 +41,7 @@ public final class AntiHungerHack extends Hack implements PacketOutputListener
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
-		if(!(event.getPacket() instanceof PlayerMoveC2SPacket oldPacket))
+		if(!(event.getPacket() instanceof PlayerMoveC2SPacket packet))
 			return;
 		
 		if(!MC.player.isOnGround() || MC.player.fallDistance > 0.5)
@@ -50,28 +50,6 @@ public final class AntiHungerHack extends Hack implements PacketOutputListener
 		if(MC.interactionManager.isBreakingBlock())
 			return;
 		
-		double x = oldPacket.getX(-1);
-		double y = oldPacket.getY(-1);
-		double z = oldPacket.getZ(-1);
-		float yaw = oldPacket.getYaw(-1);
-		float pitch = oldPacket.getPitch(-1);
-		boolean horizontalCollision = oldPacket.horizontalCollision();
-		
-		Packet<?> newPacket;
-		if(oldPacket.changesPosition())
-			if(oldPacket.changesLook())
-				newPacket = new PlayerMoveC2SPacket.Full(x, y, z, yaw, pitch,
-					false, horizontalCollision);
-			else
-				newPacket = new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z,
-					false, horizontalCollision);
-		else if(oldPacket.changesLook())
-			newPacket = new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch,
-				false, horizontalCollision);
-		else
-			newPacket = new PlayerMoveC2SPacket.OnGroundOnly(false,
-				horizontalCollision);
-		
-		event.setPacket(newPacket);
+		event.setPacket(PacketUtils.modifyOnGround(packet, false));
 	}
 }
