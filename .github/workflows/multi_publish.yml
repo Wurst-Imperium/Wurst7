@@ -1,0 +1,130 @@
+name: Publish Multiple Releases
+run-name: Publish v${{ github.event.inputs.wurst_version }} build(s) from ${{ github.event.inputs.branches }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      wurst_version:
+        description: "Wurst version (without v or -MC)"
+        required: true
+        type: string
+      branches:
+        description: "Space-separated list of branches to publish from"
+        required: true
+        type: string
+      announce_ports:
+        description: "Announce as ports on WurstForum"
+        required: true
+        type: boolean
+        default: false
+      dry_run:
+        description: "Dry-run mode (don't actually publish anything)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  # Needed to trigger the publish workflow.
+  actions: write
+
+jobs:
+
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      branches: ${{ steps.set_branches.outputs.branches }}
+    steps:
+    - name: Convert branches input to JSON array
+      id: set_branches
+      run: |
+        branches_array=(${{ inputs.branches }})
+        quoted_branches=$(printf '"%s",' "${branches_array[@]}")
+        JSON_ARRAY="[${quoted_branches%,}]"
+        echo "branches=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
+        echo "Branches: $JSON_ARRAY" >> "$GITHUB_STEP_SUMMARY"
+
+  publish_each:
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: ${{ !fromJson(inputs.dry_run) }}
+    strategy:
+      # Each job pushes an automated commit to WurstClient.net@master, so running them all in parallel
+      # would likely cause conflicts. Also, various servers might hit rate limits if we just upload
+      # all of the files at once.
+      max-parallel: 1
+      # If something goes wrong, all published files have to be manually deleted.
+      # Best to fail as early as possible.
+      fail-fast: true
+      matrix:
+        branch: ${{ fromJson(needs.prepare.outputs.branches) }}
+    # TODO: Maybe also verify that the wurst_version in each branch is as expected before publishing?
+    steps:
+    - name: Build publish inputs
+      id: publish_inputs
+      run: |
+        JSON_STRING=$(cat << EOF
+        {
+          "close_milestone": "true",
+          "upload_backups": "true",
+          "publish_github": "true",
+          "update_website": "true"
+        }
+        EOF
+        )
+        # Convert to single line and escape quotes
+        echo "json=${JSON_STRING//$'\n'/}" >> "$GITHUB_OUTPUT"
+    - name: Trigger publish workflow
+      id: publish_dispatch
+      uses: codex-/return-dispatch@v2
+      with:
+        token: ${{ github.token }}
+        owner: Wurst-Imperium
+        repo: Wurst7
+        ref: ${{ matrix.branch }}
+        workflow: publish.yml
+        workflow_inputs: ${{ steps.publish_inputs.outputs.json }}
+    - name: Wait for publish workflow to finish (run ${{ steps.publish_dispatch.outputs.run_id }})
+      uses: codex-/await-remote-run@v1
+      with:
+        token: ${{ github.token }}
+        owner: Wurst-Imperium
+        repo: Wurst7
+        run_id: ${{ steps.publish_dispatch.outputs.run_id }}
+        run_timeout_seconds: 600  # 10 minutes
+
+  announce:
+    runs-on: ubuntu-latest
+    needs: [prepare, publish_each]
+    if: ${{ !failure() && !cancelled() && inputs.announce_ports }}
+    steps:
+    - name: Build announcement inputs
+      id: announce_inputs
+      run: |
+        JSON_STRING=$(cat << EOF
+        {
+          "wurst_version": "${{ inputs.wurst_version }}",
+          "branches": "${{ inputs.branches }}",
+          "dry_run": "${{ inputs.dry_run }}"
+        }
+        EOF
+        )
+        # Convert to single line and escape quotes
+        echo "json=${JSON_STRING//$'\n'/}" >> "$GITHUB_OUTPUT"
+    - name: Trigger announce workflow
+      id: announce_dispatch
+      uses: codex-/return-dispatch@v2
+      with:
+        token: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
+        owner: Wurst-Imperium
+        repo: WurstClient.net
+        ref: gh-pages
+        workflow: announce_wurst_ports.yml
+        workflow_inputs: ${{ steps.announce_inputs.outputs.json }}
+    - name: Wait for announce workflow to finish (run ${{ steps.announce_dispatch.outputs.run_id }})
+      uses: codex-/await-remote-run@v1
+      with:
+        token: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
+        owner: Wurst-Imperium
+        repo: WurstClient.net
+        run_id: ${{ steps.announce_dispatch.outputs.run_id }}
+        run_timeout_seconds: 600  # 10 minutes

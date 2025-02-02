@@ -24,11 +24,6 @@ on:
         required: true
         type: boolean
         default: false
-      announce_backport:
-        description: "Announce as a backport on WurstForum"
-        required: false
-        type: boolean
-        default: false
       distinct_id:
         description: "Automatically set by the return-dispatch action (leave blank if running manually)"
         required: false
@@ -105,8 +100,7 @@ jobs:
         {
           "wurst_version": "$WURST_VERSION",
           "mc_version": "$MC_VERSION",
-          "fapi_version": "$FAPI_VERSION",
-          "announce": "${{ inputs.announce_backport }}"
+          "fapi_version": "$FAPI_VERSION"
         }
         EOF
         )
