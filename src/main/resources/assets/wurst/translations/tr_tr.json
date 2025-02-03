@@ -191,7 +191,7 @@
   "description.wurst.hack.prophuntesp": "Prophunt'ta sahte blokları görmenizi sağlar.\nMineplex Prophunt için yapılmıştır. Diğer sunucularda çalışmayabilir.",
   "description.wurst.hack.protect": "En yakındaki varlığı takip eden ve onu diğer varlıklardan koruyan bir bot.\nBelirli bir varlığı korumak için .protect kullanın.",
   "description.wurst.hack.radar": "Yakındaki varlıkların konumunu gösterir.\n§ckırmızı§r - oyuncular\n§6turuncu§r - canavarlar\n§ayeşil§r - hayvanlar\n§7gri§r - diğerleri",
-  "description.wurst.hack.rainbowui": "§cM§aa§9k§ce§as §9e§cv§ae§9r§cy§at§9h§ci§an§9g §cc§ao§9l§co§ar§9f§cu§al§9.",
+  "description.wurst.hack.rainbowui": "§cH§ae§9r§cş§ae§cy§ai §9r§ce§an§9k§cl§ai §cy§aa§9p§ca§ar.",
   "description.wurst.hack.reach": "Daha uzağa ulaşmanıza izin verir.",
   "description.wurst.hack.remoteview": "Başka birisi gibi dünyayı görmenizi sağlar.\nBelirli bir hedefe yönlendirmek için .rv komutunu kullanın.",
   "description.wurst.setting.remoteview.filter_players": "Diğer oyuncuları görmeyecek.",
