@@ -17,7 +17,7 @@
   "description.wurst.hack.antiafk": "Seni AFK detektörleri tarafından saklamak için rastgele sağa veya sola döndürür.",
   "description.wurst.setting.antiafk.use_ai": "Doğal bir şekilde hareket etmek ve tehlikelerden kaçınmak için bir yol bulma yapay zekası kullanır. Bazen takılıp kalabilir.",
   "description.wurst.setting.antiafk.ai_range": "AntiAFK'nin Yapay Zeka açıkken hareket edebileceği alanı belirler.",
-  "description.wurst.setting.antiafk.non-ai_range": "AntiAFK'nin Yapay Zeka kapalıyken hareket edebileceği alanı belirler. \n\n§c§lUYARI:§r Bu alan tamamen engelsiz ve tehlikelerden arındırılmış olmalıdır",
+  "description.wurst.setting.antiafk.non-ai_range": "AntiAFK'nin Yapay Zeka kapalıyken hareket edebileceği alanı belirler. \n\n§c§lUYARI:§r Bu alan tamamen engelsiz ve tehlikelerden arındırılmış olmalıdır.",
   "description.wurst.setting.antiafk.wait_time": "Hareketler arasındaki saniye cinsinden süre.",
   "description.wurst.setting.antiafk.wait_time_randomization": "Bekleme süresine rastgele eklenebilecek veya çıkarılabilecek zaman miktarını saniye cinsinden belirler.",
   "description.wurst.setting.antiafk.show_wait_time": "Hile Listesinde kalan bekleme süresini gösterir.",
