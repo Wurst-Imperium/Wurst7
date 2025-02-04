@@ -14,7 +14,7 @@
   "description.wurst.setting.anchoraura.check_line_of_sight": "Yeniden doğma ankrajlarını yerleştirirken veya sağ tıklarken bloklara ulaşmamanızı sağlar.\n\nDaha küçük ama hile karşıtı eklentilere yardımcı olabilir.",
   "description.wurst.setting.anchoraura.swing_hand": "AnchorAura'nın yeniden doğma ankrajlarını yerleştirirken, şarj ederken ve patlatırken elinizi nasıl sallaması gerektiğini belirler.",
   "description.wurst.setting.anchoraura.take_items_from": "Yeniden doğma ankrajlarını ve parıltı taşını arayacağı yerleri belirler.",
-  "description.wurst.hack.antiafk": "Seni AFK detektörleri tarafından saklamak için rastgele sağa veya sola döndürür.",
+  "description.wurst.hack.antiafk": "Seni AFK detektörleri tarafından saklamak için rastgele sağa veya sola yürütür.",
   "description.wurst.setting.antiafk.use_ai": "Doğal bir şekilde hareket etmek ve tehlikelerden kaçınmak için bir yol bulma yapay zekası kullanır. Bazen takılıp kalabilir.",
   "description.wurst.setting.antiafk.ai_range": "AntiAFK'nin Yapay Zeka açıkken hareket edebileceği alanı belirler.",
   "description.wurst.setting.antiafk.non-ai_range": "AntiAFK'nin Yapay Zeka kapalıyken hareket edebileceği alanı belirler. \n\n§c§lUYARI:§r Bu alan tamamen engelsiz ve tehlikelerden arındırılmış olmalıdır.",
