@@ -39,7 +39,7 @@ public final class RenameCmd extends Command
 			message += " " + args[i];
 		
 		message = message.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getSelectedStack();
 		
 		if(stack == null)
 			throw new CmdError("There is no item in your hand.");

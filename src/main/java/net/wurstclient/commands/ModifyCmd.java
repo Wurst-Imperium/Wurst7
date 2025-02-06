@@ -47,7 +47,7 @@ public final class ModifyCmd extends Command
 		if(args.length < 2)
 			throw new CmdSyntaxError();
 		
-		ItemStack stack = player.getInventory().getMainHandStack();
+		ItemStack stack = player.getInventory().getSelectedStack();
 		
 		if(stack == null)
 			throw new CmdError("You must hold an item in your main hand.");

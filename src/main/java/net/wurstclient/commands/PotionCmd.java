@@ -47,7 +47,7 @@ public final class PotionCmd extends Command
 		if(!MC.player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getSelectedStack();
 		if(!(stack.getItem() instanceof PotionItem))
 			throw new CmdError("You must hold a potion in your main hand.");
 		

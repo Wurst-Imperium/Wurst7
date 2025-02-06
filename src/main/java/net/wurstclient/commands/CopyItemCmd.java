@@ -62,7 +62,7 @@ public final class CopyItemCmd extends Command
 		switch(slot.toLowerCase())
 		{
 			case "hand":
-			return player.getInventory().getMainHandStack();
+			return player.getInventory().getSelectedStack();
 			
 			case "head":
 			return player.getInventory().getArmorStack(3);

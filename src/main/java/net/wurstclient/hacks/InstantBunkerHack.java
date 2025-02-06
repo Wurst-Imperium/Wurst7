@@ -72,7 +72,7 @@ public final class InstantBunkerHack extends Hack
 			return;
 		}
 		
-		ItemStack stack = MC.player.getInventory().getMainHandStack();
+		ItemStack stack = MC.player.getInventory().getSelectedStack();
 		
 		if(!(stack.getItem() instanceof BlockItem))
 		{

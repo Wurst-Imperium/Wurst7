@@ -46,7 +46,7 @@ public final class RepairCmd extends Command
 	
 	private ItemStack getHeldStack(ClientPlayerEntity player) throws CmdError
 	{
-		ItemStack stack = player.getInventory().getMainHandStack();
+		ItemStack stack = player.getInventory().getSelectedStack();
 		
 		if(stack.isEmpty())
 			throw new CmdError("You need an item in your hand.");
