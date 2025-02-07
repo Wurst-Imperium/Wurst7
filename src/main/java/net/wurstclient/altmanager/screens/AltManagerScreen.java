@@ -29,6 +29,7 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -316,7 +317,7 @@ public final class AltManagerScreen extends Screen
 			String response = bf.readLine();
 			
 			if(response == null)
-				throw new IOException("No reponse from FileChooser");
+				throw new IOException("No response from FileChooser");
 			
 			try
 			{
@@ -325,7 +326,7 @@ public final class AltManagerScreen extends Screen
 			}catch(InvalidPathException e)
 			{
 				throw new IOException(
-					"Reponse from FileChooser is not a valid path");
+					"Response from FileChooser is not a valid path");
 			}
 		}
 	}
@@ -422,11 +423,22 @@ public final class AltManagerScreen extends Screen
 		if(!listGui.isMouseOver(mouseX, mouseY))
 			return;
 		
-		Alt alt = listGui.getHoveredAlt(mouseX, mouseY);
-		if(alt == null)
+		Entry hoveredEntry = listGui.getHoveredEntry(mouseX, mouseY);
+		if(hoveredEntry == null)
 			return;
 		
+		int hoveredIndex = listGui.children().indexOf(hoveredEntry);
+		int itemX = mouseX - listGui.getRowLeft();
+		int itemY = mouseY - listGui.getRowTop(hoveredIndex);
+		
+		if(itemX < 31 || itemY < 15 || itemY >= 25)
+			return;
+		
+		Alt alt = hoveredEntry.alt;
 		ArrayList<Text> tooltip = new ArrayList<>();
+		
+		if(itemX >= 31 + textRenderer.getWidth(hoveredEntry.getBottomText()))
+			return;
 		
 		if(alt.isCracked())
 			addTooltip(tooltip, "cracked");
@@ -512,7 +524,7 @@ public final class AltManagerScreen extends Screen
 		public Text getNarration()
 		{
 			return Text.translatable("narrator.select", "Alt " + alt + ", "
-				+ StringHelper.stripTextFormat(getBottomText(alt)));
+				+ StringHelper.stripTextFormat(getBottomText()));
 		}
 		
 		@Override
@@ -548,24 +560,21 @@ public final class AltManagerScreen extends Screen
 			}
 			
 			// face
-			context.draw();
 			AltRenderer.drawAltFace(context, alt.getName(), x + 1, y + 1, 24,
 				24, listGui.getSelectedOrNull() == this);
 			
-			// name / email
-			context.drawText(client.textRenderer,
-				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880,
-				false);
-			context.drawText(client.textRenderer,
-				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880,
-				false);
+			TextRenderer tr = client.textRenderer;
 			
-			String bottomText = getBottomText(alt);
-			context.drawText(client.textRenderer, bottomText, x + 31, y + 15,
-				10526880, false);
+			// name / email
+			context.drawText(tr, "Name: " + alt.getDisplayName(), x + 31, y + 3,
+				0xA0A0A0, false);
+			
+			// status
+			context.drawText(tr, getBottomText(), x + 31, y + 15, 10526880,
+				false);
 		}
 		
-		private String getBottomText(Alt alt)
+		private String getBottomText()
 		{
 			String text = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
 			
@@ -599,22 +608,17 @@ public final class AltManagerScreen extends Screen
 		public Alt getSelectedAlt()
 		{
 			AltManagerScreen.Entry selected = getSelectedOrNull();
-			if(selected == null)
-				return null;
-			
-			return selected.alt;
+			return selected != null ? selected.alt : null;
 		}
 		
 		/**
-		 * @return The hovered Alt, or null if no Alt is hovered.
+		 * @return The hovered Entry, or null if no Entry is hovered.
 		 */
-		public Alt getHoveredAlt(double mouseX, double mouseY)
+		public AltManagerScreen.Entry getHoveredEntry(double mouseX,
+			double mouseY)
 		{
 			Optional<Element> hovered = hoveredElement(mouseX, mouseY);
-			if(!hovered.isPresent())
-				return null;
-			
-			return ((AltManagerScreen.Entry)hovered.get()).alt;
+			return hovered.map(e -> ((AltManagerScreen.Entry)e)).orElse(null);
 		}
 	}
 }
