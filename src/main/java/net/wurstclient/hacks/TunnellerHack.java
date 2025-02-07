@@ -587,7 +587,7 @@ public final class TunnellerHack extends Hack
 					.canFallThrough(BlockUtils.getState(pos.down())))
 					continue;
 				
-				MC.player.getInventory().selectedSlot = slot;
+				MC.player.getInventory().setSelectedSlot(slot);
 				return true;
 			}
 			
@@ -798,7 +798,7 @@ public final class TunnellerHack extends Hack
 				if(!(block instanceof TorchBlock))
 					continue;
 				
-				MC.player.getInventory().selectedSlot = slot;
+				MC.player.getInventory().setSelectedSlot(slot);
 				return true;
 			}
 			

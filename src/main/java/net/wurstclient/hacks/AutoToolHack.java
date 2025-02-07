@@ -97,7 +97,7 @@ public final class AutoToolHack extends Hack
 			return;
 		
 		if(prevSelectedSlot == -1)
-			prevSelectedSlot = MC.player.getInventory().selectedSlot;
+			prevSelectedSlot = MC.player.getInventory().getSelectedSlot();
 		
 		equipBestTool(pos, useSwords.isChecked(), useHands.isChecked(),
 			repairMode.getValueI());
@@ -114,7 +114,7 @@ public final class AutoToolHack extends Hack
 			return;
 		
 		if(switchBack.isChecked())
-			MC.player.getInventory().selectedSlot = prevSelectedSlot;
+			MC.player.getInventory().setSelectedSlot(prevSelectedSlot);
 		
 		prevSelectedSlot = -1;
 	}
@@ -150,7 +150,7 @@ public final class AutoToolHack extends Hack
 			return;
 		}
 		
-		player.getInventory().selectedSlot = bestSlot;
+		player.getInventory().setSelectedSlot(bestSlot);
 	}
 	
 	private int getBestSlot(BlockState state, boolean useSwords, int repairMode)
@@ -166,7 +166,7 @@ public final class AutoToolHack extends Hack
 		
 		for(int slot = 0; slot < 9; slot++)
 		{
-			if(slot == inventory.selectedSlot)
+			if(slot == inventory.getSelectedSlot())
 				continue;
 			
 			ItemStack stack = inventory.getStack(slot);
@@ -225,7 +225,7 @@ public final class AutoToolHack extends Hack
 	private void putAwayDamagedTool(int repairMode)
 	{
 		PlayerInventory inv = MC.player.getInventory();
-		int selectedSlot = inv.selectedSlot;
+		int selectedSlot = inv.getSelectedSlot();
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		
 		// If there's an empty slot in the main inventory,
@@ -275,15 +275,16 @@ public final class AutoToolHack extends Hack
 		
 		if(fallbackSlot == -1)
 		{
-			if(inventory.selectedSlot == 8)
-				inventory.selectedSlot = 0;
+			int prevSlot = inventory.getSelectedSlot();
+			if(prevSlot == 8)
+				inventory.setSelectedSlot(0);
 			else
-				inventory.selectedSlot++;
+				inventory.setSelectedSlot(prevSlot + 1);
 			
 			return;
 		}
 		
-		inventory.selectedSlot = fallbackSlot;
+		inventory.setSelectedSlot(fallbackSlot);
 	}
 	
 	private int getFallbackSlot()
@@ -292,7 +293,7 @@ public final class AutoToolHack extends Hack
 		
 		for(int slot = 0; slot < 9; slot++)
 		{
-			if(slot == inventory.selectedSlot)
+			if(slot == inventory.getSelectedSlot())
 				continue;
 			
 			ItemStack stack = inventory.getStack(slot);

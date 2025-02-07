@@ -132,10 +132,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		// save old slot
 		if(oldSlot == -1)
-			oldSlot = MC.player.getInventory().selectedSlot;
+			oldSlot = MC.player.getInventory().getSelectedSlot();
 		
 		// set slot
-		MC.player.getInventory().selectedSlot = bestSlot;
+		MC.player.getInventory().setSelectedSlot(bestSlot);
 		
 		// start timer
 		timer = releaseTime.getValueI();
@@ -184,7 +184,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		if(oldSlot != -1)
 		{
-			MC.player.getInventory().selectedSlot = oldSlot;
+			MC.player.getInventory().setSelectedSlot(oldSlot);
 			oldSlot = -1;
 		}
 	}
