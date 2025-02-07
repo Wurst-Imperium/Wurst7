@@ -125,7 +125,7 @@ public final class AltManager
 	 * @param alt
 	 *            The Alt to be removed.
 	 */
-	private void remove(Alt alt)
+	public void remove(Alt alt)
 	{
 		if(!alts.remove(alt))
 			return;

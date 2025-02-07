@@ -18,6 +18,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 import org.lwjgl.glfw.GLFW;
@@ -29,19 +31,21 @@ import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
-import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -77,6 +81,8 @@ public final class AltManagerScreen extends Screen
 	public void init()
 	{
 		listGui = new ListGui(client, this, altManager.getList());
+		addSelectableChild(listGui);
+		
 		WurstClient wurst = WurstClient.INSTANCE;
 		
 		Exception folderException = altManager.getFolderException();
@@ -147,42 +153,6 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
-	{
-		listGui.mouseClicked(mouseX, mouseY, mouseButton);
-		
-		if(mouseY >= 36 && mouseY <= height - 57)
-			if(mouseX >= width / 2 + 140 || mouseX <= width / 2 - 126)
-				listGui.selected = -1;
-			
-		return super.mouseClicked(mouseX, mouseY, mouseButton);
-	}
-	
-	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button,
-		double deltaX, double deltaY)
-	{
-		listGui.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-	}
-	
-	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button)
-	{
-		listGui.mouseReleased(mouseX, mouseY, button);
-		return super.mouseReleased(mouseX, mouseY, button);
-	}
-	
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY,
-		double horizontalAmount, double verticalAmount)
-	{
-		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
-			verticalAmount);
-	}
-	
-	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
 	{
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
@@ -194,8 +164,7 @@ public final class AltManagerScreen extends Screen
 	@Override
 	public void tick()
 	{
-		boolean altSelected = listGui.selected >= 0
-			&& listGui.selected < altManager.getList().size();
+		boolean altSelected = listGui.getSelectedOrNull() != null;
 		
 		useButton.active = altSelected;
 		starButton.active = altSelected;
@@ -233,7 +202,7 @@ public final class AltManagerScreen extends Screen
 			return;
 		
 		altManager.toggleFavorite(alt);
-		listGui.selected = -1;
+		listGui.setSelected(null);
 	}
 	
 	private void pressEdit()
@@ -394,11 +363,12 @@ public final class AltManagerScreen extends Screen
 	
 	private void confirmRemove(boolean confirmed)
 	{
-		if(listGui.getSelectedAlt() == null)
+		Alt alt = listGui.getSelectedAlt();
+		if(alt == null)
 			return;
 		
 		if(confirmed)
-			altManager.remove(listGui.selected);
+			altManager.remove(alt);
 		
 		client.setScreen(this);
 	}
@@ -411,13 +381,9 @@ public final class AltManagerScreen extends Screen
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		// skin preview
-		if(listGui.getSelectedSlot() != -1
-			&& listGui.getSelectedSlot() < altManager.getList().size())
+		Alt alt = listGui.getSelectedAlt();
+		if(alt != null)
 		{
-			Alt alt = listGui.getSelectedAlt();
-			if(alt == null)
-				return;
-			
 			AltRenderer.drawAltBack(context, alt.getName(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
 			AltRenderer.drawAltBody(context, alt.getName(),
@@ -453,27 +419,14 @@ public final class AltManagerScreen extends Screen
 	
 	private void renderAltTooltip(DrawContext context, int mouseX, int mouseY)
 	{
-		if(!listGui.isMouseInList(mouseX, mouseY))
+		if(!listGui.isMouseOver(mouseX, mouseY))
 			return;
 		
-		List<Alt> altList = altManager.getList();
-		int hoveredIndex = listGui.getItemAtPosition(mouseX, mouseY);
-		
-		if(hoveredIndex < 0 || hoveredIndex >= altList.size())
+		Alt alt = listGui.getHoveredAlt(mouseX, mouseY);
+		if(alt == null)
 			return;
 		
-		int itemX = mouseX - (width - listGui.getRowWidth()) / 2;
-		int itemY = mouseY - 36 + (int)listGui.getScrollAmount() - 4
-			- hoveredIndex * 30;
-		
-		if(itemX < 31 || itemY < 15 || itemY >= 25)
-			return;
-		
-		Alt alt = altList.get(hoveredIndex);
 		ArrayList<Text> tooltip = new ArrayList<>();
-		
-		if(itemX >= 31 + textRenderer.getWidth(listGui.getBottomText(alt)))
-			return;
 		
 		if(alt.isCracked())
 			addTooltip(tooltip, "cracked");
@@ -544,77 +497,45 @@ public final class AltManagerScreen extends Screen
 		client.setScreen(prevScreen);
 	}
 	
-	public static final class ListGui extends ListWidget
+	private final class Entry
+		extends AlwaysSelectedEntryListWidget.Entry<AltManagerScreen.Entry>
 	{
-		private final List<Alt> list;
-		private int selected = -1;
-		private AltManagerScreen prevScreen;
-		private long lastTime;
+		private final Alt alt;
+		private long lastClickTime;
 		
-		public ListGui(MinecraftClient minecraft, AltManagerScreen prevScreen,
-			List<Alt> list)
+		public Entry(Alt alt)
 		{
-			super(minecraft, prevScreen.width, prevScreen.height, 36,
-				prevScreen.height - 56, 30);
-			
-			this.prevScreen = prevScreen;
-			this.list = list;
+			this.alt = Objects.requireNonNull(alt);
 		}
 		
 		@Override
-		protected boolean isSelectedItem(int id)
+		public Text getNarration()
 		{
-			return selected == id;
-		}
-		
-		protected int getSelectedSlot()
-		{
-			return selected;
-		}
-		
-		/**
-		 * @return The selected Alt, or null if no Alt is selected.
-		 */
-		protected Alt getSelectedAlt()
-		{
-			if(selected < 0 || selected >= list.size())
-				return null;
-			
-			return list.get(selected);
+			return Text.translatable("narrator.select", "Alt " + alt + ", "
+				+ StringHelper.stripTextFormat(getBottomText(alt)));
 		}
 		
 		@Override
-		protected int getItemCount()
+		public boolean mouseClicked(double mouseX, double mouseY,
+			int mouseButton)
 		{
-			return list.size();
-		}
-		
-		@Override
-		protected boolean selectItem(int index, int button, double mouseX,
-			double mouseY)
-		{
-			if(index == selected && Util.getMeasuringTimeMs() - lastTime < 250)
-				prevScreen.pressLogin();
+			if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+				return false;
 			
-			if(index >= 0 && index < list.size())
-				selected = index;
+			long timeSinceLastClick = Util.getMeasuringTimeMs() - lastClickTime;
+			lastClickTime = Util.getMeasuringTimeMs();
 			
-			lastTime = Util.getMeasuringTimeMs();
+			if(timeSinceLastClick < 250)
+				pressLogin();
+			
 			return true;
 		}
 		
 		@Override
-		protected void renderBackground()
+		public void render(DrawContext context, int index, int y, int x,
+			int entryWidth, int entryHeight, int mouseX, int mouseY,
+			boolean hovered, float tickDelta)
 		{
-			
-		}
-		
-		@Override
-		protected void renderItem(DrawContext context, int id, int x, int y,
-			int var4, int var5, int var6, float partialTicks)
-		{
-			Alt alt = list.get(id);
-			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))
 			{
@@ -629,7 +550,7 @@ public final class AltManagerScreen extends Screen
 			// face
 			context.draw();
 			AltRenderer.drawAltFace(context, alt.getName(), x + 1, y + 1, 24,
-				24, isSelectedItem(id));
+				24, listGui.getSelectedOrNull() == this);
 			
 			// name / email
 			context.drawText(client.textRenderer,
@@ -644,7 +565,7 @@ public final class AltManagerScreen extends Screen
 				10526880, false);
 		}
 		
-		public String getBottomText(Alt alt)
+		private String getBottomText(Alt alt)
 		{
 			String text = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
 			
@@ -657,6 +578,43 @@ public final class AltManagerScreen extends Screen
 				text += "\u00a7r, \u00a7cunchecked";
 			
 			return text;
+		}
+	}
+	
+	private final class ListGui
+		extends AlwaysSelectedEntryListWidget<AltManagerScreen.Entry>
+	{
+		public ListGui(MinecraftClient minecraft, AltManagerScreen screen,
+			List<Alt> list)
+		{
+			super(minecraft, screen.width, screen.height - 96, 36, 30, 0);
+			
+			list.stream().map(AltManagerScreen.Entry::new)
+				.forEach(this::addEntry);
+		}
+		
+		/**
+		 * @return The selected Alt, or null if no Alt is selected.
+		 */
+		public Alt getSelectedAlt()
+		{
+			AltManagerScreen.Entry selected = getSelectedOrNull();
+			if(selected == null)
+				return null;
+			
+			return selected.alt;
+		}
+		
+		/**
+		 * @return The hovered Alt, or null if no Alt is hovered.
+		 */
+		public Alt getHoveredAlt(double mouseX, double mouseY)
+		{
+			Optional<Element> hovered = hoveredElement(mouseX, mouseY);
+			if(!hovered.isPresent())
+				return null;
+			
+			return ((AltManagerScreen.Entry)hovered.get()).alt;
 		}
 	}
 }
