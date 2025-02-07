@@ -20,17 +20,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.StringJoiner;
 
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -38,12 +34,6 @@ import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -420,11 +410,6 @@ public final class AltManagerScreen extends Screen
 		renderBackground(context, mouseX, mouseY, partialTicks);
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
 		// skin preview
 		if(listGui.getSelectedSlot() != -1
 			&& listGui.getSelectedSlot() < altManager.getList().size())
@@ -453,22 +438,9 @@ public final class AltManagerScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
-			GL11.glDisable(GL11.GL_CULL_FACE);
-			GL11.glEnable(GL11.GL_BLEND);
-			
-			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
-			
-			BufferBuilder bufferBuilder = tessellator
-				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, 0, 0, 0);
-			bufferBuilder.vertex(matrix, width, 0, 0);
-			bufferBuilder.vertex(matrix, width, height, 0);
-			bufferBuilder.vertex(matrix, 0, height, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-			
-			GL11.glEnable(GL11.GL_CULL_FACE);
-			GL11.glDisable(GL11.GL_BLEND);
+			int alpha = (int)(Math.min(1, errorTimer / 16F) * 255);
+			int color = 0xFF0000 | alpha << 24;
+			context.fill(0, 0, width, height, color);
 			errorTimer--;
 		}
 		
@@ -643,33 +615,15 @@ public final class AltManagerScreen extends Screen
 		{
 			Alt alt = list.get(id);
 			
-			MatrixStack matrixStack = context.getMatrices();
-			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
-			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))
 			{
-				GL11.glDisable(GL11.GL_CULL_FACE);
-				GL11.glEnable(GL11.GL_BLEND);
-				
 				float opacity =
 					0.3F - Math.abs(MathHelper.sin(System.currentTimeMillis()
 						% 10000L / 10000F * (float)Math.PI * 2.0F) * 0.15F);
 				
-				RenderSystem.setShaderColor(0, 1, 0, opacity);
-				
-				BufferBuilder bufferBuilder = tessellator
-					.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-				bufferBuilder.vertex(matrix, x - 2, y - 2, 0);
-				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0);
-				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0);
-				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0);
-				BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-				
-				GL11.glEnable(GL11.GL_CULL_FACE);
-				GL11.glDisable(GL11.GL_BLEND);
+				int color = 0x00FF00 | (int)(opacity * 255) << 24;
+				context.fill(x - 2, y - 2, x + 218, y + 28, color);
 			}
 			
 			// face
