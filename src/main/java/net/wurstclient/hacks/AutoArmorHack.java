@@ -119,7 +119,7 @@ public final class AutoArmorHack extends Hack
 		{
 			bestArmor.put(type, new ArmorData(-1, 0));
 			
-			ItemStack stack = inventory.getArmorStack(type.getEntitySlotId());
+			ItemStack stack = player.getEquippedStack(type);
 			if(!MC.player.canEquip(stack, type))
 				continue;
 			
@@ -153,8 +153,7 @@ public final class AutoArmorHack extends Hack
 				
 			// check if armor can be swapped
 			// needs 1 free slot where it can put the old armor
-			ItemStack oldArmor =
-				inventory.getArmorStack(type.getEntitySlotId());
+			ItemStack oldArmor = player.getEquippedStack(type);
 			if(!oldArmor.isEmpty() && inventory.getEmptySlot() == -1)
 				continue;
 			
