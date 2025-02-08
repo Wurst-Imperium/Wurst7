@@ -79,8 +79,8 @@ public final class LogoutSpotHack extends Hack
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> Math.abs(e.getY() - localPlayer.getY()) <= 1e6);
 		currentPlayers.addAll(stream.collect(Collectors.toList()));
-
-//		Remove Spot if Comming back
+		
+		// Remove Spot if Comming back
 		logoutEntries.removeIf(entry -> currentPlayers.stream()
 			.anyMatch(p -> p.getUuid().equals(entry.uuid())));
 		
