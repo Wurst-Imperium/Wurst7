@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.EnumSetting;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -57,6 +61,18 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each player.\n"
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
+	
+	private final EnumSetting colorMode = new EnumSetting("Color Mode",
+		"\u00a7lDistance\u00a7r mode is green the farther away and red the closer.\n"
+			+ "\u00a7lName Tag\u00a7r mode is based on the color of the player's name (usually team colors.)",
+		ColorMode.values(), ColorMode.DISTANCE);
+	
+	private final CheckboxSetting blueFriends =
+		new CheckboxSetting("Blue Friends",
+			"Show friends in blue (only work with distance color mode.)", true);
+	
+	private final CheckboxSetting showWhite = new CheckboxSetting("Show White",
+		"Show those with no team colors.", false);
 	
 	private final EntityFilterList entityFilters = new EntityFilterList(
 		new FilterSleepingSetting("Won't show sleeping players.", false),
@@ -160,17 +176,52 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			matrixStack.scale(e.getWidth() + extraSize,
 				e.getHeight() + extraSize, e.getWidth() + extraSize);
 			
+			float r = 0.8f, g = 0.8f, b = 0.8f;
+			
 			// set color
-			if(WURST.getFriends().contains(e.getName().getString()))
-				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
-			else
+			if(colorMode.getSelected().equals(ColorMode.DISTANCE))
 			{
-				float f = MC.player.distanceTo(e) / 20F;
-				RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
+				if(blueFriends.isChecked()
+					&& WURST.getFriends().contains(e.getName().getString()))
+				{
+					r = 0;
+					g = 0;
+					b = 1;
+				}else
+				{
+					float f = MC.player.distanceTo(e) / 20F;
+					r = 2 - f;
+					g = f;
+					b = 0;
+				}
+			}else if(colorMode.getSelected().equals(ColorMode.NAMETAG))
+			{
+				Text displayName = e.getDisplayName();
+				TextColor colorComponent = null;
+				if(displayName != null)
+					colorComponent = displayName.getStyle().getColor();
+				
+				if(colorComponent != null)
+				{
+					int teamColor = colorComponent.getRgb();
+					
+					b = (float)(teamColor % 256);
+					g = (float)(teamColor % 65536 / 256);
+					r = (float)(teamColor / 65536);
+					
+					b /= 256;
+					g /= 256;
+					r /= 256;
+				}
 			}
 			
-			Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-			RenderUtils.drawOutlinedBox(bb, matrixStack);
+			if(showWhite.isChecked() || !(r >= 0.8 && g >= 0.8 && b >= 0.8))
+			{
+				RenderSystem.setShaderColor(r, g, b, 0.5F);
+				
+				Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
+				RenderUtils.drawOutlinedBox(bb, matrixStack);
+			}
 			
 			matrixStack.pop();
 		}
@@ -200,31 +251,75 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
 				.subtract(regionVec);
 			
-			float r, g, b;
+			float r = 0.8f, g = 0.8f, b = 0.8f;
 			
-			if(WURST.getFriends().contains(e.getName().getString()))
+			if(colorMode.getSelected().equals(ColorMode.DISTANCE))
 			{
-				r = 0;
-				g = 0;
-				b = 1;
+				if(blueFriends.isChecked()
+					&& WURST.getFriends().contains(e.getName().getString()))
+				{
+					r = 0;
+					g = 0;
+					b = 1;
+					
+				}else
+				{
+					float f = MC.player.distanceTo(e) / 20F;
+					r = MathHelper.clamp(2 - f, 0, 1);
+					g = MathHelper.clamp(f, 0, 1);
+					b = 0;
+				}
+			}else if(colorMode.getSelected().equals(ColorMode.NAMETAG))
+			{
+				Text displayName = e.getDisplayName();
+				TextColor colorComponent = null;
+				if(displayName != null)
+					colorComponent = displayName.getStyle().getColor();
 				
-			}else
-			{
-				float f = MC.player.distanceTo(e) / 20F;
-				r = MathHelper.clamp(2 - f, 0, 1);
-				g = MathHelper.clamp(f, 0, 1);
-				b = 0;
+				if(colorComponent != null)
+				{
+					int teamColor = colorComponent.getRgb();
+					
+					b = (float)(teamColor % 256);
+					g = (float)(teamColor % 65536 / 256);
+					r = (float)(teamColor / 65536);
+					
+					b /= 256;
+					g /= 256;
+					r /= 256;
+				}
 			}
 			
-			bufferBuilder
-				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
-				.color(r, g, b, 0.5F);
-			
-			bufferBuilder
-				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
-				.color(r, g, b, 0.5F);
+			if(showWhite.isChecked() || !(r >= 0.8 && g >= 0.8 && b >= 0.8))
+			{
+				bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
+					(float)start.z).color(r, g, b, 0.5F);
+				
+				bufferBuilder
+					.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+					.color(r, g, b, 0.5F);
+			}
 		}
 		
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+	}
+	
+	private enum ColorMode
+	{
+		DISTANCE("Distance"),
+		NAMETAG("Name Tag");
+		
+		private final String name;
+		
+		private ColorMode(String name)
+		{
+			this.name = name;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return name;
+		}
 	}
 }
