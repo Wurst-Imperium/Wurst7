@@ -86,8 +86,8 @@ public final class ColorComponent extends Component
 		String value = ColorUtils.toHex(setting.getColor());
 		int valueWidth = TR.getWidth(value);
 		int txtColor = GUI.getTxtColor();
-		context.drawText(TR, name, x1, y1, txtColor, false);
-		context.drawText(TR, value, x2 - valueWidth, y1, txtColor, false);
+		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
+		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
 	}
 	
 	private String getColorTooltip()
