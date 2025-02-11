@@ -7,34 +7,23 @@
  */
 package net.wurstclient.clickgui.components;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
-import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.screens.EditSliderScreen;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.RenderUtils;
 
 public final class SliderComponent extends Component
 {
-	private final MinecraftClient MC = WurstClient.MC;
-	private final ClickGui GUI = WurstClient.INSTANCE.getGui();
+	private static final ClickGui GUI = WURST.getGui();
+	private static final TextRenderer TR = MC.textRenderer;
+	private static final int TEXT_HEIGHT = 11;
 	
 	private final SliderSetting setting;
 	private boolean dragging;
@@ -54,69 +43,17 @@ public final class SliderComponent extends Component
 		
 		switch(mouseButton)
 		{
-			case 0:
-			handleLeftClick();
+			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
+			if(Screen.hasControlDown())
+				MC.setScreen(new EditSliderScreen(MC.currentScreen, setting));
+			else
+				dragging = true;
 			break;
 			
-			case 1:
-			handleRightClick();
+			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
+			setting.setValue(setting.getDefaultValue());
 			break;
 		}
-	}
-	
-	private void handleLeftClick()
-	{
-		if(Screen.hasControlDown())
-			MC.setScreen(new EditSliderScreen(MC.currentScreen, setting));
-		else
-			dragging = true;
-	}
-	
-	private void handleRightClick()
-	{
-		setting.setValue(setting.getDefaultValue());
-	}
-	
-	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
-		float partialTicks)
-	{
-		MatrixStack matrixStack = context.getMatrices();
-		int x1 = getX();
-		int x2 = x1 + getWidth();
-		int x3 = x1 + 2;
-		int x4 = x2 - 2;
-		int y1 = getY();
-		int y2 = y1 + getHeight();
-		int y3 = y1 + 11;
-		int y4 = y3 + 4;
-		int y5 = y2 - 4;
-		
-		handleDragging(mouseX, x3, x4);
-		
-		boolean hovering = isHovering(mouseX, mouseY, x1, x2, y1, y2);
-		boolean hSlider = hovering && mouseY >= y3 || dragging;
-		boolean renderAsDisabled = setting.isDisabled() || setting.isLocked();
-		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
-		if(hovering && mouseY < y3)
-			setTooltip();
-		else if(hSlider && !dragging)
-			GUI.setTooltip(
-				"\u00a7e[ctrl]\u00a7r+\u00a7e[left-click]\u00a7r for precise input\n"
-					+ "\u00a7e[right-click]\u00a7r to reset");
-		
-		if(renderAsDisabled)
-		{
-			hovering = false;
-			hSlider = false;
-		}
-		
-		drawBackground(matrixStack, x1, x2, x3, x4, y1, y2, y4, y5);
-		drawRail(matrixStack, x3, x4, y4, y5, hSlider, renderAsDisabled);
-		drawKnob(matrixStack, x1, x2, y2, y3, hSlider, renderAsDisabled);
-		drawNameAndValue(context, x1, x2, y1, renderAsDisabled);
 	}
 	
 	private void handleDragging(int mouseX, int x3, int x4)
@@ -141,193 +78,129 @@ public final class SliderComponent extends Component
 		setting.setValue(value);
 	}
 	
-	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
-		int y2)
+	@Override
+	public void render(DrawContext context, int mouseX, int mouseY,
+		float partialTicks)
 	{
-		Window parent = getParent();
-		boolean scrollEnabled = parent.isScrollingEnabled();
-		int scroll = scrollEnabled ? parent.getScrollOffset() : 0;
+		int x1 = getX();
+		int x2 = x1 + getWidth();
+		int x3 = x1 + 2;
+		int x4 = x2 - 2;
+		int y1 = getY();
+		int y2 = y1 + getHeight();
+		int y3 = y1 + TEXT_HEIGHT;
+		int y4 = y3 + 4;
+		int y5 = y2 - 4;
 		
-		return mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2
-			&& mouseY >= -scroll && mouseY < parent.getHeight() - 13 - scroll;
-	}
-	
-	private void setTooltip()
-	{
-		String tooltip = setting.getWrappedDescription(200);
+		handleDragging(mouseX, x3, x4);
 		
-		if(setting.isLocked())
+		boolean hovering = isHovering(mouseX, mouseY);
+		boolean hText = hovering && mouseY < y3;
+		boolean hSlider = hovering && mouseY >= y3 || dragging;
+		
+		boolean grayedOut = setting.isDisabled() || setting.isLocked();
+		float opacity = GUI.getOpacity();
+		float railOpacity = opacity * (hSlider ? 1.5F : 1);
+		
+		if(hText)
+			GUI.setTooltip(getTextTooltip());
+		else if(hSlider && !dragging)
+			GUI.setTooltip(getSliderTooltip());
+		
+		if(grayedOut)
 		{
-			tooltip += "\n\nThis slider is locked to ";
-			tooltip += setting.getValueString() + ".";
-			
-		}else if(setting.isDisabled())
-			tooltip += "\n\nThis slider is disabled.";
+			hovering = false;
+			hSlider = false;
+		}
 		
-		GUI.setTooltip(tooltip);
-	}
-	
-	private void drawBackground(MatrixStack matrixStack, int x1, int x2, int x3,
-		int x4, int y1, int y2, int y4, int y5)
-	{
-		float[] bgColor = GUI.getBgColor();
-		float opacity = GUI.getOpacity();
+		// background (around the rail)
+		int bgColor = RenderUtils.toIntColor(GUI.getBgColor(), opacity);
+		float[][] bgVertices = {{x1, y1}, {x1, y4}, {x2, y4}, {x2, y1},
+			{x1, y5}, {x1, y2}, {x2, y2}, {x2, y5}, {x1, y4}, {x1, y5},
+			{x3, y5}, {x3, y4}, {x4, y4}, {x4, y5}, {x2, y5}, {x2, y4}};
+		RenderUtils.fillQuads2D(context, bgVertices, bgColor);
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		RenderUtils.setShaderColor(bgColor, opacity);
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y4, 0);
-		bufferBuilder.vertex(matrix, x2, y4, 0);
-		bufferBuilder.vertex(matrix, x2, y1, 0);
-		
-		bufferBuilder.vertex(matrix, x1, y5, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y5, 0);
-		
-		bufferBuilder.vertex(matrix, x1, y4, 0);
-		bufferBuilder.vertex(matrix, x1, y5, 0);
-		bufferBuilder.vertex(matrix, x3, y5, 0);
-		bufferBuilder.vertex(matrix, x3, y4, 0);
-		
-		bufferBuilder.vertex(matrix, x4, y4, 0);
-		bufferBuilder.vertex(matrix, x4, y5, 0);
-		bufferBuilder.vertex(matrix, x2, y5, 0);
-		bufferBuilder.vertex(matrix, x2, y4, 0);
-		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawRail(MatrixStack matrixStack, int x3, int x4, int y4,
-		int y5, boolean hSlider, boolean renderAsDisabled)
-	{
-		float[] bgColor = GUI.getBgColor();
-		float[] acColor = GUI.getAcColor();
-		float opacity = GUI.getOpacity();
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
+		// limit
 		float xl1 = x3;
 		float xl2 = x4;
-		if(!renderAsDisabled && setting.isLimited())
+		if(!grayedOut && setting.isLimited())
 		{
 			double ratio = (x4 - x3) / setting.getRange();
 			xl1 += ratio * (setting.getUsableMin() - setting.getMinimum());
 			xl2 += ratio * (setting.getUsableMax() - setting.getMaximum());
+			
+			int limitColor =
+				RenderUtils.toIntColor(new float[]{1, 0, 0}, railOpacity);
+			float[][] limitVertices = {{x3, y4}, {x3, y5}, {xl1, y5}, {xl1, y4},
+				{xl2, y4}, {xl2, y5}, {x4, y5}, {x4, y4}};
+			RenderUtils.fillQuads2D(context, limitVertices, limitColor);
 		}
 		
-		// limit
-		RenderSystem.setShaderColor(1, 0, 0,
-			hSlider ? opacity * 1.5F : opacity);
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x3, y4, 0);
-		bufferBuilder.vertex(matrix, x3, y5, 0);
-		bufferBuilder.vertex(matrix, xl1, y5, 0);
-		bufferBuilder.vertex(matrix, xl1, y4, 0);
-		bufferBuilder.vertex(matrix, xl2, y4, 0);
-		bufferBuilder.vertex(matrix, xl2, y5, 0);
-		bufferBuilder.vertex(matrix, x4, y5, 0);
-		bufferBuilder.vertex(matrix, x4, y4, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		// rail
+		RenderUtils.fill2D(context, xl1, y4, xl2, y5,
+			RenderUtils.toIntColor(GUI.getBgColor(), railOpacity));
+		RenderUtils.drawBorder2D(context, xl1, y4, xl2, y5,
+			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
-		// background
-		RenderUtils.setShaderColor(bgColor, hSlider ? opacity * 1.5F : opacity);
-		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xl1, y4, 0);
-		bufferBuilder.vertex(matrix, xl1, y5, 0);
-		bufferBuilder.vertex(matrix, xl2, y5, 0);
-		bufferBuilder.vertex(matrix, xl2, y4, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		MatrixStack matrices = context.getMatrices();
+		matrices.push();
+		matrices.translate(0, 0, 2);
 		
-		// outline
-		RenderUtils.setShaderColor(acColor, 0.5F);
-		bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x3, y4, 0);
-		bufferBuilder.vertex(matrix, x3, y5, 0);
-		bufferBuilder.vertex(matrix, x4, y5, 0);
-		bufferBuilder.vertex(matrix, x4, y4, 0);
-		bufferBuilder.vertex(matrix, x3, y4, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawKnob(MatrixStack matrixStack, int x1, int x2, int y2,
-		int y3, boolean hSlider, boolean renderAsDisabled)
-	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		double percentage = setting.getPercentage();
-		float xk1 = x1 + (x2 - x1 - 8) * (float)percentage;
+		// knob
+		float xk1 = x1 + (x2 - x1 - 8) * (float)setting.getPercentage();
 		float xk2 = xk1 + 8;
 		float yk1 = y3 + 1.5F;
 		float yk2 = y2 - 1.5F;
+		int knobColor = grayedOut ? 0xC0808080 : RenderUtils
+			.toIntColor(setting.getKnobColor(), hSlider ? 1 : 0.75F);
+		RenderUtils.fill2D(context, xk1, yk1, xk2, yk2, knobColor);
+		RenderUtils.drawBorder2D(context, xk1, yk1, xk2, yk2, 0x80101010);
 		
-		// knob
-		if(renderAsDisabled)
-			RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 0.75F);
-		else
-			RenderUtils.setShaderColor(setting.getKnobColor(),
-				hSlider ? 1 : 0.75F);
+		matrices.pop();
 		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xk1, yk1, 0);
-		bufferBuilder.vertex(matrix, xk1, yk2, 0);
-		bufferBuilder.vertex(matrix, xk2, yk2, 0);
-		bufferBuilder.vertex(matrix, xk2, yk1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-		
-		// outline
-		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xk1, yk1, 0);
-		bufferBuilder.vertex(matrix, xk1, yk2, 0);
-		bufferBuilder.vertex(matrix, xk2, yk2, 0);
-		bufferBuilder.vertex(matrix, xk2, yk1, 0);
-		bufferBuilder.vertex(matrix, xk1, yk1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawNameAndValue(DrawContext context, int x1, int x2, int y1,
-		boolean renderAsDisabled)
-	{
-		ClickGui gui = WurstClient.INSTANCE.getGui();
-		int txtColor = gui.getTxtColor();
-		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
-		TextRenderer tr = MC.textRenderer;
+		// text
 		String name = setting.getName();
 		String value = setting.getValueString();
-		int valueWidth = tr.getWidth(value);
-		context.drawText(tr, name, x1, y1 + 2, txtColor, false);
-		context.drawText(tr, value, x2 - valueWidth, y1 + 2, txtColor, false);
+		int valueWidth = TR.getWidth(value);
+		int txtColor = GUI.getTxtColor();
+		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
+		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
+	}
+	
+	private String getTextTooltip()
+	{
+		String tooltip = setting.getWrappedDescription(200);
 		
-		GL11.glEnable(GL11.GL_BLEND);
+		if(setting.isDisabled())
+			tooltip += "\n\nThis slider is disabled.";
+		else if(setting.isLocked())
+		{
+			tooltip += "\n\nThis slider is locked to ";
+			tooltip += setting.getValueString() + ".";
+		}
+		
+		return tooltip;
+	}
+	
+	private String getSliderTooltip()
+	{
+		String tooltip =
+			"\u00a7e[ctrl]\u00a7r+\u00a7e[left-click]\u00a7r for precise input\n";
+		tooltip += "\u00a7e[right-click]\u00a7r to reset";
+		return tooltip;
 	}
 	
 	@Override
 	public int getDefaultWidth()
 	{
-		TextRenderer tr = MC.textRenderer;
-		int nameWitdh = tr.getWidth(setting.getName());
-		int valueWidth = tr.getWidth(setting.getValueString());
+		int nameWitdh = TR.getWidth(setting.getName());
+		int valueWidth = TR.getWidth(setting.getValueString());
 		return nameWitdh + valueWidth + 6;
 	}
 	
 	@Override
 	public int getDefaultHeight()
 	{
-		return 22;
+		return TEXT_HEIGHT * 2;
 	}
 }
