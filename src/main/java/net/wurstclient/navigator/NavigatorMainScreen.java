@@ -10,7 +10,6 @@ package net.wurstclient.navigator;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -21,11 +20,6 @@ import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.Feature;
@@ -230,10 +224,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	protected void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		// MatrixStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
-		float[] bgColor = gui.getBgColor();
-		float[] acColor = gui.getAcColor();
+		// float[] bgColor = gui.getBgColor();
+		// float[] acColor = gui.getAcColor();
 		int txtColor = gui.getTxtColor();
 		
 		boolean clickTimerRunning = clickTimer != -1;
@@ -294,34 +288,34 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			int sh = client.currentScreen.height;
 			
 			int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
-			int xt2 = xt1 + tw + 3;
+			// int xt2 = xt1 + tw + 3;
 			int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
-			int yt2 = yt1 + th + 2;
+			// int yt2 = yt1 + th + 2;
 			
-			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+			// Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			
 			// background
-			RenderUtils.setShaderColor(bgColor, 0.75F);
-			BufferBuilder bufferBuilder = tessellator
-				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, xt1, yt1, 0);
-			bufferBuilder.vertex(matrix, xt1, yt2, 0);
-			bufferBuilder.vertex(matrix, xt2, yt2, 0);
-			bufferBuilder.vertex(matrix, xt2, yt1, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			// RenderUtils.setShaderColor(bgColor, 0.75F);
+			// BufferBuilder bufferBuilder = tessellator
+			// .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			// bufferBuilder.vertex(matrix, xt1, yt1, 0);
+			// bufferBuilder.vertex(matrix, xt1, yt2, 0);
+			// bufferBuilder.vertex(matrix, xt2, yt2, 0);
+			// bufferBuilder.vertex(matrix, xt2, yt1, 0);
+			// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			// outline
-			RenderUtils.setShaderColor(acColor, 0.5F);
-			bufferBuilder = tessellator.begin(
-				VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, xt1, yt1, 0);
-			bufferBuilder.vertex(matrix, xt1, yt2, 0);
-			bufferBuilder.vertex(matrix, xt2, yt2, 0);
-			bufferBuilder.vertex(matrix, xt2, yt1, 0);
-			bufferBuilder.vertex(matrix, xt1, yt1, 0);
-			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			// RenderUtils.setShaderColor(acColor, 0.5F);
+			// bufferBuilder = tessellator.begin(
+			// VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+			// bufferBuilder.vertex(matrix, xt1, yt1, 0);
+			// bufferBuilder.vertex(matrix, xt1, yt2, 0);
+			// bufferBuilder.vertex(matrix, xt2, yt2, 0);
+			// bufferBuilder.vertex(matrix, xt2, yt1, 0);
+			// bufferBuilder.vertex(matrix, xt1, yt1, 0);
+			// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
@@ -418,53 +412,53 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		drawBox(matrixStack, area.x, area.y, area.x + area.width,
 			area.y + area.height);
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		// Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// separator
 		int bx1 = area.x + area.width - area.height;
-		int by1 = area.y + 2;
-		int by2 = by1 + area.height - 4;
+		// int by1 = area.y + 2;
+		// int by2 = by1 + area.height - 4;
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		RenderUtils.setShaderColor(acColor, 0.5F);
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, bx1, by1, 0);
-		bufferBuilder.vertex(matrix, bx1, by2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		// BufferBuilder bufferBuilder = tessellator
+		// .begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		// bufferBuilder.vertex(matrix, bx1, by1, 0);
+		// bufferBuilder.vertex(matrix, bx1, by2, 0);
+		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// hovering
 		if(hovering)
 			hoveringArrow = mouseX >= bx1;
-		
+			
 		// arrow positions
-		float oneThrird = area.height / 3F;
-		float twoThrirds = area.height * 2F / 3F;
-		float ax1 = bx1 + oneThrird - 2F;
-		float ax2 = bx1 + twoThrirds + 2F;
-		float ax3 = bx1 + area.height / 2F;
-		float ay1 = area.y + oneThrird;
-		float ay2 = area.y + twoThrirds;
+		// float oneThrird = area.height / 3F;
+		// float twoThrirds = area.height * 2F / 3F;
+		// float ax1 = bx1 + oneThrird - 2F;
+		// float ax2 = bx1 + twoThrirds + 2F;
+		// float ax3 = bx1 + area.height / 2F;
+		// float ay1 = area.y + oneThrird;
+		// float ay2 = area.y + twoThrirds;
 		
 		// arrow
 		RenderSystem.setShaderColor(0, hovering ? 1 : 0.85F, 0, 1);
-		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLES,
-			VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, ax1, ay1, 0);
-		bufferBuilder.vertex(matrix, ax2, ay1, 0);
-		bufferBuilder.vertex(matrix, ax3, ay2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		// bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLES,
+		// VertexFormats.POSITION);
+		// bufferBuilder.vertex(matrix, ax1, ay1, 0);
+		// bufferBuilder.vertex(matrix, ax2, ay1, 0);
+		// bufferBuilder.vertex(matrix, ax3, ay2, 0);
+		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// arrow shadow
 		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, ax1, ay1, 0);
-		bufferBuilder.vertex(matrix, ax2, ay1, 0);
-		bufferBuilder.vertex(matrix, ax3, ay2, 0);
-		bufferBuilder.vertex(matrix, ax1, ay1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		// bufferBuilder = tessellator.begin(
+		// VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		// bufferBuilder.vertex(matrix, ax1, ay1, 0);
+		// bufferBuilder.vertex(matrix, ax2, ay1, 0);
+		// bufferBuilder.vertex(matrix, ax3, ay2, 0);
+		// bufferBuilder.vertex(matrix, ax1, ay1, 0);
+		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// text
 		if(!clickTimerRunning)

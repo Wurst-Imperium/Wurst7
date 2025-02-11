@@ -10,17 +10,11 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -38,7 +32,6 @@ import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"item esp", "ItemTracers", "item tracers"})
 public final class ItemEspHack extends Hack implements UpdateListener,
@@ -164,26 +157,26 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		color.setAsShaderColor(0.5F);
 		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		// Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
-		Vec3d regionVec = region.toVec3d();
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
-			.add(RenderUtils.getCameraPos()).subtract(regionVec);
+		// Vec3d regionVec = region.toVec3d();
+		// Vec3d start = RotationUtils.getClientLookVec(partialTicks)
+		// .add(RenderUtils.getCameraPos()).subtract(regionVec);
 		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		for(ItemEntity e : items)
-		{
-			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
-				.subtract(regionVec);
-			
-			bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
-				(float)start.z);
-			bufferBuilder.vertex(matrix, (float)end.x, (float)end.y,
-				(float)end.z);
-		}
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		// BufferBuilder bufferBuilder = tessellator
+		// .begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		// for(ItemEntity e : items)
+		// {
+		// Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
+		// .subtract(regionVec);
+		//
+		// bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
+		// (float)start.z);
+		// bufferBuilder.vertex(matrix, (float)end.x, (float)end.y,
+		// (float)end.z);
+		// }
+		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }
