@@ -7,31 +7,21 @@
  */
 package net.wurstclient.clickgui.components;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
-import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
+import net.wurstclient.clickgui.ClickGuiIcons;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.clickgui.Window;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.RenderUtils;
 
 public final class CheckboxComponent extends Component
 {
-	private final MinecraftClient MC = WurstClient.MC;
-	private final ClickGui GUI = WurstClient.INSTANCE.getGui();
+	private static final ClickGui GUI = WURST.getGui();
+	private static final TextRenderer TR = MC.textRenderer;
+	private static final int BOX_SIZE = 11;
 	
 	private final CheckboxSetting setting;
 	
@@ -47,11 +37,11 @@ public final class CheckboxComponent extends Component
 	{
 		switch(mouseButton)
 		{
-			case 0:
+			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
 			setting.setChecked(!setting.isChecked());
 			break;
 			
-			case 1:
+			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
 			setting.setChecked(setting.isCheckedByDefault());
 			break;
 		}
@@ -61,178 +51,66 @@ public final class CheckboxComponent extends Component
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
-		int x3 = x1 + 11;
+		int x3 = x1 + BOX_SIZE;
 		int y1 = getY();
 		int y2 = y1 + getHeight();
 		
-		boolean hovering = isHovering(mouseX, mouseY, x1, x2, y1, y2);
+		boolean hovering = isHovering(mouseX, mouseY);
+		boolean hText = hovering && mouseX >= x3;
 		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
-		if(hovering && mouseX >= x3)
-			setTooltip();
+		if(hText)
+			GUI.setTooltip(getTooltip());
 		
 		if(setting.isLocked())
 			hovering = false;
 		
-		drawBackground(matrixStack, x2, x3, y1, y2);
-		drawBox(matrixStack, x1, x3, y1, y2, hovering);
+		// background
+		context.fill(x3, y1, x2, y2, getFillColor(false));
 		
+		// box
+		context.fill(x1, y1, x3, y2, getFillColor(hovering));
+		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
+		RenderUtils.drawBorder2D(context, x1, y1, x3, y2, outlineColor);
+		
+		// check
 		if(setting.isChecked())
-			drawCheck(matrixStack, x1, y1, hovering);
+			ClickGuiIcons.drawCheck(context, x1, y1, x3, y2, hovering,
+				setting.isLocked());
 		
-		drawName(context, x3, y1);
+		// text
+		String name = setting.getName();
+		context.drawText(TR, name, x3 + 2, y1 + 2, GUI.getTxtColor(), false);
 	}
 	
-	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
-		int y2)
+	private int getFillColor(boolean hovering)
 	{
-		Window parent = getParent();
-		boolean scrollEnabled = parent.isScrollingEnabled();
-		int scroll = scrollEnabled ? parent.getScrollOffset() : 0;
-		
-		return mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2
-			&& mouseY >= -scroll && mouseY < parent.getHeight() - 13 - scroll;
+		float opacity = GUI.getOpacity() * (hovering ? 1.5F : 1);
+		return RenderUtils.toIntColor(GUI.getBgColor(), opacity);
 	}
 	
-	private void setTooltip()
+	private String getTooltip()
 	{
 		String tooltip = setting.getWrappedDescription(200);
-		
 		if(setting.isLocked())
 		{
 			tooltip += "\n\nThis checkbox is locked to ";
 			tooltip += setting.isChecked() + ".";
 		}
 		
-		GUI.setTooltip(tooltip);
-	}
-	
-	private void drawBackground(MatrixStack matrixStack, int x2, int x3, int y1,
-		int y2)
-	{
-		float[] bgColor = GUI.getBgColor();
-		float opacity = GUI.getOpacity();
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		RenderUtils.setShaderColor(bgColor, opacity);
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x3, y1, 0);
-		bufferBuilder.vertex(matrix, x3, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawBox(MatrixStack matrixStack, int x1, int x3, int y1,
-		int y2, boolean hovering)
-	{
-		float[] bgColor = GUI.getBgColor();
-		float[] acColor = GUI.getAcColor();
-		float opacity = GUI.getOpacity();
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		RenderUtils.setShaderColor(bgColor,
-			hovering ? opacity * 1.5F : opacity);
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0);
-		bufferBuilder.vertex(matrix, x3, y2, 0);
-		bufferBuilder.vertex(matrix, x3, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-		
-		RenderUtils.setShaderColor(acColor, 0.5F);
-		bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0);
-		bufferBuilder.vertex(matrix, x3, y2, 0);
-		bufferBuilder.vertex(matrix, x3, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawCheck(MatrixStack matrixStack, int x1, int y1,
-		boolean hovering)
-	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		float xc1 = x1 + 2.5F;
-		float xc2 = x1 + 3.5F;
-		float xc3 = x1 + 4.5F;
-		float xc4 = x1 + 7.5F;
-		float xc5 = x1 + 8.5F;
-		float yc1 = y1 + 2.5F;
-		float yc2 = y1 + 3.5F;
-		float yc3 = y1 + 5.5F;
-		float yc4 = y1 + 6.5F;
-		float yc5 = y1 + 8.5F;
-		
-		// check
-		if(setting.isLocked())
-			RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, 0.75F);
-		else
-			RenderSystem.setShaderColor(0, hovering ? 1 : 0.85F, 0, 1);
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xc2, yc3, 0);
-		bufferBuilder.vertex(matrix, xc3, yc4, 0);
-		bufferBuilder.vertex(matrix, xc3, yc5, 0);
-		bufferBuilder.vertex(matrix, xc1, yc4, 0);
-		bufferBuilder.vertex(matrix, xc4, yc1, 0);
-		bufferBuilder.vertex(matrix, xc5, yc2, 0);
-		bufferBuilder.vertex(matrix, xc3, yc5, 0);
-		bufferBuilder.vertex(matrix, xc3, yc4, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-		
-		// outline
-		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xc2, yc3, 0);
-		bufferBuilder.vertex(matrix, xc3, yc4, 0);
-		bufferBuilder.vertex(matrix, xc4, yc1, 0);
-		bufferBuilder.vertex(matrix, xc5, yc2, 0);
-		bufferBuilder.vertex(matrix, xc3, yc5, 0);
-		bufferBuilder.vertex(matrix, xc1, yc4, 0);
-		bufferBuilder.vertex(matrix, xc2, yc3, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawName(DrawContext context, int x3, int y1)
-	{
-		ClickGui gui = WurstClient.INSTANCE.getGui();
-		int txtColor = gui.getTxtColor();
-		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
-		String name = setting.getName();
-		int tx = x3 + 2;
-		int ty = y1 + 2;
-		context.drawText(MC.textRenderer, name, tx, ty, txtColor, false);
-		
-		GL11.glEnable(GL11.GL_BLEND);
+		return tooltip;
 	}
 	
 	@Override
 	public int getDefaultWidth()
 	{
-		return MC.textRenderer.getWidth(setting.getName()) + 13;
+		return BOX_SIZE + TR.getWidth(setting.getName()) + 2;
 	}
 	
 	@Override
 	public int getDefaultHeight()
 	{
-		return 11;
+		return BOX_SIZE;
 	}
 }

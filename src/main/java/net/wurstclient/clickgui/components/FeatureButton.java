@@ -9,24 +9,11 @@ package net.wurstclient.clickgui.components;
 
 import java.util.Objects;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.Feature;
-import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
+import net.wurstclient.clickgui.ClickGuiIcons;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.SettingsWindow;
 import net.wurstclient.clickgui.Window;
@@ -36,8 +23,8 @@ import net.wurstclient.util.RenderUtils;
 
 public final class FeatureButton extends Component
 {
-	private final MinecraftClient MC = WurstClient.MC;
-	private final ClickGui GUI = WurstClient.INSTANCE.getGui();
+	private static final ClickGui GUI = WURST.getGui();
+	private static final TextRenderer TR = MC.textRenderer;
 	
 	private final Feature feature;
 	private final boolean hasSettings;
@@ -61,16 +48,11 @@ public final class FeatureButton extends Component
 		if(hasSettings && (mouseX > getX() + getWidth() - 12
 			|| feature.getPrimaryAction().isEmpty()))
 		{
-			if(isSettingsWindowOpen())
-				closeSettingsWindow();
-			else
-				openSettingsWindow();
-			
+			toggleSettingsWindow();
 			return;
 		}
 		
-		TooManyHaxHack tooManyHax =
-			WurstClient.INSTANCE.getHax().tooManyHaxHack;
+		TooManyHaxHack tooManyHax = WURST.getHax().tooManyHaxHack;
 		if(tooManyHax.isEnabled() && tooManyHax.isBlocked(feature))
 		{
 			ChatUtils.error(feature.getName() + " is blocked by TooManyHax.");
@@ -85,235 +67,73 @@ public final class FeatureButton extends Component
 		return settingsWindow != null && !settingsWindow.isClosing();
 	}
 	
-	private void openSettingsWindow()
+	private void toggleSettingsWindow()
 	{
-		settingsWindow = new SettingsWindow(feature, getParent(), getY());
-		GUI.addWindow(settingsWindow);
-	}
-	
-	private void closeSettingsWindow()
-	{
-		settingsWindow.close();
-		settingsWindow = null;
+		if(!isSettingsWindowOpen())
+		{
+			settingsWindow = new SettingsWindow(feature, getParent(), getY());
+			GUI.addWindow(settingsWindow);
+			
+		}else
+		{
+			settingsWindow.close();
+			settingsWindow = null;
+		}
 	}
 	
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = hasSettings ? x2 - 11 : x2;
 		int y1 = getY();
 		int y2 = y1 + getHeight();
 		
-		boolean hovering = isHovering(mouseX, mouseY, x1, x2, y1, y2);
-		boolean hHack = hovering && mouseX < x3;
+		boolean hovering = isHovering(mouseX, mouseY);
+		boolean hFeature = hovering && mouseX < x3;
 		boolean hSettings = hovering && mouseX >= x3;
 		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		if(hFeature)
+			GUI.setTooltip(feature.getWrappedDescription(200));
 		
-		if(hHack)
-			setTooltip();
-		
-		drawButtonBackground(matrixStack, x1, x3, y1, y2, hHack);
-		
+		// buttons
+		context.fill(x1, y1, x3, y2,
+			getButtonColor(feature.isEnabled(), hFeature));
 		if(hasSettings)
-			drawSettingsBackground(matrixStack, x2, x3, y1, y2, hSettings);
+			context.fill(x3, y1, x2, y2, getButtonColor(false, hSettings));
 		
-		drawOutline(matrixStack, x1, x2, y1, y2);
-		
+		// outlines
+		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
+		RenderUtils.drawBorder2D(context, x1, y1, x2, y2, outlineColor);
 		if(hasSettings)
-		{
-			drawSeparator(matrixStack, x3, y1, y2);
-			drawSettingsArrow(matrixStack, x2, x3, y1, y2, hSettings);
-		}
-		
-		drawName(context, x1, x3, y1);
-	}
-	
-	private boolean isHovering(int mouseX, int mouseY, int x1, int x2, int y1,
-		int y2)
-	{
-		Window parent = getParent();
-		boolean scrollEnabled = parent.isScrollingEnabled();
-		int scroll = scrollEnabled ? parent.getScrollOffset() : 0;
-		
-		return mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2
-			&& mouseY >= -scroll && mouseY < parent.getHeight() - 13 - scroll;
-	}
-	
-	private void setTooltip()
-	{
-		String tooltip = feature.getWrappedDescription(200);
-		
-		// if(feature.isBlocked())
-		// {
-		// if(tooltip == null)
-		// tooltip = "";
-		// else
-		// tooltip += "\n\n";
-		// tooltip +=
-		// "Your current YesCheat+ profile is blocking this feature.";
-		// }
-		
-		GUI.setTooltip(tooltip);
-	}
-	
-	private void drawButtonBackground(MatrixStack matrixStack, int x1, int x3,
-		int y1, int y2, boolean hHack)
-	{
-		float[] bgColor = GUI.getBgColor();
-		float opacity = GUI.getOpacity();
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		
-		if(feature.isEnabled())
-			// if(feature.isBlocked())
-			// glColor4f(1, 0, 0, hHack ? opacity * 1.5F : opacity);
-			// else
-			RenderSystem.setShaderColor(0, 1, 0,
-				hHack ? opacity * 1.5F : opacity);
-		else
-			RenderUtils.setShaderColor(bgColor,
-				hHack ? opacity * 1.5F : opacity);
-		
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0);
-		bufferBuilder.vertex(matrix, x3, y2, 0);
-		bufferBuilder.vertex(matrix, x3, y1, 0);
-		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawSettingsBackground(MatrixStack matrixStack, int x2, int x3,
-		int y1, int y2, boolean hSettings)
-	{
-		float[] bgColor = GUI.getBgColor();
-		float opacity = GUI.getOpacity();
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		RenderUtils.setShaderColor(bgColor,
-			hSettings ? opacity * 1.5F : opacity);
-		bufferBuilder.vertex(matrix, x3, y1, 0);
-		bufferBuilder.vertex(matrix, x3, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawOutline(MatrixStack matrixStack, int x1, int x2, int y1,
-		int y2)
-	{
-		float[] acColor = GUI.getAcColor();
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		RenderUtils.setShaderColor(acColor, 0.5F);
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawSeparator(MatrixStack matrixStack, int x3, int y1, int y2)
-	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		// separator
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x3, y1, 0);
-		bufferBuilder.vertex(matrix, x3, y2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawSettingsArrow(MatrixStack matrixStack, int x2, int x3,
-		int y1, int y2, boolean hSettings)
-	{
-		float xa1 = x3 + 1;
-		float xa2 = (x3 + x2) / 2.0F;
-		float xa3 = x2 - 1;
-		float ya1;
-		float ya2;
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		if(isSettingsWindowOpen())
-		{
-			ya1 = y2 - 3.5F;
-			ya2 = y1 + 3;
-			RenderSystem.setShaderColor(hSettings ? 1 : 0.85F, 0, 0, 1);
-			
-		}else
-		{
-			ya1 = y1 + 3.5F;
-			ya2 = y2 - 3;
-			RenderSystem.setShaderColor(0, hSettings ? 1 : 0.85F, 0, 1);
-		}
+			RenderUtils.drawLine2D(context, x3, y1, x3, y2, outlineColor);
 		
 		// arrow
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xa1, ya1, 0);
-		bufferBuilder.vertex(matrix, xa3, ya1, 0);
-		bufferBuilder.vertex(matrix, xa2, ya2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		if(hasSettings)
+			ClickGuiIcons.drawMinimizeArrow(context, x3, y1 + 0.5F, x2,
+				y2 - 0.5F, hSettings, !isSettingsWindowOpen());
 		
-		// outline
-		RenderSystem.setShaderColor(0.0625F, 0.0625F, 0.0625F, 0.5F);
-		bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xa1, ya1, 0);
-		bufferBuilder.vertex(matrix, xa3, ya1, 0);
-		bufferBuilder.vertex(matrix, xa2, ya2, 0);
-		bufferBuilder.vertex(matrix, xa1, ya1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		// text
+		String name = feature.getName();
+		int tx = x1 + (x3 - x1 - TR.getWidth(name)) / 2;
+		int ty = y1 + 2;
+		context.drawText(TR, name, tx, ty, GUI.getTxtColor(), false);
 	}
 	
-	private void drawName(DrawContext context, int x1, int x3, int y1)
+	private int getButtonColor(boolean enabled, boolean hovering)
 	{
-		ClickGui gui = WurstClient.INSTANCE.getGui();
-		int txtColor = gui.getTxtColor();
-		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
-		TextRenderer tr = MC.textRenderer;
-		String name = feature.getName();
-		int nameWidth = tr.getWidth(name);
-		int tx = x1 + (x3 - x1 - nameWidth) / 2;
-		int ty = y1 + 2;
-		
-		context.drawText(tr, name, tx, ty, txtColor, false);
-		
-		GL11.glEnable(GL11.GL_BLEND);
+		float[] rgb = enabled ? new float[]{0, 1, 0} : GUI.getBgColor();
+		float opacity = GUI.getOpacity() * (hovering ? 1.5F : 1);
+		return RenderUtils.toIntColor(rgb, opacity);
 	}
 	
 	@Override
 	public int getDefaultWidth()
 	{
-		String name = feature.getName();
-		TextRenderer tr = MC.textRenderer;
-		int width = tr.getWidth(name) + 4;
-		if(hasSettings)
-			width += 11;
-		
+		int width = TR.getWidth(feature.getName());
+		width += hasSettings ? 15 : 4;
 		return width;
 	}
 	

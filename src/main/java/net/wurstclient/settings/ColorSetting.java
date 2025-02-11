@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.ColorComponent;
@@ -75,6 +76,11 @@ public final class ColorSetting extends Setting
 	public int getColorI(int alpha)
 	{
 		return color.getRGB() & 0x00FFFFFF | alpha << 24;
+	}
+	
+	public int getColorI(float alpha)
+	{
+		return getColorI((int)(MathHelper.clamp(alpha, 0, 1) * 255));
 	}
 	
 	public int getRed()
