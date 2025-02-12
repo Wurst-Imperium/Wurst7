@@ -13,6 +13,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -21,6 +22,11 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -257,8 +263,8 @@ public final class BowAimbotHack extends Hack
 		
 		matrixStack.push();
 		
-		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		// Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		
 		String message;
 		if(velocity < 1)
@@ -277,13 +283,13 @@ public final class BowAimbotHack extends Hack
 		// background
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		// BufferBuilder bufferBuilder = tessellator
-		// .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		// bufferBuilder.vertex(matrix, 0, 0, 0);
-		// bufferBuilder.vertex(matrix, msgWidth + 3, 0, 0);
-		// bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0);
-		// bufferBuilder.vertex(matrix, 0, 10, 0);
-		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		bufferBuilder.vertex(matrix, 0, 0, 0);
+		bufferBuilder.vertex(matrix, msgWidth + 3, 0, 0);
+		bufferBuilder.vertex(matrix, msgWidth + 3, 10, 0);
+		bufferBuilder.vertex(matrix, 0, 10, 0);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		
 		// text
 		RenderSystem.setShaderColor(1, 1, 1, 1);

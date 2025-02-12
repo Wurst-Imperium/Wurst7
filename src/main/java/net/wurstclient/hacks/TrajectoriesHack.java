@@ -11,12 +11,18 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -114,21 +120,21 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	{
 		if(path.isEmpty())
 			return;
-			
-		// Vec3d camPos = RenderUtils.getCameraPos();
-		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		// Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		
+		Vec3d camPos = RenderUtils.getCameraPos();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
-		// BufferBuilder bufferBuilder = tessellator.begin(
-		// VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		// color.setAsShaderColor(0.75F);
-		//
-		// for(Vec3d point : path)
-		// bufferBuilder.vertex(matrix, (float)(point.x - camPos.x),
-		// (float)(point.y - camPos.y), (float)(point.z - camPos.z));
-		//
-		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		BufferBuilder bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
+		color.setAsShaderColor(0.75F);
+		
+		for(Vec3d point : path)
+			bufferBuilder.vertex(matrix, (float)(point.x - camPos.x),
+				(float)(point.y - camPos.y), (float)(point.z - camPos.z));
+		
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private void drawEndOfLine(MatrixStack matrixStack, Vec3d end,

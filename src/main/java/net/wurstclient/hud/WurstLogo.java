@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hud;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -14,7 +15,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
@@ -74,16 +80,16 @@ public final class WurstLogo
 	private void drawQuads(MatrixStack matrices, int x1, int y1, int x2, int y2,
 		float r, float g, float b, float a)
 	{
-		// Matrix4f matrix = matrices.peek().getPositionMatrix();
+		Matrix4f matrix = matrices.peek().getPositionMatrix();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 		
-		// Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		// BufferBuilder bufferBuilder = tessellator
-		// .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-		// bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a);
-		// bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a);
-		// bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a);
-		// bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a);
-		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+		bufferBuilder.vertex(matrix, x1, y2, 0.0F).color(r, g, b, a);
+		bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(r, g, b, a);
+		bufferBuilder.vertex(matrix, x2, y1, 0.0F).color(r, g, b, a);
+		bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(r, g, b, a);
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }

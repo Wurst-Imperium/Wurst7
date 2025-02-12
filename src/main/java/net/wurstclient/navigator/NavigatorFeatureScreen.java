@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -25,6 +26,11 @@ import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
@@ -357,41 +363,41 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		matrixStack.translate(bgx1, windowY1, 0);
 		
 		{
-			// int x1 = 0;
-			// int y1 = -13;
-			// int x2 = x1 + window.getWidth();
-			// int y2 = y1 + window.getHeight();
-			// int y3 = y1 + 13;
-			// int x3 = x1 + 2;
-			// int x5 = x2 - 2;
+			int x1 = 0;
+			int y1 = -13;
+			int x2 = x1 + window.getWidth();
+			int y2 = y1 + window.getHeight();
+			int y3 = y1 + 13;
+			int x3 = x1 + 2;
+			int x5 = x2 - 2;
 			
-			// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-			// Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+			Tessellator tessellator = RenderSystem.renderThreadTesselator();
 			RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			
 			// window background
 			// left & right
 			setColorToBackground();
-			// BufferBuilder bufferBuilder = tessellator
-			// .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-			// bufferBuilder.vertex(matrix, x1, y3, 0);
-			// bufferBuilder.vertex(matrix, x1, y2, 0);
-			// bufferBuilder.vertex(matrix, x3, y2, 0);
-			// bufferBuilder.vertex(matrix, x3, y3, 0);
-			// bufferBuilder.vertex(matrix, x5, y3, 0);
-			// bufferBuilder.vertex(matrix, x5, y2, 0);
-			// bufferBuilder.vertex(matrix, x2, y2, 0);
-			// bufferBuilder.vertex(matrix, x2, y3, 0);
-			// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			BufferBuilder bufferBuilder = tessellator
+				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+			bufferBuilder.vertex(matrix, x1, y3, 0);
+			bufferBuilder.vertex(matrix, x1, y2, 0);
+			bufferBuilder.vertex(matrix, x3, y2, 0);
+			bufferBuilder.vertex(matrix, x3, y3, 0);
+			bufferBuilder.vertex(matrix, x5, y3, 0);
+			bufferBuilder.vertex(matrix, x5, y2, 0);
+			bufferBuilder.vertex(matrix, x2, y2, 0);
+			bufferBuilder.vertex(matrix, x2, y3, 0);
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 			
 			setColorToBackground();
-			// bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
-			// VertexFormats.POSITION);
+			bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
+				VertexFormats.POSITION);
 			
 			// window background
 			// between children
-			// int xc1 = 2;
-			// int xc2 = x5 - x1;
+			int xc1 = 2;
+			int xc2 = x5 - x1;
 			for(int i = 0; i < window.countChildren(); i++)
 			{
 				int yc1 = window.getChild(i).getY();
@@ -400,31 +406,31 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					continue;
 				if(yc2 > bgy3 - windowY1)
 					break;
-					
-				// bufferBuilder.vertex(matrix, xc1, yc2, 0);
-				// bufferBuilder.vertex(matrix, xc1, yc1, 0);
-				// bufferBuilder.vertex(matrix, xc2, yc1, 0);
-				// bufferBuilder.vertex(matrix, xc2, yc2, 0);
+				
+				bufferBuilder.vertex(matrix, xc1, yc2, 0);
+				bufferBuilder.vertex(matrix, xc1, yc1, 0);
+				bufferBuilder.vertex(matrix, xc2, yc1, 0);
+				bufferBuilder.vertex(matrix, xc2, yc2, 0);
 			}
 			
 			// window background
 			// bottom
-			// int yc1;
-			// if(window.countChildren() == 0)
-			// yc1 = 0;
-			// else
-			// {
-			// Component lastChild =
-			// window.getChild(window.countChildren() - 1);
-			// yc1 = lastChild.getY() + lastChild.getHeight();
-			// }
-			// int yc2 = yc1 + 2;
-			// bufferBuilder.vertex(matrix, xc1, yc2, 0);
-			// bufferBuilder.vertex(matrix, xc1, yc1, 0);
-			// bufferBuilder.vertex(matrix, xc2, yc1, 0);
-			// bufferBuilder.vertex(matrix, xc2, yc2, 0);
-			//
-			// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+			int yc1;
+			if(window.countChildren() == 0)
+				yc1 = 0;
+			else
+			{
+				Component lastChild =
+					window.getChild(window.countChildren() - 1);
+				yc1 = lastChild.getY() + lastChild.getHeight();
+			}
+			int yc2 = yc1 + 2;
+			bufferBuilder.vertex(matrix, xc1, yc2, 0);
+			bufferBuilder.vertex(matrix, xc1, yc1, 0);
+			bufferBuilder.vertex(matrix, xc2, yc1, 0);
+			bufferBuilder.vertex(matrix, xc2, yc2, 0);
+			
+			BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 		}
 		
 		for(int i = 0; i < window.countChildren(); i++)
