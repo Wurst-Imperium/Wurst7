@@ -346,11 +346,11 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int windowY2 = windowY1 + window.getInnerHeight();
 		
 		setColorToBackground();
-		drawQuads(matrixStack, bgx1, bgy1, bgx2,
+		drawQuads(context, bgx1, bgy1, bgx2,
 			MathHelper.clamp(windowY1, bgy1, bgy3));
-		drawQuads(matrixStack, bgx1, MathHelper.clamp(windowY2, bgy1, bgy3),
-			bgx2, bgy2);
-		drawBoxShadow(matrixStack, bgx1, bgy1, bgx2, bgy2);
+		drawQuads(context, bgx1, MathHelper.clamp(windowY2, bgy1, bgy3), bgx2,
+			bgy2);
+		drawBoxShadow(context, bgx1, bgy1, bgx2, bgy2);
 		
 		RenderUtils.enableScissor(context, bgx1, bgy1, bgx2, bgy3);
 		
@@ -471,7 +471,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			RenderUtils.setShaderColor(rgb, alpha);
 			
 			// button
-			drawBox(matrixStack, x1, y1, x2, y2);
+			drawBox(context, x1, y1, x2, y2);
 			
 			// text
 			context.drawCenteredTextWithShadow(client.textRenderer,
@@ -519,7 +519,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			drawBox(matrixStack, x1, y1, x2, y2);
+			drawBox(context, x1, y1, x2, y2);
 			
 			// text
 			String buttonText = button.getMessage().getString();

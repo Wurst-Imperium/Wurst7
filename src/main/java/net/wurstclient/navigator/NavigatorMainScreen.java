@@ -369,7 +369,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			area.height =
 				(int)(area.height * antiFactor + (height - 103) * factor);
 			
-			drawBackgroundBox(matrixStack, area.x, area.y, area.x + area.width,
+			drawBackgroundBox(context, area.x, area.y, area.x + area.width,
 				area.y + area.height);
 			return;
 		}
@@ -415,7 +415,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			tooltip = tt;
 		
 		// box & shadow
-		drawBox(matrixStack, area.x, area.y, area.x + area.width,
+		drawBox(context, area.x, area.y, area.x + area.width,
 			area.y + area.height);
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();

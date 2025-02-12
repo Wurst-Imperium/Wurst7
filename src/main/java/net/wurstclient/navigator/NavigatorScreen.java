@@ -115,7 +115,7 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY,
+	public final boolean mouseScrolled(double mouseX, double mouseY,
 		double horizontalAmount, double verticalAmount)
 	{
 		// scrollbar
@@ -150,8 +150,6 @@ public abstract class NavigatorScreen extends Screen
 	public final void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
-		
 		// GL settings
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -163,7 +161,7 @@ public abstract class NavigatorScreen extends Screen
 		int bgy1 = 60;
 		int bgy2 = height - 43;
 		if(hasBackground)
-			drawBackgroundBox(matrixStack, bgx1, bgy1, bgx2, bgy2);
+			drawBackgroundBox(context, bgx1, bgy1, bgx2, bgy2);
 		
 		// scrollbar
 		if(showScrollbar)
@@ -173,18 +171,18 @@ public abstract class NavigatorScreen extends Screen
 			int x2 = x1 + 12;
 			int y1 = bgy1;
 			int y2 = bgy2;
-			drawBackgroundBox(matrixStack, x1, y1, x2, y2);
+			drawBackgroundBox(context, x1, y1, x2, y2);
 			
 			// knob
 			x1 += 2;
 			x2 -= 2;
 			y1 += scrollKnobPosition;
 			y2 = y1 + 24;
-			drawForegroundBox(matrixStack, x1, y1, x2, y2);
+			drawForegroundBox(context, x1, y1, x2, y2);
 			int i;
 			for(x1++, x2--, y1 += 8, y2 -= 15, i = 0; i < 3; y1 += 4, y2 +=
 				4, i++)
-				drawDownShadow(matrixStack, x1, y1, x2, y2);
+				drawDownShadow(context, x1, y1, x2, y2);
 		}
 		
 		onRender(context, mouseX, mouseY, partialTicks);
@@ -239,9 +237,10 @@ public abstract class NavigatorScreen extends Screen
 			scroll = maxScroll;
 	}
 	
-	protected final void drawQuads(MatrixStack matrixStack, int x1, int y1,
-		int x2, int y2)
+	protected final void drawQuads(DrawContext context, int x1, int y1, int x2,
+		int y2)
 	{
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
@@ -255,7 +254,7 @@ public abstract class NavigatorScreen extends Screen
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
-	protected final void drawBoxShadow(MatrixStack matrixStack, int x1, int y1,
+	protected final void drawBoxShadow(DrawContext context, int x1, int y1,
 		int x2, int y2)
 	{
 		// color
@@ -267,6 +266,7 @@ public abstract class NavigatorScreen extends Screen
 		float yi1 = y1 - 0.1F;
 		float yi2 = y2 + 0.1F;
 		
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
@@ -329,12 +329,13 @@ public abstract class NavigatorScreen extends Screen
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
-	protected final void drawDownShadow(MatrixStack matrixStack, int x1, int y1,
+	protected final void drawDownShadow(DrawContext context, int x1, int y1,
 		int x2, int y2)
 	{
 		// color
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
+		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		Tessellator tessellator = RenderSystem.renderThreadTesselator();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
@@ -362,11 +363,11 @@ public abstract class NavigatorScreen extends Screen
 		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
-	protected final void drawBox(MatrixStack matrixStack, int x1, int y1,
-		int x2, int y2)
+	protected final void drawBox(DrawContext context, int x1, int y1, int x2,
+		int y2)
 	{
-		drawQuads(matrixStack, x1, y1, x2, y2);
-		drawBoxShadow(matrixStack, x1, y1, x2, y2);
+		drawQuads(context, x1, y1, x2, y2);
+		drawBoxShadow(context, x1, y1, x2, y2);
 	}
 	
 	protected final void setColorToBackground()
@@ -385,17 +386,17 @@ public abstract class NavigatorScreen extends Screen
 		RenderUtils.setShaderColor(bgColor, opacity);
 	}
 	
-	protected final void drawBackgroundBox(MatrixStack matrixStack, int x1,
-		int y1, int x2, int y2)
+	protected final void drawBackgroundBox(DrawContext context, int x1, int y1,
+		int x2, int y2)
 	{
 		setColorToBackground();
-		drawBox(matrixStack, x1, y1, x2, y2);
+		drawBox(context, x1, y1, x2, y2);
 	}
 	
-	protected final void drawForegroundBox(MatrixStack matrixStack, int x1,
-		int y1, int x2, int y2)
+	protected final void drawForegroundBox(DrawContext context, int x1, int y1,
+		int x2, int y2)
 	{
 		setColorToForeground();
-		drawBox(matrixStack, x1, y1, x2, y2);
+		drawBox(context, x1, y1, x2, y2);
 	}
 }

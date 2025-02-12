@@ -20,7 +20,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -159,7 +158,6 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	protected void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
@@ -209,7 +207,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 				
 				// button
-				drawBox(matrixStack, x1, y1, x2, y2);
+				drawBox(context, x1, y1, x2, y2);
 				
 				// text
 				context.drawTextWithShadow(client.textRenderer,
@@ -252,7 +250,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
 			
 			// button
-			drawBox(matrixStack, x1, y1, x2, y2);
+			drawBox(context, x1, y1, x2, y2);
 			
 			// text
 			context.drawCenteredTextWithShadow(client.textRenderer,
