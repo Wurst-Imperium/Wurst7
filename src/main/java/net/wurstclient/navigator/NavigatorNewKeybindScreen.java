@@ -11,11 +11,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -24,7 +22,6 @@ import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.keybinds.PossibleKeybind;
-import net.wurstclient.util.RenderUtils;
 
 public class NavigatorNewKeybindScreen extends NavigatorScreen
 {
@@ -64,7 +61,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					
 					WurstClient.INSTANCE.getNavigator()
 						.addPreference(parent.getFeature().getName());
-					WurstClient.MC.setScreen(parent);
+					client.setScreen(parent);
 				}else
 				{
 					choosingKey = true;
@@ -109,7 +106,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
-			WurstClient.MC.setScreen(parent);
+			client.setScreen(parent);
 			return;
 		}
 		
@@ -159,12 +156,12 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
+		TextRenderer tr = client.textRenderer;
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		context.drawCenteredTextWithShadow(client.textRenderer, "New Keybind",
-			middleX, 32, txtColor);
-		GL11.glEnable(GL11.GL_BLEND);
+		context.drawCenteredTextWithShadow(tr, "New Keybind", middleX, 32,
+			txtColor);
 		
 		// background
 		int bgx1 = middleX - 154;
@@ -174,7 +171,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		boolean noButtons = Screens.getButtons(this).isEmpty();
 		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		
-		RenderUtils.enableScissor(context, bgx1, bgy1, bgx2, bgy3);
+		context.enableScissor(bgx1, bgy1, bgx2, bgy3);
 		
 		// possible keybinds
 		if(!choosingKey)
@@ -192,30 +189,28 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				int y2 = y1 + 20;
 				
 				// color
+				int buttonColor;
 				if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2
 					&& mouseY <= bgy2 - 24)
 				{
 					hoveredCommand = pkb;
 					if(pkb == selectedCommand)
-						RenderSystem.setShaderColor(0F, 1F, 0F, 0.375F);
+						buttonColor = 0x6000FF00;
 					else
-						RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F,
-							0.375F);
+						buttonColor = 0x60404040;
 				}else if(pkb == selectedCommand)
-					RenderSystem.setShaderColor(0F, 1F, 0F, 0.25F);
+					buttonColor = 0x4000FF00;
 				else
-					RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
+					buttonColor = 0x40404040;
 				
 				// button
-				drawBox(context, x1, y1, x2, y2);
+				drawBox(context, x1, y1, x2, y2, buttonColor);
 				
 				// text
-				context.drawTextWithShadow(client.textRenderer,
-					pkb.getDescription(), x1 + 1, y1 + 1, txtColor);
-				context.drawTextWithShadow(client.textRenderer,
-					pkb.getCommand(), x1 + 1,
-					y1 + 1 + client.textRenderer.fontHeight, txtColor);
-				GL11.glEnable(GL11.GL_BLEND);
+				context.drawTextWithShadow(tr, pkb.getDescription(), x1 + 1,
+					y1 + 1, txtColor);
+				context.drawTextWithShadow(tr, pkb.getCommand(), x1 + 1,
+					y1 + 1 + tr.fontHeight, txtColor);
 			}
 		}
 		
@@ -223,13 +218,11 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		int textY = bgy1 + scroll + 2;
 		for(String line : text.split("\n"))
 		{
-			context.drawTextWithShadow(client.textRenderer, line, bgx1 + 2,
-				textY, txtColor);
-			textY += client.textRenderer.fontHeight;
+			context.drawTextWithShadow(tr, line, bgx1 + 2, textY, txtColor);
+			textY += tr.fontHeight;
 		}
-		GL11.glEnable(GL11.GL_BLEND);
 		
-		RenderUtils.disableScissor(context);
+		context.disableScissor();
 		
 		// buttons below scissor box
 		for(ClickableWidget button : Screens.getButtons(this))
@@ -241,22 +234,22 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			int y2 = y1 + 18;
 			
 			// color
+			int buttonColor;
 			if(!button.active)
-				RenderSystem.setShaderColor(0F, 0F, 0F, 0.25F);
+				buttonColor = 0x40000000;
 			else if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1
 				&& mouseY <= y2)
-				RenderSystem.setShaderColor(0.375F, 0.375F, 0.375F, 0.25F);
+				buttonColor = 0x40606060;
 			else
-				RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.25F);
+				buttonColor = 0x40404040;
 			
 			// button
-			drawBox(context, x1, y1, x2, y2);
+			drawBox(context, x1, y1, x2, y2, buttonColor);
 			
 			// text
-			context.drawCenteredTextWithShadow(client.textRenderer,
+			context.drawCenteredTextWithShadow(tr,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 5,
 				txtColor);
-			GL11.glEnable(GL11.GL_BLEND);
 		}
 	}
 	

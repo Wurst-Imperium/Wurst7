@@ -10,21 +10,15 @@ package net.wurstclient.navigator;
 import java.awt.Rectangle;
 
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
+import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.util.RenderUtils;
 
 public abstract class NavigatorScreen extends Screen
@@ -150,11 +144,6 @@ public abstract class NavigatorScreen extends Screen
 	public final void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		
 		// background
 		int bgx1 = middleX - 154;
 		int bgx2 = middleX + 154;
@@ -178,7 +167,7 @@ public abstract class NavigatorScreen extends Screen
 			x2 -= 2;
 			y1 += scrollKnobPosition;
 			y2 = y1 + 24;
-			drawForegroundBox(context, x1, y1, x2, y2);
+			drawBackgroundBox(context, x1, y1, x2, y2);
 			int i;
 			for(x1++, x2--, y1 += 8, y2 -= 15, i = 0; i < 3; y1 += 4, y2 +=
 				4, i++)
@@ -186,10 +175,6 @@ public abstract class NavigatorScreen extends Screen
 		}
 		
 		onRender(context, mouseX, mouseY, partialTicks);
-		
-		// GL resets
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	@Override
@@ -237,166 +222,104 @@ public abstract class NavigatorScreen extends Screen
 			scroll = maxScroll;
 	}
 	
-	protected final void drawQuads(DrawContext context, int x1, int y1, int x2,
-		int y2)
-	{
-		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		bufferBuilder.vertex(matrix, x2, y1, 0);
-		bufferBuilder.vertex(matrix, x2, y2, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
 	protected final void drawBoxShadow(DrawContext context, int x1, int y1,
 		int x2, int y2)
 	{
-		// color
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
-		// outline positions
-		float xi1 = x1 - 0.1F;
-		float xi2 = x2 + 0.1F;
-		float yi1 = y1 - 0.1F;
-		float yi2 = y2 + 0.1F;
+		// outline
+		float xo1 = x1 - 0.1F;
+		float xo2 = x2 + 0.1F;
+		float yo1 = y1 - 0.1F;
+		float yo2 = y2 + 0.1F;
+		
+		int outlineColor = RenderUtils.toIntColor(acColor, 0.5F);
+		RenderUtils.drawBorder2D(context, xo1, yo1, xo2, yo2, outlineColor);
+		
+		// shadow
+		float xs1 = x1 - 1;
+		float xs2 = x2 + 1;
+		float ys1 = y1 - 1;
+		float ys2 = y2 + 1;
+		
+		int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);
+		int shadowColor2 = 0x00000000;
 		
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
-		// outline
-		RenderUtils.setShaderColor(acColor, 0.5F);
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, xi1, yi1, 0);
-		bufferBuilder.vertex(matrix, xi2, yi1, 0);
-		bufferBuilder.vertex(matrix, xi2, yi2, 0);
-		bufferBuilder.vertex(matrix, xi1, yi2, 0);
-		bufferBuilder.vertex(matrix, xi1, yi1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-		
-		// shadow positions
-		xi1 -= 0.9;
-		xi2 += 0.9;
-		yi1 -= 0.9;
-		yi2 += 0.9;
-		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
-		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION_COLOR);
-		
-		// top
-		bufferBuilder.vertex(matrix, x1, y1, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		bufferBuilder.vertex(matrix, x2, y1, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0);
-		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0);
-		
-		// left
-		bufferBuilder.vertex(matrix, xi1, yi1, 0).color(0, 0, 0, 0);
-		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		bufferBuilder.vertex(matrix, x1, y1, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		
-		// right
-		bufferBuilder.vertex(matrix, x2, y2, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		bufferBuilder.vertex(matrix, x2, y1, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		bufferBuilder.vertex(matrix, xi2, yi1, 0).color(0, 0, 0, 0);
-		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0);
-		
-		// bottom
-		bufferBuilder.vertex(matrix, xi2, yi2, 0).color(0, 0, 0, 0);
-		bufferBuilder.vertex(matrix, xi1, yi2, 0).color(0, 0, 0, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		bufferBuilder.vertex(matrix, x2, y2, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		context.draw(consumers -> {
+			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
+			
+			// top
+			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
+			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
+			buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
+			buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
+			
+			// left
+			buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
+			buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
+			buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
+			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
+			
+			// right
+			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
+			buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
+			buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
+			buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
+			
+			// bottom
+			buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
+			buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
+			buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
+			buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
+		});
 	}
 	
 	protected final void drawDownShadow(DrawContext context, int x1, int y1,
 		int x2, int y2)
 	{
-		// color
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
+		
+		// line
+		float yi1 = y1 + 0.1F;
+		int lineColor = RenderUtils.toIntColor(acColor, 0.5F);
+		RenderUtils.drawLine2D(context, x1, yi1, x2, yi1, lineColor);
+		
+		// shadow
+		int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);
+		int shadowColor2 = 0x00000000;
 		
 		MatrixStack matrixStack = context.getMatrices();
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
-		// outline
-		float yi1 = y1 + 0.1F;
-		RenderUtils.setShaderColor(acColor, 0.5F);
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, yi1, 0);
-		bufferBuilder.vertex(matrix, x2, yi1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-		
-		// shadow
-		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS,
-			VertexFormats.POSITION_COLOR);
-		bufferBuilder.vertex(matrix, x1, y1, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		bufferBuilder.vertex(matrix, x2, y1, 0).color(acColor[0], acColor[1],
-			acColor[2], 0.75F);
-		bufferBuilder.vertex(matrix, x2, y2, 0).color(0, 0, 0, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0).color(0, 0, 0, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		context.draw(consumers -> {
+			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
+			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
+			buffer.vertex(matrix, x1, y2, 0).color(shadowColor2);
+			buffer.vertex(matrix, x2, y2, 0).color(shadowColor2);
+			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
+		});
 	}
 	
 	protected final void drawBox(DrawContext context, int x1, int y1, int x2,
-		int y2)
+		int y2, int color)
 	{
-		drawQuads(context, x1, y1, x2, y2);
+		context.fill(x1, y1, x2, y2, color);
 		drawBoxShadow(context, x1, y1, x2, y2);
 	}
 	
-	protected final void setColorToBackground()
+	protected final int getBackgroundColor()
 	{
-		WurstClient.INSTANCE.getGui().updateColors();
-		float[] bgColor = WurstClient.INSTANCE.getGui().getBgColor();
-		float opacity = WurstClient.INSTANCE.getGui().getOpacity();
-		RenderUtils.setShaderColor(bgColor, opacity);
-	}
-	
-	protected final void setColorToForeground()
-	{
-		WurstClient.INSTANCE.getGui().updateColors();
-		float[] bgColor = WurstClient.INSTANCE.getGui().getBgColor();
-		float opacity = WurstClient.INSTANCE.getGui().getOpacity();
-		RenderUtils.setShaderColor(bgColor, opacity);
+		ClickGui gui = WurstClient.INSTANCE.getGui();
+		gui.updateColors();
+		return RenderUtils.toIntColor(gui.getBgColor(), gui.getOpacity());
 	}
 	
 	protected final void drawBackgroundBox(DrawContext context, int x1, int y1,
 		int x2, int y2)
 	{
-		setColorToBackground();
-		drawBox(context, x1, y1, x2, y2);
-	}
-	
-	protected final void drawForegroundBox(DrawContext context, int x1, int y1,
-		int x2, int y2)
-	{
-		setColorToForeground();
-		drawBox(context, x1, y1, x2, y2);
+		drawBox(context, x1, y1, x2, y2, getBackgroundColor());
 	}
 }

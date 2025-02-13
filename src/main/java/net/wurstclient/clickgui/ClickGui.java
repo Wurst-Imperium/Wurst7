@@ -807,6 +807,11 @@ public final class ClickGui
 		return opacity;
 	}
 	
+	public float getTooltipOpacity()
+	{
+		return ttOpacity;
+	}
+	
 	public void setTooltip(String tooltip)
 	{
 		this.tooltip = Objects.requireNonNull(tooltip);
