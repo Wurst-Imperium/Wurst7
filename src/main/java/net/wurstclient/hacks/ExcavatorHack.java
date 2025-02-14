@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -23,13 +22,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -333,51 +326,25 @@ public final class ExcavatorHack extends Hack
 	@Override
 	public void onRenderGUI(DrawContext context, float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		
-		MatrixStack matrixStack = context.getMatrices();
-		matrixStack.push();
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
 		String message;
 		if(step.selectPos && step.pos != null)
 			message = "Press enter to confirm, or select a different position.";
 		else
 			message = step.message;
 		
-		// translate to center
-		Window sr = MC.getWindow();
 		TextRenderer tr = MC.textRenderer;
 		int msgWidth = tr.getWidth(message);
-		matrixStack.translate(sr.getScaledWidth() / 2 - msgWidth / 2,
-			sr.getScaledHeight() / 2 + 1, 0);
+		
+		int msgX1 = context.getScaledWindowWidth() / 2 - msgWidth / 2;
+		int msgX2 = msgX1 + msgWidth + 2;
+		int msgY1 = context.getScaledWindowHeight() / 2 + 1;
+		int msgY2 = msgY1 + 10;
 		
 		// background
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, 0, 0, 0);
-		bufferBuilder.vertex(matrix, msgWidth + 2, 0, 0);
-		bufferBuilder.vertex(matrix, msgWidth + 2, 10, 0);
-		bufferBuilder.vertex(matrix, 0, 10, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		context.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
 		
 		// text
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		context.drawText(tr, message, 2, 1, 0xffffffff, false);
-		
-		matrixStack.pop();
-		
-		// GL resets
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_BLEND);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		context.drawText(tr, message, msgX1 + 2, msgY1 + 1, 0xFFFFFFFF, false);
 	}
 	
 	public void enableWithArea(BlockPos pos1, BlockPos pos2)

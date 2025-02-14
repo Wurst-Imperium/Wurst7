@@ -12,8 +12,6 @@ import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -222,7 +220,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// search bar
 		if(!clickTimerRunning)
 		{
-			RenderSystem.setShaderColor(1, 1, 1, 1);
 			context.drawTextWithShadow(WurstClient.MC.textRenderer, "Search: ",
 				middleX - 150, 32, txtColor);
 			searchBar.render(context, mouseX, mouseY, partialTicks);

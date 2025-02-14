@@ -10,8 +10,6 @@ package net.wurstclient.altmanager;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -52,7 +50,6 @@ public final class AltRenderer
 		try
 		{
 			Identifier texture = getSkinTexture(name);
-			GL11.glEnable(GL11.GL_BLEND);
 			
 			if(selected)
 				RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -75,7 +72,7 @@ public final class AltRenderer
 			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
 				v, w, h, fw, fh);
 			
-			GL11.glDisable(GL11.GL_BLEND);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 		}catch(Exception e)
 		{
@@ -89,13 +86,11 @@ public final class AltRenderer
 		try
 		{
 			Identifier texture = getSkinTexture(name);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
 				.model() == SkinTextures.Model.SLIM;
-			
-			GL11.glEnable(GL11.GL_BLEND);
-			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			// Face
 			x = x + width / 4;
@@ -219,8 +214,6 @@ public final class AltRenderer
 			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
 				v, w, h, fw, fh);
 			
-			GL11.glDisable(GL11.GL_BLEND);
-			
 		}catch(Exception e)
 		{
 			e.printStackTrace();
@@ -233,13 +226,11 @@ public final class AltRenderer
 		try
 		{
 			Identifier texture = getSkinTexture(name);
+			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
 				.model() == SkinTextures.Model.SLIM;
-			
-			GL11.glEnable(GL11.GL_BLEND);
-			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			// Face
 			x = x + width / 4;
@@ -362,8 +353,6 @@ public final class AltRenderer
 			v = height / 4 * 4.5F;
 			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
 				v, w, h, fw, fh);
-			
-			GL11.glDisable(GL11.GL_BLEND);
 			
 		}catch(Exception e)
 		{

@@ -323,7 +323,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			getBackgroundColor());
 		context.fill(bgx1, MathHelper.clamp(windowY2, bgy1, bgy3), bgx2, bgy2,
 			getBackgroundColor());
-		drawBoxShadow(context, bgx1, bgy1, bgx2, bgy2);
+		RenderUtils.drawBoxShadow2D(context, bgx1, bgy1, bgx2, bgy2);
 		
 		context.enableScissor(bgx1, bgy1, bgx2, bgy3);
 		
