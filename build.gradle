@@ -26,6 +26,16 @@ repositories {
 	// for more information about repositories.
 }
 
+// Override vulnerable dependencies until Minecraft updates to newer versions
+configurations.all {
+	resolutionStrategy {
+		// v2.5.1, used by Minecraft 1.21.4 - 1.21.5, is vulnerable to CVE-2024-57699
+		force "net.minidev:json-smart:2.5.2"
+		// v1.115.Final, used by Minecraft 1.21.4 - 1.21.5, is vulnerable to CVE-2025-24970
+		force "io.netty:netty-handler:4.1.118.Final"
+	}
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
