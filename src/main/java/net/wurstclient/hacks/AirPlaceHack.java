@@ -13,7 +13,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -139,7 +138,7 @@ public final class AirPlaceHack extends Hack
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
 		Box box = new Box(renderPos.subtract(region.toBlockPos()));
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		guideColor.setAsShaderColor(0.1F);
 		RenderUtils.drawSolidBox(box, matrixStack);

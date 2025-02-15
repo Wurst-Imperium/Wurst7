@@ -20,7 +20,6 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -162,7 +161,7 @@ public final class ExcavatorHack extends Hack
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// area
 		if(area != null)
@@ -272,7 +271,7 @@ public final class ExcavatorHack extends Hack
 			matrixStack.translate(offset, offset, offset);
 			matrixStack.scale(scale, scale, scale);
 			
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
+			// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.15F);
 			RenderUtils.drawSolidBox(matrixStack);
 			

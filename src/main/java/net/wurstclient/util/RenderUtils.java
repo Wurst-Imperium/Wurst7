@@ -7,8 +7,6 @@
  */
 package net.wurstclient.util;
 
-import java.util.OptionalDouble;
-
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -16,11 +14,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -36,39 +32,47 @@ public enum RenderUtils
 	
 	private static final Box DEFAULT_BOX = new Box(0, 0, 0, 1, 1, 1);
 	
-	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but as a
-	 * non-srip version with support for transparency.
-	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	 *           layer doesn't support any other line width than 1px. Changing
-	 *           the line width number does nothing.
-	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINES =
-		RenderLayer.of("wurst:1px_lines", VertexFormats.POSITION_COLOR,
-			DrawMode.DEBUG_LINES, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.POSITION_COLOR_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
-	
-	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but with
-	 * support for transparency.
-	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	 *           layer doesn't support any other line width than 1px. Changing
-	 *           the line width number does nothing.
-	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
-		RenderLayer.of("wurst:1px_line_strip", VertexFormats.POSITION_COLOR,
-			DrawMode.DEBUG_LINE_STRIP, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.POSITION_COLOR_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	// public static final class_10785 field_56836 = method_67887(class_10785
+	// .method_67729(class_10799.field_56849)
+	// .method_67748("wurst:pipeline/debug_line_strip")
+	// .method_67762("core/position_color").method_67757("core/position_color")
+	// .method_67753(false).method_67746(VertexFormats.POSITION_COLOR,
+	// VertexFormat.DrawMode.DEBUG_LINE_STRIP)
+	// .method_67760());
+	//
+	// /**
+	// * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but as a
+	// * non-srip version with support for transparency.
+	// *
+	// * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
+	// * layer doesn't support any other line width than 1px. Changing
+	// * the line width number does nothing.
+	// */
+	// public static final RenderLayer.MultiPhase ONE_PIXEL_LINES =
+	// RenderLayer.of("wurst:1px_lines", VertexFormats.POSITION_COLOR,
+	// DrawMode.DEBUG_LINES, 1536, false, true,
+	// RenderLayer.MultiPhaseParameters.builder()
+	// .program(RenderLayer.POSITION_COLOR_PROGRAM)
+	// .lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
+	// .transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
+	// .cull(RenderLayer.DISABLE_CULLING).build(false));
+	//
+	// /**
+	// * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but with
+	// * support for transparency.
+	// *
+	// * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
+	// * layer doesn't support any other line width than 1px. Changing
+	// * the line width number does nothing.
+	// */
+	// public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
+	// RenderLayer.of("wurst:1px_line_strip", VertexFormats.POSITION_COLOR,
+	// DrawMode.DEBUG_LINE_STRIP, 1536, false, true,
+	// RenderLayer.MultiPhaseParameters.builder()
+	// .program(RenderLayer.POSITION_COLOR_PROGRAM)
+	// .lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
+	// .transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
+	// .cull(RenderLayer.DISABLE_CULLING).build(false));
 	
 	/**
 	 * Enables a new scissor box with the given coordinates, while avoiding the
@@ -79,7 +83,7 @@ public enum RenderUtils
 	{
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		context.enableScissor(x1, y1, x2, y2);
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 	}
@@ -227,7 +231,7 @@ public enum RenderUtils
 	
 	public static void drawSolidBox(Box bb, VertexBuffer vertexBuffer)
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		drawSolidBox(bb, bufferBuilder);
@@ -339,7 +343,7 @@ public enum RenderUtils
 	
 	public static void drawOutlinedBox(Box bb, VertexBuffer vertexBuffer)
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		drawOutlinedBox(bb, bufferBuilder);
@@ -451,7 +455,7 @@ public enum RenderUtils
 	
 	public static void drawCrossBox(Box bb, VertexBuffer vertexBuffer)
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		drawCrossBox(bb, bufferBuilder);
@@ -586,7 +590,7 @@ public enum RenderUtils
 	
 	public static void drawNode(Box bb, VertexBuffer vertexBuffer)
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		drawNode(bb, bufferBuilder);
@@ -722,7 +726,7 @@ public enum RenderUtils
 	public static void drawArrow(Vec3d from, Vec3d to,
 		VertexBuffer vertexBuffer)
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		drawArrow(from, to, bufferBuilder);
@@ -896,12 +900,12 @@ public enum RenderUtils
 	public static void drawLine2D(DrawContext context, float x1, float y1,
 		float x2, float y2, int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINES);
-			buffer.vertex(matrix, x1, y1, 1).color(color);
-			buffer.vertex(matrix, x2, y2, 1).color(color);
-		});
+		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+		// context.draw(consumers -> {
+		// VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINES);
+		// buffer.vertex(matrix, x1, y1, 1).color(color);
+		// buffer.vertex(matrix, x2, y2, 1).color(color);
+		// });
 	}
 	
 	/**
@@ -915,7 +919,8 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINE_STRIP);
+			VertexConsumer buffer =
+				consumers.getBuffer(RenderLayer.getDebugLineStrip(1));
 			buffer.vertex(matrix, x1, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y2, 1).color(color);
@@ -932,7 +937,8 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINE_STRIP);
+			VertexConsumer buffer =
+				consumers.getBuffer(RenderLayer.getDebugLineStrip(1));
 			for(float[] vertex : vertices)
 				buffer.vertex(matrix, vertex[0], vertex[1], 1).color(color);
 			buffer.vertex(matrix, vertices[0][0], vertices[0][1], 1)

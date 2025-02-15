@@ -18,7 +18,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
@@ -156,18 +155,14 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 			new PortalEspRenderer(matrixStack, partialTicks);
 		
 		if(style.getSelected().hasBoxes())
-		{
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
+			// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			groups.stream().filter(PortalEspBlockGroup::isEnabled)
 				.forEach(espRenderer::renderBoxes);
-		}
 		
 		if(style.getSelected().hasLines())
-		{
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
+			// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 			groups.stream().filter(PortalEspBlockGroup::isEnabled)
 				.forEach(espRenderer::renderLines);
-		}
 		
 		matrixStack.pop();
 		

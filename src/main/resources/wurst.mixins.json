@@ -9,7 +9,6 @@
     "AbstractSignEditScreenMixin",
     "AllowedAddressResolverMixin",
     "BackgroundRendererMixin",
-    "BasicBakedModelMixin",
     "BlockEntityRenderDispatcherMixin",
     "BlockMixin",
     "BlockModelRendererMixin",

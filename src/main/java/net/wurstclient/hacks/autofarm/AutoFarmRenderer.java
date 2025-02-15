@@ -12,17 +12,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -57,16 +55,16 @@ public final class AutoFarmRenderer
 		
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
-		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		ShaderProgram shader = RenderSystem.getShader();
+		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		// Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
+		// Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
+		// ShaderProgram shader = RenderSystem.getShader();
 		
 		if(greenBuffer != null)
 		{
 			RenderSystem.setShaderColor(0, 1, 0, 0.5F);
 			greenBuffer.bind();
-			greenBuffer.draw(viewMatrix, projMatrix, shader);
+			greenBuffer.draw(RenderLayer.getDebugQuads());
 			VertexBuffer.unbind();
 		}
 		
@@ -74,7 +72,7 @@ public final class AutoFarmRenderer
 		{
 			RenderSystem.setShaderColor(0, 1, 1, 0.5F);
 			cyanBuffer.bind();
-			cyanBuffer.draw(viewMatrix, projMatrix, shader);
+			cyanBuffer.draw(RenderLayer.getDebugQuads());
 			VertexBuffer.unbind();
 		}
 		
@@ -82,7 +80,7 @@ public final class AutoFarmRenderer
 		{
 			RenderSystem.setShaderColor(1, 0, 0, 0.5F);
 			redBuffer.bind();
-			redBuffer.draw(viewMatrix, projMatrix, shader);
+			redBuffer.draw(RenderLayer.getDebugQuads());
 			VertexBuffer.unbind();
 		}
 		
@@ -97,7 +95,7 @@ public final class AutoFarmRenderer
 	public void updateVertexBuffers(List<BlockPos> blocksToHarvest,
 		Set<BlockPos> plants, List<BlockPos> blocksToReplant)
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		Vec3d regionOffset = RenderUtils.getCameraRegion().negate().toVec3d();
 		
 		double boxMin = 1 / 16.0;

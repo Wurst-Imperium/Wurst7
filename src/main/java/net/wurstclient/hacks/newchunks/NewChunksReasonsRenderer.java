@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Tessellator;
@@ -36,7 +34,7 @@ public final class NewChunksReasonsRenderer
 	
 	public BuiltBuffer buildBuffer(Set<BlockPos> reasons)
 	{
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		renderBlocks(new ArrayList<>(reasons), bufferBuilder);

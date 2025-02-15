@@ -18,7 +18,6 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
@@ -224,7 +223,7 @@ public final class BowAimbotHack extends Hack
 		float v = 1 / velocity;
 		matrixStack.scale(v, v, v);
 		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		// draw outline
 		color.setAsShaderColor(0.5F * velocity);

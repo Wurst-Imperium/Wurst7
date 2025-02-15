@@ -14,18 +14,16 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
-import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -196,13 +194,10 @@ public final class SearchHack extends Hack
 		float[] rainbow = RenderUtils.getRainbowColor();
 		RenderUtils.setShaderColor(rainbow, 0.5F);
 		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
-		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
-		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		ShaderProgram shader = RenderSystem.getShader();
 		vertexBuffer.bind();
-		vertexBuffer.draw(viewMatrix, projMatrix, shader);
+		vertexBuffer.draw(RenderLayer.getDebugQuads());
 		VertexBuffer.unbind();
 		
 		matrixStack.pop();
@@ -268,7 +263,7 @@ public final class SearchHack extends Hack
 		
 		if(!vertices.isEmpty())
 		{
-			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferBuilder = tessellator
 				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 			

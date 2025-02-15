@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.stream.StreamSupport;
 
-import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -23,14 +22,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.block.TorchBlock;
 import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -211,7 +209,7 @@ public final class TunnellerHack extends Hack
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		for(int i = 0; i < vertexBuffers.length; i++)
 		{
@@ -228,11 +226,8 @@ public final class TunnellerHack extends Hack
 				case 4 -> RenderSystem.setShaderColor(1, 1, 0, 0.5F);
 			}
 			
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
-			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			ShaderProgram shader = RenderSystem.getShader();
 			buffer.bind();
-			buffer.draw(viewMatrix, projMatrix, shader);
+			buffer.draw(RenderLayer.getDebugQuads());
 			VertexBuffer.unbind();
 		}
 		
@@ -273,7 +268,7 @@ public final class TunnellerHack extends Hack
 		
 		vertexBuffers[0] = new VertexBuffer(GlUsage.STATIC_WRITE);
 		
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
@@ -395,7 +390,7 @@ public final class TunnellerHack extends Hack
 			Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
 				.offset(region.negate().toVec3d());
 			
-			Tessellator tessellator = RenderSystem.renderThreadTesselator();
+			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder bufferBuilder = tessellator.begin(
 				VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 			
@@ -512,7 +507,7 @@ public final class TunnellerHack extends Hack
 				Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
 					.offset(region.negate().toVec3d());
 				
-				Tessellator tessellator = RenderSystem.renderThreadTesselator();
+				Tessellator tessellator = Tessellator.getInstance();
 				BufferBuilder bufferBuilder = tessellator.begin(
 					VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 				
@@ -658,7 +653,7 @@ public final class TunnellerHack extends Hack
 				Box box = new Box(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
 					.offset(region.negate().toVec3d());
 				
-				Tessellator tessellator = RenderSystem.renderThreadTesselator();
+				Tessellator tessellator = Tessellator.getInstance();
 				BufferBuilder bufferBuilder = tessellator.begin(
 					VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 				
