@@ -71,6 +71,23 @@ public enum RenderUtils
 				.cull(RenderLayer.DISABLE_CULLING).build(false));
 	
 	/**
+	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
+	 * depth test.
+	 */
+	public static final RenderLayer.MultiPhase ESP_LINES =
+		RenderLayer.of("wurst:esp_lines", VertexFormats.LINES,
+			VertexFormat.DrawMode.LINES, 1536, false, true,
+			RenderLayer.MultiPhaseParameters.builder()
+				.program(RenderLayer.LINES_PROGRAM)
+				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
+				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
+				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
+				.target(RenderLayer.ITEM_ENTITY_TARGET)
+				.writeMaskState(RenderLayer.ALL_MASK)
+				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST)
+				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	
+	/**
 	 * Enables a new scissor box with the given coordinates, while avoiding the
 	 * strange side-effects of Minecraft's own enableScissor() method.
 	 */

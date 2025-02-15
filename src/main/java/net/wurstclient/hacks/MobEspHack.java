@@ -12,20 +12,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -82,7 +74,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			FilterArmorStandsSetting.genericVision(true));
 	
 	private final ArrayList<LivingEntity> mobs = new ArrayList<>();
-	private VertexBuffer mobBox;
 	
 	public MobEspHack()
 	{
@@ -99,10 +90,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		
-		mobBox = new VertexBuffer(GlUsage.STATIC_WRITE);
-		Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-		RenderUtils.drawOutlinedBox(bb, mobBox);
 	}
 	
 	@Override
@@ -111,9 +98,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
-		if(mobBox != null)
-			mobBox.close();
 	}
 	
 	@Override
@@ -144,9 +128,11 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
+		
+		VertexConsumerProvider.Immediate vcp =
+			MC.getBufferBuilders().getEntityVertexConsumers();
 		
 		matrixStack.push();
 		
@@ -154,67 +140,45 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		if(style.hasBoxes())
-			renderBoxes(matrixStack, partialTicks, region);
+			renderBoxes(matrixStack, vcp, partialTicks, region);
 		
 		if(style.hasLines())
-			renderTracers(matrixStack, partialTicks, region);
+			renderTracers(matrixStack, vcp, partialTicks, region);
 		
 		matrixStack.pop();
 		
+		vcp.draw(RenderUtils.ESP_LINES);
+		
 		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		RenderSystem.disableDepthTest();
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
-		RegionPos region)
+	private void renderBoxes(MatrixStack matrixStack,
+		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
 	{
-		float extraSize = boxSize.getExtraSize();
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		double extraSize = boxSize.getExtraSize() / 2;
+		Vec3d offset = region.negate().toVec3d().add(0, extraSize, 0);
+		VertexConsumer buffer = vcp.getBuffer(RenderUtils.ESP_LINES);
 		
 		for(LivingEntity e : mobs)
 		{
-			matrixStack.push();
-			
-			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
-				.subtract(region.toVec3d());
-			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
-			
-			matrixStack.scale(e.getWidth() + extraSize,
-				e.getHeight() + extraSize, e.getWidth() + extraSize);
-			
 			float f = MC.player.distanceTo(e) / 20F;
-			RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
+			float r = MathHelper.clamp(2 - f, 0, 1);
+			float g = MathHelper.clamp(f, 0, 1);
 			
-			Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
-			Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-			ShaderProgram shader = RenderSystem.getShader();
-			mobBox.bind();
-			mobBox.draw(viewMatrix, projMatrix, shader);
-			VertexBuffer.unbind();
-			
-			matrixStack.pop();
+			Box box = EntityUtils.getLerpedBox(e, partialTicks).offset(offset)
+				.expand(extraSize);
+			VertexRendering.drawBox(matrixStack, buffer, box, r, g, 0, 0.5F);
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack, float partialTicks,
-		RegionPos region)
+	private void renderTracers(MatrixStack matrixStack,
+		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
 	{
-		if(mobs.isEmpty())
-			return;
-		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+		VertexConsumer buffer = vcp.getBuffer(RenderUtils.ESP_LINES);
 		
 		Vec3d regionVec = region.toVec3d();
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks).multiply(2)
 			.add(RenderUtils.getCameraPos()).subtract(regionVec);
 		
 		for(LivingEntity e : mobs)
@@ -226,15 +190,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			float r = MathHelper.clamp(2 - f, 0, 1);
 			float g = MathHelper.clamp(f, 0, 1);
 			
-			bufferBuilder
-				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
-				.color(r, g, 0, 0.5F);
-			
-			bufferBuilder
-				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
-				.color(r, g, 0, 0.5F);
+			int color = RenderUtils.toIntColor(new float[]{r, g, 0}, 0.5F);
+			VertexRendering.drawVector(matrixStack, buffer, start.toVector3f(),
+				end.subtract(start), color);
 		}
-		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }
