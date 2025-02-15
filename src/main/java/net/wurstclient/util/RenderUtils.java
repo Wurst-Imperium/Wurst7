@@ -7,6 +7,8 @@
  */
 package net.wurstclient.util;
 
+import java.util.OptionalDouble;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -25,6 +27,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
+import net.wurstclient.WurstPipelines;
 
 public enum RenderUtils
 {
@@ -32,47 +35,34 @@ public enum RenderUtils
 	
 	private static final Box DEFAULT_BOX = new Box(0, 0, 0, 1, 1, 1);
 	
-	// public static final class_10785 field_56836 = method_67887(class_10785
-	// .method_67729(class_10799.field_56849)
-	// .method_67748("wurst:pipeline/debug_line_strip")
-	// .method_67762("core/position_color").method_67757("core/position_color")
-	// .method_67753(false).method_67746(VertexFormats.POSITION_COLOR,
-	// VertexFormat.DrawMode.DEBUG_LINE_STRIP)
-	// .method_67760());
-	//
-	// /**
-	// * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but as a
-	// * non-srip version with support for transparency.
-	// *
-	// * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	// * layer doesn't support any other line width than 1px. Changing
-	// * the line width number does nothing.
-	// */
-	// public static final RenderLayer.MultiPhase ONE_PIXEL_LINES =
-	// RenderLayer.of("wurst:1px_lines", VertexFormats.POSITION_COLOR,
-	// DrawMode.DEBUG_LINES, 1536, false, true,
-	// RenderLayer.MultiPhaseParameters.builder()
-	// .program(RenderLayer.POSITION_COLOR_PROGRAM)
-	// .lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-	// .transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-	// .cull(RenderLayer.DISABLE_CULLING).build(false));
-	//
-	// /**
-	// * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but with
-	// * support for transparency.
-	// *
-	// * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	// * layer doesn't support any other line width than 1px. Changing
-	// * the line width number does nothing.
-	// */
-	// public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
-	// RenderLayer.of("wurst:1px_line_strip", VertexFormats.POSITION_COLOR,
-	// DrawMode.DEBUG_LINE_STRIP, 1536, false, true,
-	// RenderLayer.MultiPhaseParameters.builder()
-	// .program(RenderLayer.POSITION_COLOR_PROGRAM)
-	// .lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-	// .transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-	// .cull(RenderLayer.DISABLE_CULLING).build(false));
+	/**
+	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but as a
+	 * non-srip version with support for transparency.
+	 *
+	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
+	 *           layer doesn't support any other line width than 1px. Changing
+	 *           the line width number does nothing.
+	 */
+	public static final RenderLayer.MultiPhase ONE_PIXEL_LINES =
+		RenderLayer.of("wurst:1px_lines", 1536, WurstPipelines.ONE_PIXEL_LINES,
+			RenderLayer.MultiPhaseParameters.builder()
+				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
+				.build(false));
+	
+	/**
+	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but with
+	 * support for transparency.
+	 *
+	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
+	 *           layer doesn't support any other line width than 1px. Changing
+	 *           the line width number does nothing.
+	 */
+	public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
+		RenderLayer.of("wurst:1px_line_strip", 1536,
+			WurstPipelines.ONE_PIXEL_LINE_STRIP,
+			RenderLayer.MultiPhaseParameters.builder()
+				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
+				.build(false));
 	
 	/**
 	 * Enables a new scissor box with the given coordinates, while avoiding the
@@ -900,12 +890,12 @@ public enum RenderUtils
 	public static void drawLine2D(DrawContext context, float x1, float y1,
 		float x2, float y2, int color)
 	{
-		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		// context.draw(consumers -> {
-		// VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINES);
-		// buffer.vertex(matrix, x1, y1, 1).color(color);
-		// buffer.vertex(matrix, x2, y2, 1).color(color);
-		// });
+		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+		context.draw(consumers -> {
+			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINES);
+			buffer.vertex(matrix, x1, y1, 1).color(color);
+			buffer.vertex(matrix, x2, y2, 1).color(color);
+		});
 	}
 	
 	/**
@@ -919,8 +909,7 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(RenderLayer.getDebugLineStrip(1));
+			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINE_STRIP);
 			buffer.vertex(matrix, x1, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y2, 1).color(color);
@@ -937,8 +926,7 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(RenderLayer.getDebugLineStrip(1));
+			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINE_STRIP);
 			for(float[] vertex : vertices)
 				buffer.vertex(matrix, vertex[0], vertex[1], 1).color(color);
 			buffer.vertex(matrix, vertices[0][0], vertices[0][1], 1)
