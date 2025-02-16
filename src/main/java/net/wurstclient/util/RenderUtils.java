@@ -87,36 +87,6 @@ public enum RenderUtils
 				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST)
 				.cull(RenderLayer.DISABLE_CULLING).build(false));
 	
-	/**
-	 * Enables a new scissor box with the given coordinates, while avoiding the
-	 * strange side-effects of Minecraft's own enableScissor() method.
-	 */
-	public static void enableScissor(DrawContext context, int x1, int y1,
-		int x2, int y2)
-	{
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		context.enableScissor(x1, y1, x2, y2);
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-	}
-	
-	/**
-	 * Disables the current scissor box, while avoiding most of the strange
-	 * side-effects of Minecraft's own disableScissor() method.
-	 *
-	 * <p>
-	 * <b>Note:</b> You have to draw some text after calling this method,
-	 * otherwise there will be some weird colors in the sky. It's unclear why
-	 * this happens.
-	 */
-	public static void disableScissor(DrawContext context)
-	{
-		context.disableScissor();
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-	}
-	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack)
 	{
 		applyRegionalRenderOffset(matrixStack, getCameraRegion());
