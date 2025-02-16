@@ -10,17 +10,10 @@ package net.wurstclient.hacks.autofish;
 import java.awt.Color;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
@@ -129,25 +122,25 @@ public final class AutoFishDebugDraw
 	
 	private void drawLastBite(MatrixStack matrixStack, RegionPos region)
 	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
-		matrixStack.push();
-		matrixStack.translate(lastSoundPos.x - region.x(), lastSoundPos.y,
-			lastSoundPos.z - region.z());
-		
-		ddColor.setAsShaderColor(0.5F);
-		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, -0.125F, 0, -0.125F);
-		bufferBuilder.vertex(matrix, 0.125F, 0, 0.125F);
-		bufferBuilder.vertex(matrix, 0.125F, 0, -0.125F);
-		bufferBuilder.vertex(matrix, -0.125F, 0, 0.125F);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-		
-		matrixStack.pop();
+		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		// Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		//
+		// matrixStack.push();
+		// matrixStack.translate(lastSoundPos.x - region.x(), lastSoundPos.y,
+		// lastSoundPos.z - region.z());
+		//
+		// ddColor.setAsShaderColor(0.5F);
+		//
+		// BufferBuilder bufferBuilder = tessellator
+		// .begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		// bufferBuilder.vertex(matrix, -0.125F, 0, -0.125F);
+		// bufferBuilder.vertex(matrix, 0.125F, 0, 0.125F);
+		// bufferBuilder.vertex(matrix, 0.125F, 0, -0.125F);
+		// bufferBuilder.vertex(matrix, -0.125F, 0, 0.125F);
+		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		//
+		// matrixStack.pop();
 	}
 	
 	private void drawFishingSpots(MatrixStack matrixStack, RegionPos region)

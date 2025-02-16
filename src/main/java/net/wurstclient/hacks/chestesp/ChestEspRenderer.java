@@ -10,22 +10,14 @@ package net.wurstclient.hacks.chestesp;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
-
 import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 public final class ChestEspRenderer
 {
@@ -34,14 +26,14 @@ public final class ChestEspRenderer
 	
 	private final MatrixStack matrixStack;
 	private final RegionPos region;
-	private final Vec3d start;
+	// private final Vec3d start;
 	
 	public ChestEspRenderer(MatrixStack matrixStack, float partialTicks)
 	{
 		this.matrixStack = matrixStack;
 		region = RenderUtils.getCameraRegion();
-		start = RotationUtils.getClientLookVec(partialTicks)
-			.add(RenderUtils.getCameraPos()).subtract(region.toVec3d());
+		// start = RotationUtils.getClientLookVec(partialTicks)
+		// .add(RenderUtils.getCameraPos()).subtract(region.toVec3d());
 	}
 	
 	public void renderBoxes(ChestEspGroup group)
@@ -74,30 +66,30 @@ public final class ChestEspRenderer
 	
 	public void renderLines(ChestEspGroup group)
 	{
-		if(group.getBoxes().isEmpty())
-			return;
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = Tessellator.getInstance();
-		
-		float[] colorF = group.getColorF();
-		RenderUtils.setShaderColor(colorF, 0.5F);
-		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		
-		for(Box box : group.getBoxes())
-		{
-			Vec3d end = box.getCenter().subtract(region.toVec3d());
-			
-			bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
-				(float)start.z);
-			
-			bufferBuilder.vertex(matrix, (float)end.x, (float)end.y,
-				(float)end.z);
-		}
-		
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		// if(group.getBoxes().isEmpty())
+		// return;
+		//
+		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		// Tessellator tessellator = Tessellator.getInstance();
+		//
+		// float[] colorF = group.getColorF();
+		// RenderUtils.setShaderColor(colorF, 0.5F);
+		//
+		// BufferBuilder bufferBuilder = tessellator
+		// .begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		//
+		// for(Box box : group.getBoxes())
+		// {
+		// Vec3d end = box.getCenter().subtract(region.toVec3d());
+		//
+		// bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
+		// (float)start.z);
+		//
+		// bufferBuilder.vertex(matrix, (float)end.x, (float)end.y,
+		// (float)end.z);
+		// }
+		//
+		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	public static void prepareBuffers()
