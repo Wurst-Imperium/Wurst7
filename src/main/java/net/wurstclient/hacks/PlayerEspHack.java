@@ -11,18 +11,20 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -37,6 +39,7 @@ import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"player esp", "PlayerTracers", "player tracers"})
 public final class PlayerEspHack extends Hack implements UpdateListener,
@@ -59,7 +62,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	{
 		super("PlayerESP");
 		setCategory(Category.RENDER);
-		
 		addSetting(style);
 		addSetting(boxSize);
 		entityFilters.forEach(this::addSetting);
@@ -84,13 +86,11 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onUpdate()
 	{
-		PlayerEntity player = MC.player;
-		ClientWorld world = MC.world;
-		
 		players.clear();
-		Stream<AbstractClientPlayerEntity> stream = world.getPlayers()
+		
+		Stream<AbstractClientPlayerEntity> stream = MC.world.getPlayers()
 			.parallelStream().filter(e -> !e.isRemoved() && e.getHealth() > 0)
-			.filter(e -> e != player)
+			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> Math.abs(e.getY() - MC.player.getY()) <= 1e6);
 		
@@ -110,112 +110,70 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
+		
+		VertexConsumerProvider.Immediate vcp =
+			MC.getBufferBuilders().getEntityVertexConsumers();
 		
 		matrixStack.push();
 		
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		// draw boxes
 		if(style.hasBoxes())
-			renderBoxes(matrixStack, partialTicks, region);
+			renderBoxes(matrixStack, vcp, partialTicks, region);
 		
 		if(style.hasLines())
-			renderTracers(matrixStack, partialTicks, region);
+			renderTracers(matrixStack, vcp, partialTicks, region);
 		
 		matrixStack.pop();
 		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		vcp.draw(WurstRenderLayers.ESP_LINES);
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
-		RegionPos region)
+	private void renderBoxes(MatrixStack matrixStack,
+		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
 	{
-		float extraSize = boxSize.getExtraSize();
+		double extraSize = boxSize.getExtraSize() / 2;
+		Vec3d offset = region.negate().toVec3d().add(0, extraSize, 0);
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
 		for(PlayerEntity e : players)
 		{
-			matrixStack.push();
+			Box box = EntityUtils.getLerpedBox(e, partialTicks).offset(offset)
+				.expand(extraSize);
 			
-			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
-				.subtract(region.toVec3d());
-			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
-			
-			matrixStack.scale(e.getWidth() + extraSize,
-				e.getHeight() + extraSize, e.getWidth() + extraSize);
-			
-			// set color
-			if(WURST.getFriends().contains(e.getName().getString()))
-				RenderSystem.setShaderColor(0, 0, 1, 0.5F);
-			else
-			{
-				float f = MC.player.distanceTo(e) / 20F;
-				RenderSystem.setShaderColor(2 - f, f, 0, 0.5F);
-			}
-			
-			Box bb = new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
-			RenderUtils.drawOutlinedBox(bb, matrixStack);
-			
-			matrixStack.pop();
+			RenderUtils.drawOutlinedBox(matrixStack, buffer, box, getColor(e));
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack, float partialTicks,
-		RegionPos region)
+	private void renderTracers(MatrixStack matrixStack,
+		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
 	{
-		// if(players.isEmpty())
-		// return;
-		//
-		// RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-		// RenderSystem.setShaderColor(1, 1, 1, 1);
-		//
-		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		//
-		// Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		// BufferBuilder bufferBuilder = tessellator.begin(
-		// VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-		//
-		// Vec3d regionVec = region.toVec3d();
-		// Vec3d start = RotationUtils.getClientLookVec(partialTicks)
-		// .add(RenderUtils.getCameraPos()).subtract(regionVec);
-		//
-		// for(PlayerEntity e : players)
-		// {
-		// Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
-		// .subtract(regionVec);
-		//
-		// float r, g, b;
-		//
-		// if(WURST.getFriends().contains(e.getName().getString()))
-		// {
-		// r = 0;
-		// g = 0;
-		// b = 1;
-		//
-		// }else
-		// {
-		// float f = MC.player.distanceTo(e) / 20F;
-		// r = MathHelper.clamp(2 - f, 0, 1);
-		// g = MathHelper.clamp(f, 0, 1);
-		// b = 0;
-		// }
-		//
-		// bufferBuilder
-		// .vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
-		// .color(r, g, b, 0.5F);
-		//
-		// bufferBuilder
-		// .vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
-		// .color(r, g, b, 0.5F);
-		// }
-		//
-		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
+		
+		Vec3d regionVec = region.toVec3d();
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks).multiply(2)
+			.add(RenderUtils.getCameraPos()).subtract(regionVec);
+		
+		for(PlayerEntity e : players)
+		{
+			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
+				.subtract(regionVec);
+			
+			RenderUtils.drawLine(matrixStack, buffer, start, end, getColor(e));
+		}
+	}
+	
+	private int getColor(PlayerEntity e)
+	{
+		if(WURST.getFriends().contains(e.getName().getString()))
+			return 0x800000FF;
+		
+		float f = MC.player.distanceTo(e) / 20F;
+		float r = MathHelper.clamp(2 - f, 0, 1);
+		float g = MathHelper.clamp(f, 0, 1);
+		float[] rgb = {r, g, 0};
+		return RenderUtils.toIntColor(rgb, 0.5F);
 	}
 }

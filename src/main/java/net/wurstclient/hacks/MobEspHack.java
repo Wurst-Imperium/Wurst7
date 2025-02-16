@@ -17,7 +17,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -158,13 +157,10 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		
 		for(LivingEntity e : mobs)
 		{
-			float f = MC.player.distanceTo(e) / 20F;
-			float r = MathHelper.clamp(2 - f, 0, 1);
-			float g = MathHelper.clamp(f, 0, 1);
-			
 			Box box = EntityUtils.getLerpedBox(e, partialTicks).offset(offset)
 				.expand(extraSize);
-			VertexRendering.drawBox(matrixStack, buffer, box, r, g, 0, 0.5F);
+			
+			RenderUtils.drawOutlinedBox(matrixStack, buffer, box, getColor(e));
 		}
 	}
 	
@@ -182,13 +178,16 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
 				.subtract(regionVec);
 			
-			float f = MC.player.distanceTo(e) / 20F;
-			float r = MathHelper.clamp(2 - f, 0, 1);
-			float g = MathHelper.clamp(f, 0, 1);
-			
-			int color = RenderUtils.toIntColor(new float[]{r, g, 0}, 0.5F);
-			VertexRendering.drawVector(matrixStack, buffer, start.toVector3f(),
-				end.subtract(start), color);
+			RenderUtils.drawLine(matrixStack, buffer, start, end, getColor(e));
 		}
+	}
+	
+	private int getColor(LivingEntity e)
+	{
+		float f = MC.player.distanceTo(e) / 20F;
+		float r = MathHelper.clamp(2 - f, 0, 1);
+		float g = MathHelper.clamp(f, 0, 1);
+		float[] rgb = {r, g, 0};
+		return RenderUtils.toIntColor(rgb, 0.5F);
 	}
 }
