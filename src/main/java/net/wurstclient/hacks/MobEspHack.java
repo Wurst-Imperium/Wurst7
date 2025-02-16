@@ -26,6 +26,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -147,7 +148,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		
 		matrixStack.pop();
 		
-		vcp.draw(RenderUtils.ESP_LINES);
+		vcp.draw(WurstRenderLayers.ESP_LINES);
 		
 		// GL resets
 		RenderSystem.disableDepthTest();
@@ -158,7 +159,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	{
 		double extraSize = boxSize.getExtraSize() / 2;
 		Vec3d offset = region.negate().toVec3d().add(0, extraSize, 0);
-		VertexConsumer buffer = vcp.getBuffer(RenderUtils.ESP_LINES);
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
 		for(LivingEntity e : mobs)
 		{
@@ -175,7 +176,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack,
 		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
 	{
-		VertexConsumer buffer = vcp.getBuffer(RenderUtils.ESP_LINES);
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
 		Vec3d regionVec = region.toVec3d();
 		Vec3d start = RotationUtils.getClientLookVec(partialTicks).multiply(2)

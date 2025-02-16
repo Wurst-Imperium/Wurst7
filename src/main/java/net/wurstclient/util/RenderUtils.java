@@ -7,8 +7,6 @@
  */
 package net.wurstclient.util;
 
-import java.util.OptionalDouble;
-
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -27,53 +25,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
-import net.wurstclient.WurstShaderLayers;
+import net.wurstclient.WurstRenderLayers;
 
 public enum RenderUtils
 {
 	;
 	
 	private static final Box DEFAULT_BOX = new Box(0, 0, 0, 1, 1, 1);
-	
-	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but as a
-	 * non-srip version with support for transparency.
-	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	 *           layer doesn't support any other line width than 1px. Changing
-	 *           the line width number does nothing.
-	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINES = RenderLayer.of(
-		"wurst:1px_lines", 1536, WurstShaderLayers.ONE_PIXEL_LINES,
-		RenderLayer.MultiPhaseParameters.builder()
-			.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-			.build(false));
-	
-	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but with
-	 * support for transparency.
-	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	 *           layer doesn't support any other line width than 1px. Changing
-	 *           the line width number does nothing.
-	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
-		RenderLayer.of("wurst:1px_line_strip", 1536,
-			WurstShaderLayers.ONE_PIXEL_LINE_STRIP,
-			RenderLayer.MultiPhaseParameters.builder()
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-				.build(false));
-	
-	/**
-	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
-	 * depth test.
-	 */
-	public static final RenderLayer.MultiPhase ESP_LINES =
-		RenderLayer.of("wurst:esp_lines", 1536, WurstShaderLayers.ESP_LINES,
-			RenderLayer.MultiPhaseParameters.builder()
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
 	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack)
 	{
@@ -873,7 +831,8 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINES);
+			VertexConsumer buffer =
+				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINES);
 			buffer.vertex(matrix, x1, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y2, 1).color(color);
 		});
@@ -890,7 +849,8 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINE_STRIP);
+			VertexConsumer buffer =
+				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
 			buffer.vertex(matrix, x1, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y2, 1).color(color);
@@ -907,7 +867,8 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINE_STRIP);
+			VertexConsumer buffer =
+				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
 			for(float[] vertex : vertices)
 				buffer.vertex(matrix, vertex[0], vertex[1], 1).color(color);
 			buffer.vertex(matrix, vertices[0][0], vertices[0][1], 1)
