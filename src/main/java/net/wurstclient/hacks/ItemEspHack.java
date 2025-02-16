@@ -10,17 +10,12 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -28,6 +23,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -59,7 +55,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	{
 		super("ItemESP");
 		setCategory(Category.RENDER);
-		
 		addSetting(style);
 		addSetting(boxSize);
 		addSetting(color);
@@ -101,89 +96,60 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
+		
+		VertexConsumerProvider.Immediate vcp =
+			MC.getBufferBuilders().getEntityVertexConsumers();
 		
 		matrixStack.push();
 		
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		renderBoxes(matrixStack, partialTicks, region);
+		if(style.hasBoxes())
+			renderBoxes(matrixStack, vcp, partialTicks, region);
 		
 		if(style.hasLines())
-			renderTracers(matrixStack, partialTicks, region);
+			renderTracers(matrixStack, vcp, partialTicks, region);
 		
 		matrixStack.pop();
 		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		vcp.draw(WurstRenderLayers.ESP_LINES);
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
-		RegionPos region)
+	private void renderBoxes(MatrixStack matrixStack,
+		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
 	{
-		float extraSize = boxSize.getExtraSize();
+		double extraSize = boxSize.getExtraSize() / 2;
+		Vec3d offset = region.negate().toVec3d().add(0, extraSize, 0);
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
 		for(ItemEntity e : items)
 		{
-			matrixStack.push();
-			
-			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
-				.subtract(region.toVec3d());
-			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
-			
-			if(style.hasBoxes())
-			{
-				matrixStack.push();
-				matrixStack.scale(e.getWidth() + extraSize,
-					e.getHeight() + extraSize, e.getWidth() + extraSize);
-				
-				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				color.setAsShaderColor(0.5F);
-				RenderUtils.drawOutlinedBox(new Box(-0.5, 0, -0.5, 0.5, 1, 0.5),
-					matrixStack);
-				
-				matrixStack.pop();
-			}
-			
-			matrixStack.pop();
+			Box box = EntityUtils.getLerpedBox(e, partialTicks).offset(offset)
+				.expand(extraSize);
+			float[] rgb = color.getColorF();
+			VertexRendering.drawBox(matrixStack, buffer, box, rgb[0], rgb[1],
+				rgb[2], 0.5F);
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack, float partialTicks,
-		RegionPos region)
+	private void renderTracers(MatrixStack matrixStack,
+		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
 	{
-		if(items.isEmpty())
-			return;
-		
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		color.setAsShaderColor(0.5F);
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
 		Vec3d regionVec = region.toVec3d();
 		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
 			.add(RenderUtils.getCameraPos()).subtract(regionVec);
 		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		for(ItemEntity e : items)
 		{
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
 				.subtract(regionVec);
 			
-			bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
-				(float)start.z);
-			bufferBuilder.vertex(matrix, (float)end.x, (float)end.y,
-				(float)end.z);
+			VertexRendering.drawVector(matrixStack, buffer, start.toVector3f(),
+				end.subtract(start), color.getColorI(0x80));
 		}
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }
