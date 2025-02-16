@@ -9,6 +9,7 @@ package net.wurstclient;
 
 import net.minecraft.class_10784;
 import net.minecraft.class_10785;
+import net.minecraft.class_10798;
 import net.minecraft.class_10799;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -44,4 +45,13 @@ public enum WurstPipelines
 			.method_67746(VertexFormats.POSITION_COLOR,
 				VertexFormat.DrawMode.DEBUG_LINE_STRIP)
 			.method_67760());
+	
+	/**
+	 * Similar to the LINES pipeline (class_10799.field_56833), but with no
+	 * depth test.
+	 */
+	public static final class_10785 ESP_LINES = class_10799
+		.method_67887(class_10785.method_67729(class_10799.field_56859)
+			.method_67748("pipeline/wurst_esp_lines")
+			.method_67747(class_10798.NO_DEPTH_TEST).method_67760());
 }

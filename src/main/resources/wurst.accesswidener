@@ -6,10 +6,13 @@ accessible	method	net/minecraft/client/Mouse	onMouseButton	(JIII)V
 accessible	method	net/minecraft/client/render/BackgroundRenderer	getFogModifier	(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;
 accessible	method	net/minecraft/client/render/GameRenderer	setPostProcessor	(Lnet/minecraft/util/Identifier;)V
 accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	build	(Z)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
+accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	layering	(Lnet/minecraft/client/render/RenderPhase$Layering;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
 accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	lineWidth	(Lnet/minecraft/client/render/RenderPhase$LineWidth;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
+accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	target	(Lnet/minecraft/client/render/RenderPhase$Target;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
 accessible	method	net/minecraft/entity/player/PlayerEntity	canGlide	()Z
 accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z
 accessible	field	net/minecraft/class_10799	field_56849	Lnet/minecraft/class_10785$class_10787;
+accessible	field	net/minecraft/class_10799	field_56859	Lnet/minecraft/class_10785$class_10787;
 accessible	field	net/minecraft/client/MinecraftClient	itemUseCooldown	I
 accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;

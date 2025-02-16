@@ -65,34 +65,15 @@ public enum RenderUtils
 				.build(false));
 	
 	/**
-	 * Enables a new scissor box with the given coordinates, while avoiding the
-	 * strange side-effects of Minecraft's own enableScissor() method.
+	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
+	 * depth test.
 	 */
-	public static void enableScissor(DrawContext context, int x1, int y1,
-		int x2, int y2)
-	{
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		context.enableScissor(x1, y1, x2, y2);
-		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-	}
-	
-	/**
-	 * Disables the current scissor box, while avoiding most of the strange
-	 * side-effects of Minecraft's own disableScissor() method.
-	 *
-	 * <p>
-	 * <b>Note:</b> You have to draw some text after calling this method,
-	 * otherwise there will be some weird colors in the sky. It's unclear why
-	 * this happens.
-	 */
-	public static void disableScissor(DrawContext context)
-	{
-		context.disableScissor();
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-	}
+	public static final RenderLayer.MultiPhase ESP_LINES =
+		RenderLayer.of("wurst:esp_lines", 1536, WurstPipelines.ESP_LINES,
+			RenderLayer.MultiPhaseParameters.builder()
+				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
+				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
+				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
 	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack)
 	{
@@ -182,7 +163,7 @@ public enum RenderUtils
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 		
@@ -280,7 +261,7 @@ public enum RenderUtils
 	public static void drawOutlinedBox(Box bb, MatrixStack matrixStack)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
@@ -400,7 +381,7 @@ public enum RenderUtils
 		float maxZ = (float)bb.maxZ;
 		
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
@@ -505,7 +486,7 @@ public enum RenderUtils
 	public static void drawNode(Box bb, MatrixStack matrixStack)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
 		double midX = (bb.minX + bb.maxX) / 2;
@@ -620,7 +601,7 @@ public enum RenderUtils
 	{
 		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator
 			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
 		
