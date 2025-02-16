@@ -15,7 +15,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -128,9 +127,9 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		{
 			Box box = EntityUtils.getLerpedBox(e, partialTicks).offset(offset)
 				.expand(extraSize);
-			float[] rgb = color.getColorF();
-			VertexRendering.drawBox(matrixStack, buffer, box, rgb[0], rgb[1],
-				rgb[2], 0.5F);
+			
+			RenderUtils.drawOutlinedBox(matrixStack, buffer, box,
+				color.getColorI(0x80));
 		}
 	}
 	
@@ -148,8 +147,8 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
 				.subtract(regionVec);
 			
-			VertexRendering.drawVector(matrixStack, buffer, start.toVector3f(),
-				end.subtract(start), color.getColorI(0x80));
+			RenderUtils.drawLine(matrixStack, buffer, start, end,
+				color.getColorI(0x80));
 		}
 	}
 }

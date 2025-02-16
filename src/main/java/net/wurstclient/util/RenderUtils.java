@@ -106,6 +106,22 @@ public enum RenderUtils
 			| (int)(MathHelper.clamp(rgb[2], 0, 1) * 255);
 	}
 	
+	public static void drawLine(MatrixStack matrices, VertexConsumer buffer,
+		Vec3d start, Vec3d end, int color)
+	{
+		drawLine(matrices, buffer, start.toVector3f(), end.toVector3f(), color);
+	}
+	
+	public static void drawLine(MatrixStack matrices, VertexConsumer buffer,
+		Vector3f start, Vector3f end, int color)
+	{
+		MatrixStack.Entry entry = matrices.peek();
+		Vector3f normal = new Vector3f(end).sub(start).normalize();
+		
+		buffer.vertex(entry, start).color(color).normal(entry, normal);
+		buffer.vertex(entry, end).color(color).normal(entry, normal);
+	}
+	
 	public static void drawSolidBox(MatrixStack matrixStack)
 	{
 		drawSolidBox(DEFAULT_BOX, matrixStack);
@@ -210,6 +226,48 @@ public enum RenderUtils
 		bufferBuilder.vertex(minX, minY, maxZ);
 		bufferBuilder.vertex(minX, maxY, maxZ);
 		bufferBuilder.vertex(minX, maxY, minZ);
+	}
+	
+	public static void drawOutlinedBox(MatrixStack matrices,
+		VertexConsumer buffer, Box box, int color)
+	{
+		MatrixStack.Entry entry = matrices.peek();
+		float x1 = (float)box.minX;
+		float y1 = (float)box.minY;
+		float z1 = (float)box.minZ;
+		float x2 = (float)box.maxX;
+		float y2 = (float)box.maxY;
+		float z2 = (float)box.maxZ;
+		
+		// bottom lines
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 1, 0, 0);
+		
+		// top lines
+		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 1, 0, 0);
+		
+		// side lines
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 1, 0);
 	}
 	
 	public static void drawOutlinedBox(MatrixStack matrixStack)
