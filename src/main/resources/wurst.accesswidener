@@ -1,6 +1,6 @@
 accessWidener	v1	named
 accessible	class	net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
-accessible	method	net/minecraft/class_10799	method_67887	(Lnet/minecraft/class_10785;)Lnet/minecraft/class_10785;
+accessible	method	net/minecraft/client/gl/ShaderProgramLayers	addProgram	(Lnet/minecraft/client/gl/ShaderProgramLayer;)Lnet/minecraft/client/gl/ShaderProgramLayer;
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/Mouse	onMouseButton	(JIII)V
 accessible	method	net/minecraft/client/render/BackgroundRenderer	getFogModifier	(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;
@@ -11,8 +11,8 @@ accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$B
 accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	target	(Lnet/minecraft/client/render/RenderPhase$Target;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
 accessible	method	net/minecraft/entity/player/PlayerEntity	canGlide	()Z
 accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z
-accessible	field	net/minecraft/class_10799	field_56849	Lnet/minecraft/class_10785$class_10787;
-accessible	field	net/minecraft/class_10799	field_56859	Lnet/minecraft/class_10785$class_10787;
+accessible	field	net/minecraft/client/gl/ShaderProgramLayers	MATRICIES_COLOR	Lnet/minecraft/client/gl/ShaderProgramLayer$Stage;
+accessible	field	net/minecraft/client/gl/ShaderProgramLayers	RENDERTYPE_LINES	Lnet/minecraft/client/gl/ShaderProgramLayer$Stage;
 accessible	field	net/minecraft/client/MinecraftClient	itemUseCooldown	I
 accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;
