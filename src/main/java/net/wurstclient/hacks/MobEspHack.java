@@ -12,17 +12,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -37,6 +43,7 @@ import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"mob esp", "MobTracers", "mob tracers"})
 public final class MobEspHack extends Hack implements UpdateListener,
@@ -189,40 +196,40 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private void renderTracers(MatrixStack matrixStack, float partialTicks,
 		RegionPos region)
 	{
-		// if(mobs.isEmpty())
-		// return;
-		//
-		// RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-		// RenderSystem.setShaderColor(1, 1, 1, 1);
-		//
-		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		//
-		// Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		// BufferBuilder bufferBuilder = tessellator.begin(
-		// VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-		//
-		// Vec3d regionVec = region.toVec3d();
-		// Vec3d start = RotationUtils.getClientLookVec(partialTicks)
-		// .add(RenderUtils.getCameraPos()).subtract(regionVec);
-		//
-		// for(LivingEntity e : mobs)
-		// {
-		// Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
-		// .subtract(regionVec);
-		//
-		// float f = MC.player.distanceTo(e) / 20F;
-		// float r = MathHelper.clamp(2 - f, 0, 1);
-		// float g = MathHelper.clamp(f, 0, 1);
-		//
-		// bufferBuilder
-		// .vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
-		// .color(r, g, 0, 0.5F);
-		//
-		// bufferBuilder
-		// .vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
-		// .color(r, g, 0, 0.5F);
-		// }
-		//
-		// BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		if(mobs.isEmpty())
+			return;
+		
+		RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferBuilder = tessellator.begin(
+			VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+		
+		Vec3d regionVec = region.toVec3d();
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
+			.add(RenderUtils.getCameraPos()).subtract(regionVec);
+		
+		for(LivingEntity e : mobs)
+		{
+			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
+				.subtract(regionVec);
+			
+			float f = MC.player.distanceTo(e) / 20F;
+			float r = MathHelper.clamp(2 - f, 0, 1);
+			float g = MathHelper.clamp(f, 0, 1);
+			
+			bufferBuilder
+				.vertex(matrix, (float)start.x, (float)start.y, (float)start.z)
+				.color(r, g, 0, 0.5F);
+			
+			bufferBuilder
+				.vertex(matrix, (float)end.x, (float)end.y, (float)end.z)
+				.color(r, g, 0, 0.5F);
+		}
+		
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }
