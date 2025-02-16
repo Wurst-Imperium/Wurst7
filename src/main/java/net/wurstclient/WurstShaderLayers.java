@@ -14,13 +14,13 @@ import net.minecraft.client.render.DepthTestState;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 
-public enum WurstPipelines
+public enum WurstShaderLayers
 {
 	;
 	
 	/**
-	 * Similar to the DEBUG_LINE_STIP pipeline, but as a non-srip version with
-	 * support for transparency.
+	 * Similar to the DEBUG_LINE_STIP ShaderProgramLayer, but as a non-srip
+	 * version with support for transparency.
 	 */
 	public static final ShaderProgramLayer ONE_PIXEL_LINES =
 		ShaderProgramLayers.addProgram(ShaderProgramLayer
@@ -33,7 +33,7 @@ public enum WurstPipelines
 			.create());
 	
 	/**
-	 * Similar to the DEBUG_LINE_STIP pipeline, but with support for
+	 * Similar to the DEBUG_LINE_STIP ShaderProgramLayer, but with support for
 	 * transparency.
 	 */
 	public static final ShaderProgramLayer ONE_PIXEL_LINE_STRIP =
@@ -47,7 +47,7 @@ public enum WurstPipelines
 			.create());
 	
 	/**
-	 * Similar to the LINES pipeline, but with no depth test.
+	 * Similar to the LINES ShaderProgramLayer, but with no depth test.
 	 */
 	public static final ShaderProgramLayer ESP_LINES =
 		ShaderProgramLayers.addProgram(

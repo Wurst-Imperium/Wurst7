@@ -27,7 +27,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
-import net.wurstclient.WurstPipelines;
+import net.wurstclient.WurstShaderLayers;
 
 public enum RenderUtils
 {
@@ -43,11 +43,11 @@ public enum RenderUtils
 	 *           layer doesn't support any other line width than 1px. Changing
 	 *           the line width number does nothing.
 	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINES =
-		RenderLayer.of("wurst:1px_lines", 1536, WurstPipelines.ONE_PIXEL_LINES,
-			RenderLayer.MultiPhaseParameters.builder()
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-				.build(false));
+	public static final RenderLayer.MultiPhase ONE_PIXEL_LINES = RenderLayer.of(
+		"wurst:1px_lines", 1536, WurstShaderLayers.ONE_PIXEL_LINES,
+		RenderLayer.MultiPhaseParameters.builder()
+			.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
+			.build(false));
 	
 	/**
 	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but with
@@ -59,7 +59,7 @@ public enum RenderUtils
 	 */
 	public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
 		RenderLayer.of("wurst:1px_line_strip", 1536,
-			WurstPipelines.ONE_PIXEL_LINE_STRIP,
+			WurstShaderLayers.ONE_PIXEL_LINE_STRIP,
 			RenderLayer.MultiPhaseParameters.builder()
 				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
 				.build(false));
@@ -69,7 +69,7 @@ public enum RenderUtils
 	 * depth test.
 	 */
 	public static final RenderLayer.MultiPhase ESP_LINES =
-		RenderLayer.of("wurst:esp_lines", 1536, WurstPipelines.ESP_LINES,
+		RenderLayer.of("wurst:esp_lines", 1536, WurstShaderLayers.ESP_LINES,
 			RenderLayer.MultiPhaseParameters.builder()
 				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
 				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
