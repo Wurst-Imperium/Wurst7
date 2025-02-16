@@ -128,8 +128,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
 		
 		VertexConsumerProvider.Immediate vcp =
@@ -149,9 +147,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		matrixStack.pop();
 		
 		vcp.draw(WurstRenderLayers.ESP_LINES);
-		
-		// GL resets
-		RenderSystem.disableDepthTest();
 	}
 	
 	private void renderBoxes(MatrixStack matrixStack,

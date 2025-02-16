@@ -48,6 +48,13 @@ public enum WurstRenderLayers
 	/**
 	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
 	 * depth test.
+	 *
+	 * @apiNote As of 25w07a (1.21.5), turning off depth test still has to be
+	 *          done manually, by calling
+	 *          {@code RenderSystem.depthFunc(GlConst.GL_ALWAYS);} before
+	 *          drawing the ESP lines. Without this code, ESP lines will be
+	 *          drawn with depth test set to LEQUALS (only visible if not
+	 *          obstructed).
 	 */
 	public static final RenderLayer.MultiPhase ESP_LINES =
 		RenderLayer.of("wurst:esp_lines", 1536, WurstShaderLayers.ESP_LINES,
