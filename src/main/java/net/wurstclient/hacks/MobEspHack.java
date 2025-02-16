@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.mojang.blaze3d.platform.GlConst;
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexRendering;
@@ -124,6 +127,10 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
+		// GL settings
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
+		
 		VertexConsumerProvider.Immediate vcp =
 			MC.getBufferBuilders().getEntityVertexConsumers();
 		
@@ -141,6 +148,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		matrixStack.pop();
 		
 		vcp.draw(RenderUtils.ESP_LINES);
+		
+		// GL resets
+		RenderSystem.disableDepthTest();
 	}
 	
 	private void renderBoxes(MatrixStack matrixStack,
