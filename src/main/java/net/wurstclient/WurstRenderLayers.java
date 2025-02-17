@@ -76,4 +76,47 @@ public enum WurstRenderLayers
 				.writeMaskState(RenderLayer.ALL_MASK)
 				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST)
 				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	
+	/**
+	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2 and
+	 * no depth test.
+	 *
+	 * @apiNote As of 25w07a (1.21.5), turning off depth test still has to be
+	 *          done manually, by calling
+	 *          {@code RenderSystem.depthFunc(GlConst.GL_ALWAYS);} before
+	 *          drawing the ESP lines. Without this code, ESP lines will be
+	 *          drawn with depth test set to LEQUALS (only visible if not
+	 *          obstructed).
+	 */
+	public static final RenderLayer.MultiPhase ESP_LINE_STRIP =
+		RenderLayer.of("wurst:esp_line_strip", VertexFormats.LINES,
+			VertexFormat.DrawMode.LINE_STRIP, 1536, false, true,
+			RenderLayer.MultiPhaseParameters.builder()
+				.program(RenderLayer.LINES_PROGRAM)
+				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
+				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
+				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
+				.target(RenderLayer.ITEM_ENTITY_TARGET)
+				.writeMaskState(RenderLayer.ALL_MASK)
+				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST)
+				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	
+	/**
+	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled
+	 * and no depth test.
+	 *
+	 * @apiNote As of 25w07a (1.21.5), turning off depth test still has to be
+	 *          done manually, by calling
+	 *          {@code RenderSystem.depthFunc(GlConst.GL_ALWAYS);} before
+	 *          drawing the ESP quads. Without this code, ESP quads will be
+	 *          drawn with depth test set to LEQUALS (only visible if not
+	 *          obstructed).
+	 */
+	public static final RenderLayer.MultiPhase ESP_QUADS =
+		RenderLayer.of("wurst:esp_quads", VertexFormats.POSITION_COLOR,
+			VertexFormat.DrawMode.QUADS, 1536, false, true,
+			RenderLayer.MultiPhaseParameters.builder()
+				.program(RenderLayer.POSITION_COLOR_PROGRAM)
+				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
+				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST).build(false));
 }
