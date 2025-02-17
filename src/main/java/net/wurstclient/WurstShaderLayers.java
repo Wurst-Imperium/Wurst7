@@ -12,6 +12,7 @@ import net.minecraft.client.gl.ShaderProgramLayer;
 import net.minecraft.client.gl.ShaderProgramLayers;
 import net.minecraft.client.render.DepthTestState;
 import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 
 public enum WurstShaderLayers
@@ -53,5 +54,25 @@ public enum WurstShaderLayers
 		ShaderProgramLayers.addProgram(
 			ShaderProgramLayer.create(ShaderProgramLayers.RENDERTYPE_LINES)
 				.setName("pipeline/wurst_esp_lines")
+				.AddDepthProgram(DepthTestState.NO_DEPTH_TEST).create());
+	
+	/**
+	 * Similar to the LINE_STRIP ShaderProgramLayer, but with no depth test.
+	 */
+	public static final ShaderProgramLayer ESP_LINE_STRIP =
+		ShaderProgramLayers.addProgram(
+			ShaderProgramLayer.create(ShaderProgramLayers.RENDERTYPE_LINES)
+				.setName("pipeline/wurst_esp_line_strip")
+				.addFormat(VertexFormats.LINES, DrawMode.LINE_STRIP)
+				.AddDepthProgram(DepthTestState.NO_DEPTH_TEST).create());
+	
+	/**
+	 * Similar to the DEBUG_QUADS ShaderProgramLayer, but with culling enabled
+	 * and no depth test.
+	 */
+	public static final ShaderProgramLayer ESP_QUADS =
+		ShaderProgramLayers.addProgram(
+			ShaderProgramLayer.create(ShaderProgramLayers.POSITION_COLOR)
+				.setName("pipeline/wurst_esp_quads")
 				.AddDepthProgram(DepthTestState.NO_DEPTH_TEST).create());
 }

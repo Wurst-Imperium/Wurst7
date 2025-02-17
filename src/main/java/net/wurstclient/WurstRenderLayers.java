@@ -62,4 +62,38 @@ public enum WurstRenderLayers
 				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
 				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
 				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+	
+	/**
+	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2 and
+	 * no depth test.
+	 *
+	 * @apiNote As of 25w07a (1.21.5), turning off depth test still has to be
+	 *          done manually, by calling
+	 *          {@code RenderSystem.depthFunc(GlConst.GL_ALWAYS);} before
+	 *          drawing the ESP lines. Without this code, ESP lines will be
+	 *          drawn with depth test set to LEQUALS (only visible if not
+	 *          obstructed).
+	 */
+	public static final RenderLayer.MultiPhase ESP_LINE_STRIP =
+		RenderLayer.of("wurst:esp_line_strip", 1536, false, true,
+			WurstShaderLayers.ESP_LINE_STRIP,
+			RenderLayer.MultiPhaseParameters.builder()
+				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
+				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
+				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+	
+	/**
+	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled
+	 * and no depth test.
+	 *
+	 * @apiNote As of 25w07a (1.21.5), turning off depth test still has to be
+	 *          done manually, by calling
+	 *          {@code RenderSystem.depthFunc(GlConst.GL_ALWAYS);} before
+	 *          drawing the ESP quads. Without this code, ESP quads will be
+	 *          drawn with depth test set to LEQUALS (only visible if not
+	 *          obstructed).
+	 */
+	public static final RenderLayer.MultiPhase ESP_QUADS = RenderLayer.of(
+		"wurst:esp_quads", 1536, false, true, WurstShaderLayers.ESP_QUADS,
+		RenderLayer.MultiPhaseParameters.builder().build(false));
 }

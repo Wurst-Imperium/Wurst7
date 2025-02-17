@@ -12,6 +12,7 @@ accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$B
 accessible	method	net/minecraft/entity/player/PlayerEntity	canGlide	()Z
 accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z
 accessible	field	net/minecraft/client/gl/ShaderProgramLayers	MATRICIES_COLOR	Lnet/minecraft/client/gl/ShaderProgramLayer$Stage;
+accessible	field	net/minecraft/client/gl/ShaderProgramLayers	POSITION_COLOR	Lnet/minecraft/client/gl/ShaderProgramLayer$Stage;
 accessible	field	net/minecraft/client/gl/ShaderProgramLayers	RENDERTYPE_LINES	Lnet/minecraft/client/gl/ShaderProgramLayer$Stage;
 accessible	field	net/minecraft/client/MinecraftClient	itemUseCooldown	I
 accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;

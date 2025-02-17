@@ -7,6 +7,8 @@
  */
 package net.wurstclient.util;
 
+import java.util.ArrayList;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -119,6 +121,69 @@ public enum RenderUtils
 		
 		buffer.vertex(entry, start).color(color).normal(entry, normal);
 		buffer.vertex(entry, end).color(color).normal(entry, normal);
+	}
+	
+	public static void drawCurvedLine(MatrixStack matrices,
+		VertexConsumer buffer, ArrayList<Vec3d> points, int color)
+	{
+		if(points.size() < 2)
+			return;
+		
+		MatrixStack.Entry entry = matrices.peek();
+		Vector3f first = points.get(0).toVector3f();
+		Vector3f second = points.get(1).toVector3f();
+		Vector3f normal = new Vector3f(first).sub(second).normalize();
+		buffer.vertex(entry, first).color(color).normal(entry, normal);
+		
+		for(int i = 1; i < points.size(); i++)
+		{
+			Vector3f prev = points.get(i - 1).toVector3f();
+			Vector3f current = points.get(i).toVector3f();
+			normal = new Vector3f(current).sub(prev).normalize();
+			buffer.vertex(entry, current).color(color).normal(entry, normal);
+		}
+	}
+	
+	public static void drawSolidBox(MatrixStack matrices, VertexConsumer buffer,
+		Box box, int color)
+	{
+		MatrixStack.Entry entry = matrices.peek();
+		float x1 = (float)box.minX;
+		float y1 = (float)box.minY;
+		float z1 = (float)box.minZ;
+		float x2 = (float)box.maxX;
+		float y2 = (float)box.maxY;
+		float z2 = (float)box.maxZ;
+		
+		buffer.vertex(entry, x1, y1, z1).color(color);
+		buffer.vertex(entry, x2, y1, z1).color(color);
+		buffer.vertex(entry, x2, y1, z2).color(color);
+		buffer.vertex(entry, x1, y1, z2).color(color);
+		
+		buffer.vertex(entry, x1, y2, z1).color(color);
+		buffer.vertex(entry, x1, y2, z2).color(color);
+		buffer.vertex(entry, x2, y2, z2).color(color);
+		buffer.vertex(entry, x2, y2, z1).color(color);
+		
+		buffer.vertex(entry, x1, y1, z1).color(color);
+		buffer.vertex(entry, x1, y2, z1).color(color);
+		buffer.vertex(entry, x2, y2, z1).color(color);
+		buffer.vertex(entry, x2, y1, z1).color(color);
+		
+		buffer.vertex(entry, x2, y1, z1).color(color);
+		buffer.vertex(entry, x2, y2, z1).color(color);
+		buffer.vertex(entry, x2, y2, z2).color(color);
+		buffer.vertex(entry, x2, y1, z2).color(color);
+		
+		buffer.vertex(entry, x1, y1, z2).color(color);
+		buffer.vertex(entry, x2, y1, z2).color(color);
+		buffer.vertex(entry, x2, y2, z2).color(color);
+		buffer.vertex(entry, x1, y2, z2).color(color);
+		
+		buffer.vertex(entry, x1, y1, z1).color(color);
+		buffer.vertex(entry, x1, y1, z2).color(color);
+		buffer.vertex(entry, x1, y2, z2).color(color);
+		buffer.vertex(entry, x1, y2, z1).color(color);
 	}
 	
 	public static void drawSolidBox(MatrixStack matrixStack)
