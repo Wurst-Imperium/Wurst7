@@ -10,23 +10,19 @@ package net.wurstclient.hacks.autofish;
 import java.awt.Color;
 import java.util.stream.Stream;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.Setting;
@@ -37,6 +33,8 @@ import net.wurstclient.util.RenderUtils;
 
 public final class AutoFishDebugDraw
 {
+	private static final MinecraftClient MC = WurstClient.MC;
+	
 	private final CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
 		"Shows where bites are occurring and where they will be detected."
 			+ " Useful for optimizing your 'Valid range' setting.",
@@ -71,119 +69,102 @@ public final class AutoFishDebugDraw
 		lastSoundPos = new Vec3d(sound.getX(), sound.getY(), sound.getZ());
 	}
 	
-	public void render(MatrixStack matrixStack, float partialTicks)
+	public void render(MatrixStack matrices, float partialTicks)
 	{
 		if(!debugDraw.isChecked() && !fishingSpots.isMcmmoMode())
 			return;
 		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
 		
-		matrixStack.push();
+		VertexConsumerProvider.Immediate vcp =
+			MC.getBufferBuilders().getEntityVertexConsumers();
+		
+		matrices.push();
 		
 		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
+		RenderUtils.applyRegionalRenderOffset(matrices, region);
 		
 		if(debugDraw.isChecked())
 		{
-			FishingBobberEntity bobber = WurstClient.MC.player.fishHook;
+			FishingBobberEntity bobber = MC.player.fishHook;
 			if(bobber != null)
-				drawValidRange(matrixStack, partialTicks, bobber, region);
+				drawValidRange(matrices, vcp, partialTicks, bobber, region);
 			
 			if(lastSoundPos != null)
-				drawLastBite(matrixStack, region);
+				drawLastBite(matrices, vcp, region);
 			
-			drawFishingSpots(matrixStack, region);
+			drawFishingSpots(matrices, vcp, region);
 		}
 		
 		if(fishingSpots.isMcmmoMode())
-			drawMcmmoRange(matrixStack, region);
+			drawMcmmoRange(matrices, vcp, region);
 		
-		matrixStack.pop();
+		matrices.pop();
 		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		vcp.draw(WurstRenderLayers.ESP_QUADS);
+		vcp.draw(WurstRenderLayers.ESP_LINES);
 	}
 	
-	private void drawValidRange(MatrixStack matrixStack, float partialTicks,
+	private void drawValidRange(MatrixStack matrices,
+		VertexConsumerProvider vcp, float partialTicks,
 		FishingBobberEntity bobber, RegionPos region)
 	{
-		matrixStack.push();
+		double vr = validRange.getValue();
 		Vec3d pos = EntityUtils.getLerpedPos(bobber, partialTicks)
 			.subtract(region.toVec3d());
-		matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
+		Box vrBox = new Box(-vr, -1 / 16.0, -vr, vr, 1 / 16.0, vr).offset(pos);
 		
-		ddColor.setAsShaderColor(0.5F);
-		
-		double vr = validRange.getValue();
-		Box vrBox = new Box(-vr, -1 / 16.0, -vr, vr, 1 / 16.0, vr);
-		RenderUtils.drawOutlinedBox(vrBox, matrixStack);
-		
-		matrixStack.pop();
+		RenderUtils.drawOutlinedBox(matrices,
+			vcp.getBuffer(WurstRenderLayers.ESP_LINES), vrBox,
+			ddColor.getColorI(0x80));
 	}
 	
-	private void drawLastBite(MatrixStack matrixStack, RegionPos region)
+	private void drawLastBite(MatrixStack matrixStack,
+		VertexConsumerProvider vcp, RegionPos region)
 	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		Vec3d pos = lastSoundPos.subtract(region.toVec3d());
+		int color = ddColor.getColorI(0x80);
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
-		matrixStack.push();
-		matrixStack.translate(lastSoundPos.x - region.x(), lastSoundPos.y,
-			lastSoundPos.z - region.z());
-		
-		ddColor.setAsShaderColor(0.5F);
-		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, -0.125F, 0, -0.125F);
-		bufferBuilder.vertex(matrix, 0.125F, 0, 0.125F);
-		bufferBuilder.vertex(matrix, 0.125F, 0, -0.125F);
-		bufferBuilder.vertex(matrix, -0.125F, 0, 0.125F);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-		
-		matrixStack.pop();
+		RenderUtils.drawLine(matrixStack, buffer, pos.add(-0.125, 0, -0.125),
+			pos.add(0.125, 0, 0.125), color);
+		RenderUtils.drawLine(matrixStack, buffer, pos.add(0.125, 0, -0.125),
+			pos.add(-0.125, 0, 0.125), color);
 	}
 	
-	private void drawFishingSpots(MatrixStack matrixStack, RegionPos region)
+	private void drawFishingSpots(MatrixStack matrices,
+		VertexConsumerProvider vcp, RegionPos region)
 	{
 		Box headBox = new Box(-0.25, 0, -0.25, 0.25, 0.5, 0.25);
 		Box noseBox =
 			headBox.offset(0.125, 0.125, 0.5).shrink(0.25, 0.35, 0.45);
 		
-		ddColor.setAsShaderColor(0.75F);
+		int color = ddColor.getColorI(0xC0);
+		VertexConsumer linesBuffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
 		for(FishingSpot spot : fishingSpots.getFishingSpots())
 		{
 			Vec3d playerPos = spot.input().pos().subtract(region.toVec3d());
 			Vec3d bobberPos = spot.bobberPos().subtract(region.toVec3d());
 			
-			matrixStack.push();
-			matrixStack.translate(playerPos.x, playerPos.y, playerPos.z);
+			matrices.push();
+			matrices.translate(playerPos.x, playerPos.y, playerPos.z);
+			matrices.multiply(spot.input().rotation().toQuaternion());
 			
-			matrixStack.push();
-			matrixStack.multiply(spot.input().rotation().toQuaternion());
-			
-			RenderUtils.drawOutlinedBox(headBox, matrixStack);
-			RenderUtils.drawOutlinedBox(noseBox, matrixStack);
+			RenderUtils.drawOutlinedBox(matrices, linesBuffer, headBox, color);
+			RenderUtils.drawOutlinedBox(matrices, linesBuffer, noseBox, color);
 			if(!spot.openWater())
-				RenderUtils.drawCrossBox(headBox, matrixStack);
+				RenderUtils.drawCrossBox(matrices, linesBuffer, headBox, color);
 			
-			matrixStack.pop();
+			matrices.pop();
 			
-			RenderUtils.drawArrow(Vec3d.ZERO, bobberPos.subtract(playerPos),
-				matrixStack);
-			
-			matrixStack.pop();
+			RenderUtils.drawArrow(matrices, linesBuffer, playerPos, bobberPos,
+				color, 0.1F);
 		}
 	}
 	
-	private void drawMcmmoRange(MatrixStack matrixStack, RegionPos region)
+	private void drawMcmmoRange(MatrixStack matrices,
+		VertexConsumerProvider vcp, RegionPos region)
 	{
 		FishingSpot lastSpot = fishingSpots.getLastSpot();
 		if(lastSpot == null)
@@ -193,21 +174,20 @@ public final class AutoFishDebugDraw
 		if(fishingSpots.isSetupDone() && !debugDraw.isChecked())
 			return;
 		
-		Vec3d bobberPos = lastSpot.bobberPos().subtract(region.toVec3d());
-		
-		matrixStack.push();
-		matrixStack.translate(bobberPos.x, bobberPos.y, bobberPos.z);
-		
 		int mcmmoRange = fishingSpots.getRange();
-		Box rangeBox =
-			new Box(0, 0, 0, 0, 0, 0).expand(mcmmoRange, 1, mcmmoRange);
-		RenderSystem.setShaderColor(1, 0, 0, 0.25F);
-		RenderUtils.drawSolidBox(rangeBox, matrixStack);
+		Vec3d bobberPos = lastSpot.bobberPos().subtract(region.toVec3d());
+		Box rangeBox = new Box(0, 0, 0, 0, 0, 0)
+			.expand(mcmmoRange, 1, mcmmoRange).offset(bobberPos);
 		
-		RenderSystem.setShaderColor(1, 0, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(rangeBox, matrixStack);
-		RenderUtils.drawOutlinedBox(rangeBox.contract(0, 1, 0), matrixStack);
+		int quadsColor = 0x40FF0000;
+		VertexConsumer quadsBuffer = vcp.getBuffer(WurstRenderLayers.ESP_QUADS);
+		RenderUtils.drawSolidBox(matrices, quadsBuffer, rangeBox, quadsColor);
 		
-		matrixStack.pop();
+		int linesColor = 0x80FF0000;
+		VertexConsumer linesBuffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
+		RenderUtils.drawOutlinedBox(matrices, linesBuffer, rangeBox,
+			linesColor);
+		RenderUtils.drawOutlinedBox(matrices, linesBuffer,
+			rangeBox.contract(0, 1, 0), linesColor);
 	}
 }
