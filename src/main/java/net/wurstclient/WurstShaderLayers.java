@@ -25,11 +25,10 @@ public enum WurstShaderLayers
 	 */
 	public static final ShaderProgramLayer ONE_PIXEL_LINES =
 		ShaderProgramLayers.addProgram(
-			ShaderProgramLayer.create(ShaderProgramLayers.MATRICIES_COLOR)
-				.setName("pipeline/wurst_1px_lines")
-				.setVertex("core/position_color").setPass("core/position_color")
-				.addBlend(BlendPrograms.TRANSLUCENT).addCulling(false)
-				.addFormat(VertexFormats.POSITION_COLOR,
+			ShaderProgramLayer.create(ShaderProgramLayers.MATRICES_COLOR)
+				.id("pipeline/wurst_1px_lines").vertices("core/position_color")
+				.pass("core/position_color").blender(BlendPrograms.TRANSLUCENT)
+				.culling(false).format(VertexFormats.POSITION_COLOR,
 					VertexFormat.DrawMode.DEBUG_LINES)
 				.create());
 	
@@ -38,14 +37,13 @@ public enum WurstShaderLayers
 	 * transparency.
 	 */
 	public static final ShaderProgramLayer ONE_PIXEL_LINE_STRIP =
-		ShaderProgramLayers.addProgram(
-			ShaderProgramLayer.create(ShaderProgramLayers.MATRICIES_COLOR)
-				.setName("pipeline/wurst_1px_line_strip")
-				.setVertex("core/position_color").setPass("core/position_color")
-				.addBlend(BlendPrograms.TRANSLUCENT).addCulling(false)
-				.addFormat(VertexFormats.POSITION_COLOR,
-					VertexFormat.DrawMode.DEBUG_LINE_STRIP)
-				.create());
+		ShaderProgramLayers.addProgram(ShaderProgramLayer
+			.create(ShaderProgramLayers.MATRICES_COLOR)
+			.id("pipeline/wurst_1px_line_strip").vertices("core/position_color")
+			.pass("core/position_color").blender(BlendPrograms.TRANSLUCENT)
+			.culling(false).format(VertexFormats.POSITION_COLOR,
+				VertexFormat.DrawMode.DEBUG_LINE_STRIP)
+			.create());
 	
 	/**
 	 * Similar to the LINES ShaderProgramLayer, but with no depth test.
@@ -53,8 +51,8 @@ public enum WurstShaderLayers
 	public static final ShaderProgramLayer ESP_LINES =
 		ShaderProgramLayers.addProgram(
 			ShaderProgramLayer.create(ShaderProgramLayers.RENDERTYPE_LINES)
-				.setName("pipeline/wurst_esp_lines")
-				.addDepthProgram(DepthTestState.NO_DEPTH_TEST).create());
+				.id("pipeline/wurst_esp_lines")
+				.depthTest(DepthTestState.NO_DEPTH_TEST).create());
 	
 	/**
 	 * Similar to the LINE_STRIP ShaderProgramLayer, but with no depth test.
@@ -62,9 +60,9 @@ public enum WurstShaderLayers
 	public static final ShaderProgramLayer ESP_LINE_STRIP =
 		ShaderProgramLayers.addProgram(
 			ShaderProgramLayer.create(ShaderProgramLayers.RENDERTYPE_LINES)
-				.setName("pipeline/wurst_esp_line_strip")
-				.addFormat(VertexFormats.LINES, DrawMode.LINE_STRIP)
-				.addDepthProgram(DepthTestState.NO_DEPTH_TEST).create());
+				.id("pipeline/wurst_esp_line_strip")
+				.format(VertexFormats.LINES, DrawMode.LINE_STRIP)
+				.depthTest(DepthTestState.NO_DEPTH_TEST).create());
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderProgramLayer, but with culling enabled
@@ -73,6 +71,6 @@ public enum WurstShaderLayers
 	public static final ShaderProgramLayer ESP_QUADS =
 		ShaderProgramLayers.addProgram(
 			ShaderProgramLayer.create(ShaderProgramLayers.POSITION_COLOR)
-				.setName("pipeline/wurst_esp_quads")
-				.addDepthProgram(DepthTestState.NO_DEPTH_TEST).create());
+				.id("pipeline/wurst_esp_quads")
+				.depthTest(DepthTestState.NO_DEPTH_TEST).create());
 }
