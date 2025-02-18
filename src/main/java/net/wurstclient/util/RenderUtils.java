@@ -452,6 +452,54 @@ public enum RenderUtils
 		bufferBuilder.vertex(minX, maxY, minZ);
 	}
 	
+	public static void drawCrossBox(MatrixStack matrices, VertexConsumer buffer,
+		Box box, int color)
+	{
+		MatrixStack.Entry entry = matrices.peek();
+		float x1 = (float)box.minX;
+		float y1 = (float)box.minY;
+		float z1 = (float)box.minZ;
+		float x2 = (float)box.maxX;
+		float y2 = (float)box.maxY;
+		float z2 = (float)box.maxZ;
+		
+		// back
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 1, 1, 0);
+		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 1, 1, 0);
+		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, -1, 1, 0);
+		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, -1, 1, 0);
+		
+		// left
+		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 0, 1, 1);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 1, 1);
+		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 0, 1, -1);
+		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 0, 1, -1);
+		
+		// front
+		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, -1, 1, 0);
+		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, -1, 1, 0);
+		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 1, 1, 0);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 1, 1, 0);
+		
+		// right
+		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 0, 1, -1);
+		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 0, 1, -1);
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 0, 1, 1);
+		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 0, 1, 1);
+		
+		// top
+		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 1, 0, -1);
+		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 1, 0, -1);
+		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 1, 0, 1);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 1, 0, 1);
+		
+		// bottom
+		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, -1, 0, 1);
+		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, -1, 0, 1);
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 1, 0, 1);
+		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 1, 0, 1);
+	}
+	
 	public static void drawCrossBox(Box bb, MatrixStack matrixStack)
 	{
 		// float minX = (float)bb.minX;
@@ -700,6 +748,68 @@ public enum RenderUtils
 		
 		bufferBuilder.vertex(midX, minY, midZ);
 		bufferBuilder.vertex(midX, midY, maxZ);
+	}
+	
+	public static void drawArrow(MatrixStack matrices, VertexConsumer buffer,
+		Vec3d from, Vec3d to, int color, float headSize)
+	{
+		matrices.push();
+		MatrixStack.Entry entry = matrices.peek();
+		Matrix4f matrix = entry.getPositionMatrix();
+		
+		// main line
+		Vector3f fromJoml = from.toVector3f();
+		Vector3f toJoml = to.toVector3f();
+		Vector3f normal = to.subtract(from).normalize().toVector3f();
+		buffer.vertex(entry, fromJoml).color(color).normal(entry, normal);
+		buffer.vertex(entry, toJoml).color(color).normal(entry, normal);
+		
+		matrices.translate(to);
+		matrices.scale(headSize, headSize, headSize);
+		
+		double xDiff = to.x - from.x;
+		double yDiff = to.y - from.y;
+		double zDiff = to.z - from.z;
+		
+		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
+		matrix.rotate(xAngle, new Vector3f(1, 0, 0));
+		
+		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
+		float zAngle = (float)Math.atan2(xDiff, yzDiff);
+		matrix.rotate(zAngle, new Vector3f(0, 0, 1));
+		
+		// arrow head
+		buffer.vertex(matrix, 0, 2, 1).color(color).normal(-1, 0, -1);
+		buffer.vertex(matrix, -1, 2, 0).color(color).normal(-1, 0, -1);
+		
+		buffer.vertex(matrix, -1, 2, 0).color(color).normal(1, 0, -1);
+		buffer.vertex(matrix, 0, 2, -1).color(color).normal(1, 0, -1);
+		
+		buffer.vertex(matrix, 0, 2, -1).color(color).normal(1, 0, 1);
+		buffer.vertex(matrix, 1, 2, 0).color(color).normal(1, 0, 1);
+		
+		buffer.vertex(matrix, 1, 2, 0).color(color).normal(-1, 0, 1);
+		buffer.vertex(matrix, 0, 2, 1).color(color).normal(-1, 0, 1);
+		
+		buffer.vertex(matrix, 1, 2, 0).color(color).normal(-1, 0, 0);
+		buffer.vertex(matrix, -1, 2, 0).color(color).normal(-1, 0, 0);
+		
+		buffer.vertex(matrix, 0, 2, 1).color(color).normal(0, 0, -1);
+		buffer.vertex(matrix, 0, 2, -1).color(color).normal(0, 0, 1);
+		
+		buffer.vertex(matrix, 0, 0, 0).color(color).normal(1, 2, 0);
+		buffer.vertex(matrix, 1, 2, 0).color(color).normal(1, 2, 0);
+		
+		buffer.vertex(matrix, 0, 0, 0).color(color).normal(-1, 2, 0);
+		buffer.vertex(matrix, -1, 2, 0).color(color).normal(-1, 2, 0);
+		
+		buffer.vertex(matrix, 0, 0, 0).color(color).normal(0, 2, -1);
+		buffer.vertex(matrix, 0, 2, -1).color(color).normal(0, 2, -1);
+		
+		buffer.vertex(matrix, 0, 0, 0).color(color).normal(0, 2, 1);
+		buffer.vertex(matrix, 0, 2, 1).color(color).normal(0, 2, 1);
+		
+		matrices.pop();
 	}
 	
 	public static void drawArrow(Vec3d from, Vec3d to, MatrixStack matrixStack)
