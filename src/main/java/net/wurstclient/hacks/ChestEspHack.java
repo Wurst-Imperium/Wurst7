@@ -13,18 +13,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.entity.*;
-import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestBoatEntity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.entity.vehicle.HopperMinecartEntity;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -32,11 +35,12 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.chestesp.ChestEspBlockGroup;
 import net.wurstclient.hacks.chestesp.ChestEspEntityGroup;
 import net.wurstclient.hacks.chestesp.ChestEspGroup;
-import net.wurstclient.hacks.chestesp.ChestEspRenderer;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
+import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.chunk.ChunkUtils;
 
 public class ChestEspHack extends Hack implements UpdateListener,
@@ -146,8 +150,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		
-		ChestEspRenderer.prepareBuffers();
 	}
 	
 	@Override
@@ -158,7 +160,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		EVENTS.remove(RenderListener.class, this);
 		
 		groups.forEach(ChestEspGroup::clear);
-		ChestEspRenderer.closeBuffers();
 	}
 	
 	@Override
@@ -214,40 +215,75 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
+		VertexConsumerProvider.Immediate vcp =
+			MC.getBufferBuilders().getEntityVertexConsumers();
 		
 		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		RegionPos region = RenderUtils.getCameraRegion();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		entityGroups.stream().filter(ChestEspGroup::isEnabled)
 			.forEach(g -> g.updateBoxes(partialTicks));
 		
-		ChestEspRenderer espRenderer =
-			new ChestEspRenderer(matrixStack, partialTicks);
-		
 		if(style.hasBoxes())
-		{
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
-			groups.stream().filter(ChestEspGroup::isEnabled)
-				.forEach(espRenderer::renderBoxes);
-		}
+			renderBoxes(matrixStack, vcp, partialTicks, region);
 		
 		if(style.hasLines())
-		{
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
-			groups.stream().filter(ChestEspGroup::isEnabled)
-				.forEach(espRenderer::renderLines);
-		}
+			renderTracers(matrixStack, vcp, partialTicks, region);
 		
 		matrixStack.pop();
 		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		vcp.draw(WurstRenderLayers.ESP_QUADS);
+		vcp.draw(WurstRenderLayers.ESP_LINES);
+	}
+	
+	private void renderBoxes(MatrixStack matrixStack,
+		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
+	{
+		Vec3d offset = region.negate().toVec3d();
+		
+		for(ChestEspGroup group : groups)
+		{
+			if(!group.isEnabled())
+				return;
+			
+			List<Box> boxes = group.getBoxes().stream()
+				.map(box -> box.offset(offset)).toList();
+			
+			VertexConsumer quadsBuffer =
+				vcp.getBuffer(WurstRenderLayers.ESP_QUADS);
+			int quadsColor = group.getColorI(0x40);
+			for(Box box : boxes)
+				RenderUtils.drawSolidBox(matrixStack, quadsBuffer, box,
+					quadsColor);
+			
+			VertexConsumer linesBuffer =
+				vcp.getBuffer(WurstRenderLayers.ESP_LINES);
+			int linesColor = group.getColorI(0x80);
+			for(Box box : boxes)
+				RenderUtils.drawOutlinedBox(matrixStack, linesBuffer, box,
+					linesColor);
+		}
+	}
+	
+	private void renderTracers(MatrixStack matrixStack,
+		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
+	{
+		Vec3d offset = region.negate().toVec3d();
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
+			.add(RenderUtils.getCameraPos()).add(offset);
+		
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
+		for(ChestEspGroup group : groups)
+		{
+			if(!group.isEnabled())
+				return;
+			
+			int color = group.getColorI(0x80);
+			for(Box box : group.getBoxes())
+				RenderUtils.drawLine(matrixStack, buffer, start,
+					box.getCenter().add(offset), color);
+		}
 	}
 }
