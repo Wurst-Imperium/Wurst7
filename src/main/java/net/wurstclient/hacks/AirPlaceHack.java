@@ -9,11 +9,10 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -21,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
@@ -127,31 +127,29 @@ public final class AirPlaceHack extends Hack
 		if(renderPos == null)
 			return;
 		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
+		
+		VertexConsumerProvider.Immediate vcp =
+			MC.getBufferBuilders().getEntityVertexConsumers();
 		
 		matrixStack.push();
 		
 		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
+		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		Box box = new Box(renderPos.subtract(region.toBlockPos()));
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
-		guideColor.setAsShaderColor(0.1F);
-		RenderUtils.drawSolidBox(box, matrixStack);
+		RenderUtils.drawSolidBox(matrixStack,
+			vcp.getBuffer(WurstRenderLayers.ESP_QUADS), box,
+			guideColor.getColorI(0x1A));
 		
-		guideColor.setAsShaderColor(0.75F);
-		RenderUtils.drawOutlinedBox(box, matrixStack);
+		RenderUtils.drawOutlinedBox(matrixStack,
+			vcp.getBuffer(WurstRenderLayers.ESP_LINES), box,
+			guideColor.getColorI(0xC0));
 		
 		matrixStack.pop();
 		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		vcp.draw(WurstRenderLayers.ESP_QUADS);
+		vcp.draw(WurstRenderLayers.ESP_LINES);
 	}
 }
