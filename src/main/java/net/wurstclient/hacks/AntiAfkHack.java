@@ -212,7 +212,6 @@ public final class AntiAfkHack extends Hack
 			return;
 		
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
-		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
 			pathCmd.isDepthTest());
 	}
