@@ -7,7 +7,7 @@
  */
 package net.wurstclient.util;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -83,6 +83,11 @@ public enum RenderUtils
 		return RegionPos.of(getCameraBlockPos());
 	}
 	
+	public static VertexConsumerProvider.Immediate getVCP()
+	{
+		return WurstClient.MC.getBufferBuilders().getEntityVertexConsumers();
+	}
+	
 	public static float[] getRainbowColor()
 	{
 		float x = System.currentTimeMillis() % 2000 / 1000F;
@@ -108,6 +113,19 @@ public enum RenderUtils
 			| (int)(MathHelper.clamp(rgb[2], 0, 1) * 255);
 	}
 	
+	public static void drawLine(MatrixStack matrices, Vec3d start, Vec3d end,
+		int color, boolean depthTest)
+	{
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		Vec3d offset = getCameraPos().negate();
+		drawLine(matrices, buffer, start.add(offset), end.add(offset), color);
+		
+		vcp.draw(layer);
+	}
+	
 	public static void drawLine(MatrixStack matrices, VertexConsumer buffer,
 		Vec3d start, Vec3d end, int color)
 	{
@@ -129,8 +147,22 @@ public enum RenderUtils
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, normal);
 	}
 	
+	public static void drawCurvedLine(MatrixStack matrices, List<Vec3d> points,
+		int color, boolean depthTest)
+	{
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLineStrip(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		Vec3d offset = getCameraPos().negate();
+		List<Vec3d> points2 = points.stream().map(v -> v.add(offset)).toList();
+		drawCurvedLine(matrices, buffer, points2, color);
+		
+		vcp.draw(layer);
+	}
+	
 	public static void drawCurvedLine(MatrixStack matrices,
-		VertexConsumer buffer, ArrayList<Vec3d> points, int color)
+		VertexConsumer buffer, List<Vec3d> points, int color)
 	{
 		if(points.size() < 2)
 			return;
@@ -148,6 +180,19 @@ public enum RenderUtils
 			normal = new Vector3f(current).sub(prev).normalize();
 			buffer.vertex(entry, current).color(color).normal(entry, normal);
 		}
+	}
+	
+	public static void drawSolidBox(MatrixStack matrices, Box box, int color,
+		boolean depthTest)
+	{
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getQuads(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		drawSolidBox(matrices, buffer, box.offset(getCameraPos().negate()),
+			color);
+		
+		vcp.draw(layer);
 	}
 	
 	public static void drawSolidBox(MatrixStack matrices, VertexConsumer buffer,
@@ -296,6 +341,19 @@ public enum RenderUtils
 		bufferBuilder.vertex(minX, minY, maxZ);
 		bufferBuilder.vertex(minX, maxY, maxZ);
 		bufferBuilder.vertex(minX, maxY, minZ);
+	}
+	
+	public static void drawOutlinedBox(MatrixStack matrices, Box box, int color,
+		boolean depthTest)
+	{
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		drawOutlinedBox(matrices, buffer, box.offset(getCameraPos().negate()),
+			color);
+		
+		vcp.draw(layer);
 	}
 	
 	public static void drawOutlinedBox(MatrixStack matrices,
@@ -458,6 +516,19 @@ public enum RenderUtils
 		bufferBuilder.vertex(minX, maxY, minZ);
 	}
 	
+	public static void drawCrossBox(MatrixStack matrices, Box box, int color,
+		boolean depthTest)
+	{
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		drawCrossBox(matrices, buffer, box.offset(getCameraPos().negate()),
+			color);
+		
+		vcp.draw(layer);
+	}
+	
 	public static void drawCrossBox(MatrixStack matrices, VertexConsumer buffer,
 		Box box, int color)
 	{
@@ -616,6 +687,18 @@ public enum RenderUtils
 		
 		bufferBuilder.vertex(maxX, minY, maxZ);
 		bufferBuilder.vertex(minX, minY, minZ);
+	}
+	
+	public static void drawNode(MatrixStack matrices, Box box, int color,
+		boolean depthTest)
+	{
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		drawNode(matrices, buffer, box.offset(getCameraPos().negate()), color);
+		
+		vcp.draw(layer);
 	}
 	
 	public static void drawNode(MatrixStack matrices, VertexConsumer buffer,

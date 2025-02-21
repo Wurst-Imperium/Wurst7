@@ -90,12 +90,28 @@ public enum WurstRenderLayers
 				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
 	
 	/**
+	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled.
+	 */
+	public static final RenderLayer.MultiPhase QUADS = RenderLayer.of(
+		"wurst:quads", 1536, false, true, WurstShaderLayers.QUADS,
+		RenderLayer.MultiPhaseParameters.builder().build(false));
+	
+	/**
 	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled
 	 * and no depth test.
 	 */
 	public static final RenderLayer.MultiPhase ESP_QUADS = RenderLayer.of(
 		"wurst:esp_quads", 1536, false, true, WurstShaderLayers.ESP_QUADS,
 		RenderLayer.MultiPhaseParameters.builder().build(false));
+	
+	/**
+	 * Returns either {@link #QUADS} or {@link #ESP_QUADS} depending on the
+	 * value of {@code depthTest}.
+	 */
+	public static RenderLayer getQuads(boolean depthTest)
+	{
+		return depthTest ? QUADS : ESP_QUADS;
+	}
 	
 	/**
 	 * Returns either {@link #LINES} or {@link #ESP_LINES} depending on the

@@ -65,6 +65,15 @@ public enum WurstShaderLayers
 				.depthTest(DepthTestState.NO_DEPTH_TEST).create());
 	
 	/**
+	 * Similar to the DEBUG_QUADS ShaderProgramLayer, but with culling enabled.
+	 */
+	public static final ShaderProgramLayer QUADS =
+		ShaderProgramLayers.addProgram(
+			ShaderProgramLayer.create(ShaderProgramLayers.POSITION_COLOR)
+				.id("pipeline/wurst_quads")
+				.depthTest(DepthTestState.LEQUAL_DEPTH_TEST).create());
+	
+	/**
 	 * Similar to the DEBUG_QUADS ShaderProgramLayer, but with culling enabled
 	 * and no depth test.
 	 */
