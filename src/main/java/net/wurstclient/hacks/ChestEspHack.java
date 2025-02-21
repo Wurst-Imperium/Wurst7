@@ -13,9 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.entity.*;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -215,7 +212,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
 		VertexConsumerProvider.Immediate vcp =
 			MC.getBufferBuilders().getEntityVertexConsumers();
 		

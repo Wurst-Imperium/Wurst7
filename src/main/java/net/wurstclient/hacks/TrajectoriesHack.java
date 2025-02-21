@@ -12,9 +12,6 @@ import java.util.ArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
@@ -86,7 +83,6 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		if(trajectory.isEmpty())
 			return;
 		
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
 		VertexConsumerProvider.Immediate vcp =
 			MC.getBufferBuilders().getEntityVertexConsumers();
 		

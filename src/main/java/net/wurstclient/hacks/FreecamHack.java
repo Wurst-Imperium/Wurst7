@@ -9,9 +9,6 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -176,8 +173,6 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	{
 		if(fakePlayer == null || !tracer.isChecked())
 			return;
-		
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
 		
 		VertexConsumerProvider.Immediate vcp =
 			MC.getBufferBuilders().getEntityVertexConsumers();

@@ -12,9 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.VertexConsumer;
@@ -144,7 +141,6 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
 		VertexConsumerProvider.Immediate vcp =
 			MC.getBufferBuilders().getEntityVertexConsumers();
 		

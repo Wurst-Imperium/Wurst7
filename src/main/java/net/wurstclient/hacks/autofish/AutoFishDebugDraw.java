@@ -10,9 +10,6 @@ package net.wurstclient.hacks.autofish;
 import java.awt.Color;
 import java.util.stream.Stream;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -73,8 +70,6 @@ public final class AutoFishDebugDraw
 	{
 		if(!debugDraw.isChecked() && !fishingSpots.isMcmmoMode())
 			return;
-		
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
 		
 		VertexConsumerProvider.Immediate vcp =
 			MC.getBufferBuilders().getEntityVertexConsumers();
