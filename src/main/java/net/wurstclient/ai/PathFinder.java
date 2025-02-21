@@ -551,7 +551,8 @@ public class PathFinder
 		
 		VertexConsumerProvider.Immediate vcp =
 			MC.getBufferBuilders().getEntityVertexConsumers();
-		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
+		VertexConsumer buffer =
+			vcp.getBuffer(WurstRenderLayers.getLines(depthTest));
 		
 		matrixStack.push();
 		
@@ -597,7 +598,7 @@ public class PathFinder
 		
 		matrixStack.pop();
 		
-		vcp.draw(WurstRenderLayers.ESP_LINES);
+		vcp.drawCurrentLayer();
 	}
 	
 	public boolean isPathStillValid(int index)
