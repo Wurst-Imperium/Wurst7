@@ -141,6 +141,17 @@ public enum WurstRenderLayers
 				.cull(RenderLayer.DISABLE_CULLING).build(false));
 	
 	/**
+	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled.
+	 */
+	public static final RenderLayer.MultiPhase QUADS =
+		RenderLayer.of("wurst:quads", VertexFormats.POSITION_COLOR,
+			VertexFormat.DrawMode.QUADS, 1536, false, true,
+			RenderLayer.MultiPhaseParameters.builder()
+				.program(RenderLayer.POSITION_COLOR_PROGRAM)
+				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
+				.depthTest(RenderLayer.LEQUAL_DEPTH_TEST).build(false));
+	
+	/**
 	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled
 	 * and no depth test.
 	 *
@@ -158,6 +169,22 @@ public enum WurstRenderLayers
 				.program(RenderLayer.POSITION_COLOR_PROGRAM)
 				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
 				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST).build(false));
+	
+	/**
+	 * Returns either {@link #QUADS} or {@link #ESP_QUADS} depending on the
+	 * value of {@code depthTest}.
+	 *
+	 * @apiNote Until 25w08a (1.21.5), turning off depth test has to be done
+	 *          manually, by calling
+	 *          {@code RenderSystem.depthFunc(GlConst.GL_ALWAYS);} before
+	 *          drawing the ESP lines. Without this code, ESP lines will be
+	 *          drawn with depth test set to LEQUALS (only visible if not
+	 *          obstructed).
+	 */
+	public static RenderLayer getQuads(boolean depthTest)
+	{
+		return depthTest ? QUADS : ESP_QUADS;
+	}
 	
 	/**
 	 * Returns either {@link #LINES} or {@link #ESP_LINES} depending on the
