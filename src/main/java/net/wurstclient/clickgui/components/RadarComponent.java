@@ -17,6 +17,7 @@ import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.WaterAnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -114,7 +115,8 @@ public final class RadarComponent extends Component
 		if(e instanceof Monster)
 			return 0xFFFF8000;
 		if(e instanceof AnimalEntity || e instanceof AmbientEntity
-			|| e instanceof WaterCreatureEntity)
+			|| e instanceof WaterCreatureEntity
+			|| e instanceof WaterAnimalEntity)
 			return 0xFF00FF00;
 		return 0xFF808080;
 	}
