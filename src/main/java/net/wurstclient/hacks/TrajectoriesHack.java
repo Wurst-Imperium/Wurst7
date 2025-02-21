@@ -10,13 +10,8 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -31,13 +26,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext.FluidHandling;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -80,18 +73,9 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RegionPos region = RenderUtils.getCameraRegion();
-		
-		Trajectory trajectory = getTrajectory(partialTicks, region);
+		Trajectory trajectory = getTrajectory(partialTicks);
 		if(trajectory.isEmpty())
 			return;
-		
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
-		VertexConsumerProvider.Immediate vcp =
-			MC.getBufferBuilders().getEntityVertexConsumers();
-		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
 		ColorSetting color = getColor(trajectory);
 		int lineColor = color.getColorI(0xC0);
@@ -100,22 +84,13 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		Box endBox = trajectory.getEndBox();
 		ArrayList<Vec3d> path = trajectory.path();
 		
-		RenderUtils.drawSolidBox(matrixStack,
-			vcp.getBuffer(WurstRenderLayers.ESP_QUADS), endBox, quadColor);
-		RenderUtils.drawOutlinedBox(matrixStack,
-			vcp.getBuffer(WurstRenderLayers.ESP_LINES), endBox, lineColor);
+		RenderUtils.drawSolidBox(matrixStack, endBox, quadColor, false);
+		RenderUtils.drawOutlinedBox(matrixStack, endBox, lineColor, false);
 		
-		RenderUtils.drawCurvedLine(matrixStack,
-			vcp.getBuffer(WurstRenderLayers.ESP_LINE_STRIP), path, lineColor);
-		
-		matrixStack.pop();
-		
-		vcp.draw(WurstRenderLayers.ESP_QUADS);
-		vcp.draw(WurstRenderLayers.ESP_LINES);
-		vcp.draw(WurstRenderLayers.ESP_LINE_STRIP);
+		RenderUtils.drawCurvedLine(matrixStack, path, lineColor, false);
 	}
 	
-	private Trajectory getTrajectory(float partialTicks, RegionPos region)
+	private Trajectory getTrajectory(float partialTicks)
 	{
 		ClientPlayerEntity player = MC.player;
 		ArrayList<Vec3d> path = new ArrayList<>();
@@ -194,11 +169,6 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 				break;
 			}
 		}
-		
-		// Apply region offset
-		Vec3d regionVec = region.toVec3d();
-		path = path.stream().map(v -> v.subtract(regionVec))
-			.collect(Collectors.toCollection(ArrayList::new));
 		
 		return new Trajectory(path, type);
 	}

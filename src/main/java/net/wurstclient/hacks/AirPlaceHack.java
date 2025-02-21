@@ -9,10 +9,6 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -20,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
@@ -30,7 +25,6 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.InteractionSimulator;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"air place"})
@@ -127,29 +121,12 @@ public final class AirPlaceHack extends Hack
 		if(renderPos == null)
 			return;
 		
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
+		Box box = new Box(renderPos);
 		
-		VertexConsumerProvider.Immediate vcp =
-			MC.getBufferBuilders().getEntityVertexConsumers();
+		int quadColor = guideColor.getColorI(0x1A);
+		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
 		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		Box box = new Box(renderPos.subtract(region.toBlockPos()));
-		
-		RenderUtils.drawSolidBox(matrixStack,
-			vcp.getBuffer(WurstRenderLayers.ESP_QUADS), box,
-			guideColor.getColorI(0x1A));
-		
-		RenderUtils.drawOutlinedBox(matrixStack,
-			vcp.getBuffer(WurstRenderLayers.ESP_LINES), box,
-			guideColor.getColorI(0xC0));
-		
-		matrixStack.pop();
-		
-		vcp.draw(WurstRenderLayers.ESP_QUADS);
-		vcp.draw(WurstRenderLayers.ESP_LINES);
+		int lineColor = guideColor.getColorI(0xC0);
+		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);
 	}
 }

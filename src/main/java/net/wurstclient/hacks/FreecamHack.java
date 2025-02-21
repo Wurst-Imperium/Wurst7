@@ -9,21 +9,15 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.*;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
@@ -33,7 +27,6 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -177,34 +170,18 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		if(fakePlayer == null || !tracer.isChecked())
 			return;
 		
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
-		
-		VertexConsumerProvider.Immediate vcp =
-			MC.getBufferBuilders().getEntityVertexConsumers();
-		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
-		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		Vec3d regionVec = region.toVec3d();
 		int colorI = color.getColorI(0x80);
 		
 		// box
 		double extraSize = 0.05;
-		Vec3d offset = regionVec.negate().add(0, extraSize, 0);
-		Box box = fakePlayer.getBoundingBox().offset(offset).expand(extraSize);
-		RenderUtils.drawOutlinedBox(matrixStack, buffer, box, colorI);
+		Box box = fakePlayer.getBoundingBox().offset(0, extraSize, 0)
+			.expand(extraSize);
+		RenderUtils.drawOutlinedBox(matrixStack, box, colorI, false);
 		
 		// line
 		Vec3d start = RotationUtils.getClientLookVec(partialTicks).multiply(2)
-			.add(RenderUtils.getCameraPos()).subtract(regionVec);
-		Vec3d end = fakePlayer.getBoundingBox().getCenter().subtract(regionVec);
-		RenderUtils.drawLine(matrixStack, buffer, start, end, colorI);
-		
-		matrixStack.pop();
-		
-		vcp.draw(WurstRenderLayers.ESP_LINES);
+			.add(RenderUtils.getCameraPos());
+		Vec3d end = fakePlayer.getBoundingBox().getCenter();
+		RenderUtils.drawLine(matrixStack, start, end, colorI, false);
 	}
 }
