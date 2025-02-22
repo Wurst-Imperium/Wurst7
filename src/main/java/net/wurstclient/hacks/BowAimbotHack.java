@@ -13,12 +13,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
@@ -41,7 +36,6 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -67,9 +61,6 @@ public final class BowAimbotHack extends Hack
 	
 	private final ColorSetting color = new ColorSetting("ESP color",
 		"Color of the box that BowAimbot draws around the target.", Color.RED);
-	
-	private static final Box TARGET_BOX =
-		new Box(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
 	
 	private Entity target;
 	private float velocity;
@@ -199,47 +190,14 @@ public final class BowAimbotHack extends Hack
 		if(target == null)
 			return;
 		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		Box box = EntityUtils.getLerpedBox(target, partialTicks)
+			.offset(0, 0.05, 0).expand(0.05);
 		
-		matrixStack.push();
+		int quadColor = color.getColorI(0.5F * velocity);
+		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
 		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		// set position
-		matrixStack.translate(target.getX() - region.x(), target.getY(),
-			target.getZ() - region.z());
-		
-		// set size
-		float boxWidth = target.getWidth() + 0.1F;
-		float boxHeight = target.getHeight() + 0.1F;
-		matrixStack.scale(boxWidth, boxHeight, boxWidth);
-		
-		// move to center
-		matrixStack.translate(0, 0.5, 0);
-		
-		float v = 1 / velocity;
-		matrixStack.scale(v, v, v);
-		
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
-		// draw outline
-		color.setAsShaderColor(0.5F * velocity);
-		RenderUtils.drawOutlinedBox(TARGET_BOX, matrixStack);
-		
-		// draw box
-		color.setAsShaderColor(0.25F * velocity);
-		RenderUtils.drawSolidBox(TARGET_BOX, matrixStack);
-		
-		matrixStack.pop();
-		
-		// GL resets
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		int lineColor = color.getColorI(0.25F * velocity);
+		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);
 	}
 	
 	@Override
