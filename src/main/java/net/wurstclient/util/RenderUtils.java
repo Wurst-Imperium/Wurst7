@@ -20,6 +20,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.MatrixStack.Entry;
@@ -132,6 +133,34 @@ public enum RenderUtils
 		vcp.draw(layer);
 	}
 	
+	private static Vec3d getTracerOrigin(float partialTicks)
+	{
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks);
+		if(WurstClient.MC.options
+			.getPerspective() == Perspective.THIRD_PERSON_FRONT)
+			start = start.negate();
+		
+		return start;
+	}
+	
+	public static void drawTracer(MatrixStack matrices, float partialTicks,
+		Vec3d end, int color, boolean depthTest)
+	{
+		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(depthFunc);
+		
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		Vec3d start = getTracerOrigin(partialTicks);
+		Vec3d offset = getCameraPos().negate();
+		drawLine(matrices, buffer, start, end.add(offset), color);
+		
+		vcp.draw(layer);
+	}
+	
 	public static void drawTracers(MatrixStack matrices, float partialTicks,
 		List<Vec3d> ends, int color, boolean depthTest)
 	{
@@ -143,7 +172,7 @@ public enum RenderUtils
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
 		
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks);
+		Vec3d start = getTracerOrigin(partialTicks);
 		Vec3d offset = getCameraPos().negate();
 		for(Vec3d end : ends)
 			drawLine(matrices, buffer, start, end.add(offset), color);
@@ -162,7 +191,7 @@ public enum RenderUtils
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
 		
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks);
+		Vec3d start = getTracerOrigin(partialTicks);
 		Vec3d offset = getCameraPos().negate();
 		for(ColoredPoint end : ends)
 			drawLine(matrices, buffer, start, end.point().add(offset),
