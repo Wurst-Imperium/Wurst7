@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.minecraft.block.entity.*;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestBoatEntity;
@@ -24,7 +22,6 @@ import net.minecraft.entity.vehicle.HopperMinecartEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
-import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -35,9 +32,7 @@ import net.wurstclient.hacks.chestesp.ChestEspGroup;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.chunk.ChunkUtils;
 
 public class ChestEspHack extends Hack implements UpdateListener,
@@ -212,74 +207,46 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		VertexConsumerProvider.Immediate vcp =
-			MC.getBufferBuilders().getEntityVertexConsumers();
-		
-		matrixStack.push();
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
 		entityGroups.stream().filter(ChestEspGroup::isEnabled)
 			.forEach(g -> g.updateBoxes(partialTicks));
 		
 		if(style.hasBoxes())
-			renderBoxes(matrixStack, vcp, partialTicks, region);
+			renderBoxes(matrixStack);
 		
 		if(style.hasLines())
-			renderTracers(matrixStack, vcp, partialTicks, region);
-		
-		matrixStack.pop();
-		
-		vcp.draw(WurstRenderLayers.ESP_QUADS);
-		vcp.draw(WurstRenderLayers.ESP_LINES);
+			renderTracers(matrixStack, partialTicks);
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack,
-		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
+	private void renderBoxes(MatrixStack matrixStack)
 	{
-		Vec3d offset = region.negate().toVec3d();
-		
 		for(ChestEspGroup group : groups)
 		{
 			if(!group.isEnabled())
-				return;
+				continue;
 			
-			List<Box> boxes = group.getBoxes().stream()
-				.map(box -> box.offset(offset)).toList();
-			
-			VertexConsumer quadsBuffer =
-				vcp.getBuffer(WurstRenderLayers.ESP_QUADS);
+			List<Box> boxes = group.getBoxes();
 			int quadsColor = group.getColorI(0x40);
-			for(Box box : boxes)
-				RenderUtils.drawSolidBox(matrixStack, quadsBuffer, box,
-					quadsColor);
-			
-			VertexConsumer linesBuffer =
-				vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 			int linesColor = group.getColorI(0x80);
-			for(Box box : boxes)
-				RenderUtils.drawOutlinedBox(matrixStack, linesBuffer, box,
-					linesColor);
+			
+			RenderUtils.drawSolidBoxes(matrixStack, boxes, quadsColor, false);
+			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, linesColor,
+				false);
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack,
-		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
+	private void renderTracers(MatrixStack matrixStack, float partialTicks)
 	{
-		Vec3d offset = region.negate().toVec3d();
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
-			.add(RenderUtils.getCameraPos()).add(offset);
-		
-		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		for(ChestEspGroup group : groups)
 		{
 			if(!group.isEnabled())
-				return;
+				continue;
 			
+			List<Box> boxes = group.getBoxes();
+			List<Vec3d> ends = boxes.stream().map(Box::getCenter).toList();
 			int color = group.getColorI(0x80);
-			for(Box box : group.getBoxes())
-				RenderUtils.drawLine(matrixStack, buffer, start,
-					box.getCenter().add(offset), color);
+			
+			RenderUtils.drawTracers(matrixStack, partialTicks, ends, color,
+				false);
 		}
 	}
 }

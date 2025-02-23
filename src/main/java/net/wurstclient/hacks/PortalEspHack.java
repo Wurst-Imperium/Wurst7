@@ -14,14 +14,11 @@ import java.util.function.BiPredicate;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
-import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
@@ -32,9 +29,7 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.chunk.ChunkSearcher.Result;
 import net.wurstclient.util.chunk.ChunkSearcherCoordinator;
 
@@ -141,71 +136,43 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		VertexConsumerProvider.Immediate vcp =
-			MC.getBufferBuilders().getEntityVertexConsumers();
-		
-		matrixStack.push();
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
 		if(style.getSelected().hasBoxes())
-			renderBoxes(matrixStack, vcp, partialTicks, region);
+			renderBoxes(matrixStack);
 		
 		if(style.getSelected().hasLines())
-			renderTracers(matrixStack, vcp, partialTicks, region);
-		
-		matrixStack.pop();
-		
-		vcp.draw(WurstRenderLayers.ESP_QUADS);
-		vcp.draw(WurstRenderLayers.ESP_LINES);
+			renderTracers(matrixStack, partialTicks);
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack,
-		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
+	private void renderBoxes(MatrixStack matrixStack)
 	{
-		Vec3d offset = region.negate().toVec3d();
-		
 		for(PortalEspBlockGroup group : groups)
 		{
 			if(!group.isEnabled())
 				return;
 			
-			List<Box> boxes = group.getBoxes().stream()
-				.map(box -> box.offset(offset)).toList();
-			
-			VertexConsumer quadsBuffer =
-				vcp.getBuffer(WurstRenderLayers.ESP_QUADS);
+			List<Box> boxes = group.getBoxes();
 			int quadsColor = group.getColorI(0x40);
-			for(Box box : boxes)
-				RenderUtils.drawSolidBox(matrixStack, quadsBuffer, box,
-					quadsColor);
-			
-			VertexConsumer linesBuffer =
-				vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 			int linesColor = group.getColorI(0x80);
-			for(Box box : boxes)
-				RenderUtils.drawOutlinedBox(matrixStack, linesBuffer, box,
-					linesColor);
+			
+			RenderUtils.drawSolidBoxes(matrixStack, boxes, quadsColor, false);
+			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, linesColor,
+				false);
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack,
-		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
+	private void renderTracers(MatrixStack matrixStack, float partialTicks)
 	{
-		Vec3d offset = region.negate().toVec3d();
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
-			.add(RenderUtils.getCameraPos()).add(offset);
-		
-		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		for(PortalEspBlockGroup group : groups)
 		{
 			if(!group.isEnabled())
 				return;
 			
+			List<Box> boxes = group.getBoxes();
+			List<Vec3d> ends = boxes.stream().map(Box::getCenter).toList();
 			int color = group.getColorI(0x80);
-			for(Box box : group.getBoxes())
-				RenderUtils.drawLine(matrixStack, buffer, start,
-					box.getCenter().add(offset), color);
+			
+			RenderUtils.drawTracers(matrixStack, partialTicks, ends, color,
+				false);
 		}
 	}
 	

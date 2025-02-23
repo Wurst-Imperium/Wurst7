@@ -28,7 +28,6 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @DontSaveState
 @SearchTags({"free camera", "spectator"})
@@ -179,9 +178,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		RenderUtils.drawOutlinedBox(matrixStack, box, colorI, false);
 		
 		// line
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks).multiply(2)
-			.add(RenderUtils.getCameraPos());
-		Vec3d end = fakePlayer.getBoundingBox().getCenter();
-		RenderUtils.drawLine(matrixStack, start, end, colorI, false);
+		RenderUtils.drawTracer(matrixStack, partialTicks,
+			fakePlayer.getBoundingBox().getCenter(), colorI, false);
 	}
 }
