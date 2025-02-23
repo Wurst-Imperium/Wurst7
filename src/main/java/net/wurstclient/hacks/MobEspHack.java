@@ -12,11 +12,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,7 +20,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -35,9 +29,9 @@ import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.RenderUtils.ColoredBox;
+import net.wurstclient.util.RenderUtils.ColoredPoint;
 
 @SearchTags({"mob esp", "MobTracers", "mob tracers"})
 public final class MobEspHack extends Hack implements UpdateListener,
@@ -127,58 +121,32 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
-		
-		VertexConsumerProvider.Immediate vcp =
-			MC.getBufferBuilders().getEntityVertexConsumers();
-		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
 		if(style.hasBoxes())
-			renderBoxes(matrixStack, vcp, partialTicks, region);
+		{
+			double extraSize = boxSize.getExtraSize() / 2;
+			
+			ArrayList<ColoredBox> boxes = new ArrayList<>(mobs.size());
+			for(LivingEntity e : mobs)
+			{
+				Box box = EntityUtils.getLerpedBox(e, partialTicks)
+					.offset(0, extraSize, 0).expand(extraSize);
+				boxes.add(new ColoredBox(box, getColor(e)));
+			}
+			
+			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, false);
+		}
 		
 		if(style.hasLines())
-			renderTracers(matrixStack, vcp, partialTicks, region);
-		
-		matrixStack.pop();
-		
-		vcp.draw(WurstRenderLayers.ESP_LINES);
-	}
-	
-	private void renderBoxes(MatrixStack matrixStack,
-		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
-	{
-		double extraSize = boxSize.getExtraSize() / 2;
-		Vec3d offset = region.negate().toVec3d().add(0, extraSize, 0);
-		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
-		
-		for(LivingEntity e : mobs)
 		{
-			Box box = EntityUtils.getLerpedBox(e, partialTicks).offset(offset)
-				.expand(extraSize);
+			ArrayList<ColoredPoint> ends = new ArrayList<>(mobs.size());
+			for(LivingEntity e : mobs)
+			{
+				Vec3d point =
+					EntityUtils.getLerpedBox(e, partialTicks).getCenter();
+				ends.add(new ColoredPoint(point, getColor(e)));
+			}
 			
-			RenderUtils.drawOutlinedBox(matrixStack, buffer, box, getColor(e));
-		}
-	}
-	
-	private void renderTracers(MatrixStack matrixStack,
-		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
-	{
-		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
-		
-		Vec3d regionVec = region.toVec3d();
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks).multiply(2)
-			.add(RenderUtils.getCameraPos()).subtract(regionVec);
-		
-		for(LivingEntity e : mobs)
-		{
-			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
-				.subtract(regionVec);
-			
-			RenderUtils.drawLine(matrixStack, buffer, start, end, getColor(e));
+			RenderUtils.drawTracers(matrixStack, partialTicks, ends, false);
 		}
 	}
 	
