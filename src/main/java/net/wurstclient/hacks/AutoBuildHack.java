@@ -9,15 +9,9 @@ package net.wurstclient.hacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.stream.Collectors;
+import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -42,6 +36,9 @@ import net.wurstclient.util.json.JsonException;
 public final class AutoBuildHack extends Hack
 	implements UpdateListener, RightClickListener, RenderListener
 {
+	private static final Box BLOCK_BOX =
+		new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0, 15 / 16.0, 15 / 16.0);
+	
 	private final FileSetting templateSetting = new FileSetting("Template",
 		"Determines what to build.\n\n"
 			+ "Templates are just JSON files. Feel free to add your own or to edit / delete the default templates.\n\n"
@@ -190,49 +187,22 @@ public final class AutoBuildHack extends Hack
 		if(status != Status.BUILDING)
 			return;
 		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
-		double boxStart = 1 / 16.0;
-		double boxEnd = 15 / 16.0;
-		Box box = new Box(boxStart, boxStart, boxStart, boxEnd, boxEnd, boxEnd)
-			.offset(region.negate().toBlockPos());
-		
-		ArrayList<BlockPos> blocksToDraw = remainingBlocks.stream()
+		List<BlockPos> blocksToDraw = remainingBlocks.stream()
 			.filter(pos -> BlockUtils.getState(pos).isReplaceable()).limit(1024)
-			.collect(Collectors.toCollection(ArrayList::new));
+			.toList();
 		
-		GL11.glDepthMask(false);
-		RenderSystem.setShaderColor(0, 1, 0, 0.15F);
+		int black = 0x80000000;
+		List<Box> outlineBoxes =
+			blocksToDraw.stream().map(pos -> BLOCK_BOX.offset(pos)).toList();
+		RenderUtils.drawOutlinedBoxes(matrixStack, outlineBoxes, black, true);
 		
+		int green = 0x2600FF00;
 		Vec3d eyesPos = RotationUtils.getEyesPos();
 		double rangeSq = range.getValueSq();
-		blocksToDraw.stream()
+		List<Box> greenBoxes = blocksToDraw.stream()
 			.filter(pos -> pos.getSquaredDistance(eyesPos) <= rangeSq)
-			.map(pos -> box.offset(pos)).forEach(
-				offsetBox -> RenderUtils.drawSolidBox(offsetBox, matrixStack));
-		
-		GL11.glDepthMask(true);
-		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		
-		blocksToDraw.stream().map(pos -> box.offset(pos)).forEach(
-			offsetBox -> RenderUtils.drawOutlinedBox(offsetBox, matrixStack));
-		
-		matrixStack.pop();
-		
-		// GL resets
-		GL11.glDisable(GL11.GL_BLEND);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+			.map(pos -> BLOCK_BOX.offset(pos)).toList();
+		RenderUtils.drawSolidBoxes(matrixStack, greenBoxes, green, true);
 	}
 	
 	private void buildNormally()
