@@ -61,7 +61,7 @@ public abstract class ShulkerBoxScreenMixin
 	
 	private void steal()
 	{
-		runInThread(() -> shiftClickSlots(0, rows * 9, 1));
+		runInThread(() -> shiftClickSlots(rows * 9, 0, 1));
 	}
 	
 	private void store()
@@ -87,7 +87,7 @@ public abstract class ShulkerBoxScreenMixin
 	{
 		this.mode = mode;
 		
-		for(int i = from; i < to; i++)
+		for(int i = from; i != to; i += i < to ? 1 : -1)
 		{
 			Slot slot = handler.slots.get(i);
 			if(slot.getStack().isEmpty())
