@@ -186,14 +186,6 @@ public final class ExcavatorHack extends Hack
 			}
 		}
 		
-		// selected positions
-		ArrayList<Box> selectedBoxes = new ArrayList<>();
-		for(Step step : Step.SELECT_POSITION_STEPS)
-			if(step.pos != null)
-				selectedBoxes.add(new Box(step.pos).contract(1 / 16.0));
-		RenderUtils.drawOutlinedBoxes(matrixStack, selectedBoxes, black, false);
-		RenderUtils.drawSolidBoxes(matrixStack, selectedBoxes, green1, false);
-		
 		// area preview
 		if(area == null && step == Step.END_POS && step.pos != null)
 		{
@@ -201,6 +193,14 @@ public final class ExcavatorHack extends Hack
 				.contract(1 / 16.0);
 			RenderUtils.drawOutlinedBox(matrixStack, preview, black, true);
 		}
+		
+		// selected positions
+		ArrayList<Box> selectedBoxes = new ArrayList<>();
+		for(Step step : Step.SELECT_POSITION_STEPS)
+			if(step.pos != null)
+				selectedBoxes.add(new Box(step.pos).contract(1 / 16.0));
+		RenderUtils.drawOutlinedBoxes(matrixStack, selectedBoxes, black, false);
+		RenderUtils.drawSolidBoxes(matrixStack, selectedBoxes, green1, false);
 		
 		// posLookingAt
 		if(posLookingAt != null)
