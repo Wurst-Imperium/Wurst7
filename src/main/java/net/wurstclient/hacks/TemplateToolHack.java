@@ -11,16 +11,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -29,7 +28,9 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.events.GUIRenderListener;
 import net.wurstclient.events.RenderListener;
@@ -41,7 +42,6 @@ import net.wurstclient.hacks.templatetool.Step;
 import net.wurstclient.hacks.templatetool.Template;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.json.JsonUtils;
 
@@ -239,159 +239,88 @@ public final class TemplateToolHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// scale and offset
-		float scale = 7F / 8F;
-		double offset = (1.0 - scale) / 2.0;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
+		int black = 0x80000000;
+		int gray = 0x26404040;
+		int green1 = 0x2600FF00;
+		int green2 = 0x4D00FF00;
 		
 		// area
 		if(area != null)
 		{
-			GL11.glEnable(GL11.GL_DEPTH_TEST);
-			
 			// recently scanned blocks
 			if(step == Step.SCAN_AREA && area.getProgress() < 1)
+			{
+				ArrayList<Box> boxes = new ArrayList<>();
 				for(int i = Math.max(0,
 					area.getBlocksFound().size()
 						- area.getScanSpeed()); i < area.getBlocksFound()
 							.size(); i++)
-				{
-					BlockPos pos = area.getBlocksFound().get(i)
-						.subtract(region.toBlockPos());
-					
-					matrixStack.push();
-					matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
-					matrixStack.translate(-0.005, -0.005, -0.005);
-					matrixStack.scale(1.01F, 1.01F, 1.01F);
-					
-					RenderSystem.setShaderColor(0, 1, 0, 0.15F);
-					RenderUtils.drawSolidBox(matrixStack);
-					
-					RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-					RenderUtils.drawOutlinedBox(matrixStack);
-					
-					matrixStack.pop();
-				}
+					boxes.add(
+						new Box(area.getBlocksFound().get(i)).expand(0.005));
+				
+				RenderUtils.drawOutlinedBoxes(matrixStack, boxes, black, true);
+				RenderUtils.drawSolidBoxes(matrixStack, boxes, green1, true);
+			}
 			
-			matrixStack.push();
-			matrixStack.translate(area.getMinX() + offset - region.x(),
-				area.getMinY() + offset, area.getMinZ() + offset - region.z());
-			matrixStack.scale(area.getSizeX() + scale, area.getSizeY() + scale,
-				area.getSizeZ() + scale);
+			// area box
+			Box areaBox = area.toBox();
+			RenderUtils.drawOutlinedBox(matrixStack, areaBox, black, true);
 			
 			// area scanner
 			if(area.getProgress() < 1)
 			{
-				matrixStack.push();
-				matrixStack.translate(area.getProgress(), 0, 0);
-				matrixStack.scale(0, 1, 1);
+				double scannerX = MathHelper.lerp(area.getProgress(),
+					areaBox.minX, areaBox.maxX);
+				Box scanner = areaBox.withMinX(scannerX).withMaxX(scannerX);
 				
-				RenderSystem.setShaderColor(0, 1, 0, 0.3F);
-				RenderUtils.drawSolidBox(matrixStack);
-				
-				RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-				RenderUtils.drawOutlinedBox(matrixStack);
-				
-				matrixStack.pop();
+				RenderUtils.drawOutlinedBox(matrixStack, scanner, black, true);
+				RenderUtils.drawSolidBox(matrixStack, scanner, green2, true);
 				
 				// template scanner
 			}else if(template != null && template.getProgress() > 0)
 			{
-				matrixStack.push();
-				matrixStack.translate(template.getProgress(), 0, 0);
-				matrixStack.scale(0, 1, 1);
+				double scannerX = MathHelper.lerp(template.getProgress(),
+					areaBox.minX, areaBox.maxX);
+				Box scanner = areaBox.withMinX(scannerX).withMaxX(scannerX);
 				
-				RenderSystem.setShaderColor(0, 1, 0, 0.3F);
-				RenderUtils.drawSolidBox(matrixStack);
-				
-				RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-				RenderUtils.drawOutlinedBox(matrixStack);
-				
-				matrixStack.pop();
+				RenderUtils.drawOutlinedBox(matrixStack, scanner, black, true);
+				RenderUtils.drawSolidBox(matrixStack, scanner, green2, true);
 			}
-			
-			// area box
-			RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(matrixStack);
-			
-			matrixStack.pop();
-			
-			GL11.glDisable(GL11.GL_DEPTH_TEST);
 		}
 		
 		// sorted blocks
 		if(template != null)
-			for(BlockPos pos : template.getSortedBlocks())
-			{
-				matrixStack.push();
-				matrixStack.translate(pos.getX() - region.x(), pos.getY(),
-					pos.getZ() - region.z());
-				matrixStack.translate(offset, offset, offset);
-				matrixStack.scale(scale, scale, scale);
-				
-				RenderSystem.setShaderColor(0F, 0F, 0F, 0.5F);
-				RenderUtils.drawOutlinedBox(matrixStack);
-				
-				matrixStack.pop();
-			}
+		{
+			List<Box> boxes = template.getSortedBlocks().reversed().stream()
+				.map(pos -> new Box(pos).contract(1 / 16.0)).limit(1024)
+				.toList();
+			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, black, false);
+		}
+		
+		// area preview
+		if(area == null && step == Step.END_POS && step.getPos() != null)
+		{
+			Box preview =
+				Box.enclosing(Step.START_POS.getPos(), Step.END_POS.getPos())
+					.contract(1 / 16.0);
+			RenderUtils.drawOutlinedBox(matrixStack, preview, black, true);
+		}
 		
 		// selected positions
+		ArrayList<Box> selectedBoxes = new ArrayList<>();
 		for(Step step : Step.SELECT_POSITION_STEPS)
-		{
-			BlockPos pos = step.getPos();
-			if(pos == null)
-				continue;
-			
-			matrixStack.push();
-			matrixStack.translate(pos.getX() - region.x(), pos.getY(),
-				pos.getZ() - region.z());
-			matrixStack.translate(offset, offset, offset);
-			matrixStack.scale(scale, scale, scale);
-			
-			RenderSystem.setShaderColor(0, 1, 0, 0.15F);
-			RenderUtils.drawSolidBox(matrixStack);
-			
-			RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(matrixStack);
-			
-			matrixStack.pop();
-		}
+			if(step.getPos() != null)
+				selectedBoxes.add(new Box(step.getPos()).contract(1 / 16.0));
+		RenderUtils.drawOutlinedBoxes(matrixStack, selectedBoxes, black, false);
+		RenderUtils.drawSolidBoxes(matrixStack, selectedBoxes, green1, false);
 		
 		// posLookingAt
 		if(posLookingAt != null)
 		{
-			matrixStack.push();
-			matrixStack.translate(posLookingAt.getX() - region.x(),
-				posLookingAt.getY(), posLookingAt.getZ() - region.z());
-			matrixStack.translate(offset, offset, offset);
-			matrixStack.scale(scale, scale, scale);
-			
-			RenderSystem.setShaderColor(0.25F, 0.25F, 0.25F, 0.15F);
-			RenderUtils.drawSolidBox(matrixStack);
-			
-			RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(matrixStack);
-			
-			matrixStack.pop();
+			Box box = new Box(posLookingAt).contract(1 / 16.0);
+			RenderUtils.drawOutlinedBox(matrixStack, box, black, false);
+			RenderUtils.drawSolidBox(matrixStack, box, gray, false);
 		}
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	@Override
