@@ -9,22 +9,14 @@ package net.wurstclient.hacks.treebot;
 
 import java.util.ArrayList;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
@@ -46,27 +38,20 @@ public class Tree implements AutoCloseable
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		
-		vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+		vertexBuffer = VertexBuffer.createAndUpload(DrawMode.LINES,
+			VertexFormats.LINES, this::buildBuffer);
+	}
+	
+	private void buildBuffer(VertexConsumer buffer)
+	{
+		int green = 0x8000FF00;
+		Box box = new Box(RegionPos.of(stump).negate().toBlockPos())
+			.contract(1 / 16.0);
 		
-		double boxMin = 1 / 16.0;
-		double boxMax = 15 / 16.0;
-		Vec3d regionOffset = RegionPos.of(stump).negate().toVec3d();
-		Box box = new Box(boxMin, boxMin, boxMin, boxMax, boxMax, boxMax)
-			.offset(regionOffset);
-		
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		
-		RenderUtils.drawCrossBox(box.offset(stump), bufferBuilder);
+		RenderUtils.drawCrossBox(buffer, box.offset(stump), green);
 		
 		for(BlockPos log : logs)
-			RenderUtils.drawOutlinedBox(box.offset(log), bufferBuilder);
-		
-		BuiltBuffer buffer = bufferBuilder.end();
-		vertexBuffer.bind();
-		vertexBuffer.upload(buffer);
-		VertexBuffer.unbind();
+			RenderUtils.drawOutlinedBox(buffer, box.offset(log), green);
 	}
 	
 	public void draw(MatrixStack matrixStack)
@@ -74,27 +59,13 @@ public class Tree implements AutoCloseable
 		if(vertexBuffer == null)
 			return;
 		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		RenderSystem.setShaderColor(0, 1, 0, 0.5F);
-		
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, RegionPos.of(stump));
 		
-		vertexBuffer.bind();
-		vertexBuffer.draw(RenderLayer.getDebugQuads());
-		VertexBuffer.unbind();
+		RenderUtils.drawBuffer(matrixStack, vertexBuffer,
+			WurstRenderLayers.ESP_LINES);
 		
 		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	@Override

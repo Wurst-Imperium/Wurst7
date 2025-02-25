@@ -57,6 +57,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -78,6 +79,8 @@ public final class TunnellerHack extends Hack
 		"Places just enough torches to prevent mobs from spawning inside the tunnel.",
 		false);
 	
+	private final OverlayRenderer overlay = new OverlayRenderer();
+	
 	private BlockPos start;
 	private Direction direction;
 	private int length;
@@ -86,16 +89,12 @@ public final class TunnellerHack extends Hack
 	private VertexBuffer[] vertexBuffers = new VertexBuffer[5];
 	
 	private BlockPos currentBlock;
-	private float progress;
-	private float prevProgress;
-	
 	private BlockPos lastTorch;
 	private BlockPos nextTorch;
 	
 	public TunnellerHack()
 	{
 		super("Tunneller");
-		
 		setCategory(Category.BLOCKS);
 		addSetting(size);
 		addSetting(limit);
@@ -149,6 +148,7 @@ public final class TunnellerHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
+		overlay.resetProgress();
 		if(currentBlock != null)
 		{
 			MC.interactionManager.breakingBlock = true;
@@ -231,34 +231,14 @@ public final class TunnellerHack extends Hack
 			VertexBuffer.unbind();
 		}
 		
-		if(currentBlock != null)
-		{
-			float p = prevProgress + (progress - prevProgress) * partialTicks;
-			float red = p * 2F;
-			float green = 2 - red;
-			
-			matrixStack.translate(currentBlock.getX() - region.x(),
-				currentBlock.getY(), currentBlock.getZ() - region.z());
-			if(p < 1)
-			{
-				matrixStack.translate(0.5, 0.5, 0.5);
-				matrixStack.scale(p, p, p);
-				matrixStack.translate(-0.5, -0.5, -0.5);
-			}
-			
-			Box box2 = new Box(BlockPos.ORIGIN);
-			RenderSystem.setShaderColor(red, green, 0, 0.25F);
-			RenderUtils.drawSolidBox(box2, matrixStack);
-			RenderSystem.setShaderColor(red, green, 0, 0.5F);
-			RenderUtils.drawOutlinedBox(box2, matrixStack);
-		}
-		
 		matrixStack.pop();
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
+		
+		overlay.render(matrixStack, partialTicks, currentBlock);
 	}
 	
 	private void updateCyanBuffer()
@@ -422,8 +402,7 @@ public final class TunnellerHack extends Hack
 			if(currentBlock == null)
 			{
 				MC.interactionManager.cancelBlockBreaking();
-				progress = 1;
-				prevProgress = 1;
+				overlay.resetProgress();
 				
 				length++;
 				if(limit.getValueI() == 0 || length < limit.getValueI())
@@ -444,16 +423,11 @@ public final class TunnellerHack extends Hack
 			if(MC.player.getAbilities().creativeMode
 				|| BlockUtils.getHardness(currentBlock) >= 1)
 			{
-				progress = 1;
-				prevProgress = 1;
+				overlay.resetProgress();
 				return;
 			}
 			
-			prevProgress = progress;
-			progress = MC.interactionManager.currentBreakingProgress;
-			
-			if(progress < prevProgress)
-				prevProgress = progress;
+			overlay.updateProgress();
 		}
 	}
 	
