@@ -116,6 +116,22 @@ public enum RenderUtils
 			| (int)(MathHelper.clamp(rgb[2], 0, 1) * 255);
 	}
 	
+	/**
+	 * Similar to {@link VertexBuffer#draw(RenderLayer)}, but with a
+	 * customizable view matrix. Use this if you need to translate/scale/rotate
+	 * the buffer.
+	 */
+	public static void drawBuffer(MatrixStack matrices, VertexBuffer buffer,
+		RenderLayer layer)
+	{
+		layer.startDrawing();
+		buffer.bind();
+		buffer.draw(matrices.peek().getPositionMatrix(),
+			RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
+		VertexBuffer.unbind();
+		layer.endDrawing();
+	}
+	
 	public static void drawLine(MatrixStack matrices, Vec3d start, Vec3d end,
 		int color, boolean depthTest)
 	{
@@ -312,6 +328,11 @@ public enum RenderUtils
 				box.color());
 		
 		vcp.draw(layer);
+	}
+	
+	public static void drawSolidBox(VertexConsumer buffer, Box box, int color)
+	{
+		drawSolidBox(new MatrixStack(), buffer, box, color);
 	}
 	
 	public static void drawSolidBox(MatrixStack matrices, VertexConsumer buffer,
@@ -514,6 +535,12 @@ public enum RenderUtils
 				box.color());
 		
 		vcp.draw(layer);
+	}
+	
+	public static void drawOutlinedBox(VertexConsumer buffer, Box box,
+		int color)
+	{
+		drawOutlinedBox(new MatrixStack(), buffer, box, color);
 	}
 	
 	public static void drawOutlinedBox(MatrixStack matrices,
@@ -728,6 +755,11 @@ public enum RenderUtils
 				box.color());
 		
 		vcp.draw(layer);
+	}
+	
+	public static void drawCrossBox(VertexConsumer buffer, Box box, int color)
+	{
+		drawCrossBox(new MatrixStack(), buffer, box, color);
 	}
 	
 	public static void drawCrossBox(MatrixStack matrices, VertexConsumer buffer,
