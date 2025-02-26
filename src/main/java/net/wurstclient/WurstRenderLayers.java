@@ -9,7 +9,7 @@ package net.wurstclient;
 
 import java.util.OptionalDouble;
 
-import net.minecraft.client.gl.ShaderProgramLayers;
+import net.minecraft.client.gl.ShaderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;
 
@@ -26,7 +26,7 @@ public enum WurstRenderLayers
 	 *           the line width number does nothing.
 	 */
 	public static final RenderLayer.MultiPhase ONE_PIXEL_LINES = RenderLayer.of(
-		"wurst:1px_lines", 1536, WurstShaderLayers.ONE_PIXEL_LINES,
+		"wurst:1px_lines", 1536, WurstShaderPipelines.ONE_PIXEL_LINES,
 		RenderLayer.MultiPhaseParameters.builder()
 			.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
 			.build(false));
@@ -41,7 +41,7 @@ public enum WurstRenderLayers
 	 */
 	public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
 		RenderLayer.of("wurst:1px_line_strip", 1536,
-			WurstShaderLayers.ONE_PIXEL_LINE_STRIP,
+			WurstShaderPipelines.ONE_PIXEL_LINE_STRIP,
 			RenderLayer.MultiPhaseParameters.builder()
 				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
 				.build(false));
@@ -50,7 +50,7 @@ public enum WurstRenderLayers
 	 * Similar to {@link RenderLayer#getLines()}, but with line width 2.
 	 */
 	public static final RenderLayer.MultiPhase LINES =
-		RenderLayer.of("wurst:lines", 1536, ShaderProgramLayers.LINES,
+		RenderLayer.of("wurst:lines", 1536, ShaderPipelines.LINES,
 			RenderLayer.MultiPhaseParameters.builder()
 				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
 				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
@@ -61,7 +61,7 @@ public enum WurstRenderLayers
 	 * depth test.
 	 */
 	public static final RenderLayer.MultiPhase ESP_LINES =
-		RenderLayer.of("wurst:esp_lines", 1536, WurstShaderLayers.ESP_LINES,
+		RenderLayer.of("wurst:esp_lines", 1536, WurstShaderPipelines.ESP_LINES,
 			RenderLayer.MultiPhaseParameters.builder()
 				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
 				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
@@ -71,7 +71,7 @@ public enum WurstRenderLayers
 	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2.
 	 */
 	public static final RenderLayer.MultiPhase LINE_STRIP = RenderLayer.of(
-		"wurst:line_strip", 1536, false, true, ShaderProgramLayers.LINE_STRIP,
+		"wurst:line_strip", 1536, false, true, ShaderPipelines.LINE_STRIP,
 		RenderLayer.MultiPhaseParameters.builder()
 			.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
 			.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
@@ -83,7 +83,7 @@ public enum WurstRenderLayers
 	 */
 	public static final RenderLayer.MultiPhase ESP_LINE_STRIP =
 		RenderLayer.of("wurst:esp_line_strip", 1536, false, true,
-			WurstShaderLayers.ESP_LINE_STRIP,
+			WurstShaderPipelines.ESP_LINE_STRIP,
 			RenderLayer.MultiPhaseParameters.builder()
 				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
 				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
@@ -93,7 +93,7 @@ public enum WurstRenderLayers
 	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled.
 	 */
 	public static final RenderLayer.MultiPhase QUADS = RenderLayer.of(
-		"wurst:quads", 1536, false, true, WurstShaderLayers.QUADS,
+		"wurst:quads", 1536, false, true, WurstShaderPipelines.QUADS,
 		RenderLayer.MultiPhaseParameters.builder().build(false));
 	
 	/**
@@ -101,7 +101,7 @@ public enum WurstRenderLayers
 	 * and no depth test.
 	 */
 	public static final RenderLayer.MultiPhase ESP_QUADS = RenderLayer.of(
-		"wurst:esp_quads", 1536, false, true, WurstShaderLayers.ESP_QUADS,
+		"wurst:esp_quads", 1536, false, true, WurstShaderPipelines.ESP_QUADS,
 		RenderLayer.MultiPhaseParameters.builder().build(false));
 	
 	/**
