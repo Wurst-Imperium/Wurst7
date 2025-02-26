@@ -658,6 +658,11 @@ public enum RenderUtils
 		vcp.draw(layer);
 	}
 	
+	public static void drawNode(VertexConsumer buffer, Box box, int color)
+	{
+		drawNode(new MatrixStack(), buffer, box, color);
+	}
+	
 	public static void drawNode(MatrixStack matrices, VertexConsumer buffer,
 		Box box, int color)
 	{
