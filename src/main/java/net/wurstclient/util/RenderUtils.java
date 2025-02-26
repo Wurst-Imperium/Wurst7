@@ -766,6 +766,12 @@ public enum RenderUtils
 		drawArrow(matrices, buffer, fromVec, toVec, color, 1 / 16F);
 	}
 	
+	public static void drawArrow(VertexConsumer buffer, Vec3d from, Vec3d to,
+		int color, float headSize)
+	{
+		drawArrow(new MatrixStack(), buffer, from, to, color, headSize);
+	}
+	
 	public static void drawArrow(MatrixStack matrices, VertexConsumer buffer,
 		Vec3d from, Vec3d to, int color, float headSize)
 	{
