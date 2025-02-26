@@ -20,7 +20,11 @@ import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.Perspective;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.MatrixStack.Entry;
 import net.minecraft.item.ItemStack;
@@ -433,65 +437,6 @@ public enum RenderUtils
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 1, 0);
 	}
 	
-	public static void drawOutlinedBox(Box bb, VertexBuffer vertexBuffer)
-	{
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		drawOutlinedBox(bb, bufferBuilder);
-		BuiltBuffer buffer = bufferBuilder.end();
-		
-		vertexBuffer.bind();
-		vertexBuffer.upload(buffer);
-		VertexBuffer.unbind();
-	}
-	
-	public static void drawOutlinedBox(Box bb, BufferBuilder bufferBuilder)
-	{
-		float minX = (float)bb.minX;
-		float minY = (float)bb.minY;
-		float minZ = (float)bb.minZ;
-		float maxX = (float)bb.maxX;
-		float maxY = (float)bb.maxY;
-		float maxZ = (float)bb.maxZ;
-		
-		bufferBuilder.vertex(minX, minY, minZ);
-		bufferBuilder.vertex(maxX, minY, minZ);
-		
-		bufferBuilder.vertex(maxX, minY, minZ);
-		bufferBuilder.vertex(maxX, minY, maxZ);
-		
-		bufferBuilder.vertex(maxX, minY, maxZ);
-		bufferBuilder.vertex(minX, minY, maxZ);
-		
-		bufferBuilder.vertex(minX, minY, maxZ);
-		bufferBuilder.vertex(minX, minY, minZ);
-		
-		bufferBuilder.vertex(minX, minY, minZ);
-		bufferBuilder.vertex(minX, maxY, minZ);
-		
-		bufferBuilder.vertex(maxX, minY, minZ);
-		bufferBuilder.vertex(maxX, maxY, minZ);
-		
-		bufferBuilder.vertex(maxX, minY, maxZ);
-		bufferBuilder.vertex(maxX, maxY, maxZ);
-		
-		bufferBuilder.vertex(minX, minY, maxZ);
-		bufferBuilder.vertex(minX, maxY, maxZ);
-		
-		bufferBuilder.vertex(minX, maxY, minZ);
-		bufferBuilder.vertex(maxX, maxY, minZ);
-		
-		bufferBuilder.vertex(maxX, maxY, minZ);
-		bufferBuilder.vertex(maxX, maxY, maxZ);
-		
-		bufferBuilder.vertex(maxX, maxY, maxZ);
-		bufferBuilder.vertex(minX, maxY, maxZ);
-		
-		bufferBuilder.vertex(minX, maxY, maxZ);
-		bufferBuilder.vertex(minX, maxY, minZ);
-	}
-	
 	public static void drawCrossBox(MatrixStack matrices, Box box, int color,
 		boolean depthTest)
 	{
@@ -599,6 +544,11 @@ public enum RenderUtils
 		vcp.draw(layer);
 	}
 	
+	public static void drawNode(VertexConsumer buffer, Box box, int color)
+	{
+		drawNode(new MatrixStack(), buffer, box, color);
+	}
+	
 	public static void drawNode(MatrixStack matrices, VertexConsumer buffer,
 		Box box, int color)
 	{
@@ -632,74 +582,18 @@ public enum RenderUtils
 		drawLine(entry, buffer, x3, y1, z3, x3, y3, z2, color);
 	}
 	
-	public static void drawNode(Box bb, VertexBuffer vertexBuffer)
-	{
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		drawNode(bb, bufferBuilder);
-		BuiltBuffer buffer = bufferBuilder.end();
-		
-		vertexBuffer.bind();
-		vertexBuffer.upload(buffer);
-		VertexBuffer.unbind();
-	}
-	
-	public static void drawNode(Box bb, BufferBuilder bufferBuilder)
-	{
-		float minX = (float)bb.minX;
-		float minY = (float)bb.minY;
-		float minZ = (float)bb.minZ;
-		float maxX = (float)bb.maxX;
-		float maxY = (float)bb.maxY;
-		float maxZ = (float)bb.maxZ;
-		float midX = (minX + maxX) / 2F;
-		float midY = (minY + maxY) / 2F;
-		float midZ = (minZ + maxZ) / 2F;
-		
-		bufferBuilder.vertex(midX, midY, maxZ);
-		bufferBuilder.vertex(minX, midY, midZ);
-		
-		bufferBuilder.vertex(minX, midY, midZ);
-		bufferBuilder.vertex(midX, midY, minZ);
-		
-		bufferBuilder.vertex(midX, midY, minZ);
-		bufferBuilder.vertex(maxX, midY, midZ);
-		
-		bufferBuilder.vertex(maxX, midY, midZ);
-		bufferBuilder.vertex(midX, midY, maxZ);
-		
-		bufferBuilder.vertex(midX, maxY, midZ);
-		bufferBuilder.vertex(maxX, midY, midZ);
-		
-		bufferBuilder.vertex(midX, maxY, midZ);
-		bufferBuilder.vertex(minX, midY, midZ);
-		
-		bufferBuilder.vertex(midX, maxY, midZ);
-		bufferBuilder.vertex(midX, midY, minZ);
-		
-		bufferBuilder.vertex(midX, maxY, midZ);
-		bufferBuilder.vertex(midX, midY, maxZ);
-		
-		bufferBuilder.vertex(midX, minY, midZ);
-		bufferBuilder.vertex(maxX, midY, midZ);
-		
-		bufferBuilder.vertex(midX, minY, midZ);
-		bufferBuilder.vertex(minX, midY, midZ);
-		
-		bufferBuilder.vertex(midX, minY, midZ);
-		bufferBuilder.vertex(midX, midY, minZ);
-		
-		bufferBuilder.vertex(midX, minY, midZ);
-		bufferBuilder.vertex(midX, midY, maxZ);
-	}
-	
 	public static void drawArrow(MatrixStack matrices, VertexConsumer buffer,
 		BlockPos from, BlockPos to, RegionPos region, int color)
 	{
 		Vec3d fromVec = from.toCenterPos().subtract(region.x(), 0, region.z());
 		Vec3d toVec = to.toCenterPos().subtract(region.x(), 0, region.z());
 		drawArrow(matrices, buffer, fromVec, toVec, color, 1 / 16F);
+	}
+	
+	public static void drawArrow(VertexConsumer buffer, Vec3d from, Vec3d to,
+		int color, float headSize)
+	{
+		drawArrow(new MatrixStack(), buffer, from, to, color, headSize);
 	}
 	
 	public static void drawArrow(MatrixStack matrices, VertexConsumer buffer,
@@ -739,83 +633,6 @@ public enum RenderUtils
 		drawLine(entry, buffer, 0, 0, 0, 0, 2, 1, color);
 		
 		matrices.pop();
-	}
-	
-	public static void drawArrow(Vec3d from, Vec3d to,
-		VertexBuffer vertexBuffer)
-	{
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		drawArrow(from, to, bufferBuilder);
-		BuiltBuffer buffer = bufferBuilder.end();
-		
-		vertexBuffer.bind();
-		vertexBuffer.upload(buffer);
-		VertexBuffer.unbind();
-	}
-	
-	public static void drawArrow(Vec3d from, Vec3d to,
-		BufferBuilder bufferBuilder)
-	{
-		double startX = from.x;
-		double startY = from.y;
-		double startZ = from.z;
-		
-		double endX = to.x;
-		double endY = to.y;
-		double endZ = to.z;
-		
-		Matrix4f matrix = new Matrix4f();
-		matrix.identity();
-		
-		bufferBuilder.vertex(matrix, (float)startX, (float)startY,
-			(float)startZ);
-		bufferBuilder.vertex(matrix, (float)endX, (float)endY, (float)endZ);
-		
-		matrix.translate((float)endX, (float)endY, (float)endZ);
-		matrix.scale(0.1F, 0.1F, 0.1F);
-		
-		double xDiff = endX - startX;
-		double yDiff = endY - startY;
-		double zDiff = endZ - startZ;
-		
-		float xAngle = (float)(Math.atan2(yDiff, -zDiff) + Math.toRadians(90));
-		matrix.rotate(xAngle, new Vector3f(1, 0, 0));
-		
-		double yzDiff = Math.sqrt(yDiff * yDiff + zDiff * zDiff);
-		float zAngle = (float)Math.atan2(xDiff, yzDiff);
-		matrix.rotate(zAngle, new Vector3f(0, 0, 1));
-		
-		bufferBuilder.vertex(matrix, 0, 2, 1);
-		bufferBuilder.vertex(matrix, -1, 2, 0);
-		
-		bufferBuilder.vertex(matrix, -1, 2, 0);
-		bufferBuilder.vertex(matrix, 0, 2, -1);
-		
-		bufferBuilder.vertex(matrix, 0, 2, -1);
-		bufferBuilder.vertex(matrix, 1, 2, 0);
-		
-		bufferBuilder.vertex(matrix, 1, 2, 0);
-		bufferBuilder.vertex(matrix, 0, 2, 1);
-		
-		bufferBuilder.vertex(matrix, 1, 2, 0);
-		bufferBuilder.vertex(matrix, -1, 2, 0);
-		
-		bufferBuilder.vertex(matrix, 0, 2, 1);
-		bufferBuilder.vertex(matrix, 0, 2, -1);
-		
-		bufferBuilder.vertex(matrix, 0, 0, 0);
-		bufferBuilder.vertex(matrix, 1, 2, 0);
-		
-		bufferBuilder.vertex(matrix, 0, 0, 0);
-		bufferBuilder.vertex(matrix, -1, 2, 0);
-		
-		bufferBuilder.vertex(matrix, 0, 0, 0);
-		bufferBuilder.vertex(matrix, 0, 2, -1);
-		
-		bufferBuilder.vertex(matrix, 0, 0, 0);
-		bufferBuilder.vertex(matrix, 0, 2, 1);
 	}
 	
 	public static void drawItem(DrawContext context, ItemStack stack, int x,
