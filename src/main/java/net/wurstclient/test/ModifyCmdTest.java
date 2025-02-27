@@ -37,7 +37,7 @@ public enum ModifyCmdTest
 			if(!nbt.contains("test"))
 				throw new RuntimeException(
 					"NBT data is missing the 'test' key");
-			if(nbt.getInt("test") != 123)
+			if(nbt.getInt("test").orElse(-1) != 123)
 				throw new RuntimeException("NBT data is incorrect");
 		});
 		runWurstCommand("viewnbt");

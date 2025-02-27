@@ -39,7 +39,7 @@ public final class ViewNbtCmd extends Command
 		NbtCompound tag = stack
 			.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT)
 			.copyNbt();
-		String nbtString = tag.asString();
+		String nbtString = tag.toString();
 		
 		switch(String.join(" ", args).toLowerCase())
 		{

@@ -148,7 +148,7 @@ public final class ModifyCmd extends Command
 			if(!base.contains(part) || !(base.get(part) instanceof NbtCompound))
 				return null;
 			
-			base = base.getCompound(part);
+			base = base.getCompound(part).orElse(new NbtCompound());
 		}
 		
 		if(!base.contains(parts[parts.length - 1]))
