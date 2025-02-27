@@ -16,14 +16,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
@@ -95,7 +87,7 @@ public final class BaseFinderHack extends Hack
 	
 	private final HashSet<BlockPos> matchingBlocks = new HashSet<>();
 	private ArrayList<int[]> vertices = new ArrayList<>();
-	private VertexBuffer vertexBuffer;
+	// private VertexBuffer vertexBuffer;
 	
 	private int messageTimer = 0;
 	private int counter;
@@ -149,8 +141,8 @@ public final class BaseFinderHack extends Hack
 		vertices.clear();
 		lastRegion = null;
 		
-		if(vertexBuffer != null)
-			vertexBuffer.close();
+		// if(vertexBuffer != null)
+		// vertexBuffer.close();
 	}
 	
 	@Override
@@ -172,12 +164,12 @@ public final class BaseFinderHack extends Hack
 		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		color.setAsShaderColor(0.15F);
 		
-		if(vertexBuffer != null)
-		{
-			vertexBuffer.bind();
-			vertexBuffer.draw(RenderLayer.getDebugQuads());
-			VertexBuffer.unbind();
-		}
+		// if(vertexBuffer != null)
+		// {
+		// vertexBuffer.bind();
+		// vertexBuffer.draw(RenderLayer.getDebugQuads());
+		// VertexBuffer.unbind();
+		// }
 		
 		matrixStack.pop();
 		
@@ -195,28 +187,28 @@ public final class BaseFinderHack extends Hack
 		
 		if(modulo == 0 || !region.equals(lastRegion))
 		{
-			if(vertexBuffer != null)
-			{
-				vertexBuffer.close();
-				vertexBuffer = null;
-			}
+			// if(vertexBuffer != null)
+			// {
+			// vertexBuffer.close();
+			// vertexBuffer = null;
+			// }
 			
 			if(!vertices.isEmpty())
 			{
-				Tessellator tessellator = Tessellator.getInstance();
-				BufferBuilder bufferBuilder = tessellator
-					.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-				
-				for(int[] vertex : vertices)
-					bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
-						vertex[2] - region.z());
-				
-				BuiltBuffer buffer = bufferBuilder.end();
-				
-				vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
-				vertexBuffer.bind();
-				vertexBuffer.upload(buffer);
-				VertexBuffer.unbind();
+				// Tessellator tessellator = Tessellator.getInstance();
+				// BufferBuilder bufferBuilder = tessellator
+				// .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+				//
+				// for(int[] vertex : vertices)
+				// bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
+				// vertex[2] - region.z());
+				//
+				// BuiltBuffer buffer = bufferBuilder.end();
+				//
+				// vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+				// vertexBuffer.bind();
+				// vertexBuffer.upload(buffer);
+				// VertexBuffer.unbind();
 			}
 			
 			lastRegion = region;

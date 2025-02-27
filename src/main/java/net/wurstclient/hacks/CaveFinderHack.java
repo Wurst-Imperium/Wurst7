@@ -15,22 +15,9 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.Blocks;
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
@@ -43,8 +30,6 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.RegionPos;
-import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.chunk.ChunkSearcher;
 import net.wurstclient.util.chunk.ChunkSearcherCoordinator;
@@ -80,8 +65,8 @@ public final class CaveFinderHack extends Hack
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	
-	private VertexBuffer vertexBuffer;
-	private RegionPos bufferRegion;
+	// private VertexBuffer vertexBuffer;
+	// private RegionPos bufferRegion;
 	private boolean bufferUpToDate;
 	
 	public CaveFinderHack()
@@ -120,10 +105,10 @@ public final class CaveFinderHack extends Hack
 		coordinator.reset();
 		forkJoinPool.shutdownNow();
 		
-		if(vertexBuffer != null)
-			vertexBuffer.close();
-		vertexBuffer = null;
-		bufferRegion = null;
+		// if(vertexBuffer != null)
+		// vertexBuffer.close();
+		// vertexBuffer = null;
+		// bufferRegion = null;
 	}
 	
 	@Override
@@ -166,38 +151,38 @@ public final class CaveFinderHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if(vertexBuffer == null || bufferRegion == null)
-			return;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
-		
-		// generate rainbow color
-		float x = System.currentTimeMillis() % 2000 / 1000F;
-		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
-		
-		if(opacity.getValue() > 0)
-			alpha = opacity.getValueF();
-		
-		color.setAsShaderColor(alpha);
-		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
-		vertexBuffer.bind();
-		vertexBuffer.draw(RenderLayer.getDebugQuads());
-		VertexBuffer.unbind();
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		// if(vertexBuffer == null || bufferRegion == null)
+		// return;
+		//
+		// // GL settings
+		// GL11.glEnable(GL11.GL_BLEND);
+		// GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		// GL11.glEnable(GL11.GL_CULL_FACE);
+		// GL11.glDisable(GL11.GL_DEPTH_TEST);
+		//
+		// matrixStack.push();
+		// RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
+		//
+		// // generate rainbow color
+		// float x = System.currentTimeMillis() % 2000 / 1000F;
+		// float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
+		//
+		// if(opacity.getValue() > 0)
+		// alpha = opacity.getValueF();
+		//
+		// color.setAsShaderColor(alpha);
+		// // RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		//
+		// vertexBuffer.bind();
+		// vertexBuffer.draw(RenderLayer.getDebugQuads());
+		// VertexBuffer.unbind();
+		//
+		// matrixStack.pop();
+		//
+		// // GL resets
+		// RenderSystem.setShaderColor(1, 1, 1, 1);
+		// GL11.glEnable(GL11.GL_DEPTH_TEST);
+		// GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	private void stopBuildingBuffer()
@@ -249,33 +234,33 @@ public final class CaveFinderHack extends Hack
 	
 	private void setBufferFromTask()
 	{
-		ArrayList<int[]> vertices = compileVerticesTask.join();
-		RegionPos region = RenderUtils.getCameraRegion();
-		if(vertexBuffer != null)
-		{
-			vertexBuffer.close();
-			vertexBuffer = null;
-		}
-		
-		if(!vertices.isEmpty())
-		{
-			Tessellator tessellator = Tessellator.getInstance();
-			BufferBuilder bufferBuilder = tessellator
-				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-			
-			for(int[] vertex : vertices)
-				bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
-					vertex[2] - region.z());
-			
-			BuiltBuffer buffer = bufferBuilder.end();
-			
-			vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
-			vertexBuffer.bind();
-			vertexBuffer.upload(buffer);
-			VertexBuffer.unbind();
-		}
+		// ArrayList<int[]> vertices = compileVerticesTask.join();
+		// RegionPos region = RenderUtils.getCameraRegion();
+		// if(vertexBuffer != null)
+		// {
+		// vertexBuffer.close();
+		// vertexBuffer = null;
+		// }
+		//
+		// if(!vertices.isEmpty())
+		// {
+		// Tessellator tessellator = Tessellator.getInstance();
+		// BufferBuilder bufferBuilder = tessellator
+		// .begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		//
+		// for(int[] vertex : vertices)
+		// bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
+		// vertex[2] - region.z());
+		//
+		// BuiltBuffer buffer = bufferBuilder.end();
+		//
+		// vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+		// vertexBuffer.bind();
+		// vertexBuffer.upload(buffer);
+		// VertexBuffer.unbind();
+		// }
 		
 		bufferUpToDate = true;
-		bufferRegion = region;
+		// bufferRegion = region;
 	}
 }

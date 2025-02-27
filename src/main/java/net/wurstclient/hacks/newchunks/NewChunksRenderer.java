@@ -11,10 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -22,46 +19,46 @@ import net.wurstclient.util.RenderUtils;
 
 public final class NewChunksRenderer
 {
-	private final VertexBuffer[] vertexBuffers = new VertexBuffer[4];
+	// private final VertexBuffer[] vertexBuffers = new VertexBuffer[4];
 	
-	private final SliderSetting altitude;
-	private final SliderSetting opacity;
-	private final ColorSetting newChunksColor;
-	private final ColorSetting oldChunksColor;
+	// private final SliderSetting altitude;
+	// private final SliderSetting opacity;
+	// private final ColorSetting newChunksColor;
+	// private final ColorSetting oldChunksColor;
 	
 	public NewChunksRenderer(SliderSetting altitude, SliderSetting opacity,
 		ColorSetting newChunksColor, ColorSetting oldChunksColor)
 	{
-		this.altitude = altitude;
-		this.opacity = opacity;
-		this.newChunksColor = newChunksColor;
-		this.oldChunksColor = oldChunksColor;
+		// this.altitude = altitude;
+		// this.opacity = opacity;
+		// this.newChunksColor = newChunksColor;
+		// this.oldChunksColor = oldChunksColor;
 	}
 	
 	public void updateBuffer(int i, BuiltBuffer buffer)
 	{
-		if(buffer == null)
-		{
-			vertexBuffers[i] = null;
-			return;
-		}
-		
-		vertexBuffers[i] = new VertexBuffer(GlUsage.STATIC_WRITE);
-		vertexBuffers[i].bind();
-		vertexBuffers[i].upload(buffer);
-		VertexBuffer.unbind();
+		// if(buffer == null)
+		// {
+		// vertexBuffers[i] = null;
+		// return;
+		// }
+		//
+		// vertexBuffers[i] = new VertexBuffer(GlUsage.STATIC_WRITE);
+		// vertexBuffers[i].bind();
+		// vertexBuffers[i].upload(buffer);
+		// VertexBuffer.unbind();
 	}
 	
 	public void closeBuffers()
 	{
-		for(int i = 0; i < vertexBuffers.length; i++)
-		{
-			if(vertexBuffers[i] == null)
-				continue;
-			
-			vertexBuffers[i].close();
-			vertexBuffers[i] = null;
-		}
+		// for(int i = 0; i < vertexBuffers.length; i++)
+		// {
+		// if(vertexBuffers[i] == null)
+		// continue;
+		//
+		// vertexBuffers[i].close();
+		// vertexBuffers[i] = null;
+		// }
 	}
 	
 	public void render(MatrixStack matrixStack, float partialTicks)
@@ -77,30 +74,30 @@ public final class NewChunksRenderer
 		
 		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		
-		float alpha = opacity.getValueF();
-		double altitudeD = altitude.getValue();
-		
-		for(int i = 0; i < vertexBuffers.length; i++)
-		{
-			VertexBuffer buffer = vertexBuffers[i];
-			if(buffer == null)
-				continue;
-			
-			matrixStack.push();
-			if(i == 0 || i == 2)
-				matrixStack.translate(0, altitudeD, 0);
-			
-			if(i < 2)
-				newChunksColor.setAsShaderColor(alpha);
-			else
-				oldChunksColor.setAsShaderColor(alpha);
-			
-			buffer.bind();
-			buffer.draw(RenderLayer.getDebugQuads());
-			VertexBuffer.unbind();
-			
-			matrixStack.pop();
-		}
+		// float alpha = opacity.getValueF();
+		// double altitudeD = altitude.getValue();
+		//
+		// for(int i = 0; i < vertexBuffers.length; i++)
+		// {
+		// VertexBuffer buffer = vertexBuffers[i];
+		// if(buffer == null)
+		// continue;
+		//
+		// matrixStack.push();
+		// if(i == 0 || i == 2)
+		// matrixStack.translate(0, altitudeD, 0);
+		//
+		// if(i < 2)
+		// newChunksColor.setAsShaderColor(alpha);
+		// else
+		// oldChunksColor.setAsShaderColor(alpha);
+		//
+		// buffer.bind();
+		// buffer.draw(RenderLayer.getDebugQuads());
+		// VertexBuffer.unbind();
+		//
+		// matrixStack.pop();
+		// }
 		
 		matrixStack.pop();
 		

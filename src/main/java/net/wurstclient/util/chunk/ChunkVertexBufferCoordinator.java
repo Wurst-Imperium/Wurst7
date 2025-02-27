@@ -7,17 +7,10 @@
  */
 package net.wurstclient.util.chunk;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -26,15 +19,16 @@ import net.wurstclient.util.chunk.ChunkSearcher.Result;
 
 public final class ChunkVertexBufferCoordinator extends AbstractChunkCoordinator
 {
-	private final HashMap<ChunkPos, VertexBuffer> buffers = new HashMap<>();
-	private final BiFunction<ChunkSearcher, Iterable<Result>, BuiltBuffer> renderer;
+	// private final HashMap<ChunkPos, VertexBuffer> buffers = new HashMap<>();
+	// private final BiFunction<ChunkSearcher, Iterable<Result>, BuiltBuffer>
+	// renderer;
 	
 	public ChunkVertexBufferCoordinator(BiPredicate<BlockPos, BlockState> query,
 		BiFunction<ChunkSearcher, Iterable<Result>, BuiltBuffer> renderer,
 		ChunkAreaSetting area)
 	{
 		super(query, area);
-		this.renderer = Objects.requireNonNull(renderer);
+		// this.renderer = Objects.requireNonNull(renderer);
 	}
 	
 	@Override
@@ -52,42 +46,42 @@ public final class ChunkVertexBufferCoordinator extends AbstractChunkCoordinator
 	@Override
 	protected void onRemove(ChunkSearcher searcher)
 	{
-		@SuppressWarnings("resource")
-		VertexBuffer buffer = buffers.remove(searcher.getPos());
-		if(buffer != null)
-			buffer.close();
+		// @SuppressWarnings("resource")
+		// VertexBuffer buffer = buffers.remove(searcher.getPos());
+		// if(buffer != null)
+		// buffer.close();
 	}
 	
 	@Override
 	public void reset()
 	{
 		super.reset();
-		buffers.values().forEach(VertexBuffer::close);
-		buffers.clear();
+		// buffers.values().forEach(VertexBuffer::close);
+		// buffers.clear();
 	}
 	
-	public Set<Entry<ChunkPos, VertexBuffer>> getBuffers()
-	{
-		for(ChunkSearcher searcher : searchers.values())
-			buildBuffer(searcher);
-		
-		return Collections.unmodifiableSet(buffers.entrySet());
-	}
+	// public Set<Entry<ChunkPos, VertexBuffer>> getBuffers()
+	// {
+	// for(ChunkSearcher searcher : searchers.values())
+	// buildBuffer(searcher);
+	//
+	// return Collections.unmodifiableSet(buffers.entrySet());
+	// }
 	
-	private void buildBuffer(ChunkSearcher searcher)
-	{
-		if(buffers.containsKey(searcher.getPos()))
-			return;
-		
-		BuiltBuffer buffer =
-			renderer.apply(searcher, searcher.getMatchesList());
-		if(buffer == null)
-			return;
-		
-		VertexBuffer vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
-		vertexBuffer.bind();
-		vertexBuffer.upload(buffer);
-		VertexBuffer.unbind();
-		buffers.put(searcher.getPos(), vertexBuffer);
-	}
+	// private void buildBuffer(ChunkSearcher searcher)
+	// {
+	// if(buffers.containsKey(searcher.getPos()))
+	// return;
+	//
+	// BuiltBuffer buffer =
+	// renderer.apply(searcher, searcher.getMatchesList());
+	// if(buffer == null)
+	// return;
+	//
+	// VertexBuffer vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+	// vertexBuffer.bind();
+	// vertexBuffer.upload(buffer);
+	// VertexBuffer.unbind();
+	// buffers.put(searcher.getPos(), vertexBuffer);
+	// }
 }

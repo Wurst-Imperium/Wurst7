@@ -8,17 +8,14 @@
 package net.wurstclient.hacks;
 
 import java.awt.Color;
-import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -26,7 +23,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnRestriction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.LightType;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -42,7 +38,6 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.RegionPos;
-import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.chunk.ChunkSearcher;
 import net.wurstclient.util.chunk.ChunkSearcher.Result;
 import net.wurstclient.util.chunk.ChunkVertexBufferCoordinator;
@@ -137,20 +132,20 @@ public final class MobSpawnEspHack extends Hack
 		// RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 		RenderSystem.setShaderColor(1, 1, 1, opacity.getValueF());
 		
-		for(Entry<ChunkPos, VertexBuffer> entry : coordinator.getBuffers())
-		{
-			RegionPos region = RegionPos.of(entry.getKey());
-			VertexBuffer vertexBuffer = entry.getValue();
-			
-			matrixStack.push();
-			RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-			
-			vertexBuffer.bind();
-			vertexBuffer.draw(RenderLayer.getDebugQuads());
-			VertexBuffer.unbind();
-			
-			matrixStack.pop();
-		}
+		// for(Entry<ChunkPos, VertexBuffer> entry : coordinator.getBuffers())
+		// {
+		// RegionPos region = RegionPos.of(entry.getKey());
+		// VertexBuffer vertexBuffer = entry.getValue();
+		//
+		// matrixStack.push();
+		// RenderUtils.applyRegionalRenderOffset(matrixStack, region);
+		//
+		// vertexBuffer.bind();
+		// vertexBuffer.draw(RenderLayer.getDebugQuads());
+		// VertexBuffer.unbind();
+		//
+		// matrixStack.pop();
+		// }
 		
 		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
