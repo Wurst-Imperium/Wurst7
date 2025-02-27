@@ -7,6 +7,8 @@
  */
 package net.wurstclient.mixin;
 
+import java.util.List;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -15,15 +17,14 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import net.minecraft.class_10889;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.BlockModelRenderer;
-import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -44,13 +45,14 @@ public abstract class BlockModelRendererMixin implements ItemConvertible
 	@WrapOperation(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/block/Block;shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z"),
 		method = {
-			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V",
-			"renderFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V"})
+			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Ljava/util/List;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZI)V",
+			"renderFlat(Lnet/minecraft/world/BlockRenderView;Ljava/util/List;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZI)V"})
 	private static boolean onRenderSmoothOrFlat(BlockState state,
 		BlockState otherState, Direction side, Operation<Boolean> original,
-		BlockRenderView world, BakedModel model, BlockState state2,
-		BlockPos pos, MatrixStack matrices, VertexConsumer vertexConsumer,
-		boolean cull, Random random, long seed, int overlay)
+		BlockRenderView world, List<class_10889> list,
+		BlockState stateButFromTheOtherMethod, BlockPos pos,
+		MatrixStack matrices, VertexConsumer vertexConsumer, boolean cull,
+		int i)
 	{
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
