@@ -14,6 +14,7 @@ import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PufferfishEntity;
+import net.minecraft.entity.passive.WaterAnimalEntity;
 
 public final class FilterPassiveSetting extends EntityFilterCheckbox
 {
@@ -37,7 +38,8 @@ public final class FilterPassiveSetting extends EntityFilterCheckbox
 			return true;
 		
 		return !(e instanceof AnimalEntity || e instanceof AmbientEntity
-			|| e instanceof WaterCreatureEntity);
+			|| e instanceof WaterCreatureEntity
+			|| e instanceof WaterAnimalEntity);
 	}
 	
 	public static FilterPassiveSetting genericCombat(boolean checked)
