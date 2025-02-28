@@ -7,9 +7,9 @@
  */
 package net.wurstclient.clickgui.screens;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -17,6 +17,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -33,10 +34,8 @@ import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
-import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.settings.BookOffersSetting;
-import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.RenderUtils;
 
@@ -72,6 +71,7 @@ public final class AddBookOfferScreen extends Screen
 	public void init()
 	{
 		listGui = new ListGui(client, this);
+		addSelectableChild(listGui);
 		
 		levelField = new TextFieldWidget(client.textRenderer, width / 2 - 32,
 			height - 74, 28, 12, Text.literal(""));
@@ -118,22 +118,38 @@ public final class AddBookOfferScreen extends Screen
 		
 		addDrawableChild(levelPlusButton =
 			ButtonWidget.builder(Text.literal("+"), b -> updateLevel(1, true))
-				.dimensions(width / 2 + 2, height - 74, 20, 12).build());
+				.dimensions(width / 2 + 2, height - 74, 20, 12)
+				.narrationSupplier(sup -> Text
+					.translatable("gui.narrate.button", "increase level")
+					.append(", current value: " + levelField.getText()))
+				.build());
 		levelPlusButton.active = false;
 		
 		addDrawableChild(levelMinusButton =
 			ButtonWidget.builder(Text.literal("-"), b -> updateLevel(-1, true))
-				.dimensions(width / 2 + 26, height - 74, 20, 12).build());
+				.dimensions(width / 2 + 26, height - 74, 20, 12)
+				.narrationSupplier(sup -> Text
+					.translatable("gui.narrate.button", "decrease level")
+					.append(", current value: " + levelField.getText()))
+				.build());
 		levelMinusButton.active = false;
 		
-		addDrawableChild(pricePlusButton =
-			ButtonWidget.builder(Text.literal("+"), b -> updatePrice(1, true))
-				.dimensions(width / 2 + 2, height - 58, 20, 12).build());
+		addDrawableChild(pricePlusButton = ButtonWidget
+			.builder(Text.literal("+"), b -> updatePrice(1, true))
+			.dimensions(width / 2 + 2, height - 58, 20, 12)
+			.narrationSupplier(sup -> Text
+				.translatable("gui.narrate.button", "increase max price")
+				.append(", current value: " + priceField.getText()))
+			.build());
 		pricePlusButton.active = false;
 		
-		addDrawableChild(priceMinusButton =
-			ButtonWidget.builder(Text.literal("-"), b -> updatePrice(-1, true))
-				.dimensions(width / 2 + 26, height - 58, 20, 12).build());
+		addDrawableChild(priceMinusButton = ButtonWidget
+			.builder(Text.literal("-"), b -> updatePrice(-1, true))
+			.dimensions(width / 2 + 26, height - 58, 20, 12)
+			.narrationSupplier(sup -> Text
+				.translatable("gui.narrate.button", "decrease max price")
+				.append(", current value: " + priceField.getText()))
+			.build());
 		priceMinusButton.active = false;
 		
 		addDrawableChild(
@@ -212,44 +228,11 @@ public final class AddBookOfferScreen extends Screen
 		
 		levelField.mouseClicked(mouseX, mouseY, mouseButton);
 		priceField.mouseClicked(mouseX, mouseY, mouseButton);
-		listGui.mouseClicked(mouseX, mouseY, mouseButton);
-		
-		if(!childClicked && mouseButton == 0
-			&& (mouseX < (width - 220) / 2 || mouseX > width / 2 + 129)
-			&& mouseY >= 32 && mouseY <= height - 80)
-		{
-			listGui.selected = -1;
-			updateSelectedOffer(null);
-		}
 		
 		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_4)
 			cancelButton.onPress();
 		
 		return childClicked;
-	}
-	
-	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button,
-		double deltaX, double deltaY)
-	{
-		listGui.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-	}
-	
-	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button)
-	{
-		listGui.mouseReleased(mouseX, mouseY, button);
-		return super.mouseReleased(mouseX, mouseY, button);
-	}
-	
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY,
-		double horizontalAmount, double verticalAmount)
-	{
-		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
-			verticalAmount);
 	}
 	
 	@Override
@@ -264,14 +247,6 @@ public final class AddBookOfferScreen extends Screen
 			
 			case GLFW.GLFW_KEY_ESCAPE:
 			cancelButton.onPress();
-			break;
-			
-			case GLFW.GLFW_KEY_UP:
-			listGui.selectItem(listGui.selected - 1, 0, 0, 0);
-			break;
-			
-			case GLFW.GLFW_KEY_DOWN:
-			listGui.selectItem(listGui.selected + 1, 0, 0, 0);
 			break;
 			
 			default:
@@ -305,7 +280,8 @@ public final class AddBookOfferScreen extends Screen
 		matrixStack.translate(0, 0, 300);
 		
 		TextRenderer tr = client.textRenderer;
-		String titleText = "Available Books (" + listGui.getItemCount() + ")";
+		String titleText =
+			"Available Books (" + listGui.children().size() + ")";
 		context.drawCenteredTextWithShadow(tr, titleText, width / 2, 12,
 			0xffffff);
 		
@@ -345,95 +321,95 @@ public final class AddBookOfferScreen extends Screen
 		return false;
 	}
 	
-	private static class ListGui extends ListWidget
+	private final class Entry
+		extends AlwaysSelectedEntryListWidget.Entry<AddBookOfferScreen.Entry>
 	{
-		private final MinecraftClient mc;
-		private final AddBookOfferScreen screen;
-		private final List<BookOffer> list;
-		private int selected = -1;
-		private long lastTime;
+		private final BookOffer bookOffer;
+		private long lastClickTime;
 		
-		public ListGui(MinecraftClient mc, AddBookOfferScreen screen)
+		public Entry(BookOffer bookOffer)
 		{
-			super(mc, screen.width, screen.height, 32, screen.height - 80, 30);
-			this.mc = mc;
-			this.screen = screen;
-			DynamicRegistryManager drm =
-				WurstClient.MC.world.getRegistryManager();
-			Registry<Enchantment> registry =
-				drm.getOrThrow(RegistryKeys.ENCHANTMENT);
-			list = registry.stream().map(BookOffer::create)
-				.filter(BookOffer::isFullyValid).sorted()
-				.collect(Collectors.toList());
+			this.bookOffer = Objects.requireNonNull(bookOffer);
 		}
 		
 		@Override
-		protected int getItemCount()
+		public Text getNarration()
 		{
-			return list.size();
+			RegistryEntry<Enchantment> enchantment =
+				bookOffer.getEnchantmentEntry().get();
+			
+			int maxLevel = enchantment.value().getMaxLevel();
+			String levels = maxLevel + (maxLevel == 1 ? " level" : " levels");
+			
+			return Text.translatable("narrator.select",
+				"Enchantment " + bookOffer.getEnchantmentName() + ", ID "
+					+ bookOffer.id() + ", " + levels);
 		}
 		
 		@Override
-		protected boolean selectItem(int index, int button, double mouseX,
-			double mouseY)
+		public boolean mouseClicked(double mouseX, double mouseY,
+			int mouseButton)
 		{
-			if(button != 0)
-				return true;
+			if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+				return false;
 			
-			if(index == selected && Util.getMeasuringTimeMs() - lastTime < 250
-				&& screen.addButton.active)
-				screen.addButton.onPress();
+			long timeSinceLastClick = Util.getMeasuringTimeMs() - lastClickTime;
+			lastClickTime = Util.getMeasuringTimeMs();
 			
-			if(index >= 0 && index < list.size())
-			{
-				selected = index;
-				screen.updateSelectedOffer(list.get(index));
-				lastTime = Util.getMeasuringTimeMs();
-			}
+			if(timeSinceLastClick < 250 && addButton.active)
+				addButton.onPress();
 			
 			return true;
 		}
 		
 		@Override
-		protected boolean isSelectedItem(int index)
+		public void render(DrawContext context, int index, int y, int x,
+			int entryWidth, int entryHeight, int mouseX, int mouseY,
+			boolean hovered, float tickDelta)
 		{
-			return index == selected;
-		}
-		
-		@Override
-		protected void renderBackground()
-		{
-			
-		}
-		
-		@Override
-		protected void renderItem(DrawContext context, int index, int x, int y,
-			int var4, int mouseX, int mouseY, float partialTicks)
-		{
-			MatrixStack matrixStack = context.getMatrices();
-			if(isSelectedItem(index))
-				drawSelectionOutline(matrixStack, x, y);
-			
 			Item item = Registries.ITEM.get(Identifier.of("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			
-			TextRenderer tr = mc.textRenderer;
-			BookOffer bookOffer = list.get(index);
+			TextRenderer tr = client.textRenderer;
 			RegistryEntry<Enchantment> enchantment =
 				bookOffer.getEnchantmentEntry().get();
 			
 			String name = bookOffer.getEnchantmentName();
 			int nameColor =
-				enchantment.isIn(EnchantmentTags.CURSE) ? 0xff5555 : 0xf0f0f0;
+				enchantment.isIn(EnchantmentTags.CURSE) ? 0xFF5555 : 0xF0F0F0;
 			context.drawText(tr, name, x + 28, y, nameColor, false);
 			
-			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
+			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xA0A0A0,
 				false);
 			
 			int maxLevel = enchantment.value().getMaxLevel();
 			String levels = maxLevel + (maxLevel == 1 ? " level" : " levels");
-			context.drawText(tr, levels, x + 28, y + 18, 0xa0a0a0, false);
+			context.drawText(tr, levels, x + 28, y + 18, 0xA0A0A0, false);
+		}
+	}
+	
+	private final class ListGui
+		extends AlwaysSelectedEntryListWidget<AddBookOfferScreen.Entry>
+	{
+		public ListGui(MinecraftClient minecraft, AddBookOfferScreen screen)
+		{
+			super(minecraft, screen.width, screen.height - 120, 36, 30, 0);
+			
+			DynamicRegistryManager drm = client.world.getRegistryManager();
+			Registry<Enchantment> registry =
+				drm.getOrThrow(RegistryKeys.ENCHANTMENT);
+			
+			registry.stream().map(BookOffer::create)
+				.filter(BookOffer::isFullyValid).sorted()
+				.map(AddBookOfferScreen.Entry::new).forEach(this::addEntry);
+		}
+		
+		@Override
+		public void setSelected(@Nullable AddBookOfferScreen.Entry entry)
+		{
+			super.setSelected(entry);
+			updateSelectedOffer(entry == null ? null : entry.bookOffer);
 		}
 	}
 }

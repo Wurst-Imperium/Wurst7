@@ -7,10 +7,6 @@
  */
 package net.wurstclient.hud;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -32,11 +28,7 @@ public final class IngameHUD implements GUIRenderListener
 		if(tabGui == null)
 			tabGui = new TabGui();
 		
-		boolean blend = GL11.glGetBoolean(GL11.GL_BLEND);
 		ClickGui clickGui = WurstClient.INSTANCE.getGui();
-		
-		// GL settings
-		GL11.glDisable(GL11.GL_CULL_FACE);
 		
 		clickGui.updateColors();
 		
@@ -47,15 +39,6 @@ public final class IngameHUD implements GUIRenderListener
 		// pinned windows
 		if(!(WurstClient.MC.currentScreen instanceof ClickGuiScreen))
 			clickGui.renderPinnedWindows(context, partialTicks);
-		
-		// GL resets
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
-		if(blend)
-			GL11.glEnable(GL11.GL_BLEND);
-		else
-			GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	public HackListHUD getHackList()

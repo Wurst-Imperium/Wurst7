@@ -12,15 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.PacketInputListener;
@@ -28,7 +25,6 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.portalesp.PortalEspBlockGroup;
-import net.wurstclient.hacks.portalesp.PortalEspRenderer;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ColorSetting;
@@ -104,8 +100,6 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		EVENTS.add(PacketInputListener.class, coordinator);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		
-		PortalEspRenderer.prepareBuffers();
 	}
 	
 	@Override
@@ -118,7 +112,6 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 		
 		coordinator.reset();
 		groups.forEach(PortalEspBlockGroup::clear);
-		PortalEspRenderer.closeBuffers();
 	}
 	
 	@Override
@@ -143,38 +136,44 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
-		
-		PortalEspRenderer espRenderer =
-			new PortalEspRenderer(matrixStack, partialTicks);
-		
 		if(style.getSelected().hasBoxes())
-		{
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
-			groups.stream().filter(PortalEspBlockGroup::isEnabled)
-				.forEach(espRenderer::renderBoxes);
-		}
+			renderBoxes(matrixStack);
 		
 		if(style.getSelected().hasLines())
+			renderTracers(matrixStack, partialTicks);
+	}
+	
+	private void renderBoxes(MatrixStack matrixStack)
+	{
+		for(PortalEspBlockGroup group : groups)
 		{
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
-			groups.stream().filter(PortalEspBlockGroup::isEnabled)
-				.forEach(espRenderer::renderLines);
+			if(!group.isEnabled())
+				return;
+			
+			List<Box> boxes = group.getBoxes();
+			int quadsColor = group.getColorI(0x40);
+			int linesColor = group.getColorI(0x80);
+			
+			RenderUtils.drawSolidBoxes(matrixStack, boxes, quadsColor, false);
+			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, linesColor,
+				false);
 		}
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+	}
+	
+	private void renderTracers(MatrixStack matrixStack, float partialTicks)
+	{
+		for(PortalEspBlockGroup group : groups)
+		{
+			if(!group.isEnabled())
+				return;
+			
+			List<Box> boxes = group.getBoxes();
+			List<Vec3d> ends = boxes.stream().map(Box::getCenter).toList();
+			int color = group.getColorI(0x80);
+			
+			RenderUtils.drawTracers(matrixStack, partialTicks, ends, color,
+				false);
+		}
 	}
 	
 	private void updateGroupBoxes()

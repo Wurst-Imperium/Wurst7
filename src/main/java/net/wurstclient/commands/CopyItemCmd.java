@@ -8,6 +8,7 @@
 package net.wurstclient.commands;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -62,19 +63,19 @@ public final class CopyItemCmd extends Command
 		switch(slot.toLowerCase())
 		{
 			case "hand":
-			return player.getInventory().getMainHandStack();
+			return player.getMainHandStack();
 			
 			case "head":
-			return player.getInventory().getArmorStack(3);
+			return player.getEquippedStack(EquipmentSlot.HEAD);
 			
 			case "chest":
-			return player.getInventory().getArmorStack(2);
+			return player.getEquippedStack(EquipmentSlot.CHEST);
 			
 			case "legs":
-			return player.getInventory().getArmorStack(1);
+			return player.getEquippedStack(EquipmentSlot.LEGS);
 			
 			case "feet":
-			return player.getInventory().getArmorStack(0);
+			return player.getEquippedStack(EquipmentSlot.FEET);
 			
 			default:
 			throw new CmdSyntaxError();

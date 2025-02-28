@@ -7,28 +7,18 @@
  */
 package net.wurstclient.clickgui;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.RenderUtils;
 
 public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 {
-	private final ClickGui gui = WurstClient.INSTANCE.getGui();
-	private final TextRenderer tr = WurstClient.MC.textRenderer;
+	private static final ClickGui GUI = WurstClient.INSTANCE.getGui();
+	private static final TextRenderer TR = WurstClient.MC.textRenderer;
 	
 	private final EnumSetting<T> setting;
 	private final int popupWidth;
@@ -50,7 +40,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	@Override
 	public void handleMouseClick(int mouseX, int mouseY, int mouseButton)
 	{
-		if(mouseButton != 0)
+		if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
 			return;
 		
 		int yi1 = getY() - 11;
@@ -74,7 +64,6 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY)
 	{
-		MatrixStack matrixStack = context.getMatrices();
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int y1 = getY();
@@ -83,9 +72,10 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		boolean hovering = isHovering(mouseX, mouseY, x1, x2, y1, y2);
 		
 		if(hovering)
-			gui.setTooltip("");
+			GUI.setTooltip("");
 		
-		drawOutline(matrixStack, x1, x2, y1, y2);
+		RenderUtils.drawBorder2D(context, x1, y1, x2, y2,
+			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
 		int yi1 = y1 - 11;
 		for(T value : setting.getValues())
@@ -93,15 +83,15 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 			if(value == setting.getSelected())
 				continue;
 			
-			RenderSystem.setShader(ShaderProgramKeys.POSITION);
-			
 			yi1 += 11;
 			int yi2 = yi1 + 11;
 			
 			boolean hValue = hovering && mouseY >= yi1 && mouseY < yi2;
-			drawValueBackground(matrixStack, x1, x2, yi1, yi2, hValue);
+			context.fill(x1, yi1, x2, yi2, RenderUtils.toIntColor(
+				GUI.getBgColor(), GUI.getOpacity() * (hValue ? 1.5F : 1)));
 			
-			drawValueName(context, x1, yi1, value);
+			context.drawText(TR, value.toString(), x1 + 2, yi1 + 2,
+				GUI.getTxtColor(), false);
 		}
 	}
 	
@@ -109,57 +99,6 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		int y2)
 	{
 		return mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2;
-	}
-	
-	private void drawOutline(MatrixStack matrixStack, int x1, int x2, int y1,
-		int y2)
-	{
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		float[] acColor = gui.getAcColor();
-		RenderUtils.setShaderColor(acColor, 0.5F);
-		
-		BufferBuilder bufferBuilder = tessellator.begin(
-			VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawValueBackground(MatrixStack matrixStack, int x1, int x2,
-		int yi1, int yi2, boolean hValue)
-	{
-		float[] bgColor = gui.getBgColor();
-		float alpha = gui.getOpacity() * (hValue ? 1.5F : 1);
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		
-		RenderUtils.setShaderColor(bgColor, alpha);
-		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, yi1, 0);
-		bufferBuilder.vertex(matrix, x1, yi2, 0);
-		bufferBuilder.vertex(matrix, x2, yi2, 0);
-		bufferBuilder.vertex(matrix, x2, yi1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-	}
-	
-	private void drawValueName(DrawContext context, int x1, int yi1,
-		Enum<?> value)
-	{
-		ClickGui gui = WurstClient.INSTANCE.getGui();
-		int txtColor = gui.getTxtColor();
-		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		context.drawText(tr, value.toString(), x1 + 2, yi1 + 2, txtColor,
-			false);
-		GL11.glEnable(GL11.GL_BLEND);
 	}
 	
 	@Override
