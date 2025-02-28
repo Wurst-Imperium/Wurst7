@@ -39,12 +39,14 @@ public class ChatHudMixin
 	@Inject(at = @At("HEAD"),
 		method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
 		cancellable = true)
-	private void onAddMessage(Text message,
+	private void onAddMessage(Text messageDontUse,
 		@Nullable MessageSignatureData signature,
 		@Nullable MessageIndicator indicatorDontUse, CallbackInfo ci,
-		@Local LocalRef<MessageIndicator> indicator)
+		@Local(argsOnly = true) LocalRef<Text> message,
+		@Local(argsOnly = true) LocalRef<MessageIndicator> indicator)
 	{
-		ChatInputEvent event = new ChatInputEvent(message, visibleMessages);
+		ChatInputEvent event =
+			new ChatInputEvent(message.get(), visibleMessages);
 		
 		EventManager.fire(event);
 		if(event.isCancelled())
@@ -53,8 +55,8 @@ public class ChatHudMixin
 			return;
 		}
 		
-		message = event.getComponent();
+		message.set(event.getComponent());
 		indicator.set(WurstClient.INSTANCE.getOtfs().noChatReportsOtf
-			.modifyIndicator(message, signature, indicator.get()));
+			.modifyIndicator(message.get(), signature, indicator.get()));
 	}
 }
