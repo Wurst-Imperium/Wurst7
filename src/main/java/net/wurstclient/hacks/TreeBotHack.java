@@ -117,12 +117,7 @@ public final class TreeBotHack extends Hack
 		treeFinder = null;
 		angleFinder = null;
 		processor = null;
-		
-		if(tree != null)
-		{
-			tree.close();
-			tree = null;
-		}
+		tree = null;
 		
 		if(currentBlock != null)
 		{
@@ -150,11 +145,9 @@ public final class TreeBotHack extends Hack
 		}
 		
 		tree.getLogs().removeIf(Predicate.not(TreeBotUtils::isLog));
-		tree.compileBuffer();
 		
 		if(tree.getLogs().isEmpty())
 		{
-			tree.close();
 			tree = null;
 			return;
 		}
