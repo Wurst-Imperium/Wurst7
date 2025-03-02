@@ -16,11 +16,10 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-
-import net.minecraft.class_10889;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.BlockModelRenderer;
+import net.minecraft.client.render.model.BlockModelPart;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.util.math.BlockPos;
@@ -49,7 +48,7 @@ public abstract class BlockModelRendererMixin implements ItemConvertible
 			"renderFlat(Lnet/minecraft/world/BlockRenderView;Ljava/util/List;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZI)V"})
 	private static boolean onRenderSmoothOrFlat(BlockState state,
 		BlockState otherState, Direction side, Operation<Boolean> original,
-		BlockRenderView world, List<class_10889> list,
+		BlockRenderView world, List<BlockModelPart> list,
 		BlockState stateButFromTheOtherMethod, BlockPos pos,
 		MatrixStack matrices, VertexConsumer vertexConsumer, boolean cull,
 		int i)
