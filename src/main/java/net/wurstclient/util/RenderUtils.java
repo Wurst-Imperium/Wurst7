@@ -115,24 +115,6 @@ public enum RenderUtils
 			| (int)(MathHelper.clamp(rgb[2], 0, 1) * 255);
 	}
 	
-	// /**
-	// * Similar to {@link VertexBuffer#draw(RenderLayer)}, but with a
-	// * customizable view matrix. Use this if you need to
-	// translate/scale/rotate
-	// * the buffer.
-	// */
-	// public static void drawBuffer(MatrixStack matrices, VertexBuffer buffer,
-	// RenderLayer layer)
-	// {
-	// ShaderProgram shader = layer.getShaderProgram();
-	// layer.startDrawing();
-	// buffer.bind();
-	// buffer.draw(matrices.peek().getPositionMatrix(),
-	// RenderSystem.getProjectionMatrix(), shader);
-	// VertexBuffer.unbind();
-	// layer.endDrawing();
-	// }
-	
 	public static void drawLine(MatrixStack matrices, Vec3d start, Vec3d end,
 		int color, boolean depthTest)
 	{
