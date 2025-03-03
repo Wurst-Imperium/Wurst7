@@ -53,6 +53,9 @@ public final class EasyVertexBuffer implements AutoCloseable
 		
 		try(BuiltBuffer buffer = bufferBuilder.endNullable())
 		{
+			if(buffer == null)
+				return new EasyVertexBuffer(drawMode);
+			
 			return new EasyVertexBuffer(buffer, drawMode);
 		}
 	}
@@ -61,12 +64,19 @@ public final class EasyVertexBuffer implements AutoCloseable
 	{
 		DrawParameters drawParams = buffer.getDrawParameters();
 		shapeIndexBuffer = RenderSystem.getSequentialBuffer(drawParams.mode());
-		indexCount = buffer == null ? 0 : drawParams.indexCount();
+		indexCount = drawParams.indexCount();
 		
 		GlBufferTarget target = GlBufferTarget.VERTICES;
 		GlUsage usage = GlUsage.STATIC_WRITE;
-		vertexBuffer = buffer == null ? null : RenderSystem.getDevice()
-			.createBuffer(null, target, usage, buffer.getBuffer());
+		vertexBuffer = RenderSystem.getDevice().createBuffer(null, target,
+			usage, buffer.getBuffer());
+	}
+	
+	private EasyVertexBuffer(DrawMode drawMode)
+	{
+		shapeIndexBuffer = null;
+		indexCount = 0;
+		vertexBuffer = null;
 	}
 	
 	/**
