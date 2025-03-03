@@ -15,26 +15,17 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -45,6 +36,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockVertexCompiler;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.EasyVertexBuffer;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
@@ -82,7 +74,7 @@ public final class CaveFinderHack extends Hack
 	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	
-	private VertexBuffer vertexBuffer;
+	private EasyVertexBuffer vertexBuffer;
 	private RegionPos bufferRegion;
 	private boolean bufferUpToDate;
 	
@@ -171,38 +163,20 @@ public final class CaveFinderHack extends Hack
 		if(vertexBuffer == null || bufferRegion == null)
 			return;
 		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		float x = System.currentTimeMillis() % 2000 / 1000F;
+		float alpha = 0.25F + 0.25F * MathHelper.sin(x * MathHelper.PI);
+		if(opacity.getValue() > 0)
+			alpha = opacity.getValueF();
+		color.setAsShaderColor(alpha);
 		
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
 		
-		// generate rainbow color
-		float x = System.currentTimeMillis() % 2000 / 1000F;
-		float alpha = 0.25F + 0.25F * MathHelper.sin(x * (float)Math.PI);
-		
-		if(opacity.getValue() > 0)
-			alpha = opacity.getValueF();
-		
-		color.setAsShaderColor(alpha);
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		
-		Matrix4f viewMatrix = matrixStack.peek().getPositionMatrix();
-		Matrix4f projMatrix = RenderSystem.getProjectionMatrix();
-		ShaderProgram shader = RenderSystem.getShader();
-		vertexBuffer.bind();
-		vertexBuffer.draw(viewMatrix, projMatrix, shader);
-		VertexBuffer.unbind();
+		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_QUADS);
 		
 		matrixStack.pop();
 		
-		// GL resets
 		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
 	}
 	
 	private void stopBuildingBuffer()
@@ -256,29 +230,16 @@ public final class CaveFinderHack extends Hack
 	{
 		ArrayList<int[]> vertices = compileVerticesTask.join();
 		RegionPos region = RenderUtils.getCameraRegion();
-		if(vertexBuffer != null)
-		{
-			vertexBuffer.close();
-			vertexBuffer = null;
-		}
 		
-		if(!vertices.isEmpty())
-		{
-			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator
-				.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-			
-			for(int[] vertex : vertices)
-				bufferBuilder.vertex(vertex[0] - region.x(), vertex[1],
-					vertex[2] - region.z());
-			
-			BuiltBuffer buffer = bufferBuilder.end();
-			
-			vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
-			vertexBuffer.bind();
-			vertexBuffer.upload(buffer);
-			VertexBuffer.unbind();
-		}
+		if(vertexBuffer != null)
+			vertexBuffer.close();
+		
+		vertexBuffer = EasyVertexBuffer.createAndUpload(DrawMode.QUADS,
+			VertexFormats.POSITION_COLOR, buffer -> {
+				for(int[] vertex : vertices)
+					buffer.vertex(vertex[0] - region.x(), vertex[1],
+						vertex[2] - region.z()).color(0xFFFFFFFF);
+			});
 		
 		bufferUpToDate = true;
 		bufferRegion = region;
