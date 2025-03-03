@@ -70,8 +70,9 @@ public final class EasyVertexBuffer implements AutoCloseable
 	}
 	
 	/**
-	 * Drop-in replacement for
-	 * {@code RenderUtils.drawBuffer(MatrixStack, VertexBuffer, RenderLayer)}.
+	 * Similar to {@code VertexBuffer.draw(RenderLayer)}, but with a
+	 * customizable view matrix. Use this if you need to translate/scale/rotate
+	 * the buffer.
 	 */
 	public void draw(MatrixStack matrixStack, RenderLayer layer)
 	{
