@@ -17,7 +17,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
@@ -115,22 +114,6 @@ public enum RenderUtils
 			| (int)(MathHelper.clamp(rgb[0], 0, 1) * 255) << 16
 			| (int)(MathHelper.clamp(rgb[1], 0, 1) * 255) << 8
 			| (int)(MathHelper.clamp(rgb[2], 0, 1) * 255);
-	}
-	
-	/**
-	 * Similar to {@link VertexBuffer#draw(RenderLayer)}, but with a
-	 * customizable view matrix. Use this if you need to translate/scale/rotate
-	 * the buffer.
-	 */
-	public static void drawBuffer(MatrixStack matrices, VertexBuffer buffer,
-		RenderLayer layer)
-	{
-		layer.startDrawing();
-		buffer.bind();
-		buffer.draw(matrices.peek().getPositionMatrix(),
-			RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
-		VertexBuffer.unbind();
-		layer.endDrawing();
 	}
 	
 	public static void drawLine(MatrixStack matrices, Vec3d start, Vec3d end,

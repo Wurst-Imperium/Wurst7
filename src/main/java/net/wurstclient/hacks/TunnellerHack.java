@@ -17,7 +17,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
 import net.minecraft.block.TorchBlock;
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -49,6 +48,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.EasyVertexBuffer;
 import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
@@ -78,7 +78,7 @@ public final class TunnellerHack extends Hack
 	private int length;
 	
 	private Task[] tasks;
-	private VertexBuffer[] vertexBuffers = new VertexBuffer[5];
+	private EasyVertexBuffer[] vertexBuffers = new EasyVertexBuffer[5];
 	
 	private BlockPos currentBlock;
 	private BlockPos lastTorch;
@@ -193,13 +193,12 @@ public final class TunnellerHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		for(VertexBuffer buffer : vertexBuffers)
+		for(EasyVertexBuffer buffer : vertexBuffers)
 		{
 			if(buffer == null)
 				continue;
 			
-			RenderUtils.drawBuffer(matrixStack, buffer,
-				WurstRenderLayers.ESP_LINES);
+			buffer.draw(matrixStack, WurstRenderLayers.ESP_LINES);
 		}
 		
 		matrixStack.pop();
@@ -222,7 +221,7 @@ public final class TunnellerHack extends Hack
 		Vec3d arrowStart = dirVec.multiply(0.25).add(offset);
 		Vec3d arrowEnd = dirVec.multiply(Math.max(0.5, length)).add(offset);
 		
-		vertexBuffers[0] = VertexBuffer.createAndUpload(DrawMode.LINES,
+		vertexBuffers[0] = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
 			VertexFormats.LINES, buffer -> {
 				RenderUtils.drawNode(buffer, nodeBox, cyan);
 				RenderUtils.drawArrow(buffer, arrowStart, arrowEnd, cyan, 0.1F);
@@ -347,8 +346,8 @@ public final class TunnellerHack extends Hack
 			
 			int green = 0x8000FF00;
 			if(!boxes.isEmpty())
-				vertexBuffers[1] = VertexBuffer.createAndUpload(DrawMode.LINES,
-					VertexFormats.LINES, buffer -> {
+				vertexBuffers[1] = EasyVertexBuffer.createAndUpload(
+					DrawMode.LINES, VertexFormats.LINES, buffer -> {
 						for(Box box : boxes)
 							RenderUtils.drawOutlinedBox(buffer, box, green);
 					});
@@ -436,8 +435,8 @@ public final class TunnellerHack extends Hack
 					.offset(region.negate().toVec3d());
 				
 				int yellow = 0x80FFFF00;
-				vertexBuffers[2] = VertexBuffer.createAndUpload(DrawMode.LINES,
-					VertexFormats.LINES, buffer -> {
+				vertexBuffers[2] = EasyVertexBuffer.createAndUpload(
+					DrawMode.LINES, VertexFormats.LINES, buffer -> {
 						for(BlockPos pos : blocks)
 							RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
 								yellow);
@@ -579,8 +578,8 @@ public final class TunnellerHack extends Hack
 					.offset(region.negate().toVec3d());
 				
 				int red = 0x80FF0000;
-				vertexBuffers[3] = VertexBuffer.createAndUpload(DrawMode.LINES,
-					VertexFormats.LINES, buffer -> {
+				vertexBuffers[3] = EasyVertexBuffer.createAndUpload(
+					DrawMode.LINES, VertexFormats.LINES, buffer -> {
 						for(BlockPos pos : liquids)
 							RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
 								red);
@@ -669,7 +668,7 @@ public final class TunnellerHack extends Hack
 				Vec3d.ofBottomCenter(nextTorch).subtract(region.toVec3d());
 			
 			int yellow = 0x80FFFF00;
-			vertexBuffers[4] = VertexBuffer.createAndUpload(DrawMode.LINES,
+			vertexBuffers[4] = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
 				VertexFormats.LINES, buffer -> {
 					RenderUtils.drawArrow(buffer, torchVec,
 						torchVec.add(0, 0.5, 0), yellow, 0.1F);

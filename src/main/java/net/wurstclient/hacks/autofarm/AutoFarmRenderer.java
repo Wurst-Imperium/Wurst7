@@ -10,7 +10,6 @@ package net.wurstclient.hacks.autofarm;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
@@ -19,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstRenderLayers;
+import net.wurstclient.util.EasyVertexBuffer;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
@@ -28,7 +28,7 @@ public final class AutoFarmRenderer
 		new Box(BlockPos.ORIGIN).contract(1 / 16.0);
 	private static final Box NODE_BOX = new Box(BlockPos.ORIGIN).contract(0.25);
 	
-	private VertexBuffer vertexBuffer;
+	private EasyVertexBuffer vertexBuffer;
 	private RegionPos region;
 	
 	public void reset()
@@ -48,8 +48,7 @@ public final class AutoFarmRenderer
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		RenderUtils.drawBuffer(matrixStack, vertexBuffer,
-			WurstRenderLayers.ESP_LINES);
+		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_LINES);
 		
 		matrixStack.pop();
 	}
@@ -63,7 +62,7 @@ public final class AutoFarmRenderer
 			&& blocksToReplant.isEmpty())
 			return;
 		
-		vertexBuffer = VertexBuffer.createAndUpload(DrawMode.LINES,
+		vertexBuffer = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
 			VertexFormats.LINES, buffer -> buildBuffer(buffer, blocksToHarvest,
 				plants, blocksToReplant));
 	}
