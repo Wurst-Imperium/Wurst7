@@ -7,7 +7,6 @@
  */
 package net.wurstclient.util;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -15,6 +14,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.GlUsage;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
@@ -44,17 +44,24 @@ public final class EasyVertexBuffer implements AutoCloseable
 			Tessellator.getInstance().begin(drawMode, format);
 		callback.accept(bufferBuilder);
 		
-		VertexBuffer vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
-		vertexBuffer.bind();
-		vertexBuffer.upload(bufferBuilder.end());
-		VertexBuffer.unbind();
+		BuiltBuffer buffer = bufferBuilder.endNullable();
+		if(buffer == null)
+			return new EasyVertexBuffer();
 		
-		return new EasyVertexBuffer(vertexBuffer);
+		return new EasyVertexBuffer(buffer);
 	}
 	
-	private EasyVertexBuffer(VertexBuffer vertexBuffer)
+	private EasyVertexBuffer(BuiltBuffer buffer)
 	{
-		this.vertexBuffer = Objects.requireNonNull(vertexBuffer);
+		vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+		vertexBuffer.bind();
+		vertexBuffer.upload(buffer);
+		VertexBuffer.unbind();
+	}
+	
+	private EasyVertexBuffer()
+	{
+		vertexBuffer = null;
 	}
 	
 	/**
@@ -64,6 +71,9 @@ public final class EasyVertexBuffer implements AutoCloseable
 	 */
 	public void draw(MatrixStack matrixStack, RenderLayer layer)
 	{
+		if(vertexBuffer == null)
+			return;
+		
 		layer.startDrawing();
 		vertexBuffer.bind();
 		vertexBuffer.draw(matrixStack.peek().getPositionMatrix(),
@@ -77,12 +87,16 @@ public final class EasyVertexBuffer implements AutoCloseable
 	 */
 	public void draw(RenderLayer layer)
 	{
+		if(vertexBuffer == null)
+			return;
+		
 		vertexBuffer.draw(layer);
 	}
 	
 	@Override
 	public void close()
 	{
-		vertexBuffer.close();
+		if(vertexBuffer != null)
+			vertexBuffer.close();
 	}
 }
