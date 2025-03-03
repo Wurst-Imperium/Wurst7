@@ -20,6 +20,8 @@ import net.minecraft.block.TorchBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.VertexFormat.DrawMode;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.item.BlockItem;
@@ -33,6 +35,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.EmptyBlockView;
 import net.wurstclient.Category;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
@@ -45,6 +48,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.EasyVertexBuffer;
 import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
@@ -74,7 +78,7 @@ public final class TunnellerHack extends Hack
 	private int length;
 	
 	private Task[] tasks;
-	// private VertexBuffer[] vertexBuffers = new VertexBuffer[5];
+	private EasyVertexBuffer[] vertexBuffers = new EasyVertexBuffer[5];
 	
 	private BlockPos currentBlock;
 	private BlockPos lastTorch;
@@ -144,14 +148,14 @@ public final class TunnellerHack extends Hack
 			currentBlock = null;
 		}
 		
-		// for(int i = 0; i < vertexBuffers.length; i++)
-		// {
-		// if(vertexBuffers[i] == null)
-		// continue;
-		//
-		// vertexBuffers[i].close();
-		// vertexBuffers[i] = null;
-		// }
+		for(int i = 0; i < vertexBuffers.length; i++)
+		{
+			if(vertexBuffers[i] == null)
+				continue;
+			
+			vertexBuffers[i].close();
+			vertexBuffers[i] = null;
+		}
 	}
 	
 	@Override
@@ -189,14 +193,13 @@ public final class TunnellerHack extends Hack
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack);
 		
-		// for(VertexBuffer buffer : vertexBuffers)
-		// {
-		// if(buffer == null)
-		// continue;
-		//
-		// RenderUtils.drawBuffer(matrixStack, buffer,
-		// WurstRenderLayers.ESP_LINES);
-		// }
+		for(EasyVertexBuffer buffer : vertexBuffers)
+		{
+			if(buffer == null)
+				continue;
+			
+			buffer.draw(matrixStack, WurstRenderLayers.ESP_LINES);
+		}
 		
 		matrixStack.pop();
 		
@@ -205,24 +208,24 @@ public final class TunnellerHack extends Hack
 	
 	private void updateCyanBuffer()
 	{
-		// if(vertexBuffers[0] != null)
-		// vertexBuffers[0].close();
-		//
-		// RegionPos region = RenderUtils.getCameraRegion();
-		// Vec3d offset = Vec3d.ofCenter(start).subtract(region.toVec3d());
-		// int cyan = 0x8000FFFF;
-		//
-		// Box nodeBox =
-		// new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25).offset(offset);
-		// Vec3d dirVec = Vec3d.of(direction.getVector());
-		// Vec3d arrowStart = dirVec.multiply(0.25).add(offset);
-		// Vec3d arrowEnd = dirVec.multiply(Math.max(0.5, length)).add(offset);
-		//
-		// vertexBuffers[0] = VertexBuffer.createAndUpload(DrawMode.LINES,
-		// VertexFormats.LINES, buffer -> {
-		// RenderUtils.drawNode(buffer, nodeBox, cyan);
-		// RenderUtils.drawArrow(buffer, arrowStart, arrowEnd, cyan, 0.1F);
-		// });
+		if(vertexBuffers[0] != null)
+			vertexBuffers[0].close();
+		
+		RegionPos region = RenderUtils.getCameraRegion();
+		Vec3d offset = Vec3d.ofCenter(start).subtract(region.toVec3d());
+		int cyan = 0x8000FFFF;
+		
+		Box nodeBox =
+			new Box(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25).offset(offset);
+		Vec3d dirVec = Vec3d.of(direction.getVector());
+		Vec3d arrowStart = dirVec.multiply(0.25).add(offset);
+		Vec3d arrowEnd = dirVec.multiply(Math.max(0.5, length)).add(offset);
+		
+		vertexBuffers[0] = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
+			VertexFormats.LINES, buffer -> {
+				RenderUtils.drawNode(buffer, nodeBox, cyan);
+				RenderUtils.drawArrow(buffer, arrowStart, arrowEnd, cyan, 0.1F);
+			});
 	}
 	
 	private BlockPos offset(BlockPos pos, Vec3i vec)
@@ -335,19 +338,19 @@ public final class TunnellerHack extends Hack
 				boxes.add(blockBox.offset(pos));
 			}
 			
-			// if(vertexBuffers[1] != null)
-			// {
-			// vertexBuffers[1].close();
-			// vertexBuffers[1] = null;
-			// }
-			//
-			// int green = 0x8000FF00;
-			// if(!boxes.isEmpty())
-			// vertexBuffers[1] = VertexBuffer.createAndUpload(DrawMode.LINES,
-			// VertexFormats.LINES, buffer -> {
-			// for(Box box : boxes)
-			// RenderUtils.drawOutlinedBox(buffer, box, green);
-			// });
+			if(vertexBuffers[1] != null)
+			{
+				vertexBuffers[1].close();
+				vertexBuffers[1] = null;
+			}
+			
+			int green = 0x8000FF00;
+			if(!boxes.isEmpty())
+				vertexBuffers[1] = EasyVertexBuffer.createAndUpload(
+					DrawMode.LINES, VertexFormats.LINES, buffer -> {
+						for(Box box : boxes)
+							RenderUtils.drawOutlinedBox(buffer, box, green);
+					});
 			
 			if(currentBlock == null)
 			{
@@ -418,27 +421,26 @@ public final class TunnellerHack extends Hack
 			for(BlockPos pos : BlockUtils.getAllInBox(from, to))
 				if(!BlockUtils.getState(pos).isFullCube(MC.world, pos))
 					blocks.add(pos);
-					
-			// if(vertexBuffers[2] != null)
-			// {
-			// vertexBuffers[2].close();
-			// vertexBuffers[2] = null;
-			// }
+				
+			if(vertexBuffers[2] != null)
+			{
+				vertexBuffers[2].close();
+				vertexBuffers[2] = null;
+			}
 			
 			if(!blocks.isEmpty())
 			{
-				// RegionPos region = RenderUtils.getCameraRegion();
-				// Box box = new Box(BlockPos.ORIGIN).contract(0.1)
-				// .offset(region.negate().toVec3d());
-				//
-				// int yellow = 0x80FFFF00;
-				// vertexBuffers[2] =
-				// VertexBuffer.createAndUpload(DrawMode.LINES,
-				// VertexFormats.LINES, buffer -> {
-				// for(BlockPos pos : blocks)
-				// RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
-				// yellow);
-				// });
+				RegionPos region = RenderUtils.getCameraRegion();
+				Box box = new Box(BlockPos.ORIGIN).contract(0.1)
+					.offset(region.negate().toVec3d());
+				
+				int yellow = 0x80FFFF00;
+				vertexBuffers[2] = EasyVertexBuffer.createAndUpload(
+					DrawMode.LINES, VertexFormats.LINES, buffer -> {
+						for(BlockPos pos : blocks)
+							RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
+								yellow);
+					});
 				
 				return true;
 			}
@@ -563,26 +565,26 @@ public final class TunnellerHack extends Hack
 			
 			ChatUtils.error("The tunnel is flooded, cannot continue.");
 			
-			// if(vertexBuffers[3] != null)
-			// {
-			// vertexBuffers[3].close();
-			// vertexBuffers[3] = null;
-			// }
-			//
-			// if(!liquids.isEmpty())
-			// {
-			// RegionPos region = RenderUtils.getCameraRegion();
-			// Box box = new Box(BlockPos.ORIGIN).contract(0.1)
-			// .offset(region.negate().toVec3d());
-			//
-			// int red = 0x80FF0000;
-			// vertexBuffers[3] = VertexBuffer.createAndUpload(DrawMode.LINES,
-			// VertexFormats.LINES, buffer -> {
-			// for(BlockPos pos : liquids)
-			// RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
-			// red);
-			// });
-			// }
+			if(vertexBuffers[3] != null)
+			{
+				vertexBuffers[3].close();
+				vertexBuffers[3] = null;
+			}
+			
+			if(!liquids.isEmpty())
+			{
+				RegionPos region = RenderUtils.getCameraRegion();
+				Box box = new Box(BlockPos.ORIGIN).contract(0.1)
+					.offset(region.negate().toVec3d());
+				
+				int red = 0x80FF0000;
+				vertexBuffers[3] = EasyVertexBuffer.createAndUpload(
+					DrawMode.LINES, VertexFormats.LINES, buffer -> {
+						for(BlockPos pos : liquids)
+							RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
+								red);
+					});
+			}
 			
 			return true;
 		}
@@ -641,11 +643,11 @@ public final class TunnellerHack extends Hack
 		@Override
 		public boolean canRun()
 		{
-			// if(vertexBuffers[4] != null)
-			// {
-			// vertexBuffers[4].close();
-			// vertexBuffers[4] = null;
-			// }
+			if(vertexBuffers[4] != null)
+			{
+				vertexBuffers[4].close();
+				vertexBuffers[4] = null;
+			}
 			
 			if(!torches.isChecked())
 			{
@@ -660,17 +662,17 @@ public final class TunnellerHack extends Hack
 			if(lastTorch != null)
 				nextTorch = lastTorch.offset(direction,
 					size.getSelected().torchDistance);
-				
-			// RegionPos region = RenderUtils.getCameraRegion();
-			// Vec3d torchVec =
-			// Vec3d.ofBottomCenter(nextTorch).subtract(region.toVec3d());
-			//
-			// int yellow = 0x80FFFF00;
-			// vertexBuffers[4] = VertexBuffer.createAndUpload(DrawMode.LINES,
-			// VertexFormats.LINES, buffer -> {
-			// RenderUtils.drawArrow(buffer, torchVec,
-			// torchVec.add(0, 0.5, 0), yellow, 0.1F);
-			// });
+			
+			RegionPos region = RenderUtils.getCameraRegion();
+			Vec3d torchVec =
+				Vec3d.ofBottomCenter(nextTorch).subtract(region.toVec3d());
+			
+			int yellow = 0x80FFFF00;
+			vertexBuffers[4] = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
+				VertexFormats.LINES, buffer -> {
+					RenderUtils.drawArrow(buffer, torchVec,
+						torchVec.add(0, 0.5, 0), yellow, 0.1F);
+				});
 			
 			BlockPos player = BlockPos.ofFloored(MC.player.getPos());
 			if(getDistance(player, nextTorch) > 4)
