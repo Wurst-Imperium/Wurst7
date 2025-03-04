@@ -9,8 +9,6 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.event.Event;
 import net.wurstclient.event.Listener;
@@ -33,12 +31,8 @@ public interface RenderListener extends Listener
 		@Override
 		public void fire(ArrayList<RenderListener> listeners)
 		{
-			GL11.glEnable(GL11.GL_LINE_SMOOTH);
-			
 			for(RenderListener listener : listeners)
 				listener.onRender(matrixStack, partialTicks);
-			
-			GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		}
 		
 		@Override

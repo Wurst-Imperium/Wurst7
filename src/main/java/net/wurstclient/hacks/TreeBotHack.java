@@ -246,7 +246,6 @@ public final class TreeBotHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// RenderSystem.setShader(ShaderProgramKeys.POSITION);
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		
 		if(treeFinder != null)
