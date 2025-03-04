@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.minecraft.client.util.math.MatrixStack;
@@ -162,7 +163,7 @@ public final class NewChunksHack extends Hack
 			if(showReasons.isChecked())
 				renderer.updateBuffer(1, reasonsRenderer.getLayer(),
 					buffer -> reasonsRenderer.buildBuffer(buffer,
-						newChunkReasons));
+						List.copyOf(newChunkReasons)));
 		}
 		
 		if(showSetting.includesOld())
@@ -173,7 +174,7 @@ public final class NewChunksHack extends Hack
 			if(showReasons.isChecked())
 				renderer.updateBuffer(3, reasonsRenderer.getLayer(),
 					buffer -> reasonsRenderer.buildBuffer(buffer,
-						oldChunkReasons));
+						List.copyOf(oldChunkReasons)));
 		}
 	}
 	
