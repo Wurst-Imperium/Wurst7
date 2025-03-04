@@ -105,6 +105,14 @@ public enum WurstRenderLayers
 		RenderLayer.MultiPhaseParameters.builder().build(false));
 	
 	/**
+	 * Similar to {@link RenderLayer#getDebugQuads()}, but with no depth test.
+	 */
+	public static final RenderLayer.MultiPhase ESP_QUADS_NO_CULLING =
+		RenderLayer.of("wurst:esp_quads_no_culling", 1536, false, true,
+			WurstShaderPipelines.ESP_QUADS_NO_CULLING,
+			RenderLayer.MultiPhaseParameters.builder().build(false));
+	
+	/**
 	 * Returns either {@link #QUADS} or {@link #ESP_QUADS} depending on the
 	 * value of {@code depthTest}.
 	 */

@@ -76,4 +76,12 @@ public enum WurstShaderPipelines
 		.register(ShaderPipeline.builder(ShaderPipelines.POSITION_COLOR)
 			.id("pipeline/wurst_esp_quads")
 			.depthTest(DepthTestState.NO_DEPTH_TEST).create());
+	
+	/**
+	 * Similar to the DEBUG_QUADS ShaderPipeline, but with no depth test.
+	 */
+	public static final ShaderPipeline ESP_QUADS_NO_CULLING = ShaderPipelines
+		.register(ShaderPipeline.builder(ShaderPipelines.POSITION_COLOR)
+			.id("pipeline/wurst_esp_quads").culling(false)
+			.depthTest(DepthTestState.NO_DEPTH_TEST).create());
 }
