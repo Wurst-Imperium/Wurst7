@@ -8,6 +8,7 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
@@ -24,10 +25,13 @@ import net.wurstclient.hacks.AutoStealHack;
 public abstract class ShulkerBoxScreenMixin
 	extends HandledScreen<ShulkerBoxScreenHandler>
 {
+	@Unique
 	private final int rows = 3;
 	
+	@Unique
 	private final AutoStealHack autoSteal =
 		WurstClient.INSTANCE.getHax().autoStealHack;
+	@Unique
 	private int mode;
 	
 	private ShulkerBoxScreenMixin(WurstClient wurst,
@@ -37,7 +41,7 @@ public abstract class ShulkerBoxScreenMixin
 	}
 	
 	@Override
-	protected void init()
+	public void init()
 	{
 		super.init();
 		
@@ -59,16 +63,19 @@ public abstract class ShulkerBoxScreenMixin
 			steal();
 	}
 	
+	@Unique
 	private void steal()
 	{
 		runInThread(() -> shiftClickSlots(0, rows * 9, 1));
 	}
 	
+	@Unique
 	private void store()
 	{
 		runInThread(() -> shiftClickSlots(rows * 9, rows * 9 + 44, 2));
 	}
 	
+	@Unique
 	private void runInThread(Runnable r)
 	{
 		new Thread(() -> {
@@ -83,6 +90,7 @@ public abstract class ShulkerBoxScreenMixin
 		}).start();
 	}
 	
+	@Unique
 	private void shiftClickSlots(int from, int to, int mode)
 	{
 		this.mode = mode;
@@ -101,6 +109,7 @@ public abstract class ShulkerBoxScreenMixin
 		}
 	}
 	
+	@Unique
 	private void waitForDelay()
 	{
 		try
