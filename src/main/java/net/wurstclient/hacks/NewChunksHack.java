@@ -156,20 +156,24 @@ public final class NewChunksHack extends Hack
 		
 		if(showSetting.includesNew())
 		{
-			renderer.updateBuffer(0, chunkRenderer.buildBuffer(newChunks, dd));
+			renderer.updateBuffer(0, chunkRenderer.getLayer(),
+				buffer -> chunkRenderer.buildBuffer(buffer, newChunks, dd));
 			
 			if(showReasons.isChecked())
-				renderer.updateBuffer(1,
-					reasonsRenderer.buildBuffer(newChunkReasons));
+				renderer.updateBuffer(1, reasonsRenderer.getLayer(),
+					buffer -> reasonsRenderer.buildBuffer(buffer,
+						newChunkReasons));
 		}
 		
 		if(showSetting.includesOld())
 		{
-			renderer.updateBuffer(2, chunkRenderer.buildBuffer(oldChunks, dd));
+			renderer.updateBuffer(2, chunkRenderer.getLayer(),
+				buffer -> chunkRenderer.buildBuffer(buffer, oldChunks, dd));
 			
 			if(showReasons.isChecked())
-				renderer.updateBuffer(3,
-					reasonsRenderer.buildBuffer(oldChunkReasons));
+				renderer.updateBuffer(3, reasonsRenderer.getLayer(),
+					buffer -> reasonsRenderer.buildBuffer(buffer,
+						oldChunkReasons));
 		}
 	}
 	

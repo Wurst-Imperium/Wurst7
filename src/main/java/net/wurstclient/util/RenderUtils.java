@@ -221,6 +221,14 @@ public enum RenderUtils
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, normal);
 	}
 	
+	public static void drawLine(VertexConsumer buffer, float x1, float y1,
+		float z1, float x2, float y2, float z2, int color)
+	{
+		Vector3f n = new Vector3f(x2, y2, z2).sub(x1, y1, z1).normalize();
+		buffer.vertex(x1, y1, z1).color(color).normal(n.x, n.y, n.z);
+		buffer.vertex(x2, y2, z2).color(color).normal(n.x, n.y, n.z);
+	}
+	
 	public static void drawCurvedLine(MatrixStack matrices, List<Vec3d> points,
 		int color, boolean depthTest)
 	{
