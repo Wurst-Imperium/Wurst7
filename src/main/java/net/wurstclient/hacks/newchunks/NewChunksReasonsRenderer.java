@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks.newchunks;
 
-import java.util.Set;
+import java.util.List;
 
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -28,7 +28,7 @@ public final class NewChunksReasonsRenderer
 		this.drawDistance = drawDistance;
 	}
 	
-	public void buildBuffer(VertexConsumer buffer, Set<BlockPos> reasons)
+	public void buildBuffer(VertexConsumer buffer, List<BlockPos> reasons)
 	{
 		ChunkPos camChunkPos = new ChunkPos(RenderUtils.getCameraBlockPos());
 		RegionPos region = RegionPos.of(camChunkPos);
