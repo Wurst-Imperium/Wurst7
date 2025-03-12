@@ -25,8 +25,8 @@ public final class WurstE2ETestClient implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
-		// if(System.getProperty("wurst.e2eTest") == null)
-		// return;
+		if(System.getProperty("wurst.e2eTest") == null)
+			return;
 		
 		Thread.ofVirtual().name("Wurst End-to-End Test")
 			.uncaughtExceptionHandler((t, e) -> {
