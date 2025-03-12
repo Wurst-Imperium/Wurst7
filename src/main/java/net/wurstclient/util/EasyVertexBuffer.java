@@ -104,7 +104,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 			return;
 		
 		layer.startDrawing();
-		Framebuffer framebuffer = layer.method_68494();
+		Framebuffer framebuffer = layer.getTarget();
 		ShaderPipeline pipeline = layer.method_68495();
 		
 		try(RenderPass renderPass =
