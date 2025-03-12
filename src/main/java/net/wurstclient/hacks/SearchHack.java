@@ -15,9 +15,9 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -240,8 +240,8 @@ public final class SearchHack extends Hack
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		
-		vertexBuffer = EasyVertexBuffer.createAndUpload(DrawMode.QUADS,
-			VertexFormats.POSITION_COLOR, buffer -> {
+		vertexBuffer = EasyVertexBuffer.createAndUpload(class_5596.QUADS,
+			VertexFormats.field_1576, buffer -> {
 				for(int[] vertex : vertices)
 					buffer.vertex(vertex[0] - region.x(), vertex[1],
 						vertex[2] - region.z()).color(0xFFFFFFFF);

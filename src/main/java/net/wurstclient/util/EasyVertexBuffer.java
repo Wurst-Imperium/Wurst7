@@ -13,22 +13,22 @@ import java.util.function.Consumer;
 
 import org.joml.Matrix4fStack;
 
+import com.mojang.blaze3d.buffers.BufferType;
+import com.mojang.blaze3d.buffers.BufferUsage;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
 
 import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gl.GlBufferTarget;
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.GpuBuffer;
-import net.minecraft.client.gl.ShaderPipeline;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.BuiltBuffer.DrawParameters;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPass;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.util.math.MatrixStack;
 
 /**
@@ -44,11 +44,11 @@ public final class EasyVertexBuffer implements AutoCloseable
 	/**
 	 * Drop-in replacement for {@code VertexBuffer.createAndUpload()}.
 	 */
-	public static EasyVertexBuffer createAndUpload(DrawMode drawMode,
+	public static EasyVertexBuffer createAndUpload(class_5596 drawMode,
 		VertexFormat format, Consumer<VertexConsumer> callback)
 	{
 		BufferBuilder bufferBuilder =
-			Tessellator.getInstance().begin(drawMode, format);
+			Tessellator.getInstance().method_60827(drawMode, format);
 		callback.accept(bufferBuilder);
 		
 		try(BuiltBuffer buffer = bufferBuilder.endNullable())
@@ -60,19 +60,19 @@ public final class EasyVertexBuffer implements AutoCloseable
 		}
 	}
 	
-	private EasyVertexBuffer(BuiltBuffer buffer, DrawMode drawMode)
+	private EasyVertexBuffer(BuiltBuffer buffer, class_5596 drawMode)
 	{
 		DrawParameters drawParams = buffer.getDrawParameters();
 		shapeIndexBuffer = RenderSystem.getSequentialBuffer(drawParams.mode());
 		indexCount = drawParams.indexCount();
 		
-		GlBufferTarget target = GlBufferTarget.VERTICES;
-		GlUsage usage = GlUsage.STATIC_WRITE;
+		BufferType target = BufferType.VERTICES;
+		BufferUsage usage = BufferUsage.STATIC_WRITE;
 		vertexBuffer = RenderSystem.getDevice().createBuffer(null, target,
 			usage, buffer.getBuffer());
 	}
 	
-	private EasyVertexBuffer(DrawMode drawMode)
+	private EasyVertexBuffer(class_5596 drawMode)
 	{
 		shapeIndexBuffer = null;
 		indexCount = 0;
@@ -105,20 +105,19 @@ public final class EasyVertexBuffer implements AutoCloseable
 		
 		layer.startDrawing();
 		Framebuffer framebuffer = layer.getTarget();
-		ShaderPipeline pipeline = layer.method_68495();
+		RenderPipeline pipeline = layer.method_68495();
 		
-		try(RenderPass renderPass =
-			RenderSystem.getDevice().getResourceManager().newRenderPass(
-				framebuffer.getColorAttachment(), OptionalInt.empty(),
-				framebuffer.useDepthAttachment
-					? framebuffer.getDepthAttachment() : null,
+		try(RenderPass renderPass = RenderSystem.getDevice()
+			.createCommandEncoder().createRenderPass(framebuffer.method_30277(),
+				OptionalInt.empty(), framebuffer.useDepthAttachment
+					? framebuffer.method_30278() : null,
 				OptionalDouble.empty()))
 		{
-			renderPass.bindShader(pipeline);
+			renderPass.setPipeline(pipeline);
 			renderPass.setVertexBuffer(0, vertexBuffer);
 			renderPass.setIndexBuffer(shapeIndexBuffer.method_68274(indexCount),
-				shapeIndexBuffer.getIndexType());
-			renderPass.drawObjects(0, indexCount);
+				shapeIndexBuffer.method_31924());
+			renderPass.drawIndexed(0, indexCount);
 		}
 		
 		layer.endDrawing();

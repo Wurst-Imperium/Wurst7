@@ -7,12 +7,12 @@
  */
 package net.wurstclient;
 
-import net.minecraft.client.gl.BlendPrograms;
-import net.minecraft.client.gl.ShaderPipeline;
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DepthTestFunction;
+import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
+
 import net.minecraft.client.gl.ShaderPipelines;
-import net.minecraft.client.render.DepthTestState;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 
 public enum WurstShaderPipelines
@@ -23,65 +23,69 @@ public enum WurstShaderPipelines
 	 * Similar to the DEBUG_LINE_STIP ShaderPipeline, but as a non-srip
 	 * version with support for transparency.
 	 */
-	public static final ShaderPipeline ONE_PIXEL_LINES = ShaderPipelines
-		.register(ShaderPipeline.builder(ShaderPipelines.MATRICES_COLOR)
-			.id("pipeline/wurst_1px_lines").vertices("core/position_color")
-			.pass("core/position_color").blender(BlendPrograms.TRANSLUCENT)
-			.culling(false).format(VertexFormats.POSITION_COLOR,
-				VertexFormat.DrawMode.DEBUG_LINES)
-			.create());
+	public static final RenderPipeline ONE_PIXEL_LINES = ShaderPipelines
+		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56849)
+			.withLocation("pipeline/wurst_1px_lines")
+			.withVertexShader("core/position_color")
+			.withFragmentShader("core/position_color")
+			.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
+			.withVertexFormat(VertexFormats.field_1576, class_5596.DEBUG_LINES)
+			.build());
 	
 	/**
 	 * Similar to the DEBUG_LINE_STIP ShaderPipeline, but with support for
 	 * transparency.
 	 */
-	public static final ShaderPipeline ONE_PIXEL_LINE_STRIP = ShaderPipelines
-		.register(ShaderPipeline.builder(ShaderPipelines.MATRICES_COLOR)
-			.id("pipeline/wurst_1px_line_strip").vertices("core/position_color")
-			.pass("core/position_color").blender(BlendPrograms.TRANSLUCENT)
-			.culling(false).format(VertexFormats.POSITION_COLOR,
-				VertexFormat.DrawMode.DEBUG_LINE_STRIP)
-			.create());
+	public static final RenderPipeline ONE_PIXEL_LINE_STRIP = ShaderPipelines
+		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56849)
+			.withLocation("pipeline/wurst_1px_line_strip")
+			.withVertexShader("core/position_color")
+			.withFragmentShader("core/position_color")
+			.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
+			.withVertexFormat(VertexFormats.field_1576,
+				class_5596.DEBUG_LINE_STRIP)
+			.build());
 	
 	/**
 	 * Similar to the LINES ShaderPipeline, but with no depth test.
 	 */
-	public static final ShaderPipeline ESP_LINES = ShaderPipelines
-		.register(ShaderPipeline.builder(ShaderPipelines.RENDERTYPE_LINES)
-			.id("pipeline/wurst_esp_lines")
-			.depthTest(DepthTestState.NO_DEPTH_TEST).create());
+	public static final RenderPipeline ESP_LINES = ShaderPipelines
+		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56859)
+			.withLocation("pipeline/wurst_esp_lines")
+			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**
 	 * Similar to the LINE_STRIP ShaderPipeline, but with no depth test.
 	 */
-	public static final ShaderPipeline ESP_LINE_STRIP = ShaderPipelines
-		.register(ShaderPipeline.builder(ShaderPipelines.RENDERTYPE_LINES)
-			.id("pipeline/wurst_esp_line_strip")
-			.format(VertexFormats.LINES, DrawMode.LINE_STRIP)
-			.depthTest(DepthTestState.NO_DEPTH_TEST).create());
+	public static final RenderPipeline ESP_LINE_STRIP = ShaderPipelines
+		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56859)
+			.withLocation("pipeline/wurst_esp_line_strip")
+			.withVertexFormat(VertexFormats.field_29337, class_5596.LINE_STRIP)
+			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with culling enabled.
 	 */
-	public static final ShaderPipeline QUADS =
-		ShaderPipelines.register(ShaderPipeline
-			.builder(ShaderPipelines.POSITION_COLOR).id("pipeline/wurst_quads")
-			.depthTest(DepthTestState.LEQUAL_DEPTH_TEST).create());
+	public static final RenderPipeline QUADS = ShaderPipelines
+		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56860)
+			.withLocation("pipeline/wurst_quads")
+			.withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
+			.build());
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with culling enabled
 	 * and no depth test.
 	 */
-	public static final ShaderPipeline ESP_QUADS = ShaderPipelines
-		.register(ShaderPipeline.builder(ShaderPipelines.POSITION_COLOR)
-			.id("pipeline/wurst_esp_quads")
-			.depthTest(DepthTestState.NO_DEPTH_TEST).create());
+	public static final RenderPipeline ESP_QUADS = ShaderPipelines
+		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56860)
+			.withLocation("pipeline/wurst_esp_quads")
+			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with no depth test.
 	 */
-	public static final ShaderPipeline ESP_QUADS_NO_CULLING = ShaderPipelines
-		.register(ShaderPipeline.builder(ShaderPipelines.POSITION_COLOR)
-			.id("pipeline/wurst_esp_quads").culling(false)
-			.depthTest(DepthTestState.NO_DEPTH_TEST).create());
+	public static final RenderPipeline ESP_QUADS_NO_CULLING = ShaderPipelines
+		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56860)
+			.withLocation("pipeline/wurst_esp_quads").withCull(false)
+			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 }
