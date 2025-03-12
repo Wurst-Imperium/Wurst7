@@ -106,7 +106,7 @@ jobs:
     - name: Run the mod and take screenshots
       uses: GabrielBB/xvfb-action@v1.7
       with:
-        run: ./gradlew runEndToEndTest --stacktrace --warning-mode=fail
+        run: ./gradlew runClient --stacktrace --warning-mode=fail
 
     # Needed because the screenshot gallery won't be created on pull requests.
     # Also useful if Imgur uploads fail.
