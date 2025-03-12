@@ -7,11 +7,9 @@
  */
 package net.wurstclient.hacks.autofarm;
 
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 import java.util.List;
 import java.util.Set;
-
-import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
-
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
@@ -63,8 +61,8 @@ public final class AutoFarmRenderer
 			&& blocksToReplant.isEmpty())
 			return;
 		
-		vertexBuffer = EasyVertexBuffer.createAndUpload(class_5596.LINES,
-			VertexFormats.field_29337, buffer -> buildBuffer(buffer,
+		vertexBuffer = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
+			VertexFormats.LINE_COLOR_NORMAL, buffer -> buildBuffer(buffer,
 				blocksToHarvest, plants, blocksToReplant));
 	}
 	

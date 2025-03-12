@@ -10,8 +10,7 @@ package net.wurstclient;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
-import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
-
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 import net.minecraft.client.gl.ShaderPipelines;
 import net.minecraft.client.render.VertexFormats;
 
@@ -24,12 +23,13 @@ public enum WurstShaderPipelines
 	 * version with support for transparency.
 	 */
 	public static final RenderPipeline ONE_PIXEL_LINES = ShaderPipelines
-		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56849)
+		.register(RenderPipeline.builder(ShaderPipelines.MATRICES_COLOR_SNIPPET)
 			.withLocation("pipeline/wurst_1px_lines")
 			.withVertexShader("core/position_color")
 			.withFragmentShader("core/position_color")
 			.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
-			.withVertexFormat(VertexFormats.field_1576, class_5596.DEBUG_LINES)
+			.withVertexFormat(VertexFormats.POSITION_COLOR,
+				DrawMode.DEBUG_LINES)
 			.build());
 	
 	/**
@@ -37,37 +37,39 @@ public enum WurstShaderPipelines
 	 * transparency.
 	 */
 	public static final RenderPipeline ONE_PIXEL_LINE_STRIP = ShaderPipelines
-		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56849)
+		.register(RenderPipeline.builder(ShaderPipelines.MATRICES_COLOR_SNIPPET)
 			.withLocation("pipeline/wurst_1px_line_strip")
 			.withVertexShader("core/position_color")
 			.withFragmentShader("core/position_color")
 			.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
-			.withVertexFormat(VertexFormats.field_1576,
-				class_5596.DEBUG_LINE_STRIP)
+			.withVertexFormat(VertexFormats.POSITION_COLOR,
+				DrawMode.DEBUG_LINE_STRIP)
 			.build());
 	
 	/**
 	 * Similar to the LINES ShaderPipeline, but with no depth test.
 	 */
-	public static final RenderPipeline ESP_LINES = ShaderPipelines
-		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56859)
+	public static final RenderPipeline ESP_LINES = ShaderPipelines.register(
+		RenderPipeline.builder(ShaderPipelines.RENDERTYPE_LINES_SNIPPET)
 			.withLocation("pipeline/wurst_esp_lines")
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**
 	 * Similar to the LINE_STRIP ShaderPipeline, but with no depth test.
 	 */
-	public static final RenderPipeline ESP_LINE_STRIP = ShaderPipelines
-		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56859)
+	public static final RenderPipeline ESP_LINE_STRIP =
+		ShaderPipelines.register(RenderPipeline
+			.builder(ShaderPipelines.RENDERTYPE_LINES_SNIPPET)
 			.withLocation("pipeline/wurst_esp_line_strip")
-			.withVertexFormat(VertexFormats.field_29337, class_5596.LINE_STRIP)
+			.withVertexFormat(VertexFormats.LINE_COLOR_NORMAL,
+				DrawMode.LINE_STRIP)
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with culling enabled.
 	 */
 	public static final RenderPipeline QUADS = ShaderPipelines
-		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56860)
+		.register(RenderPipeline.builder(ShaderPipelines.POSITION_COLOR_SNIPPET)
 			.withLocation("pipeline/wurst_quads")
 			.withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
 			.build());
@@ -77,7 +79,7 @@ public enum WurstShaderPipelines
 	 * and no depth test.
 	 */
 	public static final RenderPipeline ESP_QUADS = ShaderPipelines
-		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56860)
+		.register(RenderPipeline.builder(ShaderPipelines.POSITION_COLOR_SNIPPET)
 			.withLocation("pipeline/wurst_esp_quads")
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
@@ -85,7 +87,7 @@ public enum WurstShaderPipelines
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with no depth test.
 	 */
 	public static final RenderPipeline ESP_QUADS_NO_CULLING = ShaderPipelines
-		.method_67887(RenderPipeline.builder(ShaderPipelines.field_56860)
+		.register(RenderPipeline.builder(ShaderPipelines.POSITION_COLOR_SNIPPET)
 			.withLocation("pipeline/wurst_esp_quads").withCull(false)
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 }

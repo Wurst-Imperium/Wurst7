@@ -20,7 +20,7 @@ public record BufferWithLayer(EasyVertexBuffer buffer, RenderLayer layer)
 		Consumer<VertexConsumer> callback)
 	{
 		return new BufferWithLayer(EasyVertexBuffer.createAndUpload(
-			layer.method_23033(), layer.method_23031(), callback), layer);
+			layer.getDrawMode(), layer.getVertexFormat(), callback), layer);
 	}
 	
 	public void draw(MatrixStack matrixStack)

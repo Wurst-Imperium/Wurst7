@@ -11,8 +11,7 @@ import java.awt.Color;
 import java.util.Map.Entry;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
-
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -67,8 +66,8 @@ public final class MobSpawnEspHack extends Hack
 	private final HitboxCheckSetting hitboxCheck = new HitboxCheckSetting();
 	
 	private final ChunkVertexBufferCoordinator coordinator =
-		new ChunkVertexBufferCoordinator(this::isSpawnable, class_5596.LINES,
-			VertexFormats.field_29337, this::buildBuffer, drawDistance);
+		new ChunkVertexBufferCoordinator(this::isSpawnable, DrawMode.LINES,
+			VertexFormats.LINE_COLOR_NORMAL, this::buildBuffer, drawDistance);
 	
 	private int cachedDayColor;
 	private int cachedNightColor;

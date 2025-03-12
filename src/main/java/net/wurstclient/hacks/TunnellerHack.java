@@ -7,13 +7,11 @@
  */
 package net.wurstclient.hacks;
 
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.stream.StreamSupport;
-
-import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -222,8 +220,8 @@ public final class TunnellerHack extends Hack
 		Vec3d arrowStart = dirVec.multiply(0.25).add(offset);
 		Vec3d arrowEnd = dirVec.multiply(Math.max(0.5, length)).add(offset);
 		
-		vertexBuffers[0] = EasyVertexBuffer.createAndUpload(class_5596.LINES,
-			VertexFormats.field_29337, buffer -> {
+		vertexBuffers[0] = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
+			VertexFormats.LINE_COLOR_NORMAL, buffer -> {
 				RenderUtils.drawNode(buffer, nodeBox, cyan);
 				RenderUtils.drawArrow(buffer, arrowStart, arrowEnd, cyan, 0.1F);
 			});
@@ -348,7 +346,7 @@ public final class TunnellerHack extends Hack
 			int green = 0x8000FF00;
 			if(!boxes.isEmpty())
 				vertexBuffers[1] = EasyVertexBuffer.createAndUpload(
-					class_5596.LINES, VertexFormats.field_29337, buffer -> {
+					DrawMode.LINES, VertexFormats.LINE_COLOR_NORMAL, buffer -> {
 						for(Box box : boxes)
 							RenderUtils.drawOutlinedBox(buffer, box, green);
 					});
@@ -437,7 +435,7 @@ public final class TunnellerHack extends Hack
 				
 				int yellow = 0x80FFFF00;
 				vertexBuffers[2] = EasyVertexBuffer.createAndUpload(
-					class_5596.LINES, VertexFormats.field_29337, buffer -> {
+					DrawMode.LINES, VertexFormats.LINE_COLOR_NORMAL, buffer -> {
 						for(BlockPos pos : blocks)
 							RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
 								yellow);
@@ -580,7 +578,7 @@ public final class TunnellerHack extends Hack
 				
 				int red = 0x80FF0000;
 				vertexBuffers[3] = EasyVertexBuffer.createAndUpload(
-					class_5596.LINES, VertexFormats.field_29337, buffer -> {
+					DrawMode.LINES, VertexFormats.LINE_COLOR_NORMAL, buffer -> {
 						for(BlockPos pos : liquids)
 							RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
 								red);
@@ -669,8 +667,8 @@ public final class TunnellerHack extends Hack
 				Vec3d.ofBottomCenter(nextTorch).subtract(region.toVec3d());
 			
 			int yellow = 0x80FFFF00;
-			vertexBuffers[4] = EasyVertexBuffer.createAndUpload(
-				class_5596.LINES, VertexFormats.field_29337, buffer -> {
+			vertexBuffers[4] = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
+				VertexFormats.LINE_COLOR_NORMAL, buffer -> {
 					RenderUtils.drawArrow(buffer, torchVec,
 						torchVec.add(0, 0.5, 0), yellow, 0.1F);
 				});

@@ -20,8 +20,7 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat.class_5596;
-
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
@@ -44,7 +43,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 	/**
 	 * Drop-in replacement for {@code VertexBuffer.createAndUpload()}.
 	 */
-	public static EasyVertexBuffer createAndUpload(class_5596 drawMode,
+	public static EasyVertexBuffer createAndUpload(DrawMode drawMode,
 		VertexFormat format, Consumer<VertexConsumer> callback)
 	{
 		BufferBuilder bufferBuilder =
@@ -60,7 +59,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 		}
 	}
 	
-	private EasyVertexBuffer(BuiltBuffer buffer, class_5596 drawMode)
+	private EasyVertexBuffer(BuiltBuffer buffer, DrawMode drawMode)
 	{
 		DrawParameters drawParams = buffer.getDrawParameters();
 		shapeIndexBuffer = RenderSystem.getSequentialBuffer(drawParams.mode());
@@ -72,7 +71,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 			usage, buffer.getBuffer());
 	}
 	
-	private EasyVertexBuffer(class_5596 drawMode)
+	private EasyVertexBuffer(DrawMode drawMode)
 	{
 		shapeIndexBuffer = null;
 		indexCount = 0;
@@ -105,18 +104,20 @@ public final class EasyVertexBuffer implements AutoCloseable
 		
 		layer.startDrawing();
 		Framebuffer framebuffer = layer.getTarget();
-		RenderPipeline pipeline = layer.method_68495();
+		RenderPipeline pipeline = layer.getPipeline();
 		
-		try(RenderPass renderPass = RenderSystem.getDevice()
-			.createCommandEncoder().createRenderPass(framebuffer.method_30277(),
-				OptionalInt.empty(), framebuffer.useDepthAttachment
-					? framebuffer.method_30278() : null,
+		try(RenderPass renderPass =
+			RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+				framebuffer.getColorAttachment(), OptionalInt.empty(),
+				framebuffer.useDepthAttachment
+					? framebuffer.getDepthAttachment() : null,
 				OptionalDouble.empty()))
 		{
 			renderPass.setPipeline(pipeline);
 			renderPass.setVertexBuffer(0, vertexBuffer);
-			renderPass.setIndexBuffer(shapeIndexBuffer.method_68274(indexCount),
-				shapeIndexBuffer.method_31924());
+			renderPass.setIndexBuffer(
+				shapeIndexBuffer.getIndexBuffer(indexCount),
+				shapeIndexBuffer.getIndexType());
 			renderPass.drawIndexed(0, indexCount);
 		}
 		
