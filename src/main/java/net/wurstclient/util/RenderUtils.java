@@ -218,6 +218,18 @@ public enum RenderUtils
 	{
 		Vector3f normal = new Vector3f(x2, y2, z2).sub(x1, y1, z1).normalize();
 		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, normal);
+		
+		// If the line goes through the screen, add another vertex there. This
+		// works around a bug in Minecraft's line shader.
+		float t = new Vector3f(x1, y1, z1).negate().dot(normal);
+		float length = new Vector3f(x2, y2, z2).sub(x1, y1, z1).length();
+		if(t > 0 && t < length)
+		{
+			Vector3f closeToCam = new Vector3f(normal).mul(t).add(x1, y1, z1);
+			buffer.vertex(entry, closeToCam).color(color).normal(entry, normal);
+			buffer.vertex(entry, closeToCam).color(color).normal(entry, normal);
+		}
+		
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, normal);
 	}
 	
