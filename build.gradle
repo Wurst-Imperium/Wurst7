@@ -107,7 +107,7 @@ tasks.register('runEndToEndTest', JavaExec) {
 }
 
 processResources {
-	inputs.property "version", project.version
+	inputs.property "version", project.version.substring(1)
 	
 	filesMatching("fabric.mod.json") {
 		expand "version": inputs.properties.version
