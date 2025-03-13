@@ -135,7 +135,7 @@ public enum RenderUtils
 	
 	private static Vec3d getTracerOrigin(float partialTicks)
 	{
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks);
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks).multiply(10);
 		if(WurstClient.MC.options
 			.getPerspective() == Perspective.THIRD_PERSON_FRONT)
 			start = start.negate();
