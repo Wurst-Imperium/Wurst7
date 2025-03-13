@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -67,7 +68,8 @@ public final class MobSpawnEspHack extends Hack
 	
 	private final ChunkVertexBufferCoordinator coordinator =
 		new ChunkVertexBufferCoordinator(this::isSpawnable, DrawMode.LINES,
-			VertexFormats.LINE_COLOR_NORMAL, this::buildBuffer, drawDistance);
+			VertexFormats.POSITION_COLOR_NORMAL, this::buildBuffer,
+			drawDistance);
 	
 	private int cachedDayColor;
 	private int cachedNightColor;

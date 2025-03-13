@@ -21,6 +21,7 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
@@ -47,7 +48,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 		VertexFormat format, Consumer<VertexConsumer> callback)
 	{
 		BufferBuilder bufferBuilder =
-			Tessellator.getInstance().method_60827(drawMode, format);
+			Tessellator.getInstance().begin(drawMode, format);
 		callback.accept(bufferBuilder);
 		
 		try(BuiltBuffer buffer = bufferBuilder.endNullable())

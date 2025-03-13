@@ -11,6 +11,7 @@ import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+
 import net.minecraft.client.gl.ShaderPipelines;
 import net.minecraft.client.render.VertexFormats;
 
@@ -61,7 +62,7 @@ public enum WurstShaderPipelines
 		ShaderPipelines.register(RenderPipeline
 			.builder(ShaderPipelines.RENDERTYPE_LINES_SNIPPET)
 			.withLocation("pipeline/wurst_esp_line_strip")
-			.withVertexFormat(VertexFormats.LINE_COLOR_NORMAL,
+			.withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL,
 				DrawMode.LINE_STRIP)
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	

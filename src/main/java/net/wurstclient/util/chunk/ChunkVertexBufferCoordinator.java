@@ -17,6 +17,7 @@ import java.util.function.BiPredicate;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.math.BlockPos;
