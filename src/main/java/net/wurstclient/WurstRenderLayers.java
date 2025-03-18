@@ -8,8 +8,7 @@
 package net.wurstclient;
 
 import java.util.OptionalDouble;
-
-import net.minecraft.client.gl.ShaderPipelines;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;
 
@@ -50,7 +49,7 @@ public enum WurstRenderLayers
 	 * Similar to {@link RenderLayer#getLines()}, but with line width 2.
 	 */
 	public static final RenderLayer.MultiPhase LINES =
-		RenderLayer.of("wurst:lines", 1536, ShaderPipelines.LINES,
+		RenderLayer.of("wurst:lines", 1536, RenderPipelines.LINES,
 			RenderLayer.MultiPhaseParameters.builder()
 				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
 				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
@@ -71,7 +70,7 @@ public enum WurstRenderLayers
 	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2.
 	 */
 	public static final RenderLayer.MultiPhase LINE_STRIP = RenderLayer.of(
-		"wurst:line_strip", 1536, false, true, ShaderPipelines.LINE_STRIP,
+		"wurst:line_strip", 1536, false, true, RenderPipelines.LINE_STRIP,
 		RenderLayer.MultiPhaseParameters.builder()
 			.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
 			.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
