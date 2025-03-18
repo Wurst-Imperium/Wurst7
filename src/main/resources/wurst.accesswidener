@@ -1,6 +1,6 @@
 accessWidener	v1	named
 accessible	class	net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
-accessible	method	net/minecraft/client/gl/ShaderPipelines	register	(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+accessible	method	net/minecraft/client/gl/RenderPipelines	register	(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/Mouse	onMouseButton	(JIII)V
 accessible	method	net/minecraft/client/render/BackgroundRenderer	getFogModifier	(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;
@@ -11,9 +11,9 @@ accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$B
 accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	target	(Lnet/minecraft/client/render/RenderPhase$Target;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
 accessible	method	net/minecraft/entity/player/PlayerEntity	canGlide	()Z
 accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z
-accessible	field	net/minecraft/client/gl/ShaderPipelines	MATRICES_COLOR_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-accessible	field	net/minecraft/client/gl/ShaderPipelines	POSITION_COLOR_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-accessible	field	net/minecraft/client/gl/ShaderPipelines	RENDERTYPE_LINES_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible	field	net/minecraft/client/gl/RenderPipelines	MATRICES_COLOR_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible	field	net/minecraft/client/gl/RenderPipelines	POSITION_COLOR_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible	field	net/minecraft/client/gl/RenderPipelines	RENDERTYPE_LINES_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible	field	net/minecraft/client/MinecraftClient	itemUseCooldown	I
 accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;

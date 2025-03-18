@@ -8,6 +8,7 @@
 package net.wurstclient;
 
 import java.util.OptionalDouble;
+
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;

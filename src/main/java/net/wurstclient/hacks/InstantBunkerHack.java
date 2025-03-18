@@ -71,7 +71,7 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(stack.getCount() < 57 && !MC.player.isCreative())
+		if(stack.getCount() < 57 && !MC.player.getAbilities().creativeMode)
 			ChatUtils.warning("Not enough blocks. Bunker may be incomplete.");
 		
 		// get start pos and facings

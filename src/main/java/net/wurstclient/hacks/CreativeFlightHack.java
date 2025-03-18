@@ -70,7 +70,7 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 		ClientPlayerEntity player = MC.player;
 		PlayerAbilities abilities = player.getAbilities();
 		
-		boolean creative = player.isCreative();
+		boolean creative = player.getAbilities().creativeMode;
 		abilities.flying = creative && !player.isOnGround();
 		abilities.allowFlying = creative;
 		

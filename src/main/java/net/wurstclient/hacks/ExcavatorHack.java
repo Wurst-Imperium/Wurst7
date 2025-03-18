@@ -370,7 +370,7 @@ public final class ExcavatorHack extends Hack
 		overlay.updateProgress();
 		
 		// get remaining blocks
-		Predicate<BlockPos> pBreakable = MC.player.isCreative()
+		Predicate<BlockPos> pBreakable = MC.player.getAbilities().creativeMode
 			? BlockUtils::canBeClicked : pos -> BlockUtils.canBeClicked(pos)
 				&& !BlockUtils.isUnbreakable(pos);
 		area.remainingBlocks =

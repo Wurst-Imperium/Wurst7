@@ -31,9 +31,18 @@ public abstract class EntityRenderDispatcherMixin
 {
 	/**
 	 * Temporarily replaces an entity's display name to make HealthTags work.
+	 *
+	 * <p>
+	 * Target is the last render() method, set to private, just above
+	 * addRendererDetails().
+	 *
+	 * <p>
+	 * Method is the other private render() that calls it, the big one with
+	 * tickProgress and EntityRenderer parameters and CrashReport creation
+	 * logic.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;method_68834(Lnet/minecraft/client/render/entity/state/EntityRenderState;DDDLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V"),
+		target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;render(Lnet/minecraft/client/render/entity/state/EntityRenderState;DDDLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V"),
 		method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V")
 	private <E extends Entity, S extends EntityRenderState> void wrapRender(
 		EntityRenderDispatcher instance, S state, double x, double y, double z,
