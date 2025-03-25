@@ -5,9 +5,9 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "AbstractBlockRenderContextMixin",
     "AbstractBlockStateMixin",
     "AbstractSignEditScreenMixin",
+    "AbstractTerrainRenderContextMixin",
     "AllowedAddressResolverMixin",
     "BackgroundRendererMixin",
     "BlockEntityRenderDispatcherMixin",
