@@ -76,7 +76,7 @@ public final class AutoFishRodSelector
 	public boolean update()
 	{
 		PlayerInventory inventory = MC.player.getInventory();
-		int selectedSlot = inventory.selectedSlot;
+		int selectedSlot = inventory.getSelectedSlot();
 		ItemStack selectedStack = inventory.getStack(selectedSlot);
 		
 		// evaluate selected rod (or lack thereof)

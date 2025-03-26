@@ -47,7 +47,7 @@ public final class ModifyCmd extends Command
 		if(args.length < 2)
 			throw new CmdSyntaxError();
 		
-		ItemStack stack = player.getInventory().getMainHandStack();
+		ItemStack stack = player.getInventory().getSelectedStack();
 		
 		if(stack == null)
 			throw new CmdError("You must hold an item in your main hand.");
@@ -72,7 +72,7 @@ public final class ModifyCmd extends Command
 		
 		MC.player.networkHandler
 			.sendPacket(new CreativeInventoryActionC2SPacket(
-				36 + player.getInventory().selectedSlot, stack));
+				36 + player.getInventory().getSelectedSlot(), stack));
 		
 		ChatUtils.message("Item modified.");
 	}
@@ -89,7 +89,7 @@ public final class ModifyCmd extends Command
 		
 		try
 		{
-			NbtCompound parsedNbt = StringNbtReader.parse(nbtString);
+			NbtCompound parsedNbt = StringNbtReader.readCompound(nbtString);
 			itemNbt.copyFrom(parsedNbt);
 			stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(itemNbt));
 			
@@ -107,7 +107,7 @@ public final class ModifyCmd extends Command
 		
 		try
 		{
-			NbtCompound tag = StringNbtReader.parse(nbt);
+			NbtCompound tag = StringNbtReader.readCompound(nbt);
 			stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(tag));
 			
 		}catch(CommandSyntaxException e)
@@ -148,7 +148,7 @@ public final class ModifyCmd extends Command
 			if(!base.contains(part) || !(base.get(part) instanceof NbtCompound))
 				return null;
 			
-			base = base.getCompound(part);
+			base = base.getCompound(part).orElse(new NbtCompound());
 		}
 		
 		if(!base.contains(parts[parts.length - 1]))

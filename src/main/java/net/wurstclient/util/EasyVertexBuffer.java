@@ -7,32 +7,39 @@
  */
 package net.wurstclient.util;
 
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.function.Consumer;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import org.joml.Matrix4fStack;
 
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.VertexBuffer;
+import com.mojang.blaze3d.buffers.BufferType;
+import com.mojang.blaze3d.buffers.BufferUsage;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.BuiltBuffer.DrawParameters;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.util.math.MatrixStack;
 
 /**
  * An abstraction of Minecraft 1.21.5's new {@code GpuBuffer} system that makes
  * working with it as easy as {@code VertexBuffer} was.
- *
- * <p>
- * Backported to 1.21.4, where this is just a thin wrapper around
- * {@link VertexBuffer}.
  */
 public final class EasyVertexBuffer implements AutoCloseable
 {
-	private final VertexBuffer vertexBuffer;
+	private final RenderSystem.ShapeIndexBuffer shapeIndexBuffer;
+	private final GpuBuffer vertexBuffer;
+	private final int indexCount;
 	
 	/**
 	 * Drop-in replacement for {@code VertexBuffer.createAndUpload()}.
@@ -44,23 +51,31 @@ public final class EasyVertexBuffer implements AutoCloseable
 			Tessellator.getInstance().begin(drawMode, format);
 		callback.accept(bufferBuilder);
 		
-		BuiltBuffer buffer = bufferBuilder.endNullable();
-		if(buffer == null)
-			return new EasyVertexBuffer();
+		try(BuiltBuffer buffer = bufferBuilder.endNullable())
+		{
+			if(buffer == null)
+				return new EasyVertexBuffer(drawMode);
+			
+			return new EasyVertexBuffer(buffer, drawMode);
+		}
+	}
+	
+	private EasyVertexBuffer(BuiltBuffer buffer, DrawMode drawMode)
+	{
+		DrawParameters drawParams = buffer.getDrawParameters();
+		shapeIndexBuffer = RenderSystem.getSequentialBuffer(drawParams.mode());
+		indexCount = drawParams.indexCount();
 		
-		return new EasyVertexBuffer(buffer);
+		BufferType target = BufferType.VERTICES;
+		BufferUsage usage = BufferUsage.STATIC_WRITE;
+		vertexBuffer = RenderSystem.getDevice().createBuffer(null, target,
+			usage, buffer.getBuffer());
 	}
 	
-	private EasyVertexBuffer(BuiltBuffer buffer)
+	private EasyVertexBuffer(DrawMode drawMode)
 	{
-		vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
-		vertexBuffer.bind();
-		vertexBuffer.upload(buffer);
-		VertexBuffer.unbind();
-	}
-	
-	private EasyVertexBuffer()
-	{
+		shapeIndexBuffer = null;
+		indexCount = 0;
 		vertexBuffer = null;
 	}
 	
@@ -71,15 +86,13 @@ public final class EasyVertexBuffer implements AutoCloseable
 	 */
 	public void draw(MatrixStack matrixStack, RenderLayer layer)
 	{
-		if(vertexBuffer == null)
-			return;
+		Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
+		modelViewStack.pushMatrix();
+		modelViewStack.mul(matrixStack.peek().getPositionMatrix());
 		
-		layer.startDrawing();
-		vertexBuffer.bind();
-		vertexBuffer.draw(matrixStack.peek().getPositionMatrix(),
-			RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
-		VertexBuffer.unbind();
-		layer.endDrawing();
+		draw(layer);
+		
+		modelViewStack.popMatrix();
 	}
 	
 	/**
@@ -90,7 +103,26 @@ public final class EasyVertexBuffer implements AutoCloseable
 		if(vertexBuffer == null)
 			return;
 		
-		vertexBuffer.draw(layer);
+		layer.startDrawing();
+		Framebuffer framebuffer = layer.getTarget();
+		RenderPipeline pipeline = layer.getPipeline();
+		
+		try(RenderPass renderPass =
+			RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+				framebuffer.getColorAttachment(), OptionalInt.empty(),
+				framebuffer.useDepthAttachment
+					? framebuffer.getDepthAttachment() : null,
+				OptionalDouble.empty()))
+		{
+			renderPass.setPipeline(pipeline);
+			renderPass.setVertexBuffer(0, vertexBuffer);
+			renderPass.setIndexBuffer(
+				shapeIndexBuffer.getIndexBuffer(indexCount),
+				shapeIndexBuffer.getIndexType());
+			renderPass.drawIndexed(0, indexCount);
+		}
+		
+		layer.endDrawing();
 	}
 	
 	@Override

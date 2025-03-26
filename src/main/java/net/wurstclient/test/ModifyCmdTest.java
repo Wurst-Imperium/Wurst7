@@ -31,13 +31,13 @@ public enum ModifyCmdTest
 		runWurstCommand("modify add {test:123}");
 		assertOneItemInSlot(0, Items.DIAMOND);
 		submitAndWait(mc -> {
-			ItemStack stack = mc.player.getInventory().getMainHandStack();
+			ItemStack stack = mc.player.getInventory().getSelectedStack();
 			NbtCompound nbt = stack.getComponents().getOrDefault(
 				DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
 			if(!nbt.contains("test"))
 				throw new RuntimeException(
 					"NBT data is missing the 'test' key");
-			if(nbt.getInt("test") != 123)
+			if(nbt.getInt("test").orElse(-1) != 123)
 				throw new RuntimeException("NBT data is incorrect");
 		});
 		runWurstCommand("viewnbt");

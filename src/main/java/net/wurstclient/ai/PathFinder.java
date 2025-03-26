@@ -13,9 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
@@ -545,10 +542,6 @@ public class PathFinder
 	public void renderPath(MatrixStack matrixStack, boolean debugMode,
 		boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp =
 			MC.getBufferBuilders().getEntityVertexConsumers();
 		VertexConsumer buffer =

@@ -31,16 +31,25 @@ public abstract class EntityRenderDispatcherMixin
 {
 	/**
 	 * Temporarily replaces an entity's display name to make HealthTags work.
+	 *
+	 * <p>
+	 * Target is the last render() method, set to private, just above
+	 * addRendererDetails().
+	 *
+	 * <p>
+	 * Method is the other private render() that calls it, the big one with
+	 * tickProgress and EntityRenderer parameters and CrashReport creation
+	 * logic.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/entity/EntityRenderer;render(Lnet/minecraft/client/render/entity/state/EntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"),
+		target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;render(Lnet/minecraft/client/render/entity/state/EntityRenderState;DDDLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V"),
 		method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V")
 	private <E extends Entity, S extends EntityRenderState> void wrapRender(
-		EntityRenderer<? super E, S> renderer, S state, MatrixStack matrices,
-		VertexConsumerProvider vertexConsumers, int light,
-		Operation<Void> original, E entity, double x, double y, double z,
-		float tickDelta, MatrixStack matrices2,
-		VertexConsumerProvider vertexConsumers2, int light2,
+		EntityRenderDispatcher instance, S state, double x, double y, double z,
+		MatrixStack matrices, VertexConsumerProvider vcp, int light,
+		EntityRenderer<?, S> renderer, Operation<Void> original, E entity,
+		double x2, double y2, double z2, float tickProgress,
+		MatrixStack matrices2, VertexConsumerProvider vcp2, int light2,
 		EntityRenderer<? super E, S> renderer2)
 	{
 		Text originalDisplayName = state.displayName;
@@ -52,7 +61,7 @@ public abstract class EntityRenderDispatcherMixin
 			state.displayName =
 				healthTags.addHealth(le, originalDisplayName.copy());
 		
-		original.call(renderer, state, matrices, vertexConsumers, light);
+		original.call(instance, state, x, y, z, matrices, vcp, light, renderer);
 		state.displayName = originalDisplayName;
 	}
 }

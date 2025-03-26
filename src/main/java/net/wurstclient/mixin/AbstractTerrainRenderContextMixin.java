@@ -15,13 +15,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.fabricmc.fabric.impl.client.indigo.renderer.mesh.MutableQuadViewImpl;
-import net.fabricmc.fabric.impl.client.indigo.renderer.render.AbstractBlockRenderContext;
+import net.fabricmc.fabric.impl.client.indigo.renderer.render.AbstractTerrainRenderContext;
 import net.fabricmc.fabric.impl.client.indigo.renderer.render.BlockRenderInfo;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.XRayHack;
 
-@Mixin(value = AbstractBlockRenderContext.class, remap = false)
-public abstract class AbstractBlockRenderContextMixin
+@Mixin(value = AbstractTerrainRenderContext.class, remap = false)
+public abstract class AbstractTerrainRenderContextMixin
 {
 	@Shadow
 	@Final

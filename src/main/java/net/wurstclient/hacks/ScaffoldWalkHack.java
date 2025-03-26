@@ -86,13 +86,13 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			return;
 		
 		// set slot
-		int oldSlot = MC.player.getInventory().selectedSlot;
-		MC.player.getInventory().selectedSlot = newSlot;
+		int oldSlot = MC.player.getInventory().getSelectedSlot();
+		MC.player.getInventory().setSelectedSlot(newSlot);
 		
 		scaffoldTo(belowPlayer);
 		
 		// reset slot
-		MC.player.getInventory().selectedSlot = oldSlot;
+		MC.player.getInventory().setSelectedSlot(oldSlot);
 	}
 	
 	private void scaffoldTo(BlockPos belowPlayer)

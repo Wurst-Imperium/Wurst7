@@ -15,10 +15,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.wurstclient.settings.ChunkAreaSetting;

@@ -20,8 +20,8 @@ import net.wurstclient.settings.SwingHandSetting.SwingHand;
  * without sacrificing anti-cheat resistance or customizability.
  *
  * <p>
- * Accurately replicates {@link MinecraftClient#doItemUse()} as of 24w33a
- * (1.21.2), while being much easier to read and adding convenient ways to
+ * Accurately replicates {@link MinecraftClient#doItemUse()} as of 25w02a
+ * (1.21.5), while being much easier to read and adding convenient ways to
  * change parts of the behavior.
  */
 public enum InteractionSimulator
@@ -127,7 +127,7 @@ public enum InteractionSimulator
 			swing.swing(hand);
 			
 			if(!stack.isEmpty() && (stack.getCount() != oldCount
-				|| MC.interactionManager.hasCreativeInventory()))
+				|| MC.player.isInCreativeMode()))
 				MC.gameRenderer.firstPersonRenderer.resetEquipProgress(hand);
 		}
 		

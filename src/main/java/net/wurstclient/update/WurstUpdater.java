@@ -7,6 +7,7 @@
  */
 package net.wurstclient.update;
 
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -118,7 +119,7 @@ public final class WurstUpdater implements UpdateListener
 	
 	private void showLink(String text, String url)
 	{
-		ClickEvent event = new ClickEvent(ClickEvent.Action.OPEN_URL, url);
+		ClickEvent event = new ClickEvent.OpenUrl(URI.create(url));
 		component = Text.literal(text).styled(s -> s.withClickEvent(event));
 	}
 	

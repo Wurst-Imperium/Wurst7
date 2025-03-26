@@ -4,24 +4,131 @@
   },
   "passes": [
     {
-      "program": "wurst:lsd",
+      "vertex_shader": "minecraft:post/sobel",
+      "fragment_shader": "wurst:post/lsd",
       "inputs": [
         {
           "sampler_name": "Diffuse",
           "target": "minecraft:main"
         }
       ],
-      "output": "swap"
+      "output": "swap",
+      "uniforms": [
+        {
+          "name": "ProjMat",
+          "type": "matrix4x4",
+          "count": 16,
+          "values": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "OutSize",
+          "type": "float",
+          "count": 2,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "name": "GameTime",
+          "type": "float",
+          "count": 1,
+          "values": [
+            0.0
+          ]
+        },
+        {
+          "name": "Frequency",
+          "type": "float",
+          "count": 2,
+          "values": [
+            512.0,
+            288.0
+          ]
+        },
+        {
+          "name": "WobbleAmount",
+          "type": "float",
+          "count": 2,
+          "values": [
+            0.002,
+            0.002
+          ]
+        }
+      ]
     },
     {
-      "program": "minecraft:post/blit",
+      "vertex_shader": "minecraft:post/blit",
+      "fragment_shader": "minecraft:post/blit",
       "inputs": [
         {
           "sampler_name": "In",
           "target": "swap"
         }
       ],
-      "output": "minecraft:main"
+      "output": "minecraft:main",
+      "uniforms": [
+        {
+          "name": "ProjMat",
+          "type": "matrix4x4",
+          "count": 16,
+          "values": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "OutSize",
+          "type": "float",
+          "count": 2,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "name": "ColorModulate",
+          "type": "float",
+          "count": 4,
+          "values": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      ]
     }
   ]
 }

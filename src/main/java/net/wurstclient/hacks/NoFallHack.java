@@ -44,7 +44,7 @@ public final class NoFallHack extends Hack implements UpdateListener
 		if(player.isGliding() && !allowElytra.isChecked())
 			return getName() + " (paused)";
 		
-		if(player.isCreative())
+		if(player.getAbilities().creativeMode)
 			return getName() + " (paused)";
 		
 		if(pauseForMace.isChecked() && isHoldingMace(player))
@@ -71,7 +71,7 @@ public final class NoFallHack extends Hack implements UpdateListener
 	{
 		// do nothing in creative mode, since there is no fall damage anyway
 		ClientPlayerEntity player = MC.player;
-		if(player.isCreative())
+		if(player.getAbilities().creativeMode)
 			return;
 		
 		// pause when flying with elytra, unless allowed

@@ -103,8 +103,8 @@ public final class AutoArmorHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		PlayerInventory inventory = player.getInventory();
 		
-		if(!swapWhileMoving.isChecked() && (player.input.movementForward != 0
-			|| player.input.movementSideways != 0))
+		if(!swapWhileMoving.isChecked()
+			&& player.input.getMovementInput().length() > 1e-5F)
 			return;
 		
 		// store slots and values of best armor pieces

@@ -109,7 +109,7 @@ public final class FeedAuraHack extends Hack
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
-		ItemStack heldStack = player.getInventory().getMainHandStack();
+		ItemStack heldStack = player.getInventory().getSelectedStack();
 		
 		double rangeSq = range.getValueSq();
 		Stream<AnimalEntity> stream = EntityUtils.getValidAnimals()

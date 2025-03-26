@@ -181,14 +181,14 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		if(foodSlot < 9)
 		{
 			if(!isEating())
-				oldSlot = inventory.selectedSlot;
+				oldSlot = inventory.getSelectedSlot();
 			
-			inventory.selectedSlot = foodSlot;
+			inventory.setSelectedSlot(foodSlot);
 			
 		}else if(foodSlot == 40)
 		{
 			if(!isEating())
-				oldSlot = inventory.selectedSlot;
+				oldSlot = inventory.getSelectedSlot();
 			
 			// off-hand slot, no need to select anything
 			
@@ -213,7 +213,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		ArrayList<Integer> slots = new ArrayList<>();
 		if(maxInvSlot == 0)
-			slots.add(inventory.selectedSlot);
+			slots.add(inventory.getSelectedSlot());
 		if(allowOffhand.isChecked())
 			slots.add(40);
 		Stream.iterate(0, i -> i < maxInvSlot, i -> i + 1)
@@ -269,7 +269,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	private void stopEating()
 	{
 		MC.options.useKey.setPressed(false);
-		MC.player.getInventory().selectedSlot = oldSlot;
+		MC.player.getInventory().setSelectedSlot(oldSlot);
 		oldSlot = -1;
 	}
 	

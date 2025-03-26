@@ -12,6 +12,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.stream.StreamSupport;
 
+import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -20,7 +22,6 @@ import net.minecraft.block.TorchBlock;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.FallingBlockEntity;
@@ -222,7 +223,7 @@ public final class TunnellerHack extends Hack
 		Vec3d arrowEnd = dirVec.multiply(Math.max(0.5, length)).add(offset);
 		
 		vertexBuffers[0] = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
-			VertexFormats.LINES, buffer -> {
+			VertexFormats.POSITION_COLOR_NORMAL, buffer -> {
 				RenderUtils.drawNode(buffer, nodeBox, cyan);
 				RenderUtils.drawArrow(buffer, arrowStart, arrowEnd, cyan, 0.1F);
 			});
@@ -346,11 +347,12 @@ public final class TunnellerHack extends Hack
 			
 			int green = 0x8000FF00;
 			if(!boxes.isEmpty())
-				vertexBuffers[1] = EasyVertexBuffer.createAndUpload(
-					DrawMode.LINES, VertexFormats.LINES, buffer -> {
-						for(Box box : boxes)
-							RenderUtils.drawOutlinedBox(buffer, box, green);
-					});
+				vertexBuffers[1] =
+					EasyVertexBuffer.createAndUpload(DrawMode.LINES,
+						VertexFormats.POSITION_COLOR_NORMAL, buffer -> {
+							for(Box box : boxes)
+								RenderUtils.drawOutlinedBox(buffer, box, green);
+						});
 			
 			if(currentBlock == null)
 			{
@@ -435,12 +437,13 @@ public final class TunnellerHack extends Hack
 					.offset(region.negate().toVec3d());
 				
 				int yellow = 0x80FFFF00;
-				vertexBuffers[2] = EasyVertexBuffer.createAndUpload(
-					DrawMode.LINES, VertexFormats.LINES, buffer -> {
-						for(BlockPos pos : blocks)
-							RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
-								yellow);
-					});
+				vertexBuffers[2] =
+					EasyVertexBuffer.createAndUpload(DrawMode.LINES,
+						VertexFormats.POSITION_COLOR_NORMAL, buffer -> {
+							for(BlockPos pos : blocks)
+								RenderUtils.drawOutlinedBox(buffer,
+									box.offset(pos), yellow);
+						});
 				
 				return true;
 			}
@@ -506,7 +509,7 @@ public final class TunnellerHack extends Hack
 					.canFallThrough(BlockUtils.getState(pos.down())))
 					continue;
 				
-				MC.player.getInventory().selectedSlot = slot;
+				MC.player.getInventory().setSelectedSlot(slot);
 				return true;
 			}
 			
@@ -578,12 +581,13 @@ public final class TunnellerHack extends Hack
 					.offset(region.negate().toVec3d());
 				
 				int red = 0x80FF0000;
-				vertexBuffers[3] = EasyVertexBuffer.createAndUpload(
-					DrawMode.LINES, VertexFormats.LINES, buffer -> {
-						for(BlockPos pos : liquids)
-							RenderUtils.drawOutlinedBox(buffer, box.offset(pos),
-								red);
-					});
+				vertexBuffers[3] =
+					EasyVertexBuffer.createAndUpload(DrawMode.LINES,
+						VertexFormats.POSITION_COLOR_NORMAL, buffer -> {
+							for(BlockPos pos : liquids)
+								RenderUtils.drawOutlinedBox(buffer,
+									box.offset(pos), red);
+						});
 			}
 			
 			return true;
@@ -669,7 +673,7 @@ public final class TunnellerHack extends Hack
 			
 			int yellow = 0x80FFFF00;
 			vertexBuffers[4] = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
-				VertexFormats.LINES, buffer -> {
+				VertexFormats.POSITION_COLOR_NORMAL, buffer -> {
 					RenderUtils.drawArrow(buffer, torchVec,
 						torchVec.add(0, 0.5, 0), yellow, 0.1F);
 				});
@@ -714,7 +718,7 @@ public final class TunnellerHack extends Hack
 				if(!(block instanceof TorchBlock))
 					continue;
 				
-				MC.player.getInventory().selectedSlot = slot;
+				MC.player.getInventory().setSelectedSlot(slot);
 				return true;
 			}
 			
