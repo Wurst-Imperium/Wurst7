@@ -106,6 +106,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 		layer.startDrawing();
 		Framebuffer framebuffer = layer.getTarget();
 		RenderPipeline pipeline = layer.getPipeline();
+		GpuBuffer indexBuffer = shapeIndexBuffer.getIndexBuffer(indexCount);
 		
 		try(RenderPass renderPass =
 			RenderSystem.getDevice().createCommandEncoder().createRenderPass(
@@ -116,8 +117,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 		{
 			renderPass.setPipeline(pipeline);
 			renderPass.setVertexBuffer(0, vertexBuffer);
-			renderPass.setIndexBuffer(
-				shapeIndexBuffer.getIndexBuffer(indexCount),
+			renderPass.setIndexBuffer(indexBuffer,
 				shapeIndexBuffer.getIndexType());
 			renderPass.drawIndexed(0, indexCount);
 		}
