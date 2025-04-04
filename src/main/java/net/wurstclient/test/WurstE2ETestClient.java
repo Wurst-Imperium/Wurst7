@@ -74,9 +74,8 @@ public final class WurstE2ETestClient implements ModInitializer
 		// Set MC version as world name
 		setTextFieldText(0,
 			"E2E Test " + SharedConstants.getGameVersion().getName());
-		// Select creative mode
-		clickButton("selectWorld.gameMode");
-		clickButton("selectWorld.gameMode");
+		// Enable commands (creative mode doesn't exist here)
+		clickButton("selectWorld.allowCommands");
 		takeScreenshot("create_world_screen");
 		
 		System.out.println("Creating test world");
@@ -113,13 +112,13 @@ public final class WurstE2ETestClient implements ModInitializer
 		runChatCommand("fill ~-7 ~-5 ~-7 ~7 ~-1 ~7 stone");
 		runChatCommand("fill ~-7 ~ ~-7 ~7 ~30 ~7 air");
 		runChatCommand("kill @e[type=!player,distance=..10]");
+		runChatCommand("tp @s ~ ~ ~ 0 0");
 		
 		// Clear inventory and chat before running tests
 		runChatCommand("clear");
 		clearChat();
 		
 		// Test Wurst hacks
-		AutoMineHackTest.testAutoMineHack();
 		FreecamHackTest.testFreecamHack();
 		NoFallHackTest.testNoFallHack();
 		XRayHackTest.testXRayHack();

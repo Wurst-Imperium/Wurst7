@@ -36,13 +36,13 @@ public final class WurstLogo
 			bgColor = RenderUtils.toIntColor(WURST.getGui().getAcColor(), 0.5F);
 		else
 			bgColor = otf.getBackgroundColor();
-		context.fill(0, 6, tr.getWidth(version) + 76, 17, bgColor);
+		context.fill(0, 26, tr.getWidth(version) + 76, 37, bgColor);
 		
 		// version string
-		context.drawText(tr, version, 74, 8, otf.getTextColor(), false);
+		context.drawText(tr, version, 74, 28, otf.getTextColor(), false);
 		
 		// Wurst logo
-		context.drawTexture(RenderLayer::getGuiTextured, LOGO_TEXTURE, 0, 3, 0,
+		context.drawTexture(RenderLayer::getGuiTextured, LOGO_TEXTURE, 0, 23, 0,
 			0, 72, 18, 72, 18);
 	}
 	

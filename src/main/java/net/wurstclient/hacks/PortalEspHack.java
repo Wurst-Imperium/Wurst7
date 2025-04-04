@@ -45,16 +45,17 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 			new CheckboxSetting("Include nether portals", true));
 	
 	private final PortalEspBlockGroup endPortal =
-		new PortalEspBlockGroup(Blocks.END_PORTAL,
-			new ColorSetting("End portal color",
-				"End portals will be highlighted in this color.", Color.GREEN),
-			new CheckboxSetting("Include end portals", true));
+		new PortalEspBlockGroup(Blocks.MINE_TRAVELLING_BLOCK,
+			new ColorSetting("Mine travelling block color",
+				"Mine travelling blocks will be highlighted in this color.",
+				Color.GREEN),
+			new CheckboxSetting("Include mine travelling blocks", true));
 	
 	private final PortalEspBlockGroup endPortalFrame = new PortalEspBlockGroup(
-		Blocks.END_PORTAL_FRAME,
-		new ColorSetting("End portal frame color",
-			"End portal frames will be highlighted in this color.", Color.BLUE),
-		new CheckboxSetting("Include end portal frames", true));
+		Blocks.MINE_REVISITOR,
+		new ColorSetting("Mine revisitor color",
+			"Mine revisitors will be highlighted in this color.", Color.BLUE),
+		new CheckboxSetting("Include mine revisitors", true));
 	
 	private final PortalEspBlockGroup endGateway = new PortalEspBlockGroup(
 		Blocks.END_GATEWAY,
@@ -71,8 +72,8 @@ public final class PortalEspHack extends Hack implements UpdateListener,
 	
 	private final BiPredicate<BlockPos, BlockState> query =
 		(pos, state) -> state.getBlock() == Blocks.NETHER_PORTAL
-			|| state.getBlock() == Blocks.END_PORTAL
-			|| state.getBlock() == Blocks.END_PORTAL_FRAME
+			|| state.getBlock() == Blocks.MINE_TRAVELLING_BLOCK
+			|| state.getBlock() == Blocks.MINE_REVISITOR
 			|| state.getBlock() == Blocks.END_GATEWAY;
 	
 	private final ChunkSearcherCoordinator coordinator =

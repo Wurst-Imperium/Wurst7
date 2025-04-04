@@ -39,6 +39,10 @@ public enum CopyItemCmdTest
 		// Clean up
 		setPerspective(Perspective.FIRST_PERSON);
 		runChatCommand("clear");
+		// the clear command is broken, so we'll drop the helmet instead
+		runWurstCommand("drop");
+		waitForWorldTicks(1);
+		runChatCommand("kill @e[type=item]");
 		clearChat();
 	}
 }
