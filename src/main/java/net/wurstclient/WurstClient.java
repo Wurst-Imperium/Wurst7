@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 import net.minecraft.client.MinecraftClient;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.altmanager.Encryption;
-import net.wurstclient.analytics.WurstAnalytics;
+import net.wurstclient.analytics.PlausibleAnalytics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.command.CmdList;
 import net.wurstclient.command.CmdProcessor;
@@ -53,7 +53,7 @@ public enum WurstClient
 	public static final String VERSION = "7.48";
 	public static final String MC_VERSION = "1.21.5";
 	
-	private WurstAnalytics analytics;
+	private PlausibleAnalytics plausible;
 	private EventManager eventManager;
 	private AltManager altManager;
 	private HackList hax;
@@ -84,10 +84,9 @@ public enum WurstClient
 		IMC = (IMinecraftClient)MC;
 		wurstFolder = createWurstFolder();
 		
-		String trackingID = "UA-52838431-5";
-		String hostname = "client.wurstclient.net";
 		Path analyticsFile = wurstFolder.resolve("analytics.json");
-		analytics = new WurstAnalytics(trackingID, hostname, analyticsFile);
+		plausible = new PlausibleAnalytics(analyticsFile);
+		plausible.pageview("/");
 		
 		eventManager = new EventManager(this);
 		
@@ -142,9 +141,6 @@ public enum WurstClient
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
 		Path encFolder = Encryption.chooseEncryptionFolder();
 		altManager = new AltManager(altsFile, encFolder);
-		
-		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
-			"Wurst " + VERSION + " MC" + MC_VERSION);
 	}
 	
 	private Path createWurstFolder()
@@ -170,9 +166,9 @@ public enum WurstClient
 		return translator.translate(key, args);
 	}
 	
-	public WurstAnalytics getAnalytics()
+	public PlausibleAnalytics getPlausible()
 	{
-		return analytics;
+		return plausible;
 	}
 	
 	public EventManager getEventManager()

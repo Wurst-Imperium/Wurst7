@@ -22,7 +22,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.Util.OperatingSystem;
 import net.wurstclient.WurstClient;
-import net.wurstclient.analytics.WurstAnalytics;
+import net.wurstclient.analytics.PlausibleAnalytics;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.hacks.XRayHack;
 import net.wurstclient.other_features.VanillaSpoofOtf;
@@ -57,7 +57,7 @@ public class WurstOptionsScreen extends Screen
 		WurstClient wurst = WurstClient.INSTANCE;
 		FriendsCmd friendsCmd = wurst.getCmds().friendsCmd;
 		CheckboxSetting middleClickFriends = friendsCmd.getMiddleClickFriends();
-		WurstAnalytics analytics = wurst.getAnalytics();
+		PlausibleAnalytics plausible = wurst.getPlausible();
 		VanillaSpoofOtf vanillaSpoofOtf = wurst.getOtfs().vanillaSpoofOtf;
 		CheckboxSetting forceEnglish =
 			wurst.getOtfs().translationsOtf.getForceEnglish();
@@ -70,15 +70,15 @@ public class WurstOptionsScreen extends Screen
 				.setChecked(!middleClickFriends.isChecked()));
 		
 		new WurstOptionsButton(-154, 48,
-			() -> "Count Users: " + (analytics.isEnabled() ? "ON" : "OFF"),
+			() -> "Count Users: " + (plausible.isEnabled() ? "ON" : "OFF"),
 			"Counts how many people are using Wurst and which versions are the"
-				+ " most popular. We use this data to decide when to stop"
-				+ " supporting old Minecraft versions.\n\n"
-				+ "We use a random ID to tell users apart so that this data can"
-				+ " never be linked to your Minecraft account. The random ID is"
-				+ " changed every 3 days to make extra sure that you remain"
-				+ " anonymous.",
-			b -> analytics.setEnabled(!analytics.isEnabled()));
+				+ " most popular. This data helps me to decide when I can stop"
+				+ " supporting old versions.\n\n"
+				+ "These statistics are completely anonymous, never sold, and"
+				+ " stay in the EU (I'm self-hosting Plausible in Germany)."
+				+ " There are no cookies or persistent identifiers"
+				+ " (see plausible.io).",
+			b -> plausible.setEnabled(!plausible.isEnabled()));
 		
 		new WurstOptionsButton(-154, 72,
 			() -> "Spoof Vanilla: "
