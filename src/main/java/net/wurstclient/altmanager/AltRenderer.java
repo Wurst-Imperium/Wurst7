@@ -13,9 +13,9 @@ import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
@@ -61,7 +61,7 @@ public final class AltRenderer
 			int fh = 192;
 			float u = 24;
 			float v = 24;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Hat
@@ -69,7 +69,7 @@ public final class AltRenderer
 			fh = 192;
 			u = 120;
 			v = 24;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -101,7 +101,7 @@ public final class AltRenderer
 			int fh = height * 2;
 			float u = height / 4;
 			float v = height / 4;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Hat
@@ -111,7 +111,7 @@ public final class AltRenderer
 			h = height / 4;
 			u = height / 4 * 5;
 			v = height / 4;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Chest
@@ -121,7 +121,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 2.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Jacket
@@ -131,7 +131,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 2.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Left Arm
@@ -141,7 +141,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Left Sleeve
@@ -151,7 +151,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Right Arm
@@ -161,7 +161,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Right Sleeve
@@ -171,7 +171,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Left Leg
@@ -181,7 +181,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Left Pants
@@ -191,7 +191,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Right Leg
@@ -201,7 +201,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Right Pants
@@ -211,7 +211,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 		}catch(Exception e)
@@ -241,7 +241,7 @@ public final class AltRenderer
 			int fh = height * 2;
 			float u = height / 4 * 3;
 			float v = height / 4;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Hat
@@ -251,7 +251,7 @@ public final class AltRenderer
 			h = height / 4;
 			u = height / 4 * 7;
 			v = height / 4;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Chest
@@ -261,7 +261,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 4;
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Jacket
@@ -271,7 +271,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 4;
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Left Arm
@@ -281,7 +281,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Left Sleeve
@@ -291,7 +291,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Right Arm
@@ -301,7 +301,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Right Sleeve
@@ -311,7 +311,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Left Leg
@@ -321,7 +321,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Left Pants
@@ -331,7 +331,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Right Leg
@@ -341,7 +341,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 			// Right Pants
@@ -351,7 +351,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(RenderLayer::getGuiTextured, texture, x, y, u,
+			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
 		}catch(Exception e)

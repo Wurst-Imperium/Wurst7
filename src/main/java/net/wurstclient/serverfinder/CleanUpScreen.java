@@ -167,7 +167,7 @@ public class CleanUpScreen extends Screen
 	private boolean isSameProtocol(ServerInfo server)
 	{
 		return server.protocolVersion == SharedConstants.getGameVersion()
-			.getProtocolVersion();
+			.protocolVersion();
 	}
 	
 	private boolean isFailedPing(ServerInfo server)

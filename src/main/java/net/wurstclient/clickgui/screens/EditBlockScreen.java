@@ -7,6 +7,7 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.block.Block;
@@ -17,7 +18,6 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.wurstclient.settings.BlockSetting;
@@ -95,7 +95,7 @@ public final class EditBlockScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		TextRenderer tr = client.textRenderer;
 		
 		renderBackground(context, mouseX, mouseY, partialTicks);
@@ -107,8 +107,8 @@ public final class EditBlockScreen extends Screen
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		matrixStack.push();
-		matrixStack.translate(-64 + width / 2 - 100, 115, 0);
+		matrixStack.pushMatrix();
+		matrixStack.translate(-64 + width / 2 - 100, 115);
 		
 		boolean lblAbove =
 			!blockField.getText().isEmpty() || blockField.isFocused();
@@ -127,7 +127,7 @@ public final class EditBlockScreen extends Screen
 		context.fill(242, -56, 246, -36, border);
 		context.fill(241, -55, 245, -37, black);
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 		
 		String nameOrId = blockField.getText();
 		Block blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);

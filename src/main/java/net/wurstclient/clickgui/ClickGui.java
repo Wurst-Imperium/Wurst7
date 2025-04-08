@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonElement;
@@ -27,7 +28,6 @@ import com.google.gson.JsonParser;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
@@ -458,8 +458,8 @@ public final class ClickGui
 	{
 		updateColors();
 		
-		MatrixStack matrixStack = context.getMatrices();
-		matrixStack.push();
+		Matrix3x2fStack matrixStack = context.getMatrices();
+		matrixStack.pushMatrix();
 		
 		tooltip = "";
 		for(Window window : windows)
@@ -484,19 +484,19 @@ public final class ClickGui
 				else
 					window.stopDraggingScrollbar();
 				
-			matrixStack.translate(0, 0, 300);
+			// matrixStack.translate(0, 0, 300); FIXME
 			renderWindow(context, window, mouseX, mouseY, partialTicks);
 		}
 		
 		renderPopups(context, mouseX, mouseY);
 		renderTooltip(context, mouseX, mouseY);
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 	}
 	
 	public void renderPopups(DrawContext context, int mouseX, int mouseY)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		for(Popup popup : popups)
 		{
 			Component owner = popup.getOwner();
@@ -506,20 +506,20 @@ public final class ClickGui
 			int y1 =
 				parent.getY() + 13 + parent.getScrollOffset() + owner.getY();
 			
-			matrixStack.push();
-			matrixStack.translate(x1, y1, 300);
+			matrixStack.pushMatrix();
+			matrixStack.translate(x1, y1);// FIXME z300
 			
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y1;
 			popup.render(context, cMouseX, cMouseY);
 			
-			matrixStack.pop();
+			matrixStack.popMatrix();
 		}
 	}
 	
 	public void renderTooltip(DrawContext context, int mouseX, int mouseY)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		
 		if(tooltip.isEmpty())
 			return;
@@ -543,8 +543,8 @@ public final class ClickGui
 		int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
 		int yt2 = yt1 + th + 2;
 		
-		matrixStack.push();
-		matrixStack.translate(0, 0, 300);
+		matrixStack.pushMatrix();
+		matrixStack.translate(0, 0);// FIXME z300
 		
 		// background
 		context.fill(xt1, yt1, xt2, yt2,
@@ -559,23 +559,23 @@ public final class ClickGui
 			context.drawText(tr, lines[i], xt1 + 2, yt1 + 2 + i * tr.fontHeight,
 				txtColor, false);
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 	}
 	
 	public void renderPinnedWindows(DrawContext context, float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
-		matrixStack.push();
+		Matrix3x2fStack matrixStack = context.getMatrices();
+		matrixStack.pushMatrix();
 		
 		for(Window window : windows)
 			if(window.isPinned() && !window.isInvisible())
 			{
-				matrixStack.translate(0, 0, 300);
+				// matrixStack.translate(0, 0, 300); FIXME
 				renderWindow(context, window, Integer.MIN_VALUE,
 					Integer.MIN_VALUE, partialTicks);
 			}
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 	}
 	
 	public void updateColors()
@@ -607,7 +607,7 @@ public final class ClickGui
 		int windowBgColor = RenderUtils.toIntColor(bgColor, opacity);
 		int outlineColor = RenderUtils.toIntColor(acColor, 0.5F);
 		
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		
 		if(window.isMinimized())
 			y2 = y3;
@@ -671,8 +671,8 @@ public final class ClickGui
 			
 			context.enableScissor(x1, y3, x2, y2);
 			
-			matrixStack.push();
-			matrixStack.translate(x1, y4, 0);
+			matrixStack.pushMatrix();
+			matrixStack.translate(x1, y4);
 			
 			// window background
 			// between children
@@ -706,7 +706,7 @@ public final class ClickGui
 				window.getChild(i).render(context, cMouseX, cMouseY,
 					partialTicks);
 			
-			matrixStack.pop();
+			matrixStack.popMatrix();
 			context.disableScissor();
 		}
 		

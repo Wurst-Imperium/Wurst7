@@ -10,12 +10,12 @@ package net.wurstclient.hud;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.Category;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -122,9 +122,9 @@ public final class TabGui implements KeyPressListener
 		if(tabGuiOtf.isHidden())
 			return;
 		
-		MatrixStack matrixStack = context.getMatrices();
-		matrixStack.push();
-		matrixStack.translate(2, 23, 100);
+		Matrix3x2fStack matrixStack = context.getMatrices();
+		matrixStack.pushMatrix();
+		matrixStack.translate(2, 23);// FIXME z100
 		
 		drawBox(context, 0, 0, width, height);
 		context.enableScissor(0, 0, width, height);
@@ -148,8 +148,8 @@ public final class TabGui implements KeyPressListener
 		{
 			Tab tab = tabs.get(selected);
 			
-			matrixStack.push();
-			matrixStack.translate(width + 2, 0, 0);
+			matrixStack.pushMatrix();
+			matrixStack.translate(width + 2, 0);
 			
 			drawBox(context, 0, 0, tab.width, tab.height);
 			context.enableScissor(0, 0, tab.width, tab.height);
@@ -171,10 +171,10 @@ public final class TabGui implements KeyPressListener
 			}
 			
 			context.disableScissor();
-			matrixStack.pop();
+			matrixStack.popMatrix();
 		}
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 	}
 	
 	private void drawBox(DrawContext context, int x1, int y1, int x2, int y2)

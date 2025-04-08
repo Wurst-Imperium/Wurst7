@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.screens;
 import java.util.List;
 import java.util.Objects;
 
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -21,7 +22,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -136,7 +136,7 @@ public final class EditItemListScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		renderBackground(context, mouseX, mouseY, partialTicks);
 		
 		listGui.render(context, mouseX, mouseY, partialTicks);
@@ -145,24 +145,24 @@ public final class EditItemListScreen extends Screen
 			itemList.getName() + " (" + itemList.getItemNames().size() + ")",
 			width / 2, 12, 0xFFFFFF);
 		
-		matrixStack.push();
-		matrixStack.translate(0, 0, 300);
+		matrixStack.pushMatrix();
+		// matrixStack.translate(0, 0, 300); FIXME
 		
 		itemNameField.render(context, mouseX, mouseY, partialTicks);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		matrixStack.push();
-		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
+		matrixStack.pushMatrix();
+		matrixStack.translate(-64 + width / 2 - 152, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
 		{
-			matrixStack.push();
-			matrixStack.translate(0, 0, 300);
+			matrixStack.pushMatrix();
+			// matrixStack.translate(0, 0, 300); FIXME
 			context.drawTextWithShadow(client.textRenderer, "item name or ID",
 				68, height - 50, 0x808080);
-			matrixStack.pop();
+			matrixStack.popMatrix();
 		}
 		
 		int border = itemNameField.isFocused() ? 0xFFFFFFFF : 0xFFA0A0A0;
@@ -178,13 +178,13 @@ public final class EditItemListScreen extends Screen
 		context.fill(213, height - 55, 216, height - 37, black);
 		context.fill(242, height - 55, 245, height - 37, black);
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 		
 		RenderUtils.drawItem(context,
 			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 	}
 	
 	@Override

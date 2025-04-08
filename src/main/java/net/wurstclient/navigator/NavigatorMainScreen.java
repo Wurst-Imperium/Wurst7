@@ -10,13 +10,13 @@ package net.wurstclient.navigator;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -210,7 +210,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	protected void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
@@ -252,8 +252,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// tooltip
 		if(tooltip != null)
 		{
-			matrixStack.push();
-			matrixStack.translate(0, 0, 300);
+			matrixStack.pushMatrix();
+			// matrixStack.translate(0, 0, 300); FIXME
 			
 			String[] lines = tooltip.split("\n");
 			TextRenderer tr = client.textRenderer;
@@ -288,7 +288,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				context.drawText(tr, lines[i], xt1 + 2,
 					yt1 + 2 + i * tr.fontHeight, txtColor, false);
 			
-			matrixStack.pop();
+			matrixStack.popMatrix();
 		}
 	}
 	

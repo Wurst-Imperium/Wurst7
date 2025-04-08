@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.screens;
 import java.util.List;
 import java.util.Objects;
 
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -20,7 +21,6 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -146,13 +146,13 @@ public final class EditBookOffersScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		renderBackground(context, mouseX, mouseY, partialTicks);
 		
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		matrixStack.push();
-		matrixStack.translate(0, 0, 300);
+		matrixStack.pushMatrix();
+		// matrixStack.translate(0, 0, 300); FIXME
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			bookOffers.getName() + " (" + bookOffers.getOffers().size() + ")",
@@ -161,7 +161,7 @@ public final class EditBookOffersScreen extends Screen
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 	}
 	
 	@Override

@@ -9,13 +9,8 @@ package net.wurstclient.navigator;
 
 import java.awt.Rectangle;
 
-import org.joml.Matrix4f;
-
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -232,20 +227,20 @@ public abstract class NavigatorScreen extends Screen
 		int lineColor = RenderUtils.toIntColor(acColor, 0.5F);
 		RenderUtils.drawLine2D(context, x1, yi1, x2, yi1, lineColor);
 		
-		// shadow
-		int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);
-		int shadowColor2 = 0x00000000;
-		
-		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-			buffer.vertex(matrix, x1, y2, 0).color(shadowColor2);
-			buffer.vertex(matrix, x2, y2, 0).color(shadowColor2);
-			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
-		});
+		// // shadow
+		// int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);
+		// int shadowColor2 = 0x00000000;
+		//
+		// Matrix3x2fStack matrixStack = context.getMatrices();
+		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		//
+		// context.draw(consumers -> {
+		// VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
+		// buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
+		// buffer.vertex(matrix, x1, y2, 0).color(shadowColor2);
+		// buffer.vertex(matrix, x2, y2, 0).color(shadowColor2);
+		// buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
+		// });
 	}
 	
 	protected final void drawBox(DrawContext context, int x1, int y1, int x2,

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -22,7 +23,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -300,7 +300,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	protected void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
@@ -332,8 +332,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		window.validate();
 		
 		window.setY(windowY1 - 13);
-		matrixStack.push();
-		matrixStack.translate(bgx1, windowY1, 0);
+		matrixStack.pushMatrix();
+		matrixStack.translate(bgx1, windowY1);
 		
 		{
 			int x1 = 0;
@@ -392,7 +392,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			child.render(context, mouseX - bgx1, mouseY - windowY1,
 				partialTicks);
 		}
-		matrixStack.pop();
+		matrixStack.popMatrix();
 		
 		// buttons
 		activeButton = null;

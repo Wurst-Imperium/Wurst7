@@ -80,19 +80,17 @@ public abstract class GameRendererMixin implements AutoCloseable
 	 * renderWorld() method to ensure that cancelNextBobView is always reset
 	 * after the view-bobbing call.
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V")
-	private void onRenderHand(Camera camera, float tickDelta, Matrix4f matrix4f,
+	@Inject(at = @At("HEAD"), method = "renderHand(FZLorg/joml/Matrix4f;)V")
+	private void onRenderHand(float tickDelta, boolean bl, Matrix4f matrix4f,
 		CallbackInfo ci)
 	{
 		cancelNextBobView = false;
 	}
 	
-	@Inject(
-		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
-			opcode = Opcodes.GETFIELD,
-			ordinal = 0),
+	@Inject(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/render/GameRenderer;renderHand(FZLorg/joml/Matrix4f;)V",
+		opcode = Opcodes.INVOKEVIRTUAL,
+		ordinal = 0),
 		method = "renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V")
 	private void onRenderWorldHandRendering(RenderTickCounter tickCounter,
 		CallbackInfo ci, @Local(ordinal = 2) Matrix4f matrix4f3,

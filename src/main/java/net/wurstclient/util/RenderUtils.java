@@ -9,6 +9,7 @@ package net.wurstclient.util;
 
 import java.util.List;
 
+import org.joml.Matrix3x2fStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -639,14 +640,14 @@ public enum RenderUtils
 	public static void drawItem(DrawContext context, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		
-		matrixStack.push();
-		matrixStack.translate(x, y, 0);
+		matrixStack.pushMatrix();
+		matrixStack.translate(x, y);
 		if(large)
-			matrixStack.scale(1.5F, 1.5F, 1.5F);
+			matrixStack.scale(1.5F, 1.5F);
 		else
-			matrixStack.scale(0.75F, 0.75F, 0.75F);
+			matrixStack.scale(0.75F, 0.75F);
 		
 		ItemStack renderStack = stack.isEmpty() || stack.getItem() == null
 			? new ItemStack(Blocks.GRASS_BLOCK) : stack;
@@ -655,19 +656,19 @@ public enum RenderUtils
 		context.drawItem(renderStack, 0, 0);
 		DiffuseLighting.disableGuiDepthLighting();
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 		
 		if(stack.isEmpty())
 		{
-			matrixStack.push();
-			matrixStack.translate(x, y, 250);
+			matrixStack.pushMatrix();
+			matrixStack.translate(x, y);// FIXME z250
 			if(large)
-				matrixStack.scale(2, 2, 2);
+				matrixStack.scale(2, 2);
 			
 			TextRenderer tr = WurstClient.MC.textRenderer;
 			context.drawText(tr, "?", 3, 2, 0xf0f0f0, true);
 			
-			matrixStack.pop();
+			matrixStack.popMatrix();
 		}
 		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -680,14 +681,14 @@ public enum RenderUtils
 	public static void fill2D(DrawContext context, float x1, float y1, float x2,
 		float y2, int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-			buffer.vertex(matrix, x1, y1, 0).color(color);
-			buffer.vertex(matrix, x1, y2, 0).color(color);
-			buffer.vertex(matrix, x2, y2, 0).color(color);
-			buffer.vertex(matrix, x2, y1, 0).color(color);
-		});
+		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+		// context.draw(consumers -> {
+		// VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
+		// buffer.vertex(matrix, x1, y1, 0).color(color);
+		// buffer.vertex(matrix, x1, y2, 0).color(color);
+		// buffer.vertex(matrix, x2, y2, 0).color(color);
+		// buffer.vertex(matrix, x2, y1, 0).color(color);
+		// });
 	}
 	
 	/**
@@ -699,12 +700,12 @@ public enum RenderUtils
 	public static void fillQuads2D(DrawContext context, float[][] vertices,
 		int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-			for(float[] vertex : vertices)
-				buffer.vertex(matrix, vertex[0], vertex[1], 0).color(color);
-		});
+		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+		// context.draw(consumers -> {
+		// VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
+		// for(float[] vertex : vertices)
+		// buffer.vertex(matrix, vertex[0], vertex[1], 0).color(color);
+		// });
 	}
 	
 	/**
@@ -716,13 +717,13 @@ public enum RenderUtils
 	public static void fillTriangle2D(DrawContext context, float[][] vertices,
 		int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(RenderLayer.getDebugFilledBox());
-			for(float[] vertex : vertices)
-				buffer.vertex(matrix, vertex[0], vertex[1], 0).color(color);
-		});
+		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+		// context.draw(consumers -> {
+		// VertexConsumer buffer =
+		// consumers.getBuffer(RenderLayer.getDebugFilledBox());
+		// for(float[] vertex : vertices)
+		// buffer.vertex(matrix, vertex[0], vertex[1], 0).color(color);
+		// });
 	}
 	
 	/**
@@ -736,13 +737,13 @@ public enum RenderUtils
 	public static void drawLine2D(DrawContext context, float x1, float y1,
 		float x2, float y2, int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINES);
-			buffer.vertex(matrix, x1, y1, 1).color(color);
-			buffer.vertex(matrix, x2, y2, 1).color(color);
-		});
+		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+		// context.draw(consumers -> {
+		// VertexConsumer buffer =
+		// consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINES);
+		// buffer.vertex(matrix, x1, y1, 1).color(color);
+		// buffer.vertex(matrix, x2, y2, 1).color(color);
+		// });
 	}
 	
 	/**
@@ -754,16 +755,16 @@ public enum RenderUtils
 	public static void drawBorder2D(DrawContext context, float x1, float y1,
 		float x2, float y2, int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
-			buffer.vertex(matrix, x1, y1, 1).color(color);
-			buffer.vertex(matrix, x2, y1, 1).color(color);
-			buffer.vertex(matrix, x2, y2, 1).color(color);
-			buffer.vertex(matrix, x1, y2, 1).color(color);
-			buffer.vertex(matrix, x1, y1, 1).color(color);
-		});
+		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+		// context.draw(consumers -> {
+		// VertexConsumer buffer =
+		// consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
+		// buffer.vertex(matrix, x1, y1, 1).color(color);
+		// buffer.vertex(matrix, x2, y1, 1).color(color);
+		// buffer.vertex(matrix, x2, y2, 1).color(color);
+		// buffer.vertex(matrix, x1, y2, 1).color(color);
+		// buffer.vertex(matrix, x1, y1, 1).color(color);
+		// });
 	}
 	
 	/**
@@ -772,15 +773,15 @@ public enum RenderUtils
 	public static void drawLineStrip2D(DrawContext context, float[][] vertices,
 		int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
-			for(float[] vertex : vertices)
-				buffer.vertex(matrix, vertex[0], vertex[1], 1).color(color);
-			buffer.vertex(matrix, vertices[0][0], vertices[0][1], 1)
-				.color(color);
-		});
+		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
+		// context.draw(consumers -> {
+		// VertexConsumer buffer =
+		// consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
+		// for(float[] vertex : vertices)
+		// buffer.vertex(matrix, vertex[0], vertex[1], 1).color(color);
+		// buffer.vertex(matrix, vertices[0][0], vertices[0][1], 1)
+		// .color(color);
+		// });
 	}
 	
 	/**
@@ -800,45 +801,45 @@ public enum RenderUtils
 		int outlineColor = toIntColor(acColor, 0.5F);
 		drawBorder2D(context, xo1, yo1, xo2, yo2, outlineColor);
 		
-		// shadow
-		float xs1 = x1 - 1;
-		float xs2 = x2 + 1;
-		float ys1 = y1 - 1;
-		float ys2 = y2 + 1;
-		
-		int shadowColor1 = toIntColor(acColor, 0.75F);
-		int shadowColor2 = 0x00000000;
-		
-		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-			
-			// top
-			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
-			buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
-			buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
-			
-			// left
-			buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
-			buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
-			buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
-			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-			
-			// right
-			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
-			buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
-			buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
-			buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
-			
-			// bottom
-			buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
-			buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
-			buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
-			buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
-		});
+		// // shadow
+		// float xs1 = x1 - 1;
+		// float xs2 = x2 + 1;
+		// float ys1 = y1 - 1;
+		// float ys2 = y2 + 1;
+		//
+		// int shadowColor1 = toIntColor(acColor, 0.75F);
+		// int shadowColor2 = 0x00000000;
+		//
+		// Matrix3x2fStack matrixStack = context.getMatrices();
+		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		//
+		// context.draw(consumers -> {
+		// VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
+		//
+		// // top
+		// buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
+		// buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
+		// buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
+		// buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
+		//
+		// // left
+		// buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
+		// buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
+		// buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
+		// buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
+		//
+		// // right
+		// buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
+		// buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
+		// buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
+		// buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
+		//
+		// // bottom
+		// buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
+		// buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
+		// buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
+		// buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
+		// });
 	}
 	
 	public record ColoredPoint(Vec3d point, int color)

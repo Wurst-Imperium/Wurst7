@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.screens;
 import java.util.Objects;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -20,7 +21,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -271,13 +271,13 @@ public final class AddBookOfferScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		renderBackground(context, mouseX, mouseY, partialTicks);
 		
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		matrixStack.push();
-		matrixStack.translate(0, 0, 300);
+		matrixStack.pushMatrix();
+		// matrixStack.translate(0, 0, 300); FIXME
 		
 		TextRenderer tr = client.textRenderer;
 		String titleText =
@@ -291,7 +291,7 @@ public final class AddBookOfferScreen extends Screen
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		matrixStack.translate(width / 2 - 100, 0, 0);
+		matrixStack.translate(width / 2 - 100, 0);
 		
 		context.drawTextWithShadow(tr, "Level:", 0, height - 72, 0xf0f0f0);
 		context.drawTextWithShadow(tr, "Max price:", 0, height - 56, 0xf0f0f0);
@@ -303,7 +303,7 @@ public final class AddBookOfferScreen extends Screen
 			context.drawTextWithShadow(tr, errorText, 0, height - 40, 0xff5555);
 		}
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 		
 		RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
 			width / 2 - 16, height - 58, false);

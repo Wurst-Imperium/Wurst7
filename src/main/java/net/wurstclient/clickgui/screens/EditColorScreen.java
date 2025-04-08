@@ -18,12 +18,12 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.settings.ColorSetting;
@@ -176,7 +176,7 @@ public final class EditColorScreen extends Screen
 		int fh = paletteHeight;
 		float u = 0;
 		float v = 0;
-		context.drawTexture(RenderLayer::getGuiTextured, paletteIdentifier, x,
+		context.drawTexture(RenderPipelines.GUI_TEXTURED, paletteIdentifier, x,
 			y, u, v, w, h, fw, fh);
 		
 		// RGB letters

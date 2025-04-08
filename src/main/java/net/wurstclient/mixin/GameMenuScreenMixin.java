@@ -19,12 +19,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -76,8 +76,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		int fh = 16;
 		float u = 0;
 		float v = 0;
-		context.drawTexture(RenderLayer::getGuiTextured, WURST_TEXTURE, x, y, u,
-			v, w, h, fw, fh);
+		context.drawTexture(RenderPipelines.GUI_TEXTURED, WURST_TEXTURE, x, y,
+			u, v, w, h, fw, fh);
 	}
 	
 	@Unique
