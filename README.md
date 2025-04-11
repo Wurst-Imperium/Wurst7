@@ -1,20 +1,22 @@
 # Wurst Client v7
 
-- **Downloads:** [https://www.wurstclient.net/download/](https://www.wurstclient.net/download/?ref=GitHub+repo)
+![Wurst Client logo](https://img.wimods.net/github.com/Wurst-Imperium/Wurst7?to=https://wurst.wiki/_media/logo/wurst_758x192.webp)
 
-- **Installation guide:** [https://www.wurstclient.net/tutorials/how-to-install/](https://www.wurstclient.net/tutorials/how-to-install/?ref=GitHub+repo)
+- **Downloads:** [https://www.wurstclient.net/download/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwww.wurstclient.net%2Fdownload%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)
 
-- **Feature list:** [https://www.wurstclient.net/](https://www.wurstclient.net/?ref=GitHub+repo)
+- **Installation guide:** [https://www.wurstclient.net/tutorials/how-to-install/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwww.wurstclient.net%2Ftutorials%2Fhow-to-install%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)
 
-- **Wiki:** [https://wurst.wiki/](https://wurst.wiki/?ref=GitHub+repo)
+- **Feature list:** [https://www.wurstclient.net/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwww.wurstclient.net%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)
 
-- **Forum:** [https://wurstforum.net/](https://wurstforum.net/?ref=GitHub+repo)	
+- **Wiki:** [https://wurst.wiki/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwurst.wiki%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)
 
-- **Twitter/X:** https://x.com/Wurst_Imperium
+- **Forum:** [https://wurstforum.net/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwurstforum.net%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)	
 
-- **YouTube:** https://www.youtube.com/@Alexander01998
+- **Twitter/X:** [https://x.com/Wurst_Imperium](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https://x.com/Wurst_Imperium)
 
-- **Donations/Perks:** https://ko-fi.com/wurst
+- **YouTube:** [https://www.youtube.com/@Alexander01998](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https://www.youtube.com/@Alexander01998)
+
+- **Donations/Perks:** [https://ko-fi.com/wurst](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https://ko-fi.com/wurst)
 
 ## Installation
 
@@ -23,14 +25,14 @@ Wurst 7 can be installed just like any other Fabric mod. Here are the basic inst
 1. Run the Fabric installer.
 2. Add the Wurst Client and Fabric API to your mods folder.
 
-Please refer to the [full Wurst 7 installation guide](https://www.wurstclient.net/tutorials/how-to-install/wurst-7/) if you need more detailed instructions or run into any problems.
+Please refer to the [full Wurst 7 installation guide](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwww.wurstclient.net%2Ftutorials%2Fhow-to-install%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo) if you need more detailed instructions or run into any problems.
 
 Also, this should be obvious, but you do need to have a licensed copy of Minecraft Java Edition in order to use Wurst. Wurst is a cheat client, not a pirate client.
 
 ## Development Setup
 
 > [!IMPORTANT]
-> Make sure you have [Java Development Kit 21](https://adoptium.net/?variant=openjdk21&jvmVariant=hotspot) installed. It won't work with other versions.
+> Make sure you have [Java Development Kit 21](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fadoptium.net%2F%3Fvariant%3Dopenjdk21%26jvmVariant%3Dhotspot) installed. It won't work with other versions.
 
 ### Development using Eclipse
 
@@ -54,7 +56,7 @@ Also, this should be obvious, but you do need to have a licensed copy of Minecra
 ### Development using VSCode / Cursor
 
 > [!TIP]
-> You'll probably want to install the [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) to make development easier.
+> You'll probably want to install the [Extension Pack for Java](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fmarketplace.visualstudio.com%2Fitems%3FitemName%3Dvscjava.vscode-java-pack) to make development easier.
 
 1. Clone the repository:
 
@@ -86,15 +88,15 @@ cd Wurst7
 
 ## Contributing
 
-Please always [contact me](https://www.wurstclient.net/contact/) before opening a Pull Request. Any method works. That way we can discuss your ideas early and avoid wasting your time working on unwanted features or having to make lots of changes later.
+Please always [contact me](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwww.wurstclient.net%2Fcontact%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo) before opening a Pull Request. Any method works. That way we can discuss your ideas early and avoid wasting your time working on unwanted features or having to make lots of changes later.
 
-We also have [contributing guidelines](CONTRIBUTING.md) to help you get started.
+We also have [contributing guidelines](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https://github.com/Wurst-Imperium/Wurst7/blob/master/CONTRIBUTING.md) to help you get started.
 
 ## Translations
 
 To enable translations in-game, go to Wurst Options > Translations > ON.
 
-The preferred way to submit translations is through a Pull Request here on GitHub. The translation files are located in [this folder](https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/translations).
+The preferred way to submit translations is through a Pull Request here on GitHub. The translation files are located in [this folder](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https://github.com/Wurst-Imperium/Wurst7/tree/master/src/main/resources/assets/wurst/translations).
 
 Names of features (hacks/commands/etc.) should always be kept in English. This ensures that everyone can use the same commands, keybinds, etc. regardless of their language setting. It also makes it easier to communicate with someone who uses Wurst in a different language.
 
