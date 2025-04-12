@@ -118,21 +118,17 @@ public class WurstOptionsScreen extends Screen
 		OperatingSystem os = Util.getOperatingSystem();
 		
 		new WurstOptionsButton(54, 24, () -> "Official Website",
-			"§n§lWurstClient.net", b -> os.open(
-				"https://www.wurstclient.net/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=Official+Website"));
+			"§n§lWurstClient.net",
+			b -> os.open("https://www.wurstclient.net/options-website/"));
 		
-		new WurstOptionsButton(54, 48, () -> "Wurst Wiki", "§n§lWurst.Wiki\n"
-			+ "We are looking for volunteers to help us expand"
-			+ " the wiki and keep it up to date with the latest Wurst updates.",
-			b -> os.open(
-				"https://wurst.wiki/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=Wurst+Wiki"));
+		new WurstOptionsButton(54, 48, () -> "Wurst Wiki", "§n§lWurst.Wiki",
+			b -> os.open("https://www.wurstclient.net/options-wiki/"));
 		
 		new WurstOptionsButton(54, 72, () -> "WurstForum", "§n§lWurstForum.net",
-			b -> os.open(
-				"https://wurstforum.net/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=WurstForum"));
+			b -> os.open("https://www.wurstclient.net/options-forum/"));
 		
 		new WurstOptionsButton(54, 96, () -> "Twitter", "@Wurst_Imperium",
-			b -> os.open("https://www.wurstclient.net/twitter/"));
+			b -> os.open("https://www.wurstclient.net/options-twitter/"));
 		
 		new WurstOptionsButton(54, 120, () -> "Donate",
 			"§n§lWurstClient.net/donate\n"
@@ -140,8 +136,7 @@ public class WurstOptionsScreen extends Screen
 				+ " to use for everyone.\n\n"
 				+ "Every bit helps and is much appreciated! You can also get a"
 				+ " few cool perks in return.",
-			b -> os.open(
-				"https://www.wurstclient.net/donate/?utm_source=Wurst+Client&utm_medium=Wurst+Options&utm_content=Donate"));
+			b -> os.open("https://www.wurstclient.net/options-donate/"));
 	}
 	
 	@Override
