@@ -7,6 +7,11 @@
  */
 package net.wurstclient.commands;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
+
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.Component;
 import net.minecraft.item.ItemStack;
@@ -16,6 +21,7 @@ import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.json.JsonUtils;
 
 @SearchTags({"view components", "ComponentViewer", "component viewer"})
 public final class ViewCompCmd extends Command
@@ -34,10 +40,16 @@ public final class ViewCompCmd extends Command
 		if(stack.isEmpty())
 			throw new CmdError("You must hold an item in your main hand.");
 		
-		String compString =
-			stack.getComponents().stream().map(Component::toString).reduce("",
-				(a, b) -> a.replace("minecraft:", "") + "\n"
-					+ b.replace("minecraft:", ""));
+		String compString = "";
+		for(Component<?> c : stack.getComponents())
+		{
+			compString += "\n" + c.type() + " => ";
+			DataResult<JsonElement> result = c.encode(JsonOps.INSTANCE);
+			JsonElement json = result.resultOrPartial(ChatUtils::error)
+				.orElse(JsonNull.INSTANCE);
+			compString += JsonUtils.GSON.toJson(json).replace("$", "$$")
+				.replace("\u00a7", "$");
+		}
 		
 		switch(String.join(" ", args).toLowerCase())
 		{
