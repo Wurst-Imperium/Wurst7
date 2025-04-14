@@ -43,12 +43,13 @@ public final class ViewCompCmd extends Command
 		String compString = "";
 		for(Component<?> c : stack.getComponents())
 		{
-			compString += "\n" + c.type() + " => ";
+			compString +=
+				"\n" + c.type().toString().replace("minecraft:", "") + " => ";
 			DataResult<JsonElement> result = c.encode(JsonOps.INSTANCE);
 			JsonElement json = result.resultOrPartial(ChatUtils::error)
 				.orElse(JsonNull.INSTANCE);
 			compString += JsonUtils.GSON.toJson(json).replace("$", "$$")
-				.replace("\u00a7", "$");
+				.replace("\u00a7", "$").replace("minecraft:", "");
 		}
 		
 		switch(String.join(" ", args).toLowerCase())
