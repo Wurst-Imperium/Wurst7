@@ -87,8 +87,7 @@ public final class ModifyCmd extends Command
 		JsonElement valueJson = parseJson(valueString);
 		DataResult<?> valueResult =
 			type.getCodec().parse(JsonOps.INSTANCE, valueJson);
-		Object value =
-			valueResult.resultOrPartial(ChatUtils::error).orElse(null);
+		Object value = valueResult.resultOrPartial().orElse(null);
 		
 		ComponentMap.Builder builder = ComponentMap.builder();
 		builder.put(type, value);
