@@ -37,7 +37,7 @@ public enum ModifyCmdTest
 			if(!name.equals("\u00a7cRed Name"))
 				throw new RuntimeException("Custom name is wrong: " + name);
 		});
-		runWurstCommand("viewcomp");
+		runWurstCommand("viewcomp type name");
 		takeScreenshot("modify_command_result");
 		
 		// Clean up

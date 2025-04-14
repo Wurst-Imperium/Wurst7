@@ -7,6 +7,8 @@
  */
 package net.wurstclient.commands;
 
+import java.util.List;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.mojang.serialization.DataResult;
@@ -29,7 +31,9 @@ public final class ViewCompCmd extends Command
 	public ViewCompCmd()
 	{
 		super("viewcomp", "Shows you the component data of an item.",
-			".viewcomp", "Copy to clipboard: .viewcomp copy");
+			".viewcomp", ".viewcomp type <query>",
+			"Copy to clipboard: .viewcomp copy",
+			"Example: .viewcomp type name");
 	}
 	
 	@Override
@@ -40,8 +44,41 @@ public final class ViewCompCmd extends Command
 		if(stack.isEmpty())
 			throw new CmdError("You must hold an item in your main hand.");
 		
+		String query = null;
+		boolean copy = false;
+		
+		if(args.length >= 1)
+			switch(args[0].toLowerCase())
+			{
+				case "copy":
+				if(args.length != 1)
+					throw new CmdSyntaxError();
+				copy = true;
+				break;
+				
+				case "type":
+				if(args.length != 2)
+					throw new CmdSyntaxError();
+				query = args[1];
+				break;
+				
+				default:
+				throw new CmdSyntaxError();
+			}
+		
+		String compString = getComponentString(stack, query);
+		if(copy)
+		{
+			MC.keyboard.setClipboard(compString);
+			ChatUtils.message("Component data copied to clipboard.");
+		}else
+			ChatUtils.message("Components: " + compString);
+	}
+	
+	private String getComponentString(ItemStack stack, String query)
+	{
 		String compString = "";
-		for(Component<?> c : stack.getComponents())
+		for(Component<?> c : getMatchingComponents(stack, query))
 		{
 			compString +=
 				"\n" + c.type().toString().replace("minecraft:", "") + " => ";
@@ -51,20 +88,18 @@ public final class ViewCompCmd extends Command
 			compString += JsonUtils.GSON.toJson(json).replace("$", "$$")
 				.replace("\u00a7", "$").replace("minecraft:", "");
 		}
+		return compString;
+	}
+	
+	private List<Component<?>> getMatchingComponents(ItemStack stack,
+		String query)
+	{
+		if(query == null)
+			return stack.getComponents().stream().toList();
 		
-		switch(String.join(" ", args).toLowerCase())
-		{
-			case "":
-			ChatUtils.message("Components: " + compString);
-			break;
-			
-			case "copy":
-			MC.keyboard.setClipboard(compString);
-			ChatUtils.message("Component data copied to clipboard.");
-			break;
-			
-			default:
-			throw new CmdSyntaxError();
-		}
+		String queryLower = query.toLowerCase();
+		return stack.getComponents().stream()
+			.filter(c -> c.type().toString().toLowerCase().contains(queryLower))
+			.toList();
 	}
 }
