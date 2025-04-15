@@ -29,7 +29,7 @@ public final class AutoStealHack extends Hack
 	private final CheckboxSetting buttons =
 		new CheckboxSetting("Steal/Store buttons", true);
 	
-	private int mode;
+	private Mode mode;
 	
 	public AutoStealHack()
 	{
@@ -41,30 +41,23 @@ public final class AutoStealHack extends Hack
 	
 	public void steal(HandledScreen<?> screen, int rows)
 	{
-		runInThread(() -> shiftClickSlots(screen, 0, rows * 9, 1));
+		runInThread(() -> shiftClickSlots(screen, 0, rows * 9, Mode.STEAL));
 	}
 	
 	public void store(HandledScreen<?> screen, int rows)
 	{
-		runInThread(() -> shiftClickSlots(screen, rows * 9, rows * 9 + 44, 2));
+		runInThread(
+			() -> shiftClickSlots(screen, rows * 9, rows * 9 + 44, Mode.STORE));
 	}
 	
 	private void runInThread(Runnable r)
 	{
-		new Thread(() -> {
-			try
-			{
-				r.run();
-				
-			}catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}).start();
+		Thread.ofVirtual().name("AutoSteal")
+			.uncaughtExceptionHandler((t, e) -> e.printStackTrace()).start(r);
 	}
 	
 	private void shiftClickSlots(HandledScreen<?> screen, int from, int to,
-		int mode)
+		Mode mode)
 	{
 		this.mode = mode;
 		
@@ -97,6 +90,12 @@ public final class AutoStealHack extends Hack
 	public boolean areButtonsVisible()
 	{
 		return buttons.isChecked();
+	}
+	
+	private enum Mode
+	{
+		STEAL,
+		STORE;
 	}
 	
 	// See GenericContainerScreenMixin and ShulkerBoxScreenMixin
