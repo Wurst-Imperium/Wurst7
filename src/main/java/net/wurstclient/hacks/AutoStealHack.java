@@ -32,6 +32,9 @@ public final class AutoStealHack extends Hack
 	private final CheckboxSetting buttons =
 		new CheckboxSetting("Steal/Store buttons", true);
 	
+	private final CheckboxSetting reverseSteal =
+		new CheckboxSetting("Reverse steal order", false);
+	
 	private Thread thread;
 	
 	public AutoStealHack()
@@ -40,6 +43,7 @@ public final class AutoStealHack extends Hack
 		setCategory(Category.ITEMS);
 		addSetting(buttons);
 		addSetting(delay);
+		addSetting(reverseSteal);
 	}
 	
 	public void steal(HandledScreen<?> screen, int rows)
@@ -68,6 +72,9 @@ public final class AutoStealHack extends Hack
 	{
 		List<Slot> slots = IntStream.range(from, to)
 			.mapToObj(i -> screen.getScreenHandler().slots.get(i)).toList();
+		
+		if(reverseSteal.isChecked() && steal)
+			slots = slots.reversed();
 		
 		for(Slot slot : slots)
 			try
