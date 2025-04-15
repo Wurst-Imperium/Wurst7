@@ -15,8 +15,6 @@ import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ShulkerBoxScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
@@ -26,13 +24,8 @@ public abstract class ShulkerBoxScreenMixin
 	extends HandledScreen<ShulkerBoxScreenHandler>
 {
 	@Unique
-	private final int rows = 3;
-	
-	@Unique
 	private final AutoStealHack autoSteal =
 		WurstClient.INSTANCE.getHax().autoStealHack;
-	@Unique
-	private int mode;
 	
 	private ShulkerBoxScreenMixin(WurstClient wurst,
 		ShulkerBoxScreenHandler handler, PlayerInventory inventory, Text title)
@@ -51,74 +44,15 @@ public abstract class ShulkerBoxScreenMixin
 		if(autoSteal.areButtonsVisible())
 		{
 			addDrawableChild(ButtonWidget
-				.builder(Text.literal("Steal"), b -> steal())
+				.builder(Text.literal("Steal"), b -> autoSteal.steal(this, 3))
 				.dimensions(x + backgroundWidth - 108, y + 4, 50, 12).build());
 			
 			addDrawableChild(ButtonWidget
-				.builder(Text.literal("Store"), b -> store())
+				.builder(Text.literal("Store"), b -> autoSteal.store(this, 3))
 				.dimensions(x + backgroundWidth - 56, y + 4, 50, 12).build());
 		}
 		
 		if(autoSteal.isEnabled())
-			steal();
-	}
-	
-	@Unique
-	private void steal()
-	{
-		runInThread(() -> shiftClickSlots(0, rows * 9, 1));
-	}
-	
-	@Unique
-	private void store()
-	{
-		runInThread(() -> shiftClickSlots(rows * 9, rows * 9 + 44, 2));
-	}
-	
-	@Unique
-	private void runInThread(Runnable r)
-	{
-		new Thread(() -> {
-			try
-			{
-				r.run();
-				
-			}catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}).start();
-	}
-	
-	@Unique
-	private void shiftClickSlots(int from, int to, int mode)
-	{
-		this.mode = mode;
-		
-		for(int i = from; i < to; i++)
-		{
-			Slot slot = handler.slots.get(i);
-			if(slot.getStack().isEmpty())
-				continue;
-			
-			waitForDelay();
-			if(this.mode != mode || client.currentScreen == null)
-				break;
-			
-			onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
-		}
-	}
-	
-	@Unique
-	private void waitForDelay()
-	{
-		try
-		{
-			Thread.sleep(autoSteal.getDelay());
-			
-		}catch(InterruptedException e)
-		{
-			throw new RuntimeException(e);
-		}
+			autoSteal.steal(this, 3);
 	}
 }
