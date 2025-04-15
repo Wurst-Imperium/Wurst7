@@ -7,6 +7,9 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -29,7 +32,7 @@ public final class AutoStealHack extends Hack
 	private final CheckboxSetting buttons =
 		new CheckboxSetting("Steal/Store buttons", true);
 	
-	private Mode mode;
+	private Thread thread;
 	
 	public AutoStealHack()
 	{
@@ -41,61 +44,55 @@ public final class AutoStealHack extends Hack
 	
 	public void steal(HandledScreen<?> screen, int rows)
 	{
-		runInThread(() -> shiftClickSlots(screen, 0, rows * 9, Mode.STEAL));
+		startClickingSlots(screen, 0, rows * 9, true);
 	}
 	
 	public void store(HandledScreen<?> screen, int rows)
 	{
-		runInThread(
-			() -> shiftClickSlots(screen, rows * 9, rows * 9 + 44, Mode.STORE));
+		startClickingSlots(screen, rows * 9, rows * 9 + 36, false);
 	}
 	
-	private void runInThread(Runnable r)
+	private void startClickingSlots(HandledScreen<?> screen, int from, int to,
+		boolean steal)
 	{
-		Thread.ofVirtual().name("AutoSteal")
-			.uncaughtExceptionHandler((t, e) -> e.printStackTrace()).start(r);
+		if(thread != null && thread.isAlive())
+			thread.interrupt();
+		
+		thread = Thread.ofPlatform().name("AutoSteal")
+			.uncaughtExceptionHandler((t, e) -> e.printStackTrace()).daemon()
+			.start(() -> shiftClickSlots(screen, from, to, steal));
 	}
 	
 	private void shiftClickSlots(HandledScreen<?> screen, int from, int to,
-		Mode mode)
+		boolean steal)
 	{
-		this.mode = mode;
+		List<Slot> slots = IntStream.range(from, to)
+			.mapToObj(i -> screen.getScreenHandler().slots.get(i)).toList();
 		
-		for(int i = from; i < to; i++)
-		{
-			Slot slot = screen.getScreenHandler().slots.get(i);
-			if(slot.getStack().isEmpty())
-				continue;
-			
-			waitForDelay();
-			if(this.mode != mode || MC.currentScreen == null)
+		for(Slot slot : slots)
+			try
+			{
+				if(slot.getStack().isEmpty())
+					continue;
+				
+				Thread.sleep(delay.getValueI());
+				
+				if(MC.currentScreen == null)
+					break;
+				
+				screen.onMouseClick(slot, slot.id, 0,
+					SlotActionType.QUICK_MOVE);
+				
+			}catch(InterruptedException e)
+			{
+				Thread.currentThread().interrupt();
 				break;
-			
-			screen.onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
-		}
-	}
-	
-	private void waitForDelay()
-	{
-		try
-		{
-			Thread.sleep(delay.getValueI());
-			
-		}catch(InterruptedException e)
-		{
-			throw new RuntimeException(e);
-		}
+			}
 	}
 	
 	public boolean areButtonsVisible()
 	{
 		return buttons.isChecked();
-	}
-	
-	private enum Mode
-	{
-		STEAL,
-		STORE;
 	}
 	
 	// See GenericContainerScreenMixin and ShulkerBoxScreenMixin
