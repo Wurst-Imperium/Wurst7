@@ -7,6 +7,9 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -26,6 +29,8 @@ public final class AutoStealHack extends Hack
 	private final CheckboxSetting buttons =
 		new CheckboxSetting("Steal/Store buttons", true);
 	
+	private int mode;
+	
 	public AutoStealHack()
 	{
 		super("AutoSteal");
@@ -34,14 +39,64 @@ public final class AutoStealHack extends Hack
 		addSetting(delay);
 	}
 	
+	public void steal(HandledScreen<?> screen, int rows)
+	{
+		runInThread(() -> shiftClickSlots(screen, 0, rows * 9, 1));
+	}
+	
+	public void store(HandledScreen<?> screen, int rows)
+	{
+		runInThread(() -> shiftClickSlots(screen, rows * 9, rows * 9 + 44, 2));
+	}
+	
+	private void runInThread(Runnable r)
+	{
+		new Thread(() -> {
+			try
+			{
+				r.run();
+				
+			}catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}).start();
+	}
+	
+	private void shiftClickSlots(HandledScreen<?> screen, int from, int to,
+		int mode)
+	{
+		this.mode = mode;
+		
+		for(int i = from; i < to; i++)
+		{
+			Slot slot = screen.getScreenHandler().slots.get(i);
+			if(slot.getStack().isEmpty())
+				continue;
+			
+			waitForDelay();
+			if(this.mode != mode || MC.currentScreen == null)
+				break;
+			
+			screen.onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
+		}
+	}
+	
+	private void waitForDelay()
+	{
+		try
+		{
+			Thread.sleep(delay.getValueI());
+			
+		}catch(InterruptedException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public boolean areButtonsVisible()
 	{
 		return buttons.isChecked();
-	}
-	
-	public long getDelay()
-	{
-		return delay.getValueI();
 	}
 	
 	// See GenericContainerScreenMixin and ShulkerBoxScreenMixin
