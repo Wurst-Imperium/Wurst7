@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 
 import net.minecraft.client.render.VertexFormats;
@@ -167,7 +166,7 @@ public final class BaseFinderHack extends Hack
 		
 		matrixStack.pop();
 		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		// RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	@Override

@@ -336,8 +336,6 @@ public abstract class AltEditorScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context, mouseX, mouseY, partialTicks);
-		
 		// skin preview
 		AltRenderer.drawAltBack(context, nameOrEmailBox.getText(),
 			(width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);

@@ -9,8 +9,6 @@ package net.wurstclient.hacks.newchunks;
 
 import java.util.function.Consumer;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -85,6 +83,6 @@ public final class NewChunksRenderer
 		
 		matrixStack.pop();
 		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		// RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 }

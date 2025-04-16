@@ -90,7 +90,6 @@ public final class EditSliderScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			slider.getName(), width / 2, 20, 0xFFFFFF);
 		

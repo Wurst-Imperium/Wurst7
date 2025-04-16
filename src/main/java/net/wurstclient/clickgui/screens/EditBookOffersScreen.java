@@ -147,7 +147,6 @@ public final class EditBookOffersScreen extends Screen
 		float partialTicks)
 	{
 		Matrix3x2fStack matrixStack = context.getMatrices();
-		renderBackground(context, mouseX, mouseY, partialTicks);
 		
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		

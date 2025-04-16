@@ -7,21 +7,18 @@
  */
 package net.wurstclient.mixin;
 
-import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
 import net.minecraft.block.enums.CameraSubmersionType;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.BackgroundRenderer.StatusEffectFogModifier;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Fog;
-import net.minecraft.client.render.FogShape;
 import net.minecraft.entity.Entity;
 import net.wurstclient.WurstClient;
 
@@ -29,30 +26,30 @@ import net.wurstclient.WurstClient;
 public abstract class BackgroundRendererMixin
 {
 	/**
-	 * Makes the distance fog 100% transparent when NoFog is enabled,
-	 * effectively removing it.
+	 * Removes the distance fog when NoFog is enabled.
+	 *
+	 * As of 25w16a, this also seems to disable clouds for some reason.
 	 */
-	@WrapOperation(
-		at = @At(value = "NEW", target = "net/minecraft/client/render/Fog"),
-		method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;Lorg/joml/Vector4f;FZF)Lnet/minecraft/client/render/Fog;")
-	private static Fog createTransparentFog(float start, float end,
-		FogShape shape, float red, float green, float blue, float alpha,
-		Operation<Fog> original, Camera camera,
-		BackgroundRenderer.FogType fogType, Vector4f color, float viewDistance,
-		boolean thickenFog, float tickDelta)
+	@ModifyExpressionValue(at = @At(value = "FIELD",
+		target = "Lnet/minecraft/client/render/BackgroundRenderer;fogEnabled:Z"),
+		method = "method_71109")
+	private boolean onMethod_71109(boolean original)
 	{
 		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
-			return original.call(start, end, shape, red, green, blue, alpha);
+			return original;
 		
+		MinecraftClient mc = WurstClient.MC;
+		Camera camera = mc.gameRenderer.getCamera();
 		CameraSubmersionType cameraSubmersionType = camera.getSubmersionType();
 		if(cameraSubmersionType != CameraSubmersionType.NONE)
-			return original.call(start, end, shape, red, green, blue, alpha);
+			return original;
 		
 		Entity entity = camera.getFocusedEntity();
-		if(BackgroundRenderer.getFogModifier(entity, tickDelta) != null)
-			return original.call(start, end, shape, red, green, blue, alpha);
+		float tickProgress = mc.getRenderTickCounter().getTickProgress(false);
+		if(BackgroundRenderer.getFogModifier(entity, tickProgress) != null)
+			return original;
 		
-		return original.call(start, end, shape, 0F, 0F, 0F, 0F);
+		return false;
 	}
 	
 	@Inject(at = @At("HEAD"),

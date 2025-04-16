@@ -163,7 +163,6 @@ public final class EditColorScreen extends Screen
 	{
 		TextRenderer tr = client.textRenderer;
 		
-		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			colorSetting.getName(), width / 2, 16, 0xF0F0F0);
 		

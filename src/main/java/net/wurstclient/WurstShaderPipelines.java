@@ -24,7 +24,7 @@ public enum WurstShaderPipelines
 	 * version with support for transparency.
 	 */
 	public static final RenderPipeline ONE_PIXEL_LINES = RenderPipelines
-		.register(RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_SNIPPET)
+		.register(RenderPipeline.builder(RenderPipelines.field_60125)
 			.withLocation("pipeline/wurst_1px_lines")
 			.withVertexShader("core/position_color")
 			.withFragmentShader("core/position_color")
@@ -38,7 +38,7 @@ public enum WurstShaderPipelines
 	 * transparency.
 	 */
 	public static final RenderPipeline ONE_PIXEL_LINE_STRIP = RenderPipelines
-		.register(RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_SNIPPET)
+		.register(RenderPipeline.builder(RenderPipelines.field_60125)
 			.withLocation("pipeline/wurst_1px_line_strip")
 			.withVertexShader("core/position_color")
 			.withFragmentShader("core/position_color")

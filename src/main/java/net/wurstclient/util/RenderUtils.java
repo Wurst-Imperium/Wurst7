@@ -13,14 +13,11 @@ import org.joml.Matrix3x2fStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -105,7 +102,7 @@ public enum RenderUtils
 	
 	public static void setShaderColor(float[] rgb, float opacity)
 	{
-		RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], opacity);
+		// RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], opacity);
 	}
 	
 	public static int toIntColor(float[] rgb, float opacity)
@@ -652,9 +649,9 @@ public enum RenderUtils
 		ItemStack renderStack = stack.isEmpty() || stack.getItem() == null
 			? new ItemStack(Blocks.GRASS_BLOCK) : stack;
 		
-		DiffuseLighting.enableGuiDepthLighting();
+		// DiffuseLighting.enableGuiDepthLighting();
 		context.drawItem(renderStack, 0, 0);
-		DiffuseLighting.disableGuiDepthLighting();
+		// DiffuseLighting.disableGuiDepthLighting();
 		
 		matrixStack.popMatrix();
 		
@@ -671,7 +668,7 @@ public enum RenderUtils
 			matrixStack.popMatrix();
 		}
 		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
+		// RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	/**

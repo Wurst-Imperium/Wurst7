@@ -569,12 +569,10 @@ public final class ClickGui
 		
 		for(Window window : windows)
 			if(window.isPinned() && !window.isInvisible())
-			{
 				// matrixStack.translate(0, 0, 300); FIXME
 				renderWindow(context, window, Integer.MIN_VALUE,
 					Integer.MIN_VALUE, partialTicks);
-			}
-		
+			
 		matrixStack.popMatrix();
 	}
 	

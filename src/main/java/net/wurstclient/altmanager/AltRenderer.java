@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -51,10 +50,10 @@ public final class AltRenderer
 		{
 			Identifier texture = getSkinTexture(name);
 			
-			if(selected)
-				RenderSystem.setShaderColor(1, 1, 1, 1);
-			else
-				RenderSystem.setShaderColor(0.9F, 0.9F, 0.9F, 1);
+			// if(selected)
+			// RenderSystem.setShaderColor(1, 1, 1, 1);
+			// else
+			// RenderSystem.setShaderColor(0.9F, 0.9F, 0.9F, 1);
 			
 			// Face
 			int fw = 192;
@@ -72,7 +71,7 @@ public final class AltRenderer
 			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
 				v, w, h, fw, fh);
 			
-			RenderSystem.setShaderColor(1, 1, 1, 1);
+			// RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 		}catch(Exception e)
 		{
@@ -86,7 +85,7 @@ public final class AltRenderer
 		try
 		{
 			Identifier texture = getSkinTexture(name);
-			RenderSystem.setShaderColor(1, 1, 1, 1);
+			// RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
@@ -226,7 +225,7 @@ public final class AltRenderer
 		try
 		{
 			Identifier texture = getSkinTexture(name);
-			RenderSystem.setShaderColor(1, 1, 1, 1);
+			// RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))

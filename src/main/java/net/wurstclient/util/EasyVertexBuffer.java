@@ -13,8 +13,6 @@ import java.util.function.Consumer;
 
 import org.joml.Matrix4fStack;
 
-import com.mojang.blaze3d.buffers.BufferType;
-import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderPass;
@@ -66,10 +64,8 @@ public final class EasyVertexBuffer implements AutoCloseable
 		shapeIndexBuffer = RenderSystem.getSequentialBuffer(drawParams.mode());
 		indexCount = drawParams.indexCount();
 		
-		BufferType target = BufferType.VERTICES;
-		BufferUsage usage = BufferUsage.STATIC_WRITE;
-		vertexBuffer = RenderSystem.getDevice().createBuffer(null, target,
-			usage, buffer.getBuffer());
+		vertexBuffer =
+			RenderSystem.getDevice().createBuffer(null, 40, buffer.getBuffer());
 	}
 	
 	private EasyVertexBuffer(DrawMode drawMode)

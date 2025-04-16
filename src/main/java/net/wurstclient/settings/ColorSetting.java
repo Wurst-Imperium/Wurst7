@@ -15,7 +15,6 @@ import java.util.Set;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
@@ -64,8 +63,8 @@ public final class ColorSetting extends Setting
 	
 	public void setAsShaderColor(float opacity)
 	{
-		float[] rgb = getColorF();
-		RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], opacity);
+		// float[] rgb = getColorF();
+		// RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], opacity);
 	}
 	
 	public int getColorI()
