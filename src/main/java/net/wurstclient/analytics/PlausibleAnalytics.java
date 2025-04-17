@@ -14,6 +14,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.world.ClientWorld;
 
 /**
@@ -100,8 +102,16 @@ public final class PlausibleAnalytics
 	
 	private void onWorldChange(MinecraftClient client, ClientWorld world)
 	{
+		sessionProp("language", getLanguage(client));
 		sessionProp("game_type", getGameType(client));
 		pageview("/in-game");
+	}
+	
+	private String getLanguage(MinecraftClient client)
+	{
+		return Optional.ofNullable(client.getLanguageManager())
+			.map(LanguageManager::getLanguage).map(String::toLowerCase)
+			.orElse(null);
 	}
 	
 	private String getGameType(MinecraftClient client)
