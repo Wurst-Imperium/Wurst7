@@ -13,7 +13,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -101,20 +100,20 @@ public final class PlausibleAnalytics
 	
 	private void onWorldChange(MinecraftClient client, ClientWorld world)
 	{
-		String path = getPathForServer(client.getCurrentServerEntry());
-		LinkedHashMap<String, String> props = new LinkedHashMap<>();
-		pageview(path, props);
+		sessionProp("game_type", getGameType(client));
+		pageview("/in-game");
 	}
 	
-	private String getPathForServer(ServerInfo server)
+	private String getGameType(MinecraftClient client)
 	{
+		ServerInfo server = client.getCurrentServerEntry();
 		if(server == null)
-			return "/singleplayer";
+			return "singleplayer";
 		if(server.isLocal())
-			return "/lan";
+			return "lan";
 		if(server.isRealm())
-			return "/realms";
-		return "/multiplayer";
+			return "realms";
+		return "multiplayer";
 	}
 	
 	public boolean isEnabled()
