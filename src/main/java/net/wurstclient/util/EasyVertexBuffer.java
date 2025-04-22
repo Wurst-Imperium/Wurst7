@@ -106,7 +106,8 @@ public final class EasyVertexBuffer implements AutoCloseable
 		
 		try(RenderPass renderPass =
 			RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-				framebuffer.getColorAttachment(), OptionalInt.empty(),
+				() -> "something from Wurst", framebuffer.getColorAttachment(),
+				OptionalInt.empty(),
 				framebuffer.useDepthAttachment
 					? framebuffer.getDepthAttachment() : null,
 				OptionalDouble.empty()))
@@ -115,7 +116,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 			renderPass.setVertexBuffer(0, vertexBuffer);
 			renderPass.setIndexBuffer(indexBuffer,
 				shapeIndexBuffer.getIndexType());
-			renderPass.drawIndexed(0, indexCount);
+			renderPass.drawIndexed(0, indexCount, vertexBuffer.size, 1);
 		}
 		
 		layer.endDrawing();
