@@ -32,8 +32,8 @@ public abstract class BackgroundRendererMixin
 	 */
 	@ModifyExpressionValue(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/render/BackgroundRenderer;fogEnabled:Z"),
-		method = "method_71109")
-	private boolean onMethod_71109(boolean original)
+		method = "getFogBuffer")
+	private boolean onGetFogBuffer(boolean original)
 	{
 		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
 			return original;

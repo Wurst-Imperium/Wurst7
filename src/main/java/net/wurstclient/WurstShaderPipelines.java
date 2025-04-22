@@ -23,8 +23,9 @@ public enum WurstShaderPipelines
 	 * Similar to the DEBUG_LINE_STIP ShaderPipeline, but as a non-srip
 	 * version with support for transparency.
 	 */
-	public static final RenderPipeline ONE_PIXEL_LINES = RenderPipelines
-		.register(RenderPipeline.builder(RenderPipelines.field_60125)
+	public static final RenderPipeline ONE_PIXEL_LINES =
+		RenderPipelines.register(RenderPipeline
+			.builder(RenderPipelines.TRANSFORMS_AND_PROJECTION_SNIPPET)
 			.withLocation("pipeline/wurst_1px_lines")
 			.withVertexShader("core/position_color")
 			.withFragmentShader("core/position_color")
@@ -37,8 +38,9 @@ public enum WurstShaderPipelines
 	 * Similar to the DEBUG_LINE_STIP ShaderPipeline, but with support for
 	 * transparency.
 	 */
-	public static final RenderPipeline ONE_PIXEL_LINE_STRIP = RenderPipelines
-		.register(RenderPipeline.builder(RenderPipelines.field_60125)
+	public static final RenderPipeline ONE_PIXEL_LINE_STRIP =
+		RenderPipelines.register(RenderPipeline
+			.builder(RenderPipelines.TRANSFORMS_AND_PROJECTION_SNIPPET)
 			.withLocation("pipeline/wurst_1px_line_strip")
 			.withVertexShader("core/position_color")
 			.withFragmentShader("core/position_color")
