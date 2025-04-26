@@ -462,6 +462,7 @@ public final class ClickGui
 		matrixStack.pushMatrix();
 		
 		tooltip = "";
+		int windowLayers = 0;
 		for(Window window : windows)
 		{
 			if(window.isInvisible())
@@ -484,7 +485,8 @@ public final class ClickGui
 				else
 					window.stopDraggingScrollbar();
 				
-			// matrixStack.translate(0, 0, 300); FIXME
+			context.goUpLayer();
+			windowLayers++;
 			renderWindow(context, window, mouseX, mouseY, partialTicks);
 		}
 		
@@ -492,6 +494,7 @@ public final class ClickGui
 		renderTooltip(context, mouseX, mouseY);
 		
 		matrixStack.popMatrix();
+		context.popLayers(windowLayers);
 	}
 	
 	public void renderPopups(DrawContext context, int mouseX, int mouseY)
@@ -507,20 +510,20 @@ public final class ClickGui
 				parent.getY() + 13 + parent.getScrollOffset() + owner.getY();
 			
 			matrixStack.pushMatrix();
-			matrixStack.translate(x1, y1);// FIXME z300
+			matrixStack.translate(x1, y1);
+			context.goUpLayer();
 			
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y1;
 			popup.render(context, cMouseX, cMouseY);
 			
+			context.popLayer();
 			matrixStack.popMatrix();
 		}
 	}
 	
 	public void renderTooltip(DrawContext context, int mouseX, int mouseY)
 	{
-		Matrix3x2fStack matrixStack = context.getMatrices();
-		
 		if(tooltip.isEmpty())
 			return;
 		
@@ -543,8 +546,7 @@ public final class ClickGui
 		int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
 		int yt2 = yt1 + th + 2;
 		
-		matrixStack.pushMatrix();
-		matrixStack.translate(0, 0);// FIXME z300
+		context.goUpLayer();
 		
 		// background
 		context.fill(xt1, yt1, xt2, yt2,
@@ -555,25 +557,30 @@ public final class ClickGui
 			RenderUtils.toIntColor(acColor, 0.5F));
 		
 		// text
+		context.goUpLayer();
 		for(int i = 0; i < lines.length; i++)
 			context.drawText(tr, lines[i], xt1 + 2, yt1 + 2 + i * tr.fontHeight,
 				txtColor, false);
+		context.popLayer();
 		
-		matrixStack.popMatrix();
+		context.popLayer();
 	}
 	
 	public void renderPinnedWindows(DrawContext context, float partialTicks)
 	{
-		Matrix3x2fStack matrixStack = context.getMatrices();
-		matrixStack.pushMatrix();
-		
+		int windowLayers = 0;
 		for(Window window : windows)
-			if(window.isPinned() && !window.isInvisible())
-				// matrixStack.translate(0, 0, 300); FIXME
-				renderWindow(context, window, Integer.MIN_VALUE,
-					Integer.MIN_VALUE, partialTicks);
+		{
+			if(!window.isPinned() || window.isInvisible())
+				continue;
 			
-		matrixStack.popMatrix();
+			context.goUpLayer();
+			windowLayers++;
+			renderWindow(context, window, Integer.MIN_VALUE, Integer.MIN_VALUE,
+				partialTicks);
+		}
+		
+		context.popLayers(windowLayers);
 	}
 	
 	public void updateColors()
@@ -763,7 +770,9 @@ public final class ClickGui
 		TextRenderer tr = MC.textRenderer;
 		String title = tr.trimToWidth(Text.literal(window.getTitle()), x3 - x1)
 			.getString();
+		context.goUpLayer();
 		context.drawText(tr, title, x1 + 2, y1 + 3, txtColor, false);
+		context.popLayer();
 	}
 	
 	private void renderTitleBarButton(DrawContext context, int x1, int y1,
