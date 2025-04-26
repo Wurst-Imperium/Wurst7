@@ -143,8 +143,10 @@ public final class HackListHUD implements UpdateListener
 			posX = screenWidth - stringWidth - 2;
 		}
 		
-		context.drawText(tr, s, posX, posY, textColor | 0xff000000, false);
 		context.drawText(tr, s, posX + 1, posY + 1, 0xff000000, false);
+		context.goUpLayer();
+		context.drawText(tr, s, posX, posY, textColor | 0xff000000, false);
+		context.popLayer();
 		
 		posY += 9;
 	}
@@ -170,9 +172,11 @@ public final class HackListHUD implements UpdateListener
 		}
 		
 		int alpha = (int)(255 * (1 - offset / 4)) << 24;
-		context.drawText(tr, s, (int)posX, posY, textColor | alpha, false);
 		context.drawText(tr, s, (int)posX + 1, posY + 1, 0x04000000 | alpha,
 			false);
+		context.goUpLayer();
+		context.drawText(tr, s, (int)posX, posY, textColor | alpha, false);
+		context.popLayer();
 		
 		posY += 9;
 	}

@@ -124,7 +124,8 @@ public final class TabGui implements KeyPressListener
 		
 		Matrix3x2fStack matrixStack = context.getMatrices();
 		matrixStack.pushMatrix();
-		matrixStack.translate(2, 23);// FIXME z100
+		matrixStack.translate(2, 23);
+		context.goUpLayer();
 		
 		drawBox(context, 0, 0, width, height);
 		context.enableScissor(0, 0, width, height);
@@ -132,6 +133,7 @@ public final class TabGui implements KeyPressListener
 		int textY = 1;
 		int txtColor = WURST.getGui().getTxtColor();
 		TextRenderer tr = MC.textRenderer;
+		context.goUpLayer();
 		for(int i = 0; i < tabs.size(); i++)
 		{
 			String tabName = tabs.get(i).name;
@@ -141,6 +143,7 @@ public final class TabGui implements KeyPressListener
 			context.drawText(tr, tabName, 2, textY, txtColor, false);
 			textY += 10;
 		}
+		context.popLayer();
 		
 		context.disableScissor();
 		
@@ -155,6 +158,7 @@ public final class TabGui implements KeyPressListener
 			context.enableScissor(0, 0, tab.width, tab.height);
 			
 			int tabTextY = 1;
+			context.goUpLayer();
 			for(int i = 0; i < tab.features.size(); i++)
 			{
 				Feature feature = tab.features.get(i);
@@ -169,11 +173,13 @@ public final class TabGui implements KeyPressListener
 				context.drawText(tr, fName, 2, tabTextY, txtColor, false);
 				tabTextY += 10;
 			}
+			context.popLayer();
 			
 			context.disableScissor();
 			matrixStack.popMatrix();
 		}
 		
+		context.popLayer();
 		matrixStack.popMatrix();
 	}
 	
