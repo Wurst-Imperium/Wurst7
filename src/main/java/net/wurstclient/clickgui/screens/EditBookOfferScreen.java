@@ -258,7 +258,6 @@ public final class EditBookOfferScreen extends Screen
 		Matrix3x2fStack matrixStack = context.getMatrices();
 		
 		matrixStack.pushMatrix();
-		// matrixStack.translate(0, 0, 300); FIXME
 		
 		TextRenderer tr = client.textRenderer;
 		String titleText = "Edit Book Offer";

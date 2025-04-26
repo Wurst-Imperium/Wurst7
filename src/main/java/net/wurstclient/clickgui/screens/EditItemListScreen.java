@@ -145,24 +145,19 @@ public final class EditItemListScreen extends Screen
 			width / 2, 12, 0xFFFFFF);
 		
 		matrixStack.pushMatrix();
-		// matrixStack.translate(0, 0, 300); FIXME
 		
 		itemNameField.render(context, mouseX, mouseY, partialTicks);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
+		context.goUpLayer();
 		matrixStack.pushMatrix();
 		matrixStack.translate(-64 + width / 2 - 152, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
-		{
-			matrixStack.pushMatrix();
-			// matrixStack.translate(0, 0, 300); FIXME
 			context.drawTextWithShadow(client.textRenderer, "item name or ID",
 				68, height - 50, 0x808080);
-			matrixStack.popMatrix();
-		}
 		
 		int border = itemNameField.isFocused() ? 0xFFFFFFFF : 0xFFA0A0A0;
 		int black = 0xFF000000;
@@ -183,6 +178,7 @@ public final class EditItemListScreen extends Screen
 			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
 		
+		context.popLayer();
 		matrixStack.popMatrix();
 	}
 	

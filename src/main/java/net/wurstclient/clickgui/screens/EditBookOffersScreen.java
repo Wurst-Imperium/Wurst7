@@ -10,7 +10,6 @@ package net.wurstclient.clickgui.screens;
 import java.util.List;
 import java.util.Objects;
 
-import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -146,12 +145,7 @@ public final class EditBookOffersScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		Matrix3x2fStack matrixStack = context.getMatrices();
-		
 		listGui.render(context, mouseX, mouseY, partialTicks);
-		
-		matrixStack.pushMatrix();
-		// matrixStack.translate(0, 0, 300); FIXME
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			bookOffers.getName() + " (" + bookOffers.getOffers().size() + ")",
@@ -159,8 +153,6 @@ public final class EditBookOffersScreen extends Screen
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
-		
-		matrixStack.popMatrix();
 	}
 	
 	@Override

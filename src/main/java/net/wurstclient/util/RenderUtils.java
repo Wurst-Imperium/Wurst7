@@ -649,16 +649,15 @@ public enum RenderUtils
 		ItemStack renderStack = stack.isEmpty() || stack.getItem() == null
 			? new ItemStack(Blocks.GRASS_BLOCK) : stack;
 		
-		// DiffuseLighting.enableGuiDepthLighting();
 		context.drawItem(renderStack, 0, 0);
-		// DiffuseLighting.disableGuiDepthLighting();
 		
 		matrixStack.popMatrix();
 		
 		if(stack.isEmpty())
 		{
+			context.goUpLayer();
 			matrixStack.pushMatrix();
-			matrixStack.translate(x, y);// FIXME z250
+			matrixStack.translate(x, y);
 			if(large)
 				matrixStack.scale(2, 2);
 			
@@ -666,9 +665,8 @@ public enum RenderUtils
 			context.drawText(tr, "?", 3, 2, 0xf0f0f0, true);
 			
 			matrixStack.popMatrix();
+			context.popLayer();
 		}
-		
-		// RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	/**

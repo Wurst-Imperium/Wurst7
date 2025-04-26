@@ -276,7 +276,6 @@ public final class AddBookOfferScreen extends Screen
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.pushMatrix();
-		// matrixStack.translate(0, 0, 300); FIXME
 		
 		TextRenderer tr = client.textRenderer;
 		String titleText =
