@@ -64,8 +64,6 @@ public abstract class GameMenuScreenMixin extends Screen
 		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)
 			return;
 		
-		// RenderSystem.setShaderColor(1, 1, 1, 1);
-		
 		int x = wurstOptionsButton.getX() + 34;
 		int y = wurstOptionsButton.getY() + 2;
 		int w = 63;
@@ -74,8 +72,10 @@ public abstract class GameMenuScreenMixin extends Screen
 		int fh = 16;
 		float u = 0;
 		float v = 0;
+		context.goUpLayer();
 		context.drawTexture(RenderPipelines.GUI_TEXTURED, WURST_TEXTURE, x, y,
 			u, v, w, h, fw, fh);
+		context.popLayer();
 	}
 	
 	@Unique
