@@ -79,6 +79,8 @@ public final class BlockComponent extends Component
 			RenderUtils.toIntColor(GUI.getBgColor(), GUI.getOpacity());
 		context.fill(x1, y1, x2, y2, bgColor);
 		
+		context.goUpLayer();
+		
 		// text
 		String name = setting.getName() + ":";
 		context.drawText(TR, name, x1, y1 + 2, GUI.getTxtColor(), false);
@@ -86,6 +88,8 @@ public final class BlockComponent extends Component
 		// block
 		ItemStack stack = new ItemStack(setting.getBlock());
 		RenderUtils.drawItem(context, stack, x3, y1, true);
+		
+		context.popLayer();
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int y1, int x2,

@@ -110,6 +110,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		// box
 		context.fill(x4, y1, x2, y2, getFillColor(hBox));
 		
+		context.goUpLayer();
+		
 		// outlines
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
 		RenderUtils.drawBorder2D(context, x4, y1, x2, y2, outlineColor);
@@ -125,6 +127,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		int txtColor = GUI.getTxtColor();
 		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
 		context.drawText(TR, value, x4 + 2, y1 + 2, txtColor, false);
+		
+		context.popLayer();
 	}
 	
 	private int getFillColor(boolean hovering)

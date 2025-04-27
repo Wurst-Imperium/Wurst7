@@ -7,7 +7,6 @@
  */
 package net.wurstclient.clickgui.components;
 
-import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
@@ -142,9 +141,7 @@ public final class SliderComponent extends Component
 		RenderUtils.drawBorder2D(context, xl1, y4, xl2, y5,
 			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
-		Matrix3x2fStack matrices = context.getMatrices();
-		matrices.pushMatrix();
-		// matrices.translate(0, 0, 2); FIXME
+		context.goUpLayer();
 		
 		// knob
 		float xk1 = x1 + (x2 - x1 - 8) * (float)setting.getPercentage();
@@ -156,8 +153,6 @@ public final class SliderComponent extends Component
 		RenderUtils.fill2D(context, xk1, yk1, xk2, yk2, knobColor);
 		RenderUtils.drawBorder2D(context, xk1, yk1, xk2, yk2, 0x80101010);
 		
-		matrices.popMatrix();
-		
 		// text
 		String name = setting.getName();
 		String value = setting.getValueString();
@@ -165,6 +160,8 @@ public final class SliderComponent extends Component
 		int txtColor = GUI.getTxtColor();
 		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
 		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
+		
+		context.popLayer();
 	}
 	
 	private String getTextTooltip()
