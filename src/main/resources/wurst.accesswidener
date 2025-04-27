@@ -1,6 +1,7 @@
 accessWidener	v1	named
 accessible	class	net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
 accessible	method	net/minecraft/client/gl/RenderPipelines	register	(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+accessible	method	net/minecraft/client/gui/screen/ingame/HandledScreen onMouseClick	(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/Mouse	onMouseButton	(JIII)V
 accessible	method	net/minecraft/client/render/BackgroundRenderer	getFogModifier	(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;
@@ -9,6 +10,7 @@ accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$B
 accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	layering	(Lnet/minecraft/client/render/RenderPhase$Layering;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
 accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	lineWidth	(Lnet/minecraft/client/render/RenderPhase$LineWidth;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
 accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	target	(Lnet/minecraft/client/render/RenderPhase$Target;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
+accessible	method	net/minecraft/component/ComponentMap$Builder	put	(Lnet/minecraft/component/ComponentType;Ljava/lang/Object;)V
 accessible	method	net/minecraft/entity/player/PlayerEntity	canGlide	()Z
 accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z
 accessible	field	net/minecraft/client/MinecraftClient	itemUseCooldown	I

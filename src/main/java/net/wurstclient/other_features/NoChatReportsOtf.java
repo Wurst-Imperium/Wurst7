@@ -94,13 +94,13 @@ public final class NoChatReportsOtf extends OtherFeature
 		
 		event.cancel();
 		
-		ClickEvent clickEvent =
-			new ClickEvent.OpenUrl(URI.create("https://wurst.wiki/ncr"));
+		ClickEvent clickEvent = new ClickEvent.OpenUrl(
+			URI.create("https://www.wurstclient.net/chat-disabled-mpk/"));
 		HoverEvent hoverEvent = new HoverEvent.ShowText(
 			Text.literal("Original message: ").append(originalText));
 		
 		ChatUtils.component(Text.literal(
-			"The server is refusing to let you chat without enabling chat reports. See wurst.wiki/ncr")
+			"The server is refusing to let you chat without enabling chat reports. Click \u00a7nhere\u00a7r to learn more.")
 			.styled(
 				s -> s.withClickEvent(clickEvent).withHoverEvent(hoverEvent)));
 	}
