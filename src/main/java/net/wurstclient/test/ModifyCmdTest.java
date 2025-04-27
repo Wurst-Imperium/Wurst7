@@ -10,10 +10,9 @@ package net.wurstclient.test;
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 
 public enum ModifyCmdTest
 {
@@ -28,19 +27,17 @@ public enum ModifyCmdTest
 		assertOneItemInSlot(0, Items.DIAMOND);
 		
 		// .modify it with NBT data
-		runWurstCommand("modify add {test:123}");
+		runWurstCommand("modify set custom_name {\"text\":\"$cRed Name\"}");
 		assertOneItemInSlot(0, Items.DIAMOND);
 		submitAndWait(mc -> {
 			ItemStack stack = mc.player.getInventory().getSelectedStack();
-			NbtCompound nbt = stack.getComponents().getOrDefault(
-				DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT).copyNbt();
-			if(!nbt.contains("test"))
-				throw new RuntimeException(
-					"NBT data is missing the 'test' key");
-			if(nbt.getInt("test").orElse(-1) != 123)
-				throw new RuntimeException("NBT data is incorrect");
+			String name = stack.getComponents()
+				.getOrDefault(DataComponentTypes.CUSTOM_NAME, Text.empty())
+				.getString();
+			if(!name.equals("\u00a7cRed Name"))
+				throw new RuntimeException("Custom name is wrong: " + name);
 		});
-		runWurstCommand("viewnbt");
+		runWurstCommand("viewcomp type name");
 		takeScreenshot("modify_command_result");
 		
 		// Clean up
