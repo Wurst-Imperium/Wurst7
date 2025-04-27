@@ -207,20 +207,24 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				drawBox(context, x1, y1, x2, y2, buttonColor);
 				
 				// text
+				context.goUpLayer();
 				context.drawTextWithShadow(tr, pkb.getDescription(), x1 + 1,
 					y1 + 1, txtColor);
 				context.drawTextWithShadow(tr, pkb.getCommand(), x1 + 1,
 					y1 + 1 + tr.fontHeight, txtColor);
+				context.popLayer();
 			}
 		}
 		
 		// text
 		int textY = bgy1 + scroll + 2;
+		context.goUpLayer();
 		for(String line : text.split("\n"))
 		{
 			context.drawTextWithShadow(tr, line, bgx1 + 2, textY, txtColor);
 			textY += tr.fontHeight;
 		}
+		context.popLayer();
 		
 		context.disableScissor();
 		
@@ -247,9 +251,11 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			drawBox(context, x1, y1, x2, y2, buttonColor);
 			
 			// text
+			context.goUpLayer();
 			context.drawCenteredTextWithShadow(tr,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 5,
 				txtColor);
+			context.popLayer();
 		}
 	}
 	

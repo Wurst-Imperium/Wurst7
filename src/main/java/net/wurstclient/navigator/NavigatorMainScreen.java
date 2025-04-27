@@ -10,7 +10,6 @@ package net.wurstclient.navigator;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
@@ -210,7 +209,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	protected void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		Matrix3x2fStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
@@ -252,8 +250,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// tooltip
 		if(tooltip != null)
 		{
-			matrixStack.pushMatrix();
-			// matrixStack.translate(0, 0, 300); FIXME
+			context.goUpLayer();
 			
 			String[] lines = tooltip.split("\n");
 			TextRenderer tr = client.textRenderer;
@@ -284,11 +281,13 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderUtils.drawBorder2D(context, xt1, yt1, xt2, yt2, acColor);
 			
 			// text
+			context.goUpLayer();
 			for(int i = 0; i < lines.length; i++)
 				context.drawText(tr, lines[i], xt1 + 2,
 					yt1 + 2 + i * tr.fontHeight, txtColor, false);
+			context.popLayer();
 			
-			matrixStack.popMatrix();
+			context.popLayer();
 		}
 	}
 	
@@ -366,6 +365,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(hovering)
 			hoveringArrow = mouseX >= bx1;
 		
+		context.goUpLayer();
+		
 		// arrow
 		ClickGuiIcons.drawMinimizeArrow(context, bx1 + 2, area.y + 2.5F,
 			area.x + area.width - 2, area.y + area.height - 3, hovering, true);
@@ -380,6 +381,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			int txtColor = gui.getTxtColor();
 			context.drawText(tr, buttonText, bx, by, txtColor, false);
 		}
+		
+		context.popLayer();
 	}
 	
 	public void setExpanding(boolean expanding)
