@@ -75,10 +75,10 @@ public final class FileComponent extends Component
 		int txtColor = GUI.getTxtColor();
 		String labelText = setting.getName() + ":";
 		String buttonText = setting.getSelectedFileName();
-		context.goUpLayer();
+		context.state.goUpLayer();
 		context.drawText(TR, labelText, x1, y1 + 2, txtColor, false);
 		context.drawText(TR, buttonText, x3 + 2, y1 + 2, txtColor, false);
-		context.popLayer();
+		context.state.goDownLayer();
 	}
 	
 	private int getFillColor(boolean hovering)

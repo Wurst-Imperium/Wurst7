@@ -14,6 +14,7 @@ accessible	method	net/minecraft/component/ComponentMap$Builder	put	(Lnet/minecra
 accessible	method	net/minecraft/entity/player/PlayerEntity	canGlide	()Z
 accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z
 accessible	field	net/minecraft/client/MinecraftClient	itemUseCooldown	I
+accessible	field	net/minecraft/client/gui/DrawContext	state	Lnet/minecraft/client/gui/render/state/GuiRenderState;
 accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/TitleScreen	doBackgroundFade	Z

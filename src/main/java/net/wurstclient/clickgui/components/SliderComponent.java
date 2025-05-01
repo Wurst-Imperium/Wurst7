@@ -141,7 +141,7 @@ public final class SliderComponent extends Component
 		RenderUtils.drawBorder2D(context, xl1, y4, xl2, y5,
 			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
-		context.goUpLayer();
+		context.state.goUpLayer();
 		
 		// knob
 		float xk1 = x1 + (x2 - x1 - 8) * (float)setting.getPercentage();
@@ -161,7 +161,7 @@ public final class SliderComponent extends Component
 		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
 		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
 		
-		context.popLayer();
+		context.state.goDownLayer();
 	}
 	
 	private String getTextTooltip()

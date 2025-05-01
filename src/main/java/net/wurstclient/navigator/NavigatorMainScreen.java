@@ -250,7 +250,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// tooltip
 		if(tooltip != null)
 		{
-			context.goUpLayer();
+			context.state.goUpLayer();
 			
 			String[] lines = tooltip.split("\n");
 			TextRenderer tr = client.textRenderer;
@@ -281,13 +281,13 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderUtils.drawBorder2D(context, xt1, yt1, xt2, yt2, acColor);
 			
 			// text
-			context.goUpLayer();
+			context.state.goUpLayer();
 			for(int i = 0; i < lines.length; i++)
 				context.drawText(tr, lines[i], xt1 + 2,
 					yt1 + 2 + i * tr.fontHeight, txtColor, false);
-			context.popLayer();
+			context.state.goDownLayer();
 			
-			context.popLayer();
+			context.state.goDownLayer();
 		}
 	}
 	
@@ -365,7 +365,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(hovering)
 			hoveringArrow = mouseX >= bx1;
 		
-		context.goUpLayer();
+		context.state.goUpLayer();
 		
 		// arrow
 		ClickGuiIcons.drawMinimizeArrow(context, bx1 + 2, area.y + 2.5F,
@@ -382,7 +382,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			context.drawText(tr, buttonText, bx, by, txtColor, false);
 		}
 		
-		context.popLayer();
+		context.state.goDownLayer();
 	}
 	
 	public void setExpanding(boolean expanding)

@@ -151,7 +151,7 @@ public final class EditItemListScreen extends Screen
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		context.goUpLayer();
+		context.state.goUpLayer();
 		matrixStack.pushMatrix();
 		matrixStack.translate(-64 + width / 2 - 152, 0);
 		
@@ -178,7 +178,7 @@ public final class EditItemListScreen extends Screen
 			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
 		
-		context.popLayer();
+		context.state.goDownLayer();
 		matrixStack.popMatrix();
 	}
 	

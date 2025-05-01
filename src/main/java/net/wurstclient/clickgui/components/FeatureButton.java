@@ -104,7 +104,7 @@ public final class FeatureButton extends Component
 		if(hasSettings)
 			context.fill(x3, y1, x2, y2, getButtonColor(false, hSettings));
 		
-		context.goUpLayer();
+		context.state.goUpLayer();
 		
 		// outlines
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
@@ -123,7 +123,7 @@ public final class FeatureButton extends Component
 		int ty = y1 + 2;
 		context.drawText(TR, name, tx, ty, GUI.getTxtColor(), false);
 		
-		context.popLayer();
+		context.state.goDownLayer();
 	}
 	
 	private int getButtonColor(boolean enabled, boolean hovering)

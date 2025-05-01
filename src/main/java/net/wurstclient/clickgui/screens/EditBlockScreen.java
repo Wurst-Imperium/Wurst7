@@ -106,7 +106,7 @@ public final class EditBlockScreen extends Screen
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		context.goUpLayer();
+		context.state.goUpLayer();
 		matrixStack.pushMatrix();
 		matrixStack.translate(-64 + width / 2 - 100, 115);
 		
@@ -137,7 +137,7 @@ public final class EditBlockScreen extends Screen
 		
 		RenderUtils.drawItem(context, new ItemStack(blockToAdd),
 			-64 + width / 2 - 100 + 52, 115 - 52, false);
-		context.popLayer();
+		context.state.goDownLayer();
 	}
 	
 	@Override

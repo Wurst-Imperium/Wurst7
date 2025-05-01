@@ -485,7 +485,7 @@ public final class ClickGui
 				else
 					window.stopDraggingScrollbar();
 				
-			context.goUpLayer();
+			context.state.goUpLayer();
 			windowLayers++;
 			renderWindow(context, window, mouseX, mouseY, partialTicks);
 		}
@@ -494,7 +494,8 @@ public final class ClickGui
 		renderTooltip(context, mouseX, mouseY);
 		
 		matrixStack.popMatrix();
-		context.popLayers(windowLayers);
+		for(int i = 0; i < windowLayers; i++)
+			context.state.goDownLayer();
 	}
 	
 	public void renderPopups(DrawContext context, int mouseX, int mouseY)
@@ -511,13 +512,13 @@ public final class ClickGui
 			
 			matrixStack.pushMatrix();
 			matrixStack.translate(x1, y1);
-			context.goUpLayer();
+			context.state.goUpLayer();
 			
 			int cMouseX = mouseX - x1;
 			int cMouseY = mouseY - y1;
 			popup.render(context, cMouseX, cMouseY);
 			
-			context.popLayer();
+			context.state.goDownLayer();
 			matrixStack.popMatrix();
 		}
 	}
@@ -546,7 +547,7 @@ public final class ClickGui
 		int yt1 = mouseY + th - 2 <= sh ? mouseY - 4 : mouseY - th - 4;
 		int yt2 = yt1 + th + 2;
 		
-		context.goUpLayer();
+		context.state.goUpLayer();
 		
 		// background
 		context.fill(xt1, yt1, xt2, yt2,
@@ -557,13 +558,13 @@ public final class ClickGui
 			RenderUtils.toIntColor(acColor, 0.5F));
 		
 		// text
-		context.goUpLayer();
+		context.state.goUpLayer();
 		for(int i = 0; i < lines.length; i++)
 			context.drawText(tr, lines[i], xt1 + 2, yt1 + 2 + i * tr.fontHeight,
 				txtColor, false);
-		context.popLayer();
+		context.state.goDownLayer();
 		
-		context.popLayer();
+		context.state.goDownLayer();
 	}
 	
 	public void renderPinnedWindows(DrawContext context, float partialTicks)
@@ -574,13 +575,14 @@ public final class ClickGui
 			if(!window.isPinned() || window.isInvisible())
 				continue;
 			
-			context.goUpLayer();
+			context.state.goUpLayer();
 			windowLayers++;
 			renderWindow(context, window, Integer.MIN_VALUE, Integer.MIN_VALUE,
 				partialTicks);
 		}
 		
-		context.popLayers(windowLayers);
+		for(int i = 0; i < windowLayers; i++)
+			context.state.goDownLayer();
 	}
 	
 	public void updateColors()
@@ -770,9 +772,9 @@ public final class ClickGui
 		TextRenderer tr = MC.textRenderer;
 		String title = tr.trimToWidth(Text.literal(window.getTitle()), x3 - x1)
 			.getString();
-		context.goUpLayer();
+		context.state.goUpLayer();
 		context.drawText(tr, title, x1 + 2, y1 + 3, txtColor, false);
-		context.popLayer();
+		context.state.goDownLayer();
 	}
 	
 	private void renderTitleBarButton(DrawContext context, int x1, int y1,

@@ -90,10 +90,10 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 			context.fill(x1, yi1, x2, yi2, RenderUtils.toIntColor(
 				GUI.getBgColor(), GUI.getOpacity() * (hValue ? 1.5F : 1)));
 			
-			context.goUpLayer();
+			context.state.goUpLayer();
 			context.drawText(TR, value.toString(), x1 + 2, yi1 + 2,
 				GUI.getTxtColor(), false);
-			context.popLayer();
+			context.state.goDownLayer();
 		}
 	}
 	

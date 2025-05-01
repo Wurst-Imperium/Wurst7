@@ -422,24 +422,24 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				RenderUtils.toIntColor(rgb, alpha));
 			
 			// text
-			context.goUpLayer();
+			context.state.goUpLayer();
 			context.drawCenteredTextWithShadow(client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
-			context.popLayer();
+			context.state.goDownLayer();
 		}
 		
 		// text
 		int textY = bgy1 + scroll + 2;
-		context.goUpLayer();
+		context.state.goUpLayer();
 		for(String line : text.split("\n"))
 		{
 			context.drawText(client.textRenderer, line, bgx1 + 2, textY,
 				txtColor, false);
 			textY += client.textRenderer.fontHeight;
 		}
-		context.popLayer();
+		context.state.goDownLayer();
 		
 		context.disableScissor();
 		
@@ -466,11 +466,11 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			String buttonText = button.getMessage().getString();
-			context.goUpLayer();
+			context.state.goUpLayer();
 			context.drawText(client.textRenderer, buttonText,
 				(x1 + x2 - client.textRenderer.getWidth(buttonText)) / 2,
 				y1 + 5, txtColor, false);
-			context.popLayer();
+			context.state.goDownLayer();
 		}
 		
 		// popups & tooltip

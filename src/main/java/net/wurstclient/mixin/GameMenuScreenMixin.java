@@ -72,10 +72,10 @@ public abstract class GameMenuScreenMixin extends Screen
 		int fh = 16;
 		float u = 0;
 		float v = 0;
-		context.goUpLayer();
+		context.state.goUpLayer();
 		context.drawTexture(RenderPipelines.GUI_TEXTURED, WURST_TEXTURE, x, y,
 			u, v, w, h, fw, fh);
-		context.popLayer();
+		context.state.goDownLayer();
 	}
 	
 	@Unique

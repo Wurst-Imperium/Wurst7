@@ -149,7 +149,7 @@ public final class EditBlockListScreen extends Screen
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		context.goUpLayer();
+		context.state.goUpLayer();
 		matrixStack.pushMatrix();
 		matrixStack.translate(-64 + width / 2 - 152, 0);
 		
@@ -176,7 +176,7 @@ public final class EditBlockListScreen extends Screen
 			blockToAdd == null ? ItemStack.EMPTY : new ItemStack(blockToAdd),
 			width / 2 - 164, height - 52, false);
 		
-		context.popLayer();
+		context.state.goDownLayer();
 		matrixStack.popMatrix();
 	}
 	

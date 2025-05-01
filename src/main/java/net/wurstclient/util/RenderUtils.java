@@ -655,7 +655,7 @@ public enum RenderUtils
 		
 		if(stack.isEmpty())
 		{
-			context.goUpLayer();
+			context.state.goUpLayer();
 			matrixStack.pushMatrix();
 			matrixStack.translate(x, y);
 			if(large)
@@ -665,7 +665,7 @@ public enum RenderUtils
 			context.drawText(tr, "?", 3, 2, 0xf0f0f0, true);
 			
 			matrixStack.popMatrix();
-			context.popLayer();
+			context.state.goDownLayer();
 		}
 	}
 	
