@@ -78,15 +78,14 @@ public final class ModifyCmd extends Command
 		if(args.length < 3)
 			throw new CmdSyntaxError();
 		
-		ComponentType<?> type =
-			Registries.DATA_COMPONENT_TYPE.get(Identifier.tryParse(args[1]));
+		ComponentType<?> type = parseComponentType(args[1]);
 		
 		String valueString =
 			String.join(" ", Arrays.copyOfRange(args, 2, args.length))
 				.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		JsonElement valueJson = parseJson(valueString);
-		DataResult<?> valueResult =
-			type.getCodec().parse(JsonOps.INSTANCE, valueJson);
+		DataResult<?> valueResult = type.getCodec().parse(
+			MC.player.getRegistryManager().getOps(JsonOps.INSTANCE), valueJson);
 		Object value = valueResult.resultOrPartial().orElse(null);
 		
 		ComponentMap.Builder builder = ComponentMap.builder();
@@ -99,14 +98,19 @@ public final class ModifyCmd extends Command
 		if(args.length > 2)
 			throw new CmdSyntaxError();
 		
+		stack.set(parseComponentType(args[1]), null);
+	}
+	
+	private ComponentType<?> parseComponentType(String typeName) throws CmdError
+	{
 		ComponentType<?> type =
-			Registries.DATA_COMPONENT_TYPE.get(Identifier.tryParse(args[1]));
+			Registries.DATA_COMPONENT_TYPE.get(Identifier.tryParse(typeName));
 		
 		if(type == null)
 			throw new CmdError(
-				"Component type \"" + args[1] + "\" does not exist.");
+				"Component type \"" + typeName + "\" does not exist.");
 		
-		stack.set(type, null);
+		return type;
 	}
 	
 	private JsonElement parseJson(String jsonString) throws CmdError
