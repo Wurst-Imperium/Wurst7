@@ -69,13 +69,6 @@ public final class NoFallHack extends Hack implements UpdateListener
 		boolean fallFlying = player.isFallFlying();
 		if(fallFlying && !allowElytra.isChecked())
 			return;
-			
-		// ignore small falls that can't cause damage,
-		// unless CreativeFlight is enabled in survival mode
-		boolean creativeFlying = WURST.getHax().creativeFlightHack.isEnabled()
-			&& player.getAbilities().flying;
-		if(!creativeFlying && player.fallDistance <= (fallFlying ? 1 : 2))
-			return;
 		
 		// attempt to fix elytra weirdness, if allowed
 		if(fallFlying && player.isSneaking()

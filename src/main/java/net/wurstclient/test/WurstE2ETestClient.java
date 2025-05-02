@@ -110,14 +110,23 @@ public final class WurstE2ETestClient implements ModInitializer
 		
 		// TODO: Open ClickGUI and Navigator
 		
+		// Build a test platform and clear out the space above it
+		runChatCommand("fill ~-5 ~-1 ~-5 ~5 ~-1 ~5 stone");
+		runChatCommand("fill ~-5 ~ ~-5 ~5 ~30 ~5 air");
+		
 		// Clear inventory and chat before running tests
 		runChatCommand("clear");
 		clearChat();
 		
+		// Test Wurst hacks
+		NoFallHackTest.testNoFallHack();
+		
+		// Test Wurst commands
 		CopyItemCmdTest.testCopyItemCmd();
 		GiveCmdTest.testGiveCmd();
 		ModifyCmdTest.testModifyCmd();
-		// TODO: Test more Wurst hacks
+		
+		// TODO: Test more Wurst features
 		
 		System.out.println("Opening game menu");
 		openGameMenu();
