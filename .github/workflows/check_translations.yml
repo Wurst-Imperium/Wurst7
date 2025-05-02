@@ -1,0 +1,32 @@
+name: Check Translations
+
+on:
+  push:
+    branches-ignore:
+      - "dependabot/**"
+    tags-ignore:
+      - "**"
+    paths:
+      - "src/main/resources/assets/wurst/translations/**.json"
+      - "src/main/resources/intentionally_untranslated.json"
+  pull_request:
+    paths:
+      - "src/main/resources/assets/wurst/translations/**.json"
+      - "src/main/resources/intentionally_untranslated.json"
+  workflow_dispatch:
+
+jobs:
+  check_translations:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Run check_translations.py
+      run: python scripts/check_translations.py

@@ -61,6 +61,7 @@ public enum NoFallHackTest
 		float health = submitAndGet(mc -> mc.player.getHealth());
 		if(!healthCheck.test(health))
 			throw new RuntimeException("Player's health is wrong: " + health);
+		
 		System.out.println("Player's health is correct: " + health);
 	}
 }

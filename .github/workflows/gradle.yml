@@ -1,13 +1,9 @@
 name: Java CI with Gradle
-run-name: |
-  ${{ github.event_name == 'pull_request'
-  && format('Test changes in PR #{0}: {1}', github.event.pull_request.number, github.event.pull_request.title)
-  || format('Test changes in {0}: {1}', github.ref_name, github.event.head_commit.message) }}
 
 on:
   push:
-    branches:
-      - "**"
+    branches-ignore:
+      - "dependabot/**"
     tags-ignore:
       - "**"
     paths:
@@ -59,7 +55,7 @@ jobs:
       run: ./gradlew spotlessJsonCheck || (echo "::error::JSON validation failed! Run './gradlew spotlessApply' to fix style issues, or check the full error message for syntax errors." && exit 1)
 
     - name: Validate Java code style
-      run: ./gradlew spotlessCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
+      run: ./gradlew spotlessJavaCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
 
     - name: Run unit tests
       run: ./gradlew test --stacktrace --warning-mode=fail
@@ -141,6 +137,7 @@ jobs:
               echo "" >> $GITHUB_STEP_SUMMARY
             else
               echo "Failed to upload $filename" >> $GITHUB_STEP_SUMMARY
+              echo "Imgur upload response for $filename: $response"
             fi
           fi
         done

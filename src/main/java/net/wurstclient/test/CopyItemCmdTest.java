@@ -20,6 +20,8 @@ public enum CopyItemCmdTest
 	{
 		System.out.println("Testing .copyitem command");
 		setPerspective(Perspective.THIRD_PERSON_FRONT);
+		runChatCommand("clear");
+		clearChat();
 		
 		// Put on a golden helmet
 		// CURSED: The /item replace command doesn't work properly in Minecraft
