@@ -201,6 +201,7 @@ public class ServerFinderScreen extends Screen
 					}
 				}
 				pingers.remove(i);
+				i -= 1;
 			}
 	}
 	
