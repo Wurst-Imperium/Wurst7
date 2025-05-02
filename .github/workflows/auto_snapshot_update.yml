@@ -1,0 +1,119 @@
+# Experimental workflow to automate updating to a new Minecraft snapshot.
+
+# Currently this is very similar to the semi-automatic scripts I already use,
+# but moving them to GitHub Actions means I don't have to be around to start
+# them. This should allow for further automation in the future.
+
+# TODO:
+# - Add more thorough automated testing where it runs the game, creates a test
+#   world and takes screenshots, similar to what Fabric API does in their
+#   GitHub Actions workflow.
+# - Set up a server to trigger this workflow when a new snapshot is out and
+#   Fabric has updated to it. This might end up running twice per snapshot,
+#   because there is no way to know ahead of time if the previous Fabric API
+#   build still works or if we have to wait for a new build made specifically
+#   for the new snapshot.
+# - Add a step to automatically release the new snapshot build if all tests
+#   have passed. This will only ever run on small snapshots that don't break
+#   anything, but should save a ton of time at the end of each snapshot cycle
+#   when Mojang is spamming tiny pre-releases every day.
+
+# In case it isn't obvious, these todos are very ambitious and might not end
+# up working as planned.
+
+name: Auto Snapshot Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      mc_version:
+        description: 'Minecraft version to update to'
+        required: true
+      yarn_mappings:
+        description: 'Yarn mappings version'
+        required: true
+      fabric_loader:
+        description: 'Fabric Loader version'
+        required: true
+      fapi_version:
+        description: 'Fabric API version'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # so that we can see all branches
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Set up Java 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'microsoft'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        build-scan-publish: true
+        build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
+        build-scan-terms-of-use-agree: "yes"
+
+    - name: Create and checkout new snapshot branch
+      run: |
+        BRANCH_NAME="${{ github.event.inputs.mc_version }}"
+        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        
+        if [ "$CURRENT_BRANCH" = "$BRANCH_NAME" ]; then
+          echo "Already on branch $BRANCH_NAME. Skipping branch creation."
+        elif git show-ref --quiet refs/heads/$BRANCH_NAME; then
+          echo "Branch $BRANCH_NAME already exists but is not currently checked out. Failing the workflow."
+          exit 1
+        else
+          git checkout -b $BRANCH_NAME
+          echo "Created and checked out new branch: $BRANCH_NAME"
+        fi
+      shell: bash
+
+    - name: Run migrateMappings task
+      run: |
+        ./gradlew migrateMappings --mappings ${{ github.event.inputs.yarn_mappings }}
+      shell: bash
+
+    - name: Replace src/main/java with remapped files
+      run: |
+        rm -rf ./src/main/java
+        mv ./remappedSrc ./src/main/java
+      shell: bash
+
+    - name: Update version constants
+      run: |
+        python scripts/update_version_constants.py "${{ github.event.inputs.mc_version }}" "${{ github.event.inputs.yarn_mappings }}" "${{ github.event.inputs.fabric_loader }}" "${{ github.event.inputs.fapi_version }}"
+      shell: bash
+
+    # To fix any style issues that the migration scripts might cause
+    - name: Run spotlessApply task
+      run: ./gradlew spotlessApply
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'Wurst-Bot'
+        git config --global user.email 'contact.wurstimperium@gmail.com'
+        git add .
+        git commit -m "[Wurst-Bot] Update to ${{ github.event.inputs.mc_version }}"
+        git push --set-upstream origin ${{ github.event.inputs.mc_version }}
+      shell: bash

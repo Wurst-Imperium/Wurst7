@@ -273,7 +273,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				featureY);
 		}
 		
+		// CURSED: disableScissor() causes weird artifacts if you don't draw
+		// some text after it.
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		context.drawText(textRenderer, ".", -100, -100, 0xFFFFFF, false);
 		
 		// tooltip
 		if(tooltip != null)

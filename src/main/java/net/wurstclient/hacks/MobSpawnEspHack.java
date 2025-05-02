@@ -38,6 +38,7 @@ import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.mobspawnesp.HitboxCheckSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.ChunkAreaSetting.ChunkArea;
@@ -70,6 +71,8 @@ public final class MobSpawnEspHack extends Hack
 	private final CheckboxSetting depthTest =
 		new CheckboxSetting("Depth test", true);
 	
+	private final HitboxCheckSetting hitboxCheck = new HitboxCheckSetting();
+	
 	private final ChunkVertexBufferCoordinator coordinator =
 		new ChunkVertexBufferCoordinator(this::isSpawnable, this::buildBuffer,
 			drawDistance);
@@ -86,6 +89,7 @@ public final class MobSpawnEspHack extends Hack
 		addSetting(dayColor);
 		addSetting(opacity);
 		addSetting(depthTest);
+		addSetting(hitboxCheck);
 	}
 	
 	@Override
@@ -170,11 +174,9 @@ public final class MobSpawnEspHack extends Hack
 		Location location = SpawnRestriction.getLocation(EntityType.CREEPER);
 		if(!SpawnHelper.canSpawn(location, MC.world, pos, EntityType.CREEPER))
 			return false;
-			
+		
 		// Check for hitbox collisions
-		// (using a creeper because it's shorter than a zombie)
-		if(!MC.world.isSpaceEmpty(EntityType.CREEPER.createSimpleBoundingBox(
-			pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5)))
+		if(!hitboxCheck.isSpaceEmpty(pos))
 			return false;
 		
 		// Check block light level
