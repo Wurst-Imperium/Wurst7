@@ -173,7 +173,7 @@ public enum RenderUtils
 	
 	private static Vec3d getTracerOrigin(float partialTicks)
 	{
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks);
+		Vec3d start = RotationUtils.getClientLookVec(partialTicks).multiply(10);
 		if(WurstClient.MC.options
 			.getPerspective() == Perspective.THIRD_PERSON_FRONT)
 			start = start.negate();
@@ -258,6 +258,28 @@ public enum RenderUtils
 		buffer.vertex(entry.getPositionMatrix(), x1, y1, z1).color(color)
 			.normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z)
 			.next();
+		
+		// If the line goes through the screen, add another vertex there. This
+		// works around a bug in Minecraft's line shader.
+		float t = new Vector3f(x1, y1, z1).negate().dot(normal);
+		float length = new Vector3f(x2, y2, z2).sub(x1, y1, z1).length();
+		if(t > 0 && t < length)
+		{
+			Vector3f closeToCam = new Vector3f(normal).mul(t).add(x1, y1, z1);
+			buffer
+				.vertex(entry.getPositionMatrix(), closeToCam.x, closeToCam.y,
+					closeToCam.z)
+				.color(color)
+				.normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z)
+				.next();
+			buffer
+				.vertex(entry.getPositionMatrix(), closeToCam.x, closeToCam.y,
+					closeToCam.z)
+				.color(color)
+				.normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z)
+				.next();
+		}
+		
 		buffer.vertex(entry.getPositionMatrix(), x2, y2, z2).color(color)
 			.normal(entry.getNormalMatrix(), normal.x, normal.y, normal.z)
 			.next();
