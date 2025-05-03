@@ -29,6 +29,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.util.ProfileKeys;
 import net.minecraft.client.util.Session;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
@@ -217,6 +218,22 @@ public abstract class MinecraftClientMixin
 				: UserApiService.OFFLINE;
 		wurstProfileKeys =
 			ProfileKeys.create(userApiService, session, runDirectory.toPath());
+	}
+	
+	/**
+	 * Does the same thing as ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE
+	 * but for older Minecraft versions where Fabric API >=0.108.0 is
+	 * not available.
+	 */
+	@Inject(at = @At("TAIL"),
+		method = "setWorld(Lnet/minecraft/client/world/ClientWorld;)V")
+	private void onSetWorld(ClientWorld world, CallbackInfo ci)
+	{
+		if(world == null)
+			return;
+		
+		MinecraftClient client = (MinecraftClient)(Object)this;
+		WurstClient.INSTANCE.getPlausible().onWorldChange(client, world);
 	}
 	
 	private UserApiService wurst_createUserApiService(String accessToken)

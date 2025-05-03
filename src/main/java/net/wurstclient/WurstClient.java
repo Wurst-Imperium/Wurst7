@@ -22,7 +22,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.altmanager.Encryption;
-import net.wurstclient.analytics.WurstAnalytics;
+import net.wurstclient.analytics.PlausibleAnalytics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.command.CmdList;
 import net.wurstclient.command.CmdProcessor;
@@ -56,10 +56,10 @@ public enum WurstClient
 	public static MinecraftClient MC;
 	public static IMinecraftClient IMC;
 	
-	public static final String VERSION = "7.47.3";
+	public static final String VERSION = "7.48";
 	public static final String MC_VERSION = "1.20.1";
 	
-	private WurstAnalytics analytics;
+	private PlausibleAnalytics plausible;
 	private EventManager eventManager;
 	private AltManager altManager;
 	private HackList hax;
@@ -90,10 +90,9 @@ public enum WurstClient
 		IMC = (IMinecraftClient)MC;
 		wurstFolder = createWurstFolder();
 		
-		String trackingID = "UA-52838431-5";
-		String hostname = "client.wurstclient.net";
 		Path analyticsFile = wurstFolder.resolve("analytics.json");
-		analytics = new WurstAnalytics(trackingID, hostname, analyticsFile);
+		plausible = new PlausibleAnalytics(analyticsFile);
+		plausible.pageview("/");
 		
 		eventManager = new EventManager(this);
 		
@@ -154,9 +153,6 @@ public enum WurstClient
 			System.out.println("[Wurst] Applying fixes for Sinytra Connector");
 			HudRenderCallback.EVENT.register(this::onHudRender);
 		}
-		
-		analytics.trackPageView("/mc" + MC_VERSION + "/v" + VERSION,
-			"Wurst " + VERSION + " MC" + MC_VERSION);
 	}
 	
 	// Alternative HUD rendering when using Sinytra Connector
@@ -193,9 +189,9 @@ public enum WurstClient
 		return translator.translate(key, args);
 	}
 	
-	public WurstAnalytics getAnalytics()
+	public PlausibleAnalytics getPlausible()
 	{
-		return analytics;
+		return plausible;
 	}
 	
 	public EventManager getEventManager()

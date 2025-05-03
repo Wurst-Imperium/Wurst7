@@ -4,7 +4,7 @@
 
 Generally, Wurst Client versions for the latest Minecraft release and for the latest Minecraft snapshot are supported.
 
-Older versions are decided on a case-by-case basis, depending on the severity of the exploit.
+Older versions are decided on a case-by-case basis, depending on the severity of the exploit. ![](https://img.wimods.net/github.com/Wurst-Imperium/Wurst7/SECURITY.md)
 
 ## Reporting a Vulnerability
 
