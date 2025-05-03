@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,19 +13,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.lwjgl.opengl.GL11;
-
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.LavaFluid;
 import net.minecraft.fluid.WaterFluid;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
@@ -541,69 +545,60 @@ public class PathFinder
 	public void renderPath(MatrixStack matrixStack, boolean debugMode,
 		boolean depthTest)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		if(!depthTest)
-			GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
+		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(depthFunc);
+		
+		VertexConsumerProvider.Immediate vcp =
+			MC.getBufferBuilders().getEntityVertexConsumers();
+		VertexConsumer buffer =
+			vcp.getBuffer(WurstRenderLayers.getLines(depthTest));
 		
 		matrixStack.push();
 		
 		RegionPos region = RenderUtils.getCameraRegion();
+		Vec3d regionOffset = region.negate().toVec3d();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		matrixStack.translate(0.5, 0.5, 0.5);
 		
 		if(debugMode)
 		{
-			int renderedThings = 0;
+			int thingsRendered = 0;
 			
 			// queue (yellow)
-			RenderSystem.setShaderColor(1, 1, 0, 0.75F);
 			for(PathPos element : queue.toArray())
 			{
-				if(renderedThings >= 5000)
+				if(thingsRendered >= 5000)
 					break;
 				
-				PathRenderer.renderNode(matrixStack, element, region);
-				renderedThings++;
+				Box box = new Box(element).offset(regionOffset).contract(0.4);
+				RenderUtils.drawNode(matrixStack, buffer, box, 0xC0FFFF00);
+				thingsRendered++;
 			}
 			
-			// processed (red)
+			// processed (red or magenta)
 			for(Entry<PathPos, PathPos> entry : prevPosMap.entrySet())
 			{
-				if(renderedThings >= 5000)
+				if(thingsRendered >= 5000)
 					break;
 				
-				if(entry.getKey().isJumping())
-					RenderSystem.setShaderColor(1, 0, 1, 0.75F);
-				else
-					RenderSystem.setShaderColor(1, 0, 0, 0.75F);
+				int color =
+					entry.getKey().isJumping() ? 0xC0FF00FF : 0xC0FF0000;
 				
-				PathRenderer.renderArrow(matrixStack, entry.getValue(),
-					entry.getKey(), region);
-				renderedThings++;
+				RenderUtils.drawArrow(matrixStack, buffer, entry.getValue(),
+					entry.getKey(), region, color);
+				thingsRendered++;
 			}
 		}
 		
-		// path (blue)
-		if(debugMode)
-			RenderSystem.setShaderColor(0, 0, 1, 0.75F);
-		else
-			RenderSystem.setShaderColor(0, 1, 0, 0.75F);
+		// path (blue or green)
+		int pathColor = debugMode ? 0xC00000FF : 0xC000FF00;
 		for(int i = 0; i < path.size() - 1; i++)
-			PathRenderer.renderArrow(matrixStack, path.get(i), path.get(i + 1),
-				region);
+			RenderUtils.drawArrow(matrixStack, buffer, path.get(i),
+				path.get(i + 1), region, pathColor);
 		
 		matrixStack.pop();
 		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDepthMask(true);
+		vcp.drawCurrentLayer();
 	}
 	
 	public boolean isPathStillValid(int index)

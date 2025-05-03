@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,9 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import java.util.ArrayList;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -20,7 +18,6 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 
 @SearchTags({"prophunt esp"})
@@ -50,23 +47,13 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
 		// set color
 		float alpha = 0.5F + 0.25F * MathHelper
-			.sin(System.currentTimeMillis() % 1000 / 500F * (float)Math.PI);
-		RenderSystem.setShaderColor(1, 0, 0, alpha);
+			.sin(System.currentTimeMillis() % 1000 / 500F * MathHelper.PI);
+		int color = RenderUtils.toIntColor(new float[]{1, 0, 0}, alpha);
 		
 		// draw boxes
+		ArrayList<Box> boxes = new ArrayList<>();
 		for(Entity entity : MC.world.getEntities())
 		{
 			if(!(entity instanceof MobEntity))
@@ -78,21 +65,10 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 			if(MC.player.squaredDistanceTo(entity) < 0.25)
 				continue;
 			
-			matrixStack.push();
-			matrixStack.translate(entity.getX() - region.x(), entity.getY(),
-				entity.getZ() - region.z());
-			
-			RenderUtils.drawOutlinedBox(FAKE_BLOCK_BOX, matrixStack);
-			RenderUtils.drawSolidBox(FAKE_BLOCK_BOX, matrixStack);
-			
-			matrixStack.pop();
+			boxes.add(FAKE_BLOCK_BOX.offset(entity.getPos()));
 		}
 		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		RenderUtils.drawSolidBoxes(matrixStack, boxes, color, false);
+		RenderUtils.drawOutlinedBoxes(matrixStack, boxes, color, false);
 	}
 }

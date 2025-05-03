@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,6 +8,7 @@
 package net.wurstclient.clickgui.screens;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -16,6 +17,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
@@ -27,7 +29,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.settings.BookOffersSetting;
-import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.RenderUtils;
 
 public final class EditBookOffersScreen extends Screen
@@ -51,6 +52,7 @@ public final class EditBookOffersScreen extends Screen
 	public void init()
 	{
 		listGui = new ListGui(client, this, bookOffers.getOffers());
+		addSelectableChild(listGui);
 		
 		addDrawableChild(
 			ButtonWidget
@@ -61,20 +63,21 @@ public final class EditBookOffersScreen extends Screen
 		
 		addDrawableChild(
 			editButton = ButtonWidget.builder(Text.literal("Edit"), b -> {
-				boolean selected = listGui.selected >= 0
-					&& listGui.selected < listGui.list.size();
-				if(!selected)
+				BookOffer selected = listGui.getSelectedOffer();
+				if(selected == null)
 					return;
 				
 				client.setScreen(new EditBookOfferScreen(this, bookOffers,
-					listGui.selected));
+					bookOffers.indexOf(selected)));
 			}).dimensions(width / 2 - 50, height - 56, 100, 20).build());
 		editButton.active = false;
 		
-		addDrawableChild(removeButton = ButtonWidget
-			.builder(Text.literal("Remove"),
-				b -> bookOffers.remove(listGui.selected))
-			.dimensions(width / 2 + 54, height - 56, 100, 20).build());
+		addDrawableChild(
+			removeButton = ButtonWidget.builder(Text.literal("Remove"), b -> {
+				bookOffers
+					.remove(bookOffers.indexOf(listGui.getSelectedOffer()));
+				client.setScreen(EditBookOffersScreen.this);
+			}).dimensions(width / 2 + 54, height - 56, 100, 20).build());
 		removeButton.active = false;
 		
 		addDrawableChild(ButtonWidget.builder(Text.literal("Reset to Defaults"),
@@ -96,40 +99,10 @@ public final class EditBookOffersScreen extends Screen
 	{
 		boolean childClicked = super.mouseClicked(mouseX, mouseY, mouseButton);
 		
-		listGui.mouseClicked(mouseX, mouseY, mouseButton);
-		
-		if(!childClicked && mouseButton == 0 && (mouseX < (width - 220) / 2
-			|| mouseX > width / 2 + 129 || mouseY < 32 || mouseY > height - 64))
-			listGui.selected = -1;
-		
 		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_4)
 			doneButton.onPress();
 		
 		return childClicked;
-	}
-	
-	@Override
-	public boolean mouseDragged(double double_1, double double_2, int int_1,
-		double double_3, double double_4)
-	{
-		listGui.mouseDragged(double_1, double_2, int_1, double_3, double_4);
-		return super.mouseDragged(double_1, double_2, int_1, double_3,
-			double_4);
-	}
-	
-	@Override
-	public boolean mouseReleased(double double_1, double double_2, int int_1)
-	{
-		listGui.mouseReleased(double_1, double_2, int_1);
-		return super.mouseReleased(double_1, double_2, int_1);
-	}
-	
-	@Override
-	public boolean mouseScrolled(double double_1, double double_2,
-		double double_3)
-	{
-		listGui.mouseScrolled(double_1, double_2, double_3);
-		return super.mouseScrolled(double_1, double_2, double_3);
 	}
 	
 	@Override
@@ -151,14 +124,6 @@ public final class EditBookOffersScreen extends Screen
 			doneButton.onPress();
 			break;
 			
-			case GLFW.GLFW_KEY_UP:
-			listGui.selectItem(listGui.selected - 1, 0, 0, 0);
-			break;
-			
-			case GLFW.GLFW_KEY_DOWN:
-			listGui.selectItem(listGui.selected + 1, 0, 0, 0);
-			break;
-			
 			default:
 			break;
 		}
@@ -169,9 +134,7 @@ public final class EditBookOffersScreen extends Screen
 	@Override
 	public void tick()
 	{
-		boolean selected =
-			listGui.selected >= 0 && listGui.selected < listGui.list.size();
-		
+		boolean selected = listGui.getSelectedOrNull() != null;
 		editButton.active = selected;
 		removeButton.active = selected;
 	}
@@ -187,8 +150,8 @@ public final class EditBookOffersScreen extends Screen
 		matrixStack.translate(0, 0, 300);
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,
-			bookOffers.getName() + " (" + listGui.getItemCount() + ")",
-			width / 2, 12, 0xffffff);
+			bookOffers.getName() + " (" + bookOffers.getOffers().size() + ")",
+			width / 2, 12, 0xFFFFFF);
 		
 		super.render(context, mouseX, mouseY, partialTicks);
 		
@@ -207,82 +170,83 @@ public final class EditBookOffersScreen extends Screen
 		return false;
 	}
 	
-	private static class ListGui extends ListWidget
+	private final class Entry
+		extends AlwaysSelectedEntryListWidget.Entry<EditBookOffersScreen.Entry>
 	{
-		private final MinecraftClient mc;
-		private final List<BookOffer> list;
-		private int selected = -1;
+		private final BookOffer bookOffer;
 		
-		public ListGui(MinecraftClient mc, EditBookOffersScreen screen,
-			List<BookOffer> list)
+		public Entry(BookOffer bookOffer)
 		{
-			super(mc, screen.width, screen.height, 32, screen.height - 64, 30);
-			this.mc = mc;
-			this.list = list;
+			this.bookOffer = Objects.requireNonNull(bookOffer);
 		}
 		
 		@Override
-		protected int getItemCount()
+		public Text getNarration()
 		{
-			return list.size();
+			return Text.translatable("narrator.select",
+				"Book offer " + bookOffer.getEnchantmentNameWithLevel()
+					+ ", ID " + bookOffer.id() + ", " + getPriceText());
 		}
 		
 		@Override
-		protected boolean selectItem(int index, int int_2, double var3,
-			double var4)
+		public boolean mouseClicked(double mouseX, double mouseY, int button)
 		{
-			if(index >= 0 && index < list.size())
-				selected = index;
-			
-			return true;
+			return button == GLFW.GLFW_MOUSE_BUTTON_LEFT;
 		}
 		
 		@Override
-		protected boolean isSelectedItem(int index)
+		public void render(DrawContext context, int index, int y, int x,
+			int entryWidth, int entryHeight, int mouseX, int mouseY,
+			boolean hovered, float tickDelta)
 		{
-			return index == selected;
-		}
-		
-		@Override
-		protected void renderBackground()
-		{
-			
-		}
-		
-		@Override
-		protected void renderItem(DrawContext context, int index, int x, int y,
-			int var4, int var5, int var6, float partialTicks)
-		{
-			MatrixStack matrixStack = context.getMatrices();
-			if(isSelectedItem(index))
-				drawSelectionOutline(matrixStack, x, y);
-			
 			Item item = Registries.ITEM.get(new Identifier("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			
-			TextRenderer tr = mc.textRenderer;
-			BookOffer bookOffer = list.get(index);
+			TextRenderer tr = client.textRenderer;
 			String name = bookOffer.getEnchantmentNameWithLevel();
 			
 			Enchantment enchantment = bookOffer.getEnchantment();
-			int nameColor = enchantment.isCursed() ? 0xff5555 : 0xf0f0f0;
+			int nameColor = enchantment.isCursed() ? 0xFF5555 : 0xF0F0F0;
 			context.drawText(tr, name, x + 28, y, nameColor, false);
 			
-			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0,
+			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xA0A0A0,
 				false);
 			
-			String price;
-			if(bookOffer.price() >= 64)
-				price = "any price";
-			else
-			{
-				price = "max " + bookOffer.price();
+			String price = getPriceText();
+			context.drawText(tr, price, x + 28, y + 18, 0xA0A0A0, false);
+			
+			if(bookOffer.price() < 64)
 				RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
 					x + 28 + tr.getWidth(price), y + 16, false);
-			}
+		}
+		
+		private String getPriceText()
+		{
+			if(bookOffer.price() >= 64)
+				return "any price";
 			
-			context.drawText(tr, price, x + 28, y + 18, 0xa0a0a0, false);
+			return "max " + bookOffer.price();
+		}
+	}
+	
+	private final class ListGui
+		extends AlwaysSelectedEntryListWidget<EditBookOffersScreen.Entry>
+	{
+		public ListGui(MinecraftClient minecraft, EditBookOffersScreen screen,
+			List<BookOffer> list)
+		{
+			super(minecraft, screen.width, screen.height, 32,
+				screen.height - 64, 30);
+			
+			list.stream().map(EditBookOffersScreen.Entry::new)
+				.forEach(this::addEntry);
+		}
+		
+		public BookOffer getSelectedOffer()
+		{
+			EditBookOffersScreen.Entry entry = getSelectedOrNull();
+			return entry != null ? entry.bookOffer : null;
 		}
 	}
 }

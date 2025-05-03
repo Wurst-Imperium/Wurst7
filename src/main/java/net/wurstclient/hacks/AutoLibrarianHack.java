@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,12 +9,9 @@ package net.wurstclient.hacks;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
@@ -510,43 +507,21 @@ public final class AutoLibrarianHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		Vec3d regionOffset = region.negate().toVec3d();
-		
-		RenderSystem.setShaderColor(0, 1, 0, 0.75F);
+		int green = 0xC000FF00;
+		int red = 0xC0FF0000;
 		
 		if(villager != null)
-			RenderUtils.drawOutlinedBox(
-				villager.getBoundingBox().offset(regionOffset), matrixStack);
+			RenderUtils.drawOutlinedBox(matrixStack, villager.getBoundingBox(),
+				green, false);
 		
 		if(jobSite != null)
-			RenderUtils.drawOutlinedBox(new Box(jobSite).offset(regionOffset),
-				matrixStack);
+			RenderUtils.drawOutlinedBox(matrixStack, new Box(jobSite), green,
+				false);
 		
-		RenderSystem.setShaderColor(1, 0, 0, 0.75F);
-		
-		for(VillagerEntity villager : experiencedVillagers)
-		{
-			Box box = villager.getBoundingBox().offset(regionOffset);
-			RenderUtils.drawOutlinedBox(box, matrixStack);
-			RenderUtils.drawCrossBox(box, matrixStack);
-		}
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		List<Box> expVilBoxes = experiencedVillagers.stream()
+			.map(VillagerEntity::getBoundingBox).toList();
+		RenderUtils.drawOutlinedBoxes(matrixStack, expVilBoxes, red, false);
+		RenderUtils.drawCrossBoxes(matrixStack, expVilBoxes, red, false);
 		
 		if(breakingJobSite)
 			overlay.render(matrixStack, partialTicks, jobSite);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,17 +11,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -83,83 +73,22 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		matrixStack.push();
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(false);
-		
-		RenderUtils.applyCameraRotationOnly();
-		
 		Trajectory trajectory = getTrajectory(partialTicks);
-		ArrayList<Vec3d> path = trajectory.path;
+		if(trajectory.isEmpty())
+			return;
 		
-		ColorSetting color = switch(trajectory.type)
-		{
-			case MISS -> missColor;
-			case ENTITY -> entityHitColor;
-			case BLOCK -> blockHitColor;
-		};
+		ColorSetting color = getColor(trajectory);
+		int lineColor = color.getColorI(0xC0);
+		int quadColor = color.getColorI(0x40);
 		
-		drawLine(matrixStack, path, color);
+		Box endBox = trajectory.getEndBox();
+		ArrayList<Vec3d> path = trajectory.path();
 		
-		if(!path.isEmpty())
-		{
-			Vec3d end = path.get(path.size() - 1);
-			drawEndOfLine(matrixStack, end, color);
-		}
+		RenderUtils.drawSolidBox(matrixStack, endBox, quadColor, false);
+		RenderUtils.drawOutlinedBox(matrixStack, endBox, lineColor, false);
 		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthMask(true);
-		matrixStack.pop();
+		RenderUtils.drawCurvedLine(matrixStack, path, lineColor, false);
 	}
-	
-	private void drawLine(MatrixStack matrixStack, ArrayList<Vec3d> path,
-		ColorSetting color)
-	{
-		Vec3d camPos = RenderUtils.getCameraPos();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		
-		bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP,
-			VertexFormats.POSITION);
-		color.setAsShaderColor(0.75F);
-		
-		for(Vec3d point : path)
-			bufferBuilder
-				.vertex(matrix, (float)(point.x - camPos.x),
-					(float)(point.y - camPos.y), (float)(point.z - camPos.z))
-				.next();
-		
-		tessellator.draw();
-	}
-	
-	private void drawEndOfLine(MatrixStack matrixStack, Vec3d end,
-		ColorSetting color)
-	{
-		Vec3d camPos = RenderUtils.getCameraPos();
-		double renderX = end.x - camPos.x;
-		double renderY = end.y - camPos.y;
-		double renderZ = end.z - camPos.z;
-		
-		matrixStack.push();
-		matrixStack.translate(renderX - 0.5, renderY - 0.5, renderZ - 0.5);
-		
-		color.setAsShaderColor(0.25F);
-		RenderUtils.drawSolidBox(matrixStack);
-		
-		color.setAsShaderColor(0.75F);
-		RenderUtils.drawOutlinedBox(matrixStack);
-		
-		matrixStack.pop();
-	}
-	
-	private record Trajectory(ArrayList<Vec3d> path, HitResult.Type type)
-	{}
 	
 	private Trajectory getTrajectory(float partialTicks)
 	{
@@ -167,7 +96,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		ArrayList<Vec3d> path = new ArrayList<>();
 		HitResult.Type type = HitResult.Type.MISS;
 		
-		// find the hand with a throwable item
+		// Find the hand with a throwable item
 		Hand hand = Hand.MAIN_HAND;
 		ItemStack stack = player.getMainHandStack();
 		if(!isThrowable(stack))
@@ -175,66 +104,66 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 			hand = Hand.OFF_HAND;
 			stack = player.getOffHandStack();
 			
-			// if neither hand has a throwable item, return empty path
+			// If neither hand has a throwable item, return empty path
 			if(!isThrowable(stack))
 				return new Trajectory(path, type);
 		}
 		
-		// calculate item-specific values
+		// Calculate item-specific values
 		Item item = stack.getItem();
 		double throwPower = getThrowPower(item);
 		double gravity = getProjectileGravity(item);
 		FluidHandling fluidHandling = getFluidHandling(item);
 		
-		// prepare yaw and pitch
+		// Prepare yaw and pitch
 		double yaw = Math.toRadians(player.getYaw());
 		double pitch = Math.toRadians(player.getPitch());
 		
-		// calculate starting position
+		// Calculate starting position
 		Vec3d arrowPos = EntityUtils.getLerpedPos(player, partialTicks)
 			.add(getHandOffset(hand, yaw));
 		
-		// calculate starting motion
+		// Calculate starting motion
 		Vec3d arrowMotion = getStartingMotion(yaw, pitch, throwPower);
 		
-		// build the path
+		// Build the path
 		for(int i = 0; i < 1000; i++)
 		{
-			// add to path
+			// Add to path
 			path.add(arrowPos);
 			
-			// apply motion
+			// Apply motion
 			arrowPos = arrowPos.add(arrowMotion.multiply(0.1));
 			
-			// apply air friction
+			// Apply air friction
 			arrowMotion = arrowMotion.multiply(0.999);
 			
-			// apply gravity
+			// Apply gravity
 			arrowMotion = arrowMotion.add(0, -gravity * 0.1, 0);
 			
 			Vec3d lastPos = path.size() > 1 ? path.get(path.size() - 2)
 				: RotationUtils.getEyesPos();
 			
-			// check for block collision
+			// Check for block collision
 			BlockHitResult bResult =
 				BlockUtils.raycast(lastPos, arrowPos, fluidHandling);
 			if(bResult.getType() != HitResult.Type.MISS)
 			{
-				// replace last pos with the collision point
+				// Replace last pos with the collision point
 				type = HitResult.Type.BLOCK;
 				path.set(path.size() - 1, bResult.getPos());
 				break;
 			}
 			
-			// check for entity collision
+			// Check for entity collision
 			Box box = new Box(lastPos, arrowPos);
 			Predicate<Entity> predicate = e -> !e.isSpectator() && e.canHit();
 			double maxDistSq = 64 * 64;
-			EntityHitResult eResult = ProjectileUtil.raycast(MC.player, lastPos,
+			EntityHitResult eResult = ProjectileUtil.raycast(player, lastPos,
 				arrowPos, box, predicate, maxDistSq);
 			if(eResult != null && eResult.getType() != HitResult.Type.MISS)
 			{
-				// replace last pos with the collision point
+				// Replace last pos with the collision point
 				type = HitResult.Type.ENTITY;
 				path.set(path.size() - 1, eResult.getPos());
 				break;
@@ -244,44 +173,29 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		return new Trajectory(path, type);
 	}
 	
-	private Vec3d getHandOffset(Hand hand, double yaw)
+	private boolean isThrowable(ItemStack stack)
 	{
-		Arm mainArm = MC.options.getMainArm().getValue();
+		if(stack.isEmpty())
+			return false;
 		
-		boolean rightSide = mainArm == Arm.RIGHT && hand == Hand.MAIN_HAND
-			|| mainArm == Arm.LEFT && hand == Hand.OFF_HAND;
-		
-		double sideMultiplier = rightSide ? -1 : 1;
-		double handOffsetX = Math.cos(yaw) * 0.16 * sideMultiplier;
-		double handOffsetY = MC.player.getStandingEyeHeight() - 0.1;
-		double handOffsetZ = Math.sin(yaw) * 0.16 * sideMultiplier;
-		
-		return new Vec3d(handOffsetX, handOffsetY, handOffsetZ);
-	}
-	
-	private Vec3d getStartingMotion(double yaw, double pitch, double throwPower)
-	{
-		double cosOfPitch = Math.cos(pitch);
-		
-		double arrowMotionX = -Math.sin(yaw) * cosOfPitch;
-		double arrowMotionY = -Math.sin(pitch);
-		double arrowMotionZ = Math.cos(yaw) * cosOfPitch;
-		
-		return new Vec3d(arrowMotionX, arrowMotionY, arrowMotionZ).normalize()
-			.multiply(throwPower);
+		Item item = stack.getItem();
+		return item instanceof RangedWeaponItem || item instanceof SnowballItem
+			|| item instanceof EggItem || item instanceof EnderPearlItem
+			|| item instanceof ThrowablePotionItem
+			|| item instanceof FishingRodItem || item instanceof TridentItem;
 	}
 	
 	private double getThrowPower(Item item)
 	{
-		// use a static 1.5x for snowballs and such
+		// Use a static 1.5x for snowballs and such
 		if(!(item instanceof RangedWeaponItem))
 			return 1.5;
 		
-		// calculate bow power
+		// Calculate bow power
 		float bowPower = (72000 - MC.player.getItemUseTimeLeft()) / 20F;
 		bowPower = bowPower * bowPower + bowPower * 2F;
 		
-		// clamp value if fully charged or not charged at all
+		// Clamp value if fully charged or not charged at all
 		if(bowPower > 3 || bowPower <= 0.3F)
 			bowPower = 3;
 		
@@ -313,15 +227,54 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		return FluidHandling.NONE;
 	}
 	
-	public static boolean isThrowable(ItemStack stack)
+	private Vec3d getHandOffset(Hand hand, double yaw)
 	{
-		if(stack.isEmpty())
-			return false;
+		Arm mainArm = MC.options.getMainArm().getValue();
 		
-		Item item = stack.getItem();
-		return item instanceof RangedWeaponItem || item instanceof SnowballItem
-			|| item instanceof EggItem || item instanceof EnderPearlItem
-			|| item instanceof ThrowablePotionItem
-			|| item instanceof FishingRodItem || item instanceof TridentItem;
+		boolean rightSide = mainArm == Arm.RIGHT && hand == Hand.MAIN_HAND
+			|| mainArm == Arm.LEFT && hand == Hand.OFF_HAND;
+		
+		double sideMultiplier = rightSide ? -1 : 1;
+		double handOffsetX = Math.cos(yaw) * 0.16 * sideMultiplier;
+		double handOffsetY = MC.player.getStandingEyeHeight() - 0.1;
+		double handOffsetZ = Math.sin(yaw) * 0.16 * sideMultiplier;
+		
+		return new Vec3d(handOffsetX, handOffsetY, handOffsetZ);
+	}
+	
+	private Vec3d getStartingMotion(double yaw, double pitch, double throwPower)
+	{
+		double cosOfPitch = Math.cos(pitch);
+		
+		double arrowMotionX = -Math.sin(yaw) * cosOfPitch;
+		double arrowMotionY = -Math.sin(pitch);
+		double arrowMotionZ = Math.cos(yaw) * cosOfPitch;
+		
+		return new Vec3d(arrowMotionX, arrowMotionY, arrowMotionZ).normalize()
+			.multiply(throwPower);
+	}
+	
+	private ColorSetting getColor(Trajectory trajectory)
+	{
+		return switch(trajectory.type())
+		{
+			case MISS -> missColor;
+			case ENTITY -> entityHitColor;
+			case BLOCK -> blockHitColor;
+		};
+	}
+	
+	private record Trajectory(ArrayList<Vec3d> path, HitResult.Type type)
+	{
+		public boolean isEmpty()
+		{
+			return path.isEmpty();
+		}
+		
+		public Box getEndBox()
+		{
+			Vec3d end = path.get(path.size() - 1);
+			return new Box(end.subtract(0.5, 0.5, 0.5), end.add(0.5, 0.5, 0.5));
+		}
 	}
 }

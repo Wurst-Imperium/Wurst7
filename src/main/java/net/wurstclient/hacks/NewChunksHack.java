@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.minecraft.client.util.math.MatrixStack;
@@ -156,20 +157,24 @@ public final class NewChunksHack extends Hack
 		
 		if(showSetting.includesNew())
 		{
-			renderer.updateBuffer(0, chunkRenderer.buildBuffer(newChunks, dd));
+			renderer.updateBuffer(0, chunkRenderer.getLayer(),
+				buffer -> chunkRenderer.buildBuffer(buffer, newChunks, dd));
 			
 			if(showReasons.isChecked())
-				renderer.updateBuffer(1,
-					reasonsRenderer.buildBuffer(newChunkReasons));
+				renderer.updateBuffer(1, reasonsRenderer.getLayer(),
+					buffer -> reasonsRenderer.buildBuffer(buffer,
+						List.copyOf(newChunkReasons)));
 		}
 		
 		if(showSetting.includesOld())
 		{
-			renderer.updateBuffer(2, chunkRenderer.buildBuffer(oldChunks, dd));
+			renderer.updateBuffer(2, chunkRenderer.getLayer(),
+				buffer -> chunkRenderer.buildBuffer(buffer, oldChunks, dd));
 			
 			if(showReasons.isChecked())
-				renderer.updateBuffer(3,
-					reasonsRenderer.buildBuffer(oldChunkReasons));
+				renderer.updateBuffer(3, reasonsRenderer.getLayer(),
+					buffer -> reasonsRenderer.buildBuffer(buffer,
+						List.copyOf(oldChunkReasons)));
 		}
 	}
 	

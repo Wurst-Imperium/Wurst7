@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -9,12 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.BlockState;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
@@ -25,18 +20,15 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"instant bunker"})
-public final class InstantBunkerHack extends Hack
-	implements UpdateListener, RenderListener
+public final class InstantBunkerHack extends Hack implements UpdateListener
 {
 	private final int[][] template = {{2, 0, 2}, {-2, 0, 2}, {2, 0, -2},
 		{-2, 0, -2}, {2, 1, 2}, {-2, 1, 2}, {2, 1, -2}, {-2, 1, -2}, {2, 2, 2},
@@ -50,8 +42,6 @@ public final class InstantBunkerHack extends Hack
 		{-1, 2, -1}, {0, 2, 1}, {1, 2, 0}, {-1, 2, 0}, {0, 2, -1}, {0, 2, 0}};
 	private final ArrayList<BlockPos> positions = new ArrayList<>();
 	
-	private int blockIndex;
-	private boolean building;
 	private int startTimer;
 	
 	public InstantBunkerHack()
@@ -95,27 +85,16 @@ public final class InstantBunkerHack extends Hack
 			positions.add(startPos.up(pos[1]).offset(facing, pos[2])
 				.offset(facing2, pos[0]));
 		
-		if(!"".isEmpty())// mode.getSelected() == 1)
-		{
-			// initialize building process
-			blockIndex = 0;
-			building = true;
-			MC.itemUseCooldown = 4;
-		}
-		
 		startTimer = 2;
 		MC.player.jump();
 		
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(RenderListener.class, this);
-		building = false;
 	}
 	
 	@Override
@@ -128,7 +107,7 @@ public final class InstantBunkerHack extends Hack
 		}
 		
 		// build instantly
-		if(!building && startTimer <= 0)
+		if(startTimer <= 0)
 		{
 			for(BlockPos pos : positions)
 				if(BlockUtils.getState(pos).isReplaceable()
@@ -139,34 +118,6 @@ public final class InstantBunkerHack extends Hack
 			if(MC.player.isOnGround())
 				setEnabled(false);
 		}
-		
-		// place next block
-		// if(blockIndex < positions.size() && (IMC.getItemUseCooldown() == 0
-		// || WURST.getHax().fastPlaceHack.isEnabled()))
-		// {
-		// BlockPos pos = positions.get(blockIndex);
-		//
-		// if(BlockUtils.getState(pos).getMaterial().isReplaceable())
-		// {
-		// if(!BlockUtils.placeBlockLegit(pos))
-		// {
-		// BlockPos playerPos = BlockPos.method_49638(MC.player);
-		// if(MC.player.onGround
-		// && Math.abs(pos.getX() - playerPos.getX()) == 2
-		// && pos.getY() - playerPos.getY() == 2
-		// && Math.abs(pos.getZ() - playerPos.getZ()) == 2)
-		// MC.player.jump();
-		// }
-		// }else
-		// {
-		// blockIndex++;
-		// if(blockIndex == positions.size())
-		// {
-		// building = false;
-		// setEnabled(false);
-		// }
-		// }
-		// }
 	}
 	
 	private void placeBlockSimple(BlockPos pos)
@@ -240,66 +191,5 @@ public final class InstantBunkerHack extends Hack
 		
 		// reset timer
 		MC.itemUseCooldown = 4;
-	}
-	
-	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
-	{
-		if(!building || blockIndex >= positions.size())
-			return;
-		
-		// scale and offset
-		float scale = 1.0F * 7.0F / 8.0F;
-		double offset = (1.0 - scale) / 2.0;
-		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		
-		matrixStack.push();
-		
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
-		BlockPos regionOffset =
-			RenderUtils.getCameraRegion().negate().toBlockPos();
-		
-		// green box
-		{
-			GL11.glDepthMask(false);
-			RenderSystem.setShaderColor(0, 1, 0, 0.15F);
-			BlockPos pos = positions.get(blockIndex).add(regionOffset);
-			
-			matrixStack.push();
-			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
-			matrixStack.translate(offset, offset, offset);
-			matrixStack.scale(scale, scale, scale);
-			
-			RenderUtils.drawSolidBox(matrixStack);
-			
-			matrixStack.pop();
-			GL11.glDepthMask(true);
-		}
-		
-		// black outlines
-		RenderSystem.setShaderColor(0, 0, 0, 0.5F);
-		for(int i = blockIndex; i < positions.size(); i++)
-		{
-			BlockPos pos = positions.get(i).add(regionOffset);
-			
-			matrixStack.push();
-			matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
-			matrixStack.translate(offset, offset, offset);
-			matrixStack.scale(scale, scale, scale);
-			
-			RenderUtils.drawOutlinedBox(matrixStack);
-			
-			matrixStack.pop();
-		}
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glDisable(GL11.GL_BLEND);
 	}
 }

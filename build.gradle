@@ -1,12 +1,12 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.326"
+		classpath "org.kohsuke:github-api:1.327"
 	}
 }
 
 plugins {
-	id "fabric-loom" version "1.9-SNAPSHOT"
-	id "com.diffplug.spotless" version "6.25.0"
+	id "fabric-loom" version "1.10-SNAPSHOT"
+	id "com.diffplug.spotless" version "7.0.2"
 }
 
 def ENV = System.getenv()
@@ -98,7 +98,7 @@ processResources {
 	inputs.property "version", project.version
 	
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": inputs.properties.version
 	}
 }
 
@@ -118,20 +118,30 @@ java {
 }
 
 jar {
+	inputs.property "archivesName", project.base.archivesName
+	
 	from("LICENSE") {
-		rename {"${it}_${base.archivesName.get()}"}
+		rename {"${it}_${inputs.properties.archivesName}"}
 	}
 	
 	exclude("intentionally_untranslated.json")
 }
 
+import com.diffplug.spotless.generic.LicenseHeaderStep
 spotless {
-	lineEndings("WINDOWS")
+	lineEndings = "WINDOWS"
 	java {
 		removeUnusedImports()
-		indentWithTabs()
+		leadingSpacesToTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
+	}
+	format("licenseHeader") {
+		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		targetExclude("src/main/java/net/wurstclient/analytics/dmurph/**/*.java")
+		def header_file = file("codestyle/license_header.txt")
+		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
+		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
 	}
 	json {
 		target "src/**/*.json"
@@ -218,29 +228,48 @@ task uploadBackups {
 		def shortVersion = getGhVersion().substring(1)
 		def backupUrl = "https://api.wurstclient.net/artifact-backups/Wurst/${shortVersion}"
 		
-		def connection = new URL(backupUrl).openConnection() as HttpURLConnection
-		def boundary = UUID.randomUUID().toString()
-		connection.setRequestMethod("POST")
-		connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
-		connection.setRequestProperty("Accept", "application/json")
-		connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
-		connection.doOutput = true
+		def maxRetries = 3
+		def retryCount = 0
+		def success = false
 		
-		def output = connection.outputStream
-		[remapJar, remapSourcesJar].each { jarTask ->
-			def file = jarTask.archiveFile.get().asFile
-			output << "--${boundary}\r\n"
-			output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
-			output << "Content-Type: application/java-archive\r\n\r\n"
-			file.withInputStream { input -> 
-				output << input
+		while (!success && retryCount < maxRetries) {
+			try {
+				def connection = new URL(backupUrl).openConnection() as HttpURLConnection
+				def boundary = UUID.randomUUID().toString()
+				connection.setRequestMethod("POST")
+				connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
+				connection.setRequestProperty("Accept", "application/json")
+				connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+				connection.doOutput = true
+				
+				def output = connection.outputStream
+				[remapJar, remapSourcesJar].each { jarTask ->
+					def file = jarTask.archiveFile.get().asFile
+					output << "--${boundary}\r\n"
+					output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
+					output << "Content-Type: application/java-archive\r\n\r\n"
+					file.withInputStream { input -> 
+						output << input
+					}
+					output << "\r\n"
+				}
+				output << "--${boundary}--\r\n"
+				output.flush()
+				
+				if(connection.responseCode != 200) {
+					throw new IOException("HTTP ${connection.responseCode}: ${connection.responseMessage}")
+				}
+				
+				success = true
+				
+			} catch (Exception e) {
+				retryCount++
+				if (retryCount >= maxRetries) {
+					throw new GradleException("Failed to upload backups after ${maxRetries} attempts: ${e.message}")
+				}
+				println "Upload attempt ${retryCount} failed: ${e.message}. Retrying in 5 seconds..."
+				Thread.sleep(5000)
 			}
-			output << "\r\n"
 		}
-		output << "--${boundary}--\r\n"
-		output.flush()
-		
-		if(connection.responseCode != 200)
-			throw new GradleException("Failed to upload backups: ${connection.responseCode} ${connection.responseMessage}")
 	}
 }

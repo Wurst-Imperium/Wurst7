@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,38 +18,35 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.StringJoiner;
 
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
-import net.wurstclient.util.ListWidget;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -85,6 +82,8 @@ public final class AltManagerScreen extends Screen
 	public void init()
 	{
 		listGui = new ListGui(client, this, altManager.getList());
+		addSelectableChild(listGui);
+		
 		WurstClient wurst = WurstClient.INSTANCE;
 		
 		Exception folderException = altManager.getFolderException();
@@ -155,40 +154,6 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
-	{
-		listGui.mouseClicked(mouseX, mouseY, mouseButton);
-		
-		if(mouseY >= 36 && mouseY <= height - 57)
-			if(mouseX >= width / 2 + 140 || mouseX <= width / 2 - 126)
-				listGui.selected = -1;
-			
-		return super.mouseClicked(mouseX, mouseY, mouseButton);
-	}
-	
-	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int button,
-		double deltaX, double deltaY)
-	{
-		listGui.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-		return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-	}
-	
-	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button)
-	{
-		listGui.mouseReleased(mouseX, mouseY, button);
-		return super.mouseReleased(mouseX, mouseY, button);
-	}
-	
-	@Override
-	public boolean mouseScrolled(double d, double e, double amount)
-	{
-		listGui.mouseScrolled(d, e, amount);
-		return super.mouseScrolled(d, e, amount);
-	}
-	
-	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
 	{
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
@@ -200,8 +165,7 @@ public final class AltManagerScreen extends Screen
 	@Override
 	public void tick()
 	{
-		boolean altSelected = listGui.selected >= 0
-			&& listGui.selected < altManager.getList().size();
+		boolean altSelected = listGui.getSelectedOrNull() != null;
 		
 		useButton.active = altSelected;
 		starButton.active = altSelected;
@@ -239,7 +203,7 @@ public final class AltManagerScreen extends Screen
 			return;
 		
 		altManager.toggleFavorite(alt);
-		listGui.selected = -1;
+		listGui.setSelected(null);
 	}
 	
 	private void pressEdit()
@@ -353,7 +317,7 @@ public final class AltManagerScreen extends Screen
 			String response = bf.readLine();
 			
 			if(response == null)
-				throw new IOException("No reponse from FileChooser");
+				throw new IOException("No response from FileChooser");
 			
 			try
 			{
@@ -362,7 +326,7 @@ public final class AltManagerScreen extends Screen
 			}catch(InvalidPathException e)
 			{
 				throw new IOException(
-					"Reponse from FileChooser is not a valid path");
+					"Response from FileChooser is not a valid path");
 			}
 		}
 	}
@@ -400,11 +364,12 @@ public final class AltManagerScreen extends Screen
 	
 	private void confirmRemove(boolean confirmed)
 	{
-		if(listGui.getSelectedAlt() == null)
+		Alt alt = listGui.getSelectedAlt();
+		if(alt == null)
 			return;
 		
 		if(confirmed)
-			altManager.remove(listGui.selected);
+			altManager.remove(alt);
 		
 		client.setScreen(this);
 	}
@@ -416,20 +381,10 @@ public final class AltManagerScreen extends Screen
 		renderBackground(context);
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		BufferBuilder bufferBuilder = tessellator.getBuffer();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		
 		// skin preview
-		if(listGui.getSelectedSlot() != -1
-			&& listGui.getSelectedSlot() < altManager.getList().size())
+		Alt alt = listGui.getSelectedAlt();
+		if(alt != null)
 		{
-			Alt alt = listGui.getSelectedAlt();
-			if(alt == null)
-				return;
-			
 			AltRenderer.drawAltBack(context, alt.getName(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
 			AltRenderer.drawAltBody(context, alt.getName(),
@@ -450,52 +405,39 @@ public final class AltManagerScreen extends Screen
 		// red flash for errors
 		if(errorTimer > 0)
 		{
-			RenderSystem.setShader(GameRenderer::getPositionProgram);
-			GL11.glDisable(GL11.GL_CULL_FACE);
-			GL11.glEnable(GL11.GL_BLEND);
-			
-			RenderSystem.setShaderColor(1, 0, 0, errorTimer / 16F);
-			
-			bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-				VertexFormats.POSITION);
-			bufferBuilder.vertex(matrix, 0, 0, 0).next();
-			bufferBuilder.vertex(matrix, width, 0, 0).next();
-			bufferBuilder.vertex(matrix, width, height, 0).next();
-			bufferBuilder.vertex(matrix, 0, height, 0).next();
-			tessellator.draw();
-			
-			GL11.glEnable(GL11.GL_CULL_FACE);
-			GL11.glDisable(GL11.GL_BLEND);
+			int alpha = (int)(Math.min(1, errorTimer / 16F) * 255);
+			int color = 0xFF0000 | alpha << 24;
+			context.fill(0, 0, width, height, color);
 			errorTimer--;
 		}
 		
-		super.render(context, mouseX, mouseY, partialTicks);
+		for(Drawable drawable : drawables)
+			drawable.render(context, mouseX, mouseY, partialTicks);
+		
 		renderButtonTooltip(context, mouseX, mouseY);
 		renderAltTooltip(context, mouseX, mouseY);
 	}
 	
 	private void renderAltTooltip(DrawContext context, int mouseX, int mouseY)
 	{
-		if(!listGui.isMouseInList(mouseX, mouseY))
+		if(!listGui.isMouseOver(mouseX, mouseY))
 			return;
 		
-		List<Alt> altList = altManager.getList();
-		int hoveredIndex = listGui.getItemAtPosition(mouseX, mouseY);
-		
-		if(hoveredIndex < 0 || hoveredIndex >= altList.size())
+		Entry hoveredEntry = listGui.getHoveredEntry(mouseX, mouseY);
+		if(hoveredEntry == null)
 			return;
 		
-		int itemX = mouseX - (width - listGui.getRowWidth()) / 2;
-		int itemY = mouseY - 36 + (int)listGui.getScrollAmount() - 4
-			- hoveredIndex * 30;
+		int hoveredIndex = listGui.children().indexOf(hoveredEntry);
+		int itemX = mouseX - listGui.getRowLeft();
+		int itemY = mouseY - listGui.getRowTop(hoveredIndex);
 		
 		if(itemX < 31 || itemY < 15 || itemY >= 25)
 			return;
 		
-		Alt alt = altList.get(hoveredIndex);
+		Alt alt = hoveredEntry.alt;
 		ArrayList<Text> tooltip = new ArrayList<>();
 		
-		if(itemX >= 31 + textRenderer.getWidth(listGui.getBottomText(alt)))
+		if(itemX >= 31 + textRenderer.getWidth(hoveredEntry.getBottomText()))
 			return;
 		
 		if(alt.isCracked())
@@ -567,125 +509,72 @@ public final class AltManagerScreen extends Screen
 		client.setScreen(prevScreen);
 	}
 	
-	public static final class ListGui extends ListWidget
+	private final class Entry
+		extends AlwaysSelectedEntryListWidget.Entry<AltManagerScreen.Entry>
 	{
-		private final List<Alt> list;
-		private int selected = -1;
-		private AltManagerScreen prevScreen;
-		private long lastTime;
+		private final Alt alt;
+		private long lastClickTime;
 		
-		public ListGui(MinecraftClient minecraft, AltManagerScreen prevScreen,
-			List<Alt> list)
+		public Entry(Alt alt)
 		{
-			super(minecraft, prevScreen.width, prevScreen.height, 36,
-				prevScreen.height - 56, 30);
-			
-			this.prevScreen = prevScreen;
-			this.list = list;
+			this.alt = Objects.requireNonNull(alt);
 		}
 		
 		@Override
-		protected boolean isSelectedItem(int id)
+		public Text getNarration()
 		{
-			return selected == id;
-		}
-		
-		protected int getSelectedSlot()
-		{
-			return selected;
-		}
-		
-		/**
-		 * @return The selected Alt, or null if no Alt is selected.
-		 */
-		protected Alt getSelectedAlt()
-		{
-			if(selected < 0 || selected >= list.size())
-				return null;
-			
-			return list.get(selected);
+			return Text.translatable("narrator.select", "Alt " + alt + ", "
+				+ StringHelper.stripTextFormat(getBottomText()));
 		}
 		
 		@Override
-		protected int getItemCount()
+		public boolean mouseClicked(double mouseX, double mouseY,
+			int mouseButton)
 		{
-			return list.size();
-		}
-		
-		@Override
-		protected boolean selectItem(int index, int button, double mouseX,
-			double mouseY)
-		{
-			if(index == selected && Util.getMeasuringTimeMs() - lastTime < 250)
-				prevScreen.pressLogin();
+			if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+				return false;
 			
-			if(index >= 0 && index < list.size())
-				selected = index;
+			long timeSinceLastClick = Util.getMeasuringTimeMs() - lastClickTime;
+			lastClickTime = Util.getMeasuringTimeMs();
 			
-			lastTime = Util.getMeasuringTimeMs();
+			if(timeSinceLastClick < 250)
+				pressLogin();
+			
 			return true;
 		}
 		
 		@Override
-		protected void renderBackground()
+		public void render(DrawContext context, int index, int y, int x,
+			int entryWidth, int entryHeight, int mouseX, int mouseY,
+			boolean hovered, float tickDelta)
 		{
-			
-		}
-		
-		@Override
-		protected void renderItem(DrawContext context, int id, int x, int y,
-			int var4, int var5, int var6, float partialTicks)
-		{
-			Alt alt = list.get(id);
-			
-			MatrixStack matrixStack = context.getMatrices();
-			Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-			Tessellator tessellator = RenderSystem.renderThreadTesselator();
-			BufferBuilder bufferBuilder = tessellator.getBuffer();
-			RenderSystem.setShader(GameRenderer::getPositionProgram);
-			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))
 			{
-				GL11.glDisable(GL11.GL_CULL_FACE);
-				GL11.glEnable(GL11.GL_BLEND);
-				
 				float opacity =
 					0.3F - Math.abs(MathHelper.sin(System.currentTimeMillis()
 						% 10000L / 10000F * (float)Math.PI * 2.0F) * 0.15F);
 				
-				RenderSystem.setShaderColor(0, 1, 0, opacity);
-				
-				bufferBuilder.begin(VertexFormat.DrawMode.QUADS,
-					VertexFormats.POSITION);
-				bufferBuilder.vertex(matrix, x - 2, y - 2, 0).next();
-				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2, 0).next();
-				bufferBuilder.vertex(matrix, x - 2 + 220, y - 2 + 30, 0).next();
-				bufferBuilder.vertex(matrix, x - 2, y - 2 + 30, 0).next();
-				tessellator.draw();
-				
-				GL11.glEnable(GL11.GL_CULL_FACE);
-				GL11.glDisable(GL11.GL_BLEND);
+				int color = 0x00FF00 | (int)(opacity * 255) << 24;
+				context.fill(x - 2, y - 2, x + 218, y + 28, color);
 			}
 			
 			// face
 			AltRenderer.drawAltFace(context, alt.getName(), x + 1, y + 1, 24,
-				24, isSelectedItem(id));
+				24, listGui.getSelectedOrNull() == this);
+			
+			TextRenderer tr = client.textRenderer;
 			
 			// name / email
-			context.drawText(client.textRenderer,
-				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880,
-				false);
-			context.drawText(client.textRenderer,
-				"Name: " + alt.getDisplayName(), x + 31, y + 3, 10526880,
-				false);
+			context.drawText(tr, "Name: " + alt.getDisplayName(), x + 31, y + 3,
+				0xA0A0A0, false);
 			
-			String bottomText = getBottomText(alt);
-			context.drawText(client.textRenderer, bottomText, x + 31, y + 15,
-				10526880, false);
+			// status
+			context.drawText(tr, getBottomText(), x + 31, y + 15, 10526880,
+				false);
 		}
 		
-		public String getBottomText(Alt alt)
+		private String getBottomText()
 		{
 			String text = alt.isCracked() ? "\u00a78cracked" : "\u00a72premium";
 			
@@ -698,6 +587,39 @@ public final class AltManagerScreen extends Screen
 				text += "\u00a7r, \u00a7cunchecked";
 			
 			return text;
+		}
+	}
+	
+	private final class ListGui
+		extends AlwaysSelectedEntryListWidget<AltManagerScreen.Entry>
+	{
+		public ListGui(MinecraftClient minecraft, AltManagerScreen screen,
+			List<Alt> list)
+		{
+			super(minecraft, screen.width, screen.height, 36,
+				screen.height - 56, 30);
+			
+			list.stream().map(AltManagerScreen.Entry::new)
+				.forEach(this::addEntry);
+		}
+		
+		/**
+		 * @return The selected Alt, or null if no Alt is selected.
+		 */
+		public Alt getSelectedAlt()
+		{
+			AltManagerScreen.Entry selected = getSelectedOrNull();
+			return selected != null ? selected.alt : null;
+		}
+		
+		/**
+		 * @return The hovered Entry, or null if no Entry is hovered.
+		 */
+		public AltManagerScreen.Entry getHoveredEntry(double mouseX,
+			double mouseY)
+		{
+			Optional<Element> hovered = hoveredElement(mouseX, mouseY);
+			return hovered.map(e -> ((AltManagerScreen.Entry)e)).orElse(null);
 		}
 	}
 }

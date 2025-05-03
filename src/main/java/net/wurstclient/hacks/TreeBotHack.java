@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -15,10 +15,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -120,12 +117,7 @@ public final class TreeBotHack extends Hack
 		treeFinder = null;
 		angleFinder = null;
 		processor = null;
-		
-		if(tree != null)
-		{
-			tree.close();
-			tree = null;
-		}
+		tree = null;
 		
 		if(currentBlock != null)
 		{
@@ -153,11 +145,9 @@ public final class TreeBotHack extends Hack
 		}
 		
 		tree.getLogs().removeIf(Predicate.not(TreeBotUtils::isLog));
-		tree.compileBuffer();
 		
 		if(tree.getLogs().isEmpty())
 		{
-			tree.close();
 			tree = null;
 			return;
 		}
@@ -256,7 +246,6 @@ public final class TreeBotHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		
 		if(treeFinder != null)
