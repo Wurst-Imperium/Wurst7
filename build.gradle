@@ -165,9 +165,27 @@ def getGhVersion() {
 	return version.substring(0, version.indexOf("-MC"))
 }
 
-def getChangelogUrl() {
-	def versionSlug = version.substring(1, version.indexOf("-MC")).replace(".", "-")
-	return "https://www.wurstclient.net/updates/wurst-${versionSlug}/"
+def getChangelogLink(String platform, String from) {
+	def versionSlug = getGhVersion().substring(1).replace(".", "-")
+	def shortURL = "https://www.wurstclient.net/updates/wurst-${versionSlug}/"
+	def query = []
+	if (platform != "GitHub")
+		query.add("mc=${project.minecraft_version}")
+	query.add("utm_source=${platform}")
+	query.add("utm_medium=" + project.archives_base_name.replace("-", "+"))
+	def fullURL = shortURL + (query.isEmpty() ? "" : "?" + query.join("&"))
+	def encodedURL = java.net.URLEncoder.encode(fullURL, "UTF-8")
+	return "[${shortURL}](https://go.wimods.net/from/${from}?to=${encodedURL})"
+}
+
+def getChangelogImage(String from) {
+	return "![](https://img.wimods.net/${from})"
+}
+
+def getChangelog(String platform, String from) {
+	def prefix = platform == "GitHub" ? "" : "A changelog can be found at: "
+	def imgQuery = platform == "GitHub" ? "" : "?mc_version=${project.minecraft_version}&mod_loader=${project.mod_loader}"
+	return prefix + getChangelogLink(platform, from) + getChangelogImage(from + imgQuery)
 }
 
 import org.kohsuke.github.GHReleaseBuilder
@@ -180,12 +198,14 @@ task github(dependsOn: build) {
 	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repository = github.getRepository("Wurst-Imperium/Wurst-MCX2")
+		def repoId = project.mcx_repo_id
+		def repository = github.getRepository(repoId)
 		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
+			releaseBuilder.body(getChangelogImage("github.com/${repoId}/releases/tag/${ghVersion}"))
 			releaseBuilder.prerelease(ghVersion.contains("pre"))
 			ghRelease = releaseBuilder.create()
 		}
@@ -195,10 +215,8 @@ task github(dependsOn: build) {
 	}
 }
 
-import java.time.LocalDate
 import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHMilestoneState
-import java.time.ZoneId
 import java.time.Instant
 
 task closeMilestone {
@@ -208,7 +226,8 @@ task closeMilestone {
 	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repository = github.getRepository("Wurst-Imperium/Wurst7")
+		def repoId = project.gh_repo_id
+		def repository = github.getRepository(repoId)
 		def ghVersion = getGhVersion()
 		
 		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
@@ -219,7 +238,7 @@ task closeMilestone {
 		
 		if (milestone.getState() != GHMilestoneState.CLOSED) {
 			milestone.setDueOn(Date.from(Instant.now()))
-			milestone.setDescription(getChangelogUrl())
+			milestone.setDescription(getChangelog("GitHub", "github.com/${repoId}/milestone/${ghVersion}"))
 			milestone.close()
 		}
 	}
