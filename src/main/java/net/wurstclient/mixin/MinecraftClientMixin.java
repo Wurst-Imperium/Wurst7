@@ -27,6 +27,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.session.ProfileKeys;
 import net.minecraft.client.session.Session;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
@@ -204,6 +205,23 @@ public abstract class MinecraftClientMixin
 	public IClientPlayerInteractionManager getInteractionManager()
 	{
 		return (IClientPlayerInteractionManager)interactionManager;
+	}
+	
+	/**
+	 * Does the same thing as ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE
+	 * but for older Minecraft versions where Fabric API >=0.108.0 is
+	 * not available (or in this case, available but not commonly used by
+	 * Sinytra Connector users).
+	 */
+	@Inject(at = @At("TAIL"),
+		method = "setWorld(Lnet/minecraft/client/world/ClientWorld;)V")
+	private void onSetWorld(ClientWorld world, CallbackInfo ci)
+	{
+		if(world == null)
+			return;
+		
+		MinecraftClient client = (MinecraftClient)(Object)this;
+		WurstClient.INSTANCE.getPlausible().onWorldChange(client, world);
 	}
 	
 	@Override
