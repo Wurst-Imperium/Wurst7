@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -12,15 +12,9 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AbstractHorseEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.TameableEntity;
@@ -28,7 +22,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -42,7 +35,6 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filters.FilterBabiesSetting;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -188,51 +180,23 @@ public final class FeedAuraHack extends Hack
 		if(renderTarget == null)
 			return;
 		
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		Box box = new Box(BlockPos.ORIGIN);
 		float p = 1;
-		LivingEntity le = renderTarget;
-		p = (le.getMaxHealth() - le.getHealth()) / le.getMaxHealth();
+		if(renderTarget.getMaxHealth() > 1e-5)
+			p = renderTarget.getHealth() / renderTarget.getMaxHealth();
 		float green = p * 2F;
 		float red = 2 - green;
+		float[] rgb = {red, green, 0};
+		int quadColor = RenderUtils.toIntColor(rgb, 0.25F);
+		int lineColor = RenderUtils.toIntColor(rgb, 0.5F);
 		
-		Vec3d lerpedPos = EntityUtils.getLerpedPos(renderTarget, partialTicks)
-			.subtract(region.toVec3d());
-		matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
+		Box box = EntityUtils.getLerpedBox(renderTarget, partialTicks);
+		if(p < 1)
+			box = box.contract((1 - p) * 0.5 * box.getLengthX(),
+				(1 - p) * 0.5 * box.getLengthY(),
+				(1 - p) * 0.5 * box.getLengthZ());
 		
-		matrixStack.translate(0, 0.05, 0);
-		matrixStack.scale(renderTarget.getWidth(), renderTarget.getHeight(),
-			renderTarget.getWidth());
-		matrixStack.translate(-0.5, 0, -0.5);
-		
-		matrixStack.translate(0.5, 0.5, 0.5);
-		matrixStack.scale(p, p, p);
-		matrixStack.translate(-0.5, -0.5, -0.5);
-		
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.25F);
-		RenderUtils.drawSolidBox(box, matrixStack);
-		
-		RenderSystem.setShaderColor(red, green, 0, 0.5F);
-		RenderUtils.drawOutlinedBox(box, matrixStack);
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
+		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);
 	}
 	
 	private boolean isUntamed(AnimalEntity e)

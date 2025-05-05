@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -13,17 +13,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.block.entity.*;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestBoatEntity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.entity.vehicle.HopperMinecartEntity;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
@@ -32,7 +29,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.chestesp.ChestEspBlockGroup;
 import net.wurstclient.hacks.chestesp.ChestEspEntityGroup;
 import net.wurstclient.hacks.chestesp.ChestEspGroup;
-import net.wurstclient.hacks.chestesp.ChestEspRenderer;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
@@ -146,8 +142,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
-		
-		ChestEspRenderer.prepareBuffers();
 	}
 	
 	@Override
@@ -158,7 +152,6 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		EVENTS.remove(RenderListener.class, this);
 		
 		groups.forEach(ChestEspGroup::clear);
-		ChestEspRenderer.closeBuffers();
 	}
 	
 	@Override
@@ -214,40 +207,46 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack);
-		
 		entityGroups.stream().filter(ChestEspGroup::isEnabled)
 			.forEach(g -> g.updateBoxes(partialTicks));
 		
-		ChestEspRenderer espRenderer =
-			new ChestEspRenderer(matrixStack, partialTicks);
-		
 		if(style.hasBoxes())
-		{
-			RenderSystem.setShader(GameRenderer::getPositionProgram);
-			groups.stream().filter(ChestEspGroup::isEnabled)
-				.forEach(espRenderer::renderBoxes);
-		}
+			renderBoxes(matrixStack);
 		
 		if(style.hasLines())
+			renderTracers(matrixStack, partialTicks);
+	}
+	
+	private void renderBoxes(MatrixStack matrixStack)
+	{
+		for(ChestEspGroup group : groups)
 		{
-			RenderSystem.setShader(GameRenderer::getPositionProgram);
-			groups.stream().filter(ChestEspGroup::isEnabled)
-				.forEach(espRenderer::renderLines);
+			if(!group.isEnabled())
+				continue;
+			
+			List<Box> boxes = group.getBoxes();
+			int quadsColor = group.getColorI(0x40);
+			int linesColor = group.getColorI(0x80);
+			
+			RenderUtils.drawSolidBoxes(matrixStack, boxes, quadsColor, false);
+			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, linesColor,
+				false);
 		}
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+	}
+	
+	private void renderTracers(MatrixStack matrixStack, float partialTicks)
+	{
+		for(ChestEspGroup group : groups)
+		{
+			if(!group.isEnabled())
+				continue;
+			
+			List<Box> boxes = group.getBoxes();
+			List<Vec3d> ends = boxes.stream().map(Box::getCenter).toList();
+			int color = group.getColorI(0x80);
+			
+			RenderUtils.drawTracers(matrixStack, partialTicks, ends, color,
+				false);
+		}
 	}
 }

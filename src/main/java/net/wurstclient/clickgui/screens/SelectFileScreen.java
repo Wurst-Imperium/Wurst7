@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -8,9 +8,9 @@
 package net.wurstclient.clickgui.screens;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -20,11 +20,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
-import net.wurstclient.util.ListWidget;
 
 public final class SelectFileScreen extends Screen
 {
@@ -45,6 +45,7 @@ public final class SelectFileScreen extends Screen
 	public void init()
 	{
 		listGui = new ListGui(client, this, setting.listFiles());
+		addSelectableChild(listGui);
 		
 		addDrawableChild(
 			ButtonWidget.builder(Text.literal("Open Folder"), b -> openFolder())
@@ -76,9 +77,9 @@ public final class SelectFileScreen extends Screen
 	
 	private void done()
 	{
-		if(listGui.selected >= 0 && listGui.selected < listGui.list.size())
+		Path path = listGui.getSelectedPath();
+		if(path != null)
 		{
-			Path path = listGui.list.get(listGui.selected);
 			String fileName = "" + path.getFileName();
 			setting.setSelectedFile(fileName);
 		}
@@ -107,60 +108,20 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
-	{
-		boolean childClicked = super.mouseClicked(mouseX, mouseY, mouseButton);
-		
-		listGui.mouseClicked(mouseX, mouseY, mouseButton);
-		
-		if(!childClicked && (mouseX < (width - 220) / 2
-			|| mouseX > width / 2 + 129 || mouseY < 32 || mouseY > height - 64))
-			listGui.selected = -1;
-		
-		return childClicked;
-	}
-	
-	@Override
-	public boolean mouseDragged(double double_1, double double_2, int int_1,
-		double double_3, double double_4)
-	{
-		listGui.mouseDragged(double_1, double_2, int_1, double_3, double_4);
-		return super.mouseDragged(double_1, double_2, int_1, double_3,
-			double_4);
-	}
-	
-	@Override
-	public boolean mouseReleased(double double_1, double double_2, int int_1)
-	{
-		listGui.mouseReleased(double_1, double_2, int_1);
-		return super.mouseReleased(double_1, double_2, int_1);
-	}
-	
-	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY,
-		double horizontalAmount, double verticalAmount)
-	{
-		listGui.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-		return super.mouseScrolled(mouseX, mouseY, horizontalAmount,
-			verticalAmount);
-	}
-	
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
 	{
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
 			done();
 		else if(keyCode == GLFW.GLFW_KEY_ESCAPE)
 			openPrevScreen();
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 	
 	@Override
 	public void tick()
 	{
-		doneButton.active =
-			listGui.selected >= 0 && listGui.selected < listGui.list.size();
+		doneButton.active = listGui.getSelectedOrNull() != null;
 	}
 	
 	@Override
@@ -194,60 +155,54 @@ public final class SelectFileScreen extends Screen
 		return false;
 	}
 	
-	private static class ListGui extends ListWidget
+	private final class Entry
+		extends AlwaysSelectedEntryListWidget.Entry<SelectFileScreen.Entry>
 	{
-		private final MinecraftClient mc;
-		private final List<Path> list;
-		private int selected = -1;
+		private final Path path;
 		
+		public Entry(Path path)
+		{
+			this.path = Objects.requireNonNull(path);
+		}
+		
+		@Override
+		public Text getNarration()
+		{
+			return Text.translatable("narrator.select",
+				"File " + path.getFileName());
+		}
+		
+		@Override
+		public void render(DrawContext context, int index, int y, int x,
+			int entryWidth, int entryHeight, int mouseX, int mouseY,
+			boolean hovered, float tickDelta)
+		{
+			TextRenderer tr = client.textRenderer;
+			
+			String fileName = "" + path.getFileName();
+			context.drawTextWithShadow(tr, fileName, x + 28, y, 0xF0F0F0);
+			
+			String relPath = "" + client.runDirectory.toPath().relativize(path);
+			context.drawTextWithShadow(tr, relPath, x + 28, y + 9, 0xA0A0A0);
+		}
+	}
+	
+	private final class ListGui
+		extends AlwaysSelectedEntryListWidget<SelectFileScreen.Entry>
+	{
 		public ListGui(MinecraftClient mc, SelectFileScreen screen,
-			ArrayList<Path> list)
+			List<Path> list)
 		{
-			super(mc, screen.width, screen.height, 36, screen.height - 64, 20);
-			this.mc = mc;
-			this.list = list;
-		}
-		
-		@Override
-		protected int getItemCount()
-		{
-			return list.size();
-		}
-		
-		@Override
-		protected boolean selectItem(int index, int int_2, double var3,
-			double var4)
-		{
-			if(index >= 0 && index < list.size())
-				selected = index;
+			super(mc, screen.width, screen.height - 96, 36, 20);
 			
-			return true;
+			list.stream().map(SelectFileScreen.Entry::new)
+				.forEach(this::addEntry);
 		}
 		
-		@Override
-		protected boolean isSelectedItem(int index)
+		public Path getSelectedPath()
 		{
-			return index == selected;
-		}
-		
-		@Override
-		protected void renderBackground()
-		{
-			
-		}
-		
-		@Override
-		protected void renderItem(DrawContext context, int index, int x, int y,
-			int var4, int var5, int var6, float partialTicks)
-		{
-			TextRenderer tr = mc.textRenderer;
-			
-			Path path = list.get(index);
-			context.drawText(tr, "" + path.getFileName(), x + 28, y, 0xf0f0f0,
-				false);
-			context.drawText(tr,
-				"" + client.runDirectory.toPath().relativize(path), x + 28,
-				y + 9, 0xa0a0a0, false);
+			SelectFileScreen.Entry selected = getSelectedOrNull();
+			return selected != null ? selected.path : null;
 		}
 	}
 }

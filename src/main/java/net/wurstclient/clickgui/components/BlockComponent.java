@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -7,39 +7,31 @@
  */
 package net.wurstclient.clickgui.components;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
+import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.screens.EditBlockScreen;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.RenderUtils;
 
 public final class BlockComponent extends Component
 {
+	private static final ClickGui GUI = WURST.getGui();
+	private static final TextRenderer TR = MC.textRenderer;
 	private static final int BLOCK_WITDH = 24;
+	
 	private final BlockSetting setting;
 	
 	public BlockComponent(BlockSetting setting)
 	{
 		this.setting = setting;
-		
 		setWidth(getDefaultWidth());
 		setHeight(getDefaultHeight());
 	}
@@ -50,100 +42,94 @@ public final class BlockComponent extends Component
 		if(mouseX < getX() + getWidth() - BLOCK_WITDH)
 			return;
 		
-		if(mouseButton == 0)
+		switch(mouseButton)
 		{
-			Screen currentScreen = WurstClient.MC.currentScreen;
-			EditBlockScreen editScreen =
-				new EditBlockScreen(currentScreen, setting);
-			WurstClient.MC.setScreen(editScreen);
+			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
+			MC.setScreen(new EditBlockScreen(MC.currentScreen, setting));
+			break;
 			
-		}else if(mouseButton == 1)
+			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
 			setting.resetToDefault();
+			break;
+		}
 	}
 	
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		ClickGui gui = WurstClient.INSTANCE.getGui();
-		float[] bgColor = gui.getBgColor();
-		int txtColor = gui.getTxtColor();
-		float opacity = gui.getOpacity();
-		
 		int x1 = getX();
 		int x2 = x1 + getWidth();
 		int x3 = x2 - BLOCK_WITDH;
 		int y1 = getY();
 		int y2 = y1 + getHeight();
 		
-		int scroll = getParent().isScrollingEnabled()
-			? getParent().getScrollOffset() : 0;
-		boolean hovering = mouseX >= x1 && mouseY >= y1 && mouseX < x2
-			&& mouseY < y2 && mouseY >= -scroll
-			&& mouseY < getParent().getHeight() - 13 - scroll;
+		boolean hovering = isHovering(mouseX, mouseY, x1, y1, x2, y2);
 		boolean hText = hovering && mouseX < x3;
 		boolean hBlock = hovering && mouseX >= x3;
 		
-		ItemStack stack = new ItemStack(setting.getBlock());
-		
-		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		
 		// tooltip
 		if(hText)
-			gui.setTooltip(setting.getWrappedDescription(200));
+			GUI.setTooltip(setting.getWrappedDescription(200));
 		else if(hBlock)
-		{
-			String tooltip = "\u00a76Name:\u00a7r " + getBlockName(stack);
-			tooltip += "\n\u00a76ID:\u00a7r " + setting.getBlockName();
-			tooltip += "\n\u00a76Block #:\u00a7r "
-				+ Block.getRawIdFromState(setting.getBlock().getDefaultState());
-			tooltip += "\n\n\u00a7e[left-click]\u00a7r to edit";
-			tooltip += "\n\u00a7e[right-click]\u00a7r to reset";
-			gui.setTooltip(tooltip);
-		}
+			GUI.setTooltip(getBlockTooltip());
 		
 		// background
-		RenderUtils.setShaderColor(bgColor, opacity);
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
-		bufferBuilder.vertex(matrix, x1, y1, 0);
-		bufferBuilder.vertex(matrix, x1, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y2, 0);
-		bufferBuilder.vertex(matrix, x2, y1, 0);
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+		int bgColor =
+			RenderUtils.toIntColor(GUI.getBgColor(), GUI.getOpacity());
+		context.fill(x1, y1, x2, y2, bgColor);
 		
-		// setting name
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		TextRenderer tr = WurstClient.MC.textRenderer;
-		String text = setting.getName() + ":";
-		context.drawText(tr, text, x1, y1 + 2, txtColor, false);
+		// text
+		String name = setting.getName() + ":";
+		context.drawText(TR, name, x1, y1 + 2, GUI.getTxtColor(), false);
 		
+		// block
+		ItemStack stack = new ItemStack(setting.getBlock());
 		RenderUtils.drawItem(context, stack, x3, y1, true);
+	}
+	
+	private boolean isHovering(int mouseX, int mouseY, int x1, int y1, int x2,
+		int y2)
+	{
+		Window parent = getParent();
+		boolean scrollEnabled = parent.isScrollingEnabled();
+		int scroll = scrollEnabled ? parent.getScrollOffset() : 0;
 		
-		GL11.glEnable(GL11.GL_BLEND);
+		return mouseX >= x1 && mouseY >= y1 && mouseX < x2 && mouseY < y2
+			&& mouseY >= -scroll && mouseY < parent.getHeight() - 13 - scroll;
+	}
+	
+	private String getBlockTooltip()
+	{
+		Block block = setting.getBlock();
+		BlockState state = block.getDefaultState();
+		ItemStack stack = new ItemStack(block);
+		
+		String translatedName = stack.isEmpty() ? "\u00a7ounknown block\u00a7r"
+			: stack.getName().getString();
+		String tooltip = "\u00a76Name:\u00a7r " + translatedName;
+		
+		String blockId = setting.getBlockName();
+		tooltip += "\n\u00a76ID:\u00a7r " + blockId;
+		
+		int blockNumber = Block.getRawIdFromState(state);
+		tooltip += "\n\u00a76Block #:\u00a7r " + blockNumber;
+		
+		tooltip += "\n\n\u00a7e[left-click]\u00a7r to edit";
+		tooltip += "\n\u00a7e[right-click]\u00a7r to reset";
+		
+		return tooltip;
 	}
 	
 	@Override
 	public int getDefaultWidth()
 	{
-		TextRenderer tr = WurstClient.MC.textRenderer;
-		String text = setting.getName() + ":";
-		return tr.getWidth(text) + BLOCK_WITDH + 4;
+		return TR.getWidth(setting.getName() + ":") + BLOCK_WITDH + 4;
 	}
 	
 	@Override
 	public int getDefaultHeight()
 	{
 		return BLOCK_WITDH;
-	}
-	
-	private String getBlockName(ItemStack stack)
-	{
-		if(stack.isEmpty())
-			return "\u00a7ounknown block\u00a7r";
-		return stack.getName().getString();
 	}
 }

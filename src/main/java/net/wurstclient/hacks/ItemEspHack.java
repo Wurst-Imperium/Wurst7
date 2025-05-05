@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,17 +10,6 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -36,9 +25,7 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspBoxSizeSetting;
 import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"item esp", "ItemTracers", "item tracers"})
 public final class ItemEspHack extends Hack implements UpdateListener,
@@ -59,7 +46,6 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	{
 		super("ItemESP");
 		setCategory(Category.RENDER);
-		
 		addSetting(style);
 		addSetting(boxSize);
 		addSetting(color);
@@ -101,89 +87,28 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		int lineColor = color.getColorI(0x80);
 		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		renderBoxes(matrixStack, partialTicks, region);
+		if(style.hasBoxes())
+		{
+			double extraSize = boxSize.getExtraSize() / 2;
+			
+			ArrayList<Box> boxes = new ArrayList<>(items.size());
+			for(ItemEntity e : items)
+				boxes.add(EntityUtils.getLerpedBox(e, partialTicks)
+					.offset(0, extraSize, 0).expand(extraSize));
+			
+			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, lineColor, false);
+		}
 		
 		if(style.hasLines())
-			renderTracers(matrixStack, partialTicks, region);
-		
-		matrixStack.pop();
-		
-		// GL resets
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
-	}
-	
-	private void renderBoxes(MatrixStack matrixStack, float partialTicks,
-		RegionPos region)
-	{
-		float extraSize = boxSize.getExtraSize();
-		
-		for(ItemEntity e : items)
 		{
-			matrixStack.push();
+			ArrayList<Vec3d> ends = new ArrayList<>(items.size());
+			for(ItemEntity e : items)
+				ends.add(EntityUtils.getLerpedBox(e, partialTicks).getCenter());
 			
-			Vec3d lerpedPos = EntityUtils.getLerpedPos(e, partialTicks)
-				.subtract(region.toVec3d());
-			matrixStack.translate(lerpedPos.x, lerpedPos.y, lerpedPos.z);
-			
-			if(style.hasBoxes())
-			{
-				matrixStack.push();
-				matrixStack.scale(e.getWidth() + extraSize,
-					e.getHeight() + extraSize, e.getWidth() + extraSize);
-				
-				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				color.setAsShaderColor(0.5F);
-				RenderUtils.drawOutlinedBox(new Box(-0.5, 0, -0.5, 0.5, 1, 0.5),
-					matrixStack);
-				
-				matrixStack.pop();
-			}
-			
-			matrixStack.pop();
+			RenderUtils.drawTracers(matrixStack, partialTicks, ends, lineColor,
+				false);
 		}
-	}
-	
-	private void renderTracers(MatrixStack matrixStack, float partialTicks,
-		RegionPos region)
-	{
-		if(items.isEmpty())
-			return;
-		
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		color.setAsShaderColor(0.5F);
-		
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		Tessellator tessellator = RenderSystem.renderThreadTesselator();
-		RenderSystem.setShader(GameRenderer::getPositionProgram);
-		
-		Vec3d regionVec = region.toVec3d();
-		Vec3d start = RotationUtils.getClientLookVec(partialTicks)
-			.add(RenderUtils.getCameraPos()).subtract(regionVec);
-		
-		BufferBuilder bufferBuilder = tessellator
-			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
-		for(ItemEntity e : items)
-		{
-			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
-				.subtract(regionVec);
-			
-			bufferBuilder.vertex(matrix, (float)start.x, (float)start.y,
-				(float)start.z);
-			bufferBuilder.vertex(matrix, (float)end.x, (float)end.y,
-				(float)end.z);
-		}
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 }

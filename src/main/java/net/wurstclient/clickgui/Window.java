@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -10,6 +10,7 @@ package net.wurstclient.clickgui;
 import java.util.ArrayList;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 
 public class Window
@@ -67,16 +68,8 @@ public class Window
 	 */
 	public final int getX()
 	{
-		// prevent window from going off the right side of the screen
-		net.minecraft.client.util.Window mcWindow = WurstClient.MC.getWindow();
-		if(x > mcWindow.getScaledWidth() - 1)
-			return mcWindow.getScaledWidth() - 1;
-		
-		// prevent window from going off the left side of the screen
-		if(x <= -width)
-			return -width + 1;
-		
-		return x;
+		int scaledWidth = WurstClient.MC.getWindow().getScaledWidth();
+		return MathHelper.clamp(x, -width + 1, scaledWidth - 1);
 	}
 	
 	/**
@@ -99,16 +92,8 @@ public class Window
 	 */
 	public final int getY()
 	{
-		// prevent window from going off the bottom of the screen
-		net.minecraft.client.util.Window mcWindow = WurstClient.MC.getWindow();
-		if(y > mcWindow.getScaledHeight() - 1)
-			return mcWindow.getScaledHeight() - 1;
-		
-		// prevent window from going off the top of the screen
-		if(y <= -12)
-			return -12;
-		
-		return y;
+		int scaledHeight = WurstClient.MC.getWindow().getScaledHeight();
+		return MathHelper.clamp(y, -12, scaledHeight - 1);
 	}
 	
 	/**

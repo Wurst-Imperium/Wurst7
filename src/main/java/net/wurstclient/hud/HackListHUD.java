@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,7 +14,6 @@ import java.util.Iterator;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.Window;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -56,9 +55,9 @@ public final class HackListHUD implements UpdateListener
 			textColor = otf.getColor(0x04);
 		
 		int height = posY + activeHax.size() * 9;
-		Window sr = WurstClient.MC.getWindow();
 		
-		if(otf.getMode() == Mode.COUNT || height > sr.getScaledHeight())
+		if(otf.getMode() == Mode.COUNT
+			|| height > context.getScaledWindowHeight())
 			drawCounter(context);
 		else
 			drawHackList(context, partialTicks);
@@ -138,7 +137,7 @@ public final class HackListHUD implements UpdateListener
 			posX = 2;
 		else
 		{
-			int screenWidth = WurstClient.MC.getWindow().getScaledWidth();
+			int screenWidth = context.getScaledWindowWidth();
 			int stringWidth = tr.getWidth(s);
 			
 			posX = screenWidth - stringWidth - 2;
@@ -164,7 +163,7 @@ public final class HackListHUD implements UpdateListener
 			posX = 2 - 5 * offset;
 		else
 		{
-			int screenWidth = WurstClient.MC.getWindow().getScaledWidth();
+			int screenWidth = context.getScaledWindowWidth();
 			int stringWidth = tr.getWidth(s);
 			
 			posX = screenWidth - stringWidth - 2 + 5 * offset;
@@ -194,12 +193,9 @@ public final class HackListHUD implements UpdateListener
 		@Override
 		public boolean equals(Object obj)
 		{
-			// do not use Java 16 syntax here,
-			// it breaks Eclipse's Clean Up feature
-			if(!(obj instanceof HackListEntry))
+			if(!(obj instanceof HackListEntry other))
 				return false;
 			
-			HackListEntry other = (HackListEntry)obj;
 			return hack == other.hack;
 		}
 		

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.util.BlockUtils;
 
@@ -118,5 +119,11 @@ public final class Area
 	public ArrayList<BlockPos> getBlocksFound()
 	{
 		return blocksFound;
+	}
+	
+	public Box toBox()
+	{
+		return new Box(minX, minY, minZ, minX + sizeX, minY + sizeY,
+			minZ + sizeZ);
 	}
 }
