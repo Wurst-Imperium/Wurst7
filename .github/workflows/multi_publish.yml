@@ -12,6 +12,11 @@ on:
         description: "Space-separated list of branches to publish from"
         required: true
         type: string
+      announce_update:
+        description: "Announce as an update on WurstForum"
+        required: true
+        type: boolean
+        default: false
       announce_ports:
         description: "Announce as ports on WurstForum"
         required: true
@@ -92,7 +97,43 @@ jobs:
         run_id: ${{ steps.publish_dispatch.outputs.run_id }}
         run_timeout_seconds: 600  # 10 minutes
 
-  announce:
+  announce_update:
+    runs-on: ubuntu-latest
+    needs: [prepare, publish_each]
+    if: ${{ !failure() && !cancelled() && inputs.announce_update }}
+    steps:
+    - name: Build announcement inputs
+      id: announce_inputs
+      run: |
+        JSON_STRING=$(cat << EOF
+        {
+          "wurst_version": "${{ inputs.wurst_version }}",
+          "dry_run": "${{ inputs.dry_run }}"
+        }
+        EOF
+        )
+        # Convert to single line and escape quotes
+        echo "json=${JSON_STRING//$'\n'/}" >> "$GITHUB_OUTPUT"
+    - name: Trigger announce workflow
+      id: announce_dispatch
+      uses: codex-/return-dispatch@v2
+      with:
+        token: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
+        owner: Wurst-Imperium
+        repo: WurstClient.net
+        ref: gh-pages
+        workflow: announce_wurst_update.yml
+        workflow_inputs: ${{ steps.announce_inputs.outputs.json }}
+    - name: Wait for announce workflow to finish (run ${{ steps.announce_dispatch.outputs.run_id }})
+      uses: codex-/await-remote-run@v1
+      with:
+        token: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
+        owner: Wurst-Imperium
+        repo: WurstClient.net
+        run_id: ${{ steps.announce_dispatch.outputs.run_id }}
+        run_timeout_seconds: 600  # 10 minutes
+
+  announce_ports:
     runs-on: ubuntu-latest
     needs: [prepare, publish_each]
     if: ${{ !failure() && !cancelled() && inputs.announce_ports }}

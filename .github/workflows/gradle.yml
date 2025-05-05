@@ -12,6 +12,7 @@ on:
       - "**.yml"
       - "gradle**"
       - "*.gradle"
+      - "*.accesswidener"
   pull_request:
     paths:
       - "**.java"
@@ -19,6 +20,7 @@ on:
       - "**.yml"
       - "gradle**"
       - "*.gradle"
+      - "*.accesswidener"
   workflow_dispatch:
     inputs:
       distinct_id:
