@@ -106,10 +106,8 @@ public final class EasyVertexBuffer implements AutoCloseable
 		
 		try(RenderPass renderPass =
 			RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-				() -> "something from Wurst", framebuffer.getColorAttachment(),
-				OptionalInt.empty(),
-				framebuffer.useDepthAttachment
-					? framebuffer.getDepthAttachment() : null,
+				() -> "something from Wurst", framebuffer.method_71639(),
+				OptionalInt.empty(), framebuffer.method_71640(),
 				OptionalDouble.empty()))
 		{
 			renderPass.setPipeline(pipeline);
