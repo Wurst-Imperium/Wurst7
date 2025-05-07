@@ -27,8 +27,8 @@ public abstract class FogRendererMixin
 	 * As of 25w16a, this also seems to disable clouds for some reason.
 	 */
 	@ModifyExpressionValue(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/render/BackgroundRenderer;fogEnabled:Z"),
-		method = "getFogBuffer(Lnet/minecraft/client/render/BackgroundRenderer$FogType;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;")
+		target = "Lnet/minecraft/client/render/fog/FogRenderer;fogEnabled:Z"),
+		method = "getFogBuffer(Lnet/minecraft/client/render/fog/FogRenderer$FogType;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;")
 	private boolean onGetFogBuffer(boolean original)
 	{
 		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
