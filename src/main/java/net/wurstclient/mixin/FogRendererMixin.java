@@ -14,12 +14,12 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
 import net.minecraft.block.enums.CameraSubmersionType;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.fog.FogRenderer;
 import net.wurstclient.WurstClient;
 
-@Mixin(BackgroundRenderer.class)
-public abstract class BackgroundRendererMixin
+@Mixin(FogRenderer.class)
+public abstract class FogRendererMixin
 {
 	/**
 	 * Removes the distance fog when NoFog is enabled.
