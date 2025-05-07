@@ -82,7 +82,8 @@ public final class ViewCompCmd extends Command
 		{
 			compString +=
 				"\n" + c.type().toString().replace("minecraft:", "") + " => ";
-			DataResult<JsonElement> result = c.encode(JsonOps.INSTANCE);
+			DataResult<JsonElement> result = c.encode(
+				MC.player.getRegistryManager().getOps(JsonOps.INSTANCE));
 			JsonElement json =
 				result.resultOrPartial().orElse(JsonNull.INSTANCE);
 			compString += JsonUtils.GSON.toJson(json).replace("$", "$$")
