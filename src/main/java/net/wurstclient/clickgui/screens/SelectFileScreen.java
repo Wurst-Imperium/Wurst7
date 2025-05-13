@@ -23,8 +23,10 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
+import net.wurstclient.util.WurstColors;
 
 public final class SelectFileScreen extends Screen
 {
@@ -131,7 +133,7 @@ public final class SelectFileScreen extends Screen
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,
-			setting.getName(), width / 2, 12, 0xffffff);
+			setting.getName(), width / 2, 12, Colors.WHITE);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
@@ -179,10 +181,12 @@ public final class SelectFileScreen extends Screen
 			TextRenderer tr = client.textRenderer;
 			
 			String fileName = "" + path.getFileName();
-			context.drawTextWithShadow(tr, fileName, x + 28, y, 0xF0F0F0);
+			context.drawTextWithShadow(tr, fileName, x + 28, y,
+				WurstColors.VERY_LIGHT_GRAY);
 			
 			String relPath = "" + client.runDirectory.toPath().relativize(path);
-			context.drawTextWithShadow(tr, relPath, x + 28, y + 9, 0xA0A0A0);
+			context.drawTextWithShadow(tr, relPath, x + 28, y + 9,
+				Colors.LIGHT_GRAY);
 		}
 	}
 	

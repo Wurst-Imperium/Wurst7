@@ -26,10 +26,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.WurstColors;
 
 public final class EditItemListScreen extends Screen
 {
@@ -142,7 +144,7 @@ public final class EditItemListScreen extends Screen
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			itemList.getName() + " (" + itemList.getItemNames().size() + ")",
-			width / 2, 12, 0xFFFFFF);
+			width / 2, 12, Colors.WHITE);
 		
 		matrixStack.pushMatrix();
 		
@@ -157,10 +159,11 @@ public final class EditItemListScreen extends Screen
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
 			context.drawTextWithShadow(client.textRenderer, "item name or ID",
-				68, height - 50, 0x808080);
+				68, height - 50, Colors.GRAY);
 		
-		int border = itemNameField.isFocused() ? 0xFFFFFFFF : 0xFFA0A0A0;
-		int black = 0xFF000000;
+		int border =
+			itemNameField.isFocused() ? Colors.WHITE : Colors.LIGHT_GRAY;
+		int black = Colors.BLACK;
 		
 		context.fill(48, height - 56, 64, height - 36, border);
 		context.fill(49, height - 55, 65, height - 37, black);
@@ -225,11 +228,12 @@ public final class EditItemListScreen extends Screen
 			TextRenderer tr = client.textRenderer;
 			
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
-			context.drawText(tr, getDisplayName(stack), x + 28, y, 0xF0F0F0,
+			context.drawText(tr, getDisplayName(stack), x + 28, y,
+				WurstColors.VERY_LIGHT_GRAY, false);
+			context.drawText(tr, itemName, x + 28, y + 9, Colors.LIGHT_GRAY,
 				false);
-			context.drawText(tr, itemName, x + 28, y + 9, 0xA0A0A0, false);
-			context.drawText(tr, getIdText(item), x + 28, y + 18, 0xA0A0A0,
-				false);
+			context.drawText(tr, getIdText(item), x + 28, y + 18,
+				Colors.LIGHT_GRAY, false);
 		}
 		
 		private String getDisplayName(ItemStack stack)

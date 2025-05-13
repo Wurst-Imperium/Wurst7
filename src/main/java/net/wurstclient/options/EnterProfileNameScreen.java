@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 
 public final class EnterProfileNameScreen extends Screen
 {
@@ -87,7 +88,7 @@ public final class EnterProfileNameScreen extends Screen
 		float partialTicks)
 	{
 		context.drawCenteredTextWithShadow(client.textRenderer,
-			"Name your new profile", width / 2, 20, 0xFFFFFF);
+			"Name your new profile", width / 2, 20, Colors.WHITE);
 		
 		valueField.render(context, mouseX, mouseY, partialTicks);
 		

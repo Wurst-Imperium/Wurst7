@@ -30,6 +30,7 @@ import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.util.MathUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.WurstColors;
 
 public final class EditBookOfferScreen extends Screen
 {
@@ -263,7 +264,7 @@ public final class EditBookOfferScreen extends Screen
 		TextRenderer tr = client.textRenderer;
 		String titleText = "Edit Book Offer";
 		context.drawCenteredTextWithShadow(tr, titleText, width / 2, 12,
-			0xffffff);
+			Colors.WHITE);
 		
 		int x = width / 2 - 100;
 		int y = 64;
@@ -277,8 +278,8 @@ public final class EditBookOfferScreen extends Screen
 		
 		RegistryEntry<Enchantment> enchantment =
 			bookOffer.getEnchantmentEntry().get();
-		int nameColor =
-			enchantment.isIn(EnchantmentTags.CURSE) ? 0xFFFF5555 : Colors.WHITE;
+		int nameColor = enchantment.isIn(EnchantmentTags.CURSE)
+			? WurstColors.LIGHT_RED : Colors.WHITE;
 		context.drawTextWithShadow(tr, name, x + 28, y, nameColor);
 		
 		context.drawText(tr, bookOffer.id(), x + 28, y + 9, Colors.LIGHT_GRAY,
@@ -304,14 +305,17 @@ public final class EditBookOfferScreen extends Screen
 		
 		matrixStack.translate(width / 2 - 100, 112);
 		
-		context.drawTextWithShadow(tr, "Level:", 0, 0, 0xFFF0F0F0);
-		context.drawTextWithShadow(tr, "Max price:", 0, 16, 0xFFF0F0F0);
+		context.drawTextWithShadow(tr, "Level:", 0, 0,
+			WurstColors.VERY_LIGHT_GRAY);
+		context.drawTextWithShadow(tr, "Max price:", 0, 16,
+			WurstColors.VERY_LIGHT_GRAY);
 		
 		if(alreadyAdded && offerToSave != null)
 		{
 			String errorText = offerToSave.getEnchantmentNameWithLevel()
 				+ " is already on your list!";
-			context.drawTextWithShadow(tr, errorText, 0, 32, 0xFFFF5555);
+			context.drawTextWithShadow(tr, errorText, 0, 32,
+				WurstColors.LIGHT_RED);
 		}
 		
 		matrixStack.popMatrix();

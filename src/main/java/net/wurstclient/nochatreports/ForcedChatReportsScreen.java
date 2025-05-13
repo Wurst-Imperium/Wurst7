@@ -19,6 +19,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.PlainTextContent.Literal;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.util.Colors;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.NoChatReportsOtf;
 import net.wurstclient.util.ChatUtils;
@@ -111,7 +112,7 @@ public final class ForcedChatReportsScreen extends Screen
 		int titleY = reasonY - textRenderer.fontHeight * 2;
 		
 		context.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
-			0xAAAAAA);
+			Colors.LIGHT_GRAY);
 		reasonFormatted.drawCenterWithShadow(context, centerX, reasonY);
 		
 		for(Drawable drawable : drawables)

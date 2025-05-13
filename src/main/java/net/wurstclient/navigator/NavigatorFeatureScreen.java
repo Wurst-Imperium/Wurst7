@@ -25,6 +25,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -39,6 +40,7 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.WurstColors;
 
 public final class NavigatorFeatureScreen extends NavigatorScreen
 {
@@ -425,8 +427,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			context.state.goUpLayer();
 			context.drawCenteredTextWithShadow(client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
-				y1 + (buttonData.height - 10) / 2 + 1,
-				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
+				y1 + (buttonData.height - 10) / 2 + 1, buttonData.isLocked()
+					? WurstColors.VERY_LIGHT_GRAY : buttonData.textColor);
 			context.state.goDownLayer();
 		}
 		
@@ -510,7 +512,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	{
 		public String buttonText;
 		public Color color;
-		public int textColor = 0xffffff;
+		public int textColor = Colors.WHITE;
 		
 		public ButtonData(int x, int y, int width, int height,
 			String buttonText, int color)

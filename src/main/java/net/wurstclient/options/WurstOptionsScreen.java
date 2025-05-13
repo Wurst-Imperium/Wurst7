@@ -19,6 +19,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
 import net.minecraft.util.Util.OperatingSystem;
 import net.wurstclient.WurstClient;
@@ -28,6 +29,7 @@ import net.wurstclient.hacks.XRayHack;
 import net.wurstclient.other_features.VanillaSpoofOtf;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.WurstColors;
 
 public class WurstOptionsScreen extends Screen
 {
@@ -165,14 +167,14 @@ public class WurstOptionsScreen extends Screen
 		int y2 = height / 4 + 24 - 28;
 		
 		context.drawCenteredTextWithShadow(tr, "Wurst Options", middleX, y1,
-			0xffffff);
+			Colors.WHITE);
 		
 		context.drawCenteredTextWithShadow(tr, "Settings", middleX - 104, y2,
-			0xcccccc);
+			WurstColors.VERY_LIGHT_GRAY);
 		context.drawCenteredTextWithShadow(tr, "Managers", middleX, y2,
-			0xcccccc);
+			WurstColors.VERY_LIGHT_GRAY);
 		context.drawCenteredTextWithShadow(tr, "Links", middleX + 104, y2,
-			0xcccccc);
+			WurstColors.VERY_LIGHT_GRAY);
 	}
 	
 	private void renderButtonTooltip(DrawContext context, int mouseX,

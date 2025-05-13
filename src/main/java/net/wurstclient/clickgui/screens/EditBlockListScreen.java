@@ -29,6 +29,7 @@ import net.minecraft.util.Colors;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.WurstColors;
 
 public final class EditBlockListScreen extends Screen
 {
@@ -158,8 +159,9 @@ public final class EditBlockListScreen extends Screen
 			context.drawTextWithShadow(client.textRenderer, "block name or ID",
 				68, height - 50, Colors.GRAY);
 		
-		int border = blockNameField.isFocused() ? 0xFFFFFFFF : 0xFFA0A0A0;
-		int black = 0xFF000000;
+		int border =
+			blockNameField.isFocused() ? Colors.WHITE : Colors.LIGHT_GRAY;
+		int black = Colors.BLACK;
 		
 		context.fill(48, height - 56, 64, height - 36, border);
 		context.fill(49, height - 55, 65, height - 37, black);
@@ -224,8 +226,8 @@ public final class EditBlockListScreen extends Screen
 			TextRenderer tr = client.textRenderer;
 			
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
-			context.drawText(tr, getDisplayName(stack), x + 28, y, 0xFFF0F0F0,
-				false);
+			context.drawText(tr, getDisplayName(stack), x + 28, y,
+				WurstColors.VERY_LIGHT_GRAY, false);
 			context.drawText(tr, blockName, x + 28, y + 9, Colors.LIGHT_GRAY,
 				false);
 			context.drawText(tr, getIdText(block), x + 28, y + 18,

@@ -24,6 +24,7 @@ import net.minecraft.util.Colors;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.WurstColors;
 
 public final class EditBlockScreen extends Screen
 {
@@ -117,11 +118,11 @@ public final class EditBlockScreen extends Screen
 			lblAbove ? "Block ID or number:" : "block ID or number";
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
-		int lblColor = lblAbove ? 0xFFF0F0F0 : Colors.GRAY;
+		int lblColor = lblAbove ? WurstColors.VERY_LIGHT_GRAY : Colors.GRAY;
 		context.drawTextWithShadow(tr, lblText, lblX, lblY, lblColor);
 		
-		int border = blockField.isFocused() ? 0xFFFFFFFF : Colors.LIGHT_GRAY;
-		int black = 0xff000000;
+		int border = blockField.isFocused() ? Colors.WHITE : Colors.LIGHT_GRAY;
+		int black = Colors.BLACK;
 		
 		context.fill(48, -56, 64, -36, border);
 		context.fill(49, -55, 65, -37, black);

@@ -17,6 +17,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.StringHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_feature.OtfList;
@@ -126,7 +127,7 @@ public final class NcrModRequiredScreen extends Screen
 		int titleY = reasonY - textRenderer.fontHeight * 2;
 		
 		context.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
-			0xAAAAAA);
+			Colors.LIGHT_GRAY);
 		reasonFormatted.drawCenterWithShadow(context, centerX, reasonY);
 		
 		for(Drawable drawable : drawables)

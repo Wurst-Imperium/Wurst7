@@ -662,7 +662,7 @@ public enum RenderUtils
 				matrixStack.scale(2, 2);
 			
 			TextRenderer tr = WurstClient.MC.textRenderer;
-			context.drawText(tr, "?", 3, 2, 0xf0f0f0, true);
+			context.drawText(tr, "?", 3, 2, WurstColors.VERY_LIGHT_GRAY, true);
 			
 			matrixStack.popMatrix();
 			context.state.goDownLayer();
