@@ -33,6 +33,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
@@ -346,18 +347,18 @@ public abstract class AltEditorScreen extends Screen
 		
 		// text
 		context.drawTextWithShadow(textRenderer, "Name (for cracked alts), or",
-			width / 2 - 100, 37, 10526880);
+			width / 2 - 100, 37, Colors.LIGHT_GRAY);
 		context.drawTextWithShadow(textRenderer, "E-Mail (for premium alts)",
-			width / 2 - 100, 47, 10526880);
+			width / 2 - 100, 47, Colors.LIGHT_GRAY);
 		context.drawTextWithShadow(textRenderer, "Password (for premium alts)",
-			width / 2 - 100, 87, 10526880);
+			width / 2 - 100, 87, Colors.LIGHT_GRAY);
 		context.drawTextWithShadow(textRenderer, "Account type: " + accountType,
-			width / 2 - 100, 127, 10526880);
+			width / 2 - 100, 127, Colors.LIGHT_GRAY);
 		
 		String[] lines = message.split("\n");
 		for(int i = 0; i < lines.length; i++)
 			context.drawCenteredTextWithShadow(textRenderer, lines[i],
-				width / 2, 142 + 10 * i, 16777215);
+				width / 2, 142 + 10 * i, Colors.WHITE);
 		
 		// text boxes
 		nameOrEmailBox.render(context, mouseX, mouseY, partialTicks);
