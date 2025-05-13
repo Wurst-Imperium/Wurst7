@@ -25,6 +25,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
@@ -140,7 +141,7 @@ public final class EditBlockListScreen extends Screen
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			blockList.getName() + " (" + blockList.size() + ")", width / 2, 12,
-			0xFFFFFF);
+			Colors.WHITE);
 		
 		matrixStack.pushMatrix();
 		
@@ -155,7 +156,7 @@ public final class EditBlockListScreen extends Screen
 		
 		if(blockNameField.getText().isEmpty() && !blockNameField.isFocused())
 			context.drawTextWithShadow(client.textRenderer, "block name or ID",
-				68, height - 50, 0x808080);
+				68, height - 50, Colors.GRAY);
 		
 		int border = blockNameField.isFocused() ? 0xFFFFFFFF : 0xFFA0A0A0;
 		int black = 0xFF000000;
@@ -223,11 +224,12 @@ public final class EditBlockListScreen extends Screen
 			TextRenderer tr = client.textRenderer;
 			
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
-			context.drawText(tr, getDisplayName(stack), x + 28, y, 0xF0F0F0,
+			context.drawText(tr, getDisplayName(stack), x + 28, y, 0xFFF0F0F0,
 				false);
-			context.drawText(tr, blockName, x + 28, y + 9, 0xA0A0A0, false);
-			context.drawText(tr, getIdText(block), x + 28, y + 18, 0xA0A0A0,
+			context.drawText(tr, blockName, x + 28, y + 9, Colors.LIGHT_GRAY,
 				false);
+			context.drawText(tr, getIdText(block), x + 28, y + 18,
+				Colors.LIGHT_GRAY, false);
 		}
 		
 		private String getDisplayName(ItemStack stack)
