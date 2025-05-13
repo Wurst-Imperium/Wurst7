@@ -24,6 +24,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.settings.BookOffersSetting;
@@ -277,10 +278,11 @@ public final class EditBookOfferScreen extends Screen
 		RegistryEntry<Enchantment> enchantment =
 			bookOffer.getEnchantmentEntry().get();
 		int nameColor =
-			enchantment.isIn(EnchantmentTags.CURSE) ? 0xff5555 : 0xffffff;
+			enchantment.isIn(EnchantmentTags.CURSE) ? 0xFFFF5555 : Colors.WHITE;
 		context.drawTextWithShadow(tr, name, x + 28, y, nameColor);
 		
-		context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xa0a0a0, false);
+		context.drawText(tr, bookOffer.id(), x + 28, y + 9, Colors.LIGHT_GRAY,
+			false);
 		
 		String price;
 		if(bookOffer.price() >= 64)
@@ -292,7 +294,7 @@ public final class EditBookOfferScreen extends Screen
 				x + 28 + tr.getWidth(price), y + 16, false);
 		}
 		
-		context.drawText(tr, price, x + 28, y + 18, 0xa0a0a0, false);
+		context.drawText(tr, price, x + 28, y + 18, Colors.LIGHT_GRAY, false);
 		
 		levelField.render(context, mouseX, mouseY, partialTicks);
 		priceField.render(context, mouseX, mouseY, partialTicks);
@@ -302,14 +304,14 @@ public final class EditBookOfferScreen extends Screen
 		
 		matrixStack.translate(width / 2 - 100, 112);
 		
-		context.drawTextWithShadow(tr, "Level:", 0, 0, 0xf0f0f0);
-		context.drawTextWithShadow(tr, "Max price:", 0, 16, 0xf0f0f0);
+		context.drawTextWithShadow(tr, "Level:", 0, 0, 0xFFF0F0F0);
+		context.drawTextWithShadow(tr, "Max price:", 0, 16, 0xFFF0F0F0);
 		
 		if(alreadyAdded && offerToSave != null)
 		{
 			String errorText = offerToSave.getEnchantmentNameWithLevel()
 				+ " is already on your list!";
-			context.drawTextWithShadow(tr, errorText, 0, 32, 0xff5555);
+			context.drawTextWithShadow(tr, errorText, 0, 32, 0xFFFF5555);
 		}
 		
 		matrixStack.popMatrix();

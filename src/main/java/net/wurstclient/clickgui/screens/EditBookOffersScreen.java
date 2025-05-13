@@ -28,6 +28,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.settings.BookOffersSetting;
@@ -149,7 +150,7 @@ public final class EditBookOffersScreen extends Screen
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			bookOffers.getName() + " (" + bookOffers.getOffers().size() + ")",
-			width / 2, 12, 0xFFFFFF);
+			width / 2, 12, Colors.WHITE);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
@@ -199,15 +200,15 @@ public final class EditBookOffersScreen extends Screen
 			
 			RegistryEntry<Enchantment> enchantment =
 				bookOffer.getEnchantmentEntry().get();
-			int nameColor =
-				enchantment.isIn(EnchantmentTags.CURSE) ? 0xFF5555 : 0xF0F0F0;
+			int nameColor = enchantment.isIn(EnchantmentTags.CURSE) ? 0xFFFF5555
+				: 0xFFF0F0F0;
 			context.drawText(tr, name, x + 28, y, nameColor, false);
 			
-			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xA0A0A0,
+			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xFFA0A0A0,
 				false);
 			
 			String price = getPriceText();
-			context.drawText(tr, price, x + 28, y + 18, 0xA0A0A0, false);
+			context.drawText(tr, price, x + 28, y + 18, 0xFFA0A0A0, false);
 			
 			if(bookOffer.price() < 64)
 				RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),

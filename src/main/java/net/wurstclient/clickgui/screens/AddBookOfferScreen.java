@@ -32,6 +32,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
@@ -281,7 +282,7 @@ public final class AddBookOfferScreen extends Screen
 		String titleText =
 			"Available Books (" + listGui.children().size() + ")";
 		context.drawCenteredTextWithShadow(tr, titleText, width / 2, 12,
-			0xffffff);
+			Colors.WHITE);
 		
 		levelField.render(context, mouseX, mouseY, partialTicks);
 		priceField.render(context, mouseX, mouseY, partialTicks);
@@ -291,14 +292,16 @@ public final class AddBookOfferScreen extends Screen
 		
 		matrixStack.translate(width / 2 - 100, 0);
 		
-		context.drawTextWithShadow(tr, "Level:", 0, height - 72, 0xf0f0f0);
-		context.drawTextWithShadow(tr, "Max price:", 0, height - 56, 0xf0f0f0);
+		context.drawTextWithShadow(tr, "Level:", 0, height - 72, 0xFFF0F0F0);
+		context.drawTextWithShadow(tr, "Max price:", 0, height - 56,
+			0xFFF0F0F0);
 		
 		if(alreadyAdded && offerToAdd != null)
 		{
 			String errorText = offerToAdd.getEnchantmentNameWithLevel()
 				+ " is already on your list!";
-			context.drawTextWithShadow(tr, errorText, 0, height - 40, 0xff5555);
+			context.drawTextWithShadow(tr, errorText, 0, height - 40,
+				0xFFFF5555);
 		}
 		
 		matrixStack.popMatrix();
@@ -374,16 +377,17 @@ public final class AddBookOfferScreen extends Screen
 				bookOffer.getEnchantmentEntry().get();
 			
 			String name = bookOffer.getEnchantmentName();
-			int nameColor =
-				enchantment.isIn(EnchantmentTags.CURSE) ? 0xFF5555 : 0xF0F0F0;
+			int nameColor = enchantment.isIn(EnchantmentTags.CURSE) ? 0xFFFF5555
+				: 0xFFF0F0F0;
 			context.drawText(tr, name, x + 28, y, nameColor, false);
 			
-			context.drawText(tr, bookOffer.id(), x + 28, y + 9, 0xA0A0A0,
-				false);
+			context.drawText(tr, bookOffer.id(), x + 28, y + 9,
+				Colors.LIGHT_GRAY, false);
 			
 			int maxLevel = enchantment.value().getMaxLevel();
 			String levels = maxLevel + (maxLevel == 1 ? " level" : " levels");
-			context.drawText(tr, levels, x + 28, y + 18, 0xA0A0A0, false);
+			context.drawText(tr, levels, x + 28, y + 18, Colors.LIGHT_GRAY,
+				false);
 		}
 	}
 	
