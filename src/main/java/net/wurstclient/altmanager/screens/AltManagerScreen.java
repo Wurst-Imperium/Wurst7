@@ -42,6 +42,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -393,13 +394,14 @@ public final class AltManagerScreen extends Screen
 		
 		// title text
 		context.drawCenteredTextWithShadow(textRenderer, "Alt Manager",
-			width / 2, 4, 16777215);
+			width / 2, 4, Colors.WHITE);
 		context.drawCenteredTextWithShadow(textRenderer,
-			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
+			"Alts: " + altManager.getList().size(), width / 2, 14,
+			Colors.LIGHT_GRAY);
 		context.drawCenteredTextWithShadow(
 			textRenderer, "premium: " + altManager.getNumPremium()
 				+ ", cracked: " + altManager.getNumCracked(),
-			width / 2, 24, 10526880);
+			width / 2, 24, Colors.LIGHT_GRAY);
 		
 		// red flash for errors
 		if(errorTimer > 0)
@@ -566,11 +568,11 @@ public final class AltManagerScreen extends Screen
 			
 			// name / email
 			context.drawText(tr, "Name: " + alt.getDisplayName(), x + 31, y + 3,
-				0xA0A0A0, false);
+				Colors.LIGHT_GRAY, false);
 			
 			// status
-			context.drawText(tr, getBottomText(), x + 31, y + 15, 10526880,
-				false);
+			context.drawText(tr, getBottomText(), x + 31, y + 15,
+				Colors.LIGHT_GRAY, false);
 		}
 		
 		private String getBottomText()
