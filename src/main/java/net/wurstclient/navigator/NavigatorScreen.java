@@ -163,9 +163,11 @@ public abstract class NavigatorScreen extends Screen
 			y1 += scrollKnobPosition;
 			y2 = y1 + 24;
 			drawBackgroundBox(context, x1, y1, x2, y2);
-			int i;
-			for(x1++, x2--, y1 += 8, y2 -= 15, i = 0; i < 3; y1 += 4, y2 +=
-				4, i++)
+			x1++;
+			x2--;
+			y1 += 8;
+			y2 -= 15;
+			for(int i = 0; i < 3; y1 += 4, y2 += 4, i++)
 				drawDownShadow(context, x1, y1, x2, y2);
 		}
 		
@@ -223,9 +225,9 @@ public abstract class NavigatorScreen extends Screen
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
 		// line
-		float yi1 = y1 + 0.1F;
 		int lineColor = RenderUtils.toIntColor(acColor, 0.5F);
-		RenderUtils.drawLine2D(context, x1, yi1, x2, yi1, lineColor);
+		RenderUtils.drawLine2D(context, x1 + 0.1F, y1, x2 + 0.1F, y1,
+			lineColor);
 		
 		// // shadow
 		// int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);

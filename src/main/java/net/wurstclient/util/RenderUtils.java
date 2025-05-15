@@ -724,42 +724,47 @@ public enum RenderUtils
 	/**
 	 * Similar to {@link DrawContext#drawHorizontalLine(int, int, int, int)} and
 	 * {@link DrawContext#drawVerticalLine(int, int, int, int)}, but supports
-	 * diagonal lines, uses floating-point coordinates instead of integers, is
-	 * one actual pixel wide instead of one scaled pixel, uses fewer draw calls
-	 * than the vanilla method, and uses a z value of 1 to ensure that lines
-	 * show up above fills.
+	 * diagonal lines, uses floating-point coordinates instead of integers, and
+	 * is one actual pixel wide instead of one scaled pixel.
 	 */
 	public static void drawLine2D(DrawContext context, float x1, float y1,
 		float x2, float y2, int color)
 	{
-		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		// context.draw(consumers -> {
-		// VertexConsumer buffer =
-		// consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINES);
-		// buffer.vertex(matrix, x1, y1, 1).color(color);
-		// buffer.vertex(matrix, x2, y2, 1).color(color);
-		// });
+		int scale = WurstClient.MC.getWindow().getScaleFactor();
+		float x = x1 * scale;
+		float y = y1 * scale;
+		float w = (x2 - x1) * scale;
+		float h = (y2 - y1) * scale;
+		float angle = (float)MathHelper.atan2(h, w);
+		int length = Math.round(MathHelper.sqrt(w * w + h * h));
+		
+		context.getMatrices().pushMatrix();
+		context.getMatrices().scale(1F / scale);
+		context.getMatrices().translate(x, y);
+		context.getMatrices().rotate(angle);
+		context.getMatrices().translate(-0.5F, -0.5F);
+		context.drawHorizontalLine(0, length - 1, 0, color);
+		context.getMatrices().popMatrix();
 	}
 	
 	/**
 	 * Similar to {@link DrawContext#drawBorder(int, int, int, int, int)}, but
-	 * uses floating-point coordinates instead of integers, is one actual pixel
-	 * wide instead of one scaled pixel, uses fewer draw calls than the vanilla
-	 * method, and uses a z value of 1 to ensure that lines show up above fills.
+	 * uses floating-point coordinates instead of integers, and is one actual
+	 * pixel wide instead of one scaled pixel.
 	 */
 	public static void drawBorder2D(DrawContext context, float x1, float y1,
 		float x2, float y2, int color)
 	{
-		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		// context.draw(consumers -> {
-		// VertexConsumer buffer =
-		// consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
-		// buffer.vertex(matrix, x1, y1, 1).color(color);
-		// buffer.vertex(matrix, x2, y1, 1).color(color);
-		// buffer.vertex(matrix, x2, y2, 1).color(color);
-		// buffer.vertex(matrix, x1, y2, 1).color(color);
-		// buffer.vertex(matrix, x1, y1, 1).color(color);
-		// });
+		int scale = WurstClient.MC.getWindow().getScaleFactor();
+		int x = (int)(x1 * scale);
+		int y = (int)(y1 * scale);
+		int w = (int)((x2 - x1) * scale);
+		int h = (int)((y2 - y1) * scale);
+		
+		context.getMatrices().pushMatrix();
+		context.getMatrices().scale(1F / scale);
+		context.drawBorder(x, y, w, h, color);
+		context.getMatrices().popMatrix();
 	}
 	
 	/**
@@ -768,15 +773,15 @@ public enum RenderUtils
 	public static void drawLineStrip2D(DrawContext context, float[][] vertices,
 		int color)
 	{
-		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		// context.draw(consumers -> {
-		// VertexConsumer buffer =
-		// consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
-		// for(float[] vertex : vertices)
-		// buffer.vertex(matrix, vertex[0], vertex[1], 1).color(color);
-		// buffer.vertex(matrix, vertices[0][0], vertices[0][1], 1)
-		// .color(color);
-		// });
+		if(vertices.length < 2)
+			return;
+		
+		for(int i = 1; i < vertices.length; i++)
+			drawLine2D(context, vertices[i - 1][0], vertices[i - 1][1],
+				vertices[i][0], vertices[i][1], color);
+		drawLine2D(context, vertices[vertices.length - 1][0],
+			vertices[vertices.length - 1][1], vertices[0][0], vertices[0][1],
+			color);
 	}
 	
 	/**
@@ -788,13 +793,8 @@ public enum RenderUtils
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
 		// outline
-		float xo1 = x1 - 0.1F;
-		float xo2 = x2 + 0.1F;
-		float yo1 = y1 - 0.1F;
-		float yo2 = y2 + 0.1F;
-		
 		int outlineColor = toIntColor(acColor, 0.5F);
-		drawBorder2D(context, xo1, yo1, xo2, yo2, outlineColor);
+		drawBorder2D(context, x1, y1, x2, y2, outlineColor);
 		
 		// // shadow
 		// float xs1 = x1 - 1;
