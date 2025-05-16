@@ -676,14 +676,16 @@ public enum RenderUtils
 	public static void fill2D(DrawContext context, float x1, float y1, float x2,
 		float y2, int color)
 	{
-		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		// context.draw(consumers -> {
-		// VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-		// buffer.vertex(matrix, x1, y1, 0).color(color);
-		// buffer.vertex(matrix, x1, y2, 0).color(color);
-		// buffer.vertex(matrix, x2, y2, 0).color(color);
-		// buffer.vertex(matrix, x2, y1, 0).color(color);
-		// });
+		int scale = WurstClient.MC.getWindow().getScaleFactor();
+		int xs1 = (int)(x1 * scale);
+		int ys1 = (int)(y1 * scale);
+		int xs2 = (int)(x2 * scale);
+		int ys2 = (int)(y2 * scale);
+		
+		context.getMatrices().pushMatrix();
+		context.getMatrices().scale(1F / scale);
+		context.fill(xs1, ys1, xs2, ys2, color);
+		context.getMatrices().popMatrix();
 	}
 	
 	/**
