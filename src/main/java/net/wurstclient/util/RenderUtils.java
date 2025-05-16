@@ -9,18 +9,22 @@ package net.wurstclient.util;
 
 import java.util.List;
 
+import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.MatrixStack.Entry;
 import net.minecraft.item.ItemStack;
@@ -706,21 +710,34 @@ public enum RenderUtils
 	}
 	
 	/**
-	 * Renders the given vertices in TRIANGLE_STRIP draw mode.
+	 * Pretends to render the given vertices in TRIANGLES draw mode
+	 * by squeezing a bunch of quads into triangle shapes.
 	 *
-	 * @apiNote Due to back-face culling, triangles will be invisible if their
-	 *          vertices are not supplied in counter-clockwise order.
+	 * <p>
+	 * ...blame Vibrant Visuals.
 	 */
 	public static void fillTriangle2D(DrawContext context, float[][] vertices,
 		int color)
 	{
-		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		// context.draw(consumers -> {
-		// VertexConsumer buffer =
-		// consumers.getBuffer(RenderLayer.getDebugFilledBox());
-		// for(float[] vertex : vertices)
-		// buffer.vertex(matrix, vertex[0], vertex[1], 0).color(color);
-		// });
+		Matrix3x2f pose = new Matrix3x2f(context.getMatrices());
+		ScreenRect scissor = context.scissorStack.peekLast();
+		
+		for(int i = 0; i < vertices.length - 2; i += 3)
+		{
+			if(i + 2 >= vertices.length)
+				break;
+			
+			float x1 = vertices[i][0];
+			float y1 = vertices[i][1];
+			float x2 = vertices[i + 1][0];
+			float y2 = vertices[i + 1][1];
+			float x3 = vertices[i + 2][0];
+			float y3 = vertices[i + 2][1];
+			
+			context.state.addSimpleElement(new FakeTriangleRenderState(
+				RenderPipelines.GUI, TextureSetup.empty(), pose, x1, y1, x2, y2,
+				x3, y3, color, scissor));
+		}
 	}
 	
 	/**
