@@ -694,19 +694,31 @@ public enum RenderUtils
 	
 	/**
 	 * Renders the given vertices in QUADS draw mode.
-	 *
-	 * @apiNote Due to back-face culling, quads will be invisible if their
-	 *          vertices are not supplied in counter-clockwise order.
 	 */
 	public static void fillQuads2D(DrawContext context, float[][] vertices,
 		int color)
 	{
-		// Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		// context.draw(consumers -> {
-		// VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-		// for(float[] vertex : vertices)
-		// buffer.vertex(matrix, vertex[0], vertex[1], 0).color(color);
-		// });
+		Matrix3x2f pose = new Matrix3x2f(context.getMatrices());
+		ScreenRect scissor = context.scissorStack.peekLast();
+		
+		for(int i = 0; i < vertices.length - 3; i += 4)
+		{
+			if(i + 3 >= vertices.length)
+				break;
+			
+			float x1 = vertices[i][0];
+			float y1 = vertices[i][1];
+			float x2 = vertices[i + 1][0];
+			float y2 = vertices[i + 1][1];
+			float x3 = vertices[i + 2][0];
+			float y3 = vertices[i + 2][1];
+			float x4 = vertices[i + 3][0];
+			float y4 = vertices[i + 3][1];
+			
+			context.state.addSimpleElement(new CustomQuadRenderState(
+				RenderPipelines.GUI, TextureSetup.empty(), pose, x1, y1, x2, y2,
+				x3, y3, x4, y4, color, scissor));
+		}
 	}
 	
 	/**
@@ -815,45 +827,41 @@ public enum RenderUtils
 		int outlineColor = toIntColor(acColor, 0.5F);
 		drawBorder2D(context, x1, y1, x2, y2, outlineColor);
 		
-		// // shadow
-		// float xs1 = x1 - 1;
-		// float xs2 = x2 + 1;
-		// float ys1 = y1 - 1;
-		// float ys2 = y2 + 1;
-		//
-		// int shadowColor1 = toIntColor(acColor, 0.75F);
-		// int shadowColor2 = 0x00000000;
-		//
-		// Matrix3x2fStack matrixStack = context.getMatrices();
-		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		//
-		// context.draw(consumers -> {
-		// VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-		//
-		// // top
-		// buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-		// buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
-		// buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
-		// buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
-		//
-		// // left
-		// buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
-		// buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
-		// buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
-		// buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-		//
-		// // right
-		// buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
-		// buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
-		// buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
-		// buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
-		//
-		// // bottom
-		// buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
-		// buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
-		// buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
-		// buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
-		// });
+		// shadow
+		float xs1 = x1 - 1;
+		float xs2 = x2 + 1;
+		float ys1 = y1 - 1;
+		float ys2 = y2 + 1;
+		
+		int shadowColor1 = toIntColor(acColor, 0.75F);
+		int shadowColor2 = 0x00000000;
+		
+		Matrix3x2f pose = new Matrix3x2f(context.getMatrices());
+		ScreenRect scissor = context.scissorStack.peekLast();
+		
+		// top
+		context.state.addSimpleElement(
+			new CustomQuadRenderState(RenderPipelines.GUI, TextureSetup.empty(),
+				pose, x1, y1, x2, y1, xs2, ys1, xs1, ys1, shadowColor1,
+				shadowColor1, shadowColor2, shadowColor2, scissor));
+		
+		// left
+		context.state.addSimpleElement(
+			new CustomQuadRenderState(RenderPipelines.GUI, TextureSetup.empty(),
+				pose, xs1, ys1, xs1, ys2, x1, y2, x1, y1, shadowColor2,
+				shadowColor2, shadowColor1, shadowColor1, scissor));
+		
+		// right
+		context.state.addSimpleElement(
+			new CustomQuadRenderState(RenderPipelines.GUI, TextureSetup.empty(),
+				pose, x2, y1, x2, y2, xs2, ys2, xs2, ys1, shadowColor1,
+				shadowColor1, shadowColor2, shadowColor2, scissor));
+		
+		// bottom
+		context.state.addSimpleElement(
+			new CustomQuadRenderState(RenderPipelines.GUI, TextureSetup.empty(),
+				pose, x2, y2, x1, y2, xs1, ys2, xs2, ys2, shadowColor1,
+				shadowColor1, shadowColor2, shadowColor2, scissor));
 	}
 	
 	public record ColoredPoint(Vec3d point, int color)
