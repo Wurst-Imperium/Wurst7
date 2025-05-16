@@ -114,10 +114,10 @@ public final class SliderComponent extends Component
 		
 		// background (around the rail)
 		int bgColor = RenderUtils.toIntColor(GUI.getBgColor(), opacity);
-		float[][] bgVertices = {{x1, y1}, {x1, y4}, {x2, y4}, {x2, y1},
-			{x1, y5}, {x1, y2}, {x2, y2}, {x2, y5}, {x1, y4}, {x1, y5},
-			{x3, y5}, {x3, y4}, {x4, y4}, {x4, y5}, {x2, y5}, {x2, y4}};
-		RenderUtils.fillQuads2D(context, bgVertices, bgColor);
+		RenderUtils.fill2D(context, x1, y1, x2, y4, bgColor);
+		RenderUtils.fill2D(context, x1, y5, x2, y2, bgColor);
+		RenderUtils.fill2D(context, x1, y4, x3, y5, bgColor);
+		RenderUtils.fill2D(context, x4, y4, x2, y5, bgColor);
 		
 		// limit
 		float xl1 = x3;
@@ -130,15 +130,14 @@ public final class SliderComponent extends Component
 			
 			int limitColor =
 				RenderUtils.toIntColor(new float[]{1, 0, 0}, railOpacity);
-			float[][] limitVertices = {{x3, y4}, {x3, y5}, {xl1, y5}, {xl1, y4},
-				{xl2, y4}, {xl2, y5}, {x4, y5}, {x4, y4}};
-			RenderUtils.fillQuads2D(context, limitVertices, limitColor);
+			RenderUtils.fill2D(context, x3, y4, xl1, y5, limitColor);
+			RenderUtils.fill2D(context, xl2, y4, x4, y5, limitColor);
 		}
 		
 		// rail
 		RenderUtils.fill2D(context, xl1, y4, xl2, y5,
 			RenderUtils.toIntColor(GUI.getBgColor(), railOpacity));
-		RenderUtils.drawBorder2D(context, xl1, y4, xl2, y5,
+		RenderUtils.drawBorder2D(context, x3, y4, x4, y5,
 			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
 		context.state.goUpLayer();
