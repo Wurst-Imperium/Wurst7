@@ -175,6 +175,13 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
+	public void renderBackground(DrawContext context, int mouseX, int mouseY,
+		float deltaTicks)
+	{
+		// Don't blur
+	}
+	
+	@Override
 	public final boolean shouldPause()
 	{
 		return false;
