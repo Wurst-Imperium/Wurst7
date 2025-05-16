@@ -229,20 +229,10 @@ public abstract class NavigatorScreen extends Screen
 		RenderUtils.drawLine2D(context, x1 + 0.1F, y1, x2 + 0.1F, y1,
 			lineColor);
 		
-		// // shadow
-		// int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);
-		// int shadowColor2 = 0x00000000;
-		//
-		// Matrix3x2fStack matrixStack = context.getMatrices();
-		// Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		//
-		// context.draw(consumers -> {
-		// VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-		// buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-		// buffer.vertex(matrix, x1, y2, 0).color(shadowColor2);
-		// buffer.vertex(matrix, x2, y2, 0).color(shadowColor2);
-		// buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
-		// });
+		// shadow
+		int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);
+		int shadowColor2 = 0x00000000;
+		context.fillGradient(x1, y1, x2, y2, shadowColor1, shadowColor2);
 	}
 	
 	protected final void drawBox(DrawContext context, int x1, int y1, int x2,
