@@ -16,7 +16,6 @@ import org.joml.Vector3f;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.option.Perspective;
@@ -24,7 +23,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.MatrixStack.Entry;
 import net.minecraft.item.ItemStack;
@@ -715,9 +713,8 @@ public enum RenderUtils
 			float x4 = vertices[i + 3][0];
 			float y4 = vertices[i + 3][1];
 			
-			context.state.addSimpleElement(new CustomQuadRenderState(
-				RenderPipelines.GUI, TextureSetup.empty(), pose, x1, y1, x2, y2,
-				x3, y3, x4, y4, color, scissor));
+			context.state.addSimpleElement(new CustomQuadRenderState(pose, x1,
+				y1, x2, y2, x3, y3, x4, y4, color, scissor));
 		}
 	}
 	
@@ -746,9 +743,8 @@ public enum RenderUtils
 			float x3 = vertices[i + 2][0];
 			float y3 = vertices[i + 2][1];
 			
-			context.state.addSimpleElement(new CustomQuadRenderState(
-				RenderPipelines.GUI, TextureSetup.empty(), pose, x1, y1, x2, y2,
-				x3, y3, x3, y3, color, scissor));
+			context.state.addSimpleElement(new CustomQuadRenderState(pose, x1,
+				y1, x2, y2, x3, y3, x3, y3, color, scissor));
 		}
 	}
 	
@@ -840,28 +836,24 @@ public enum RenderUtils
 		ScreenRect scissor = context.scissorStack.peekLast();
 		
 		// top
-		context.state.addSimpleElement(
-			new CustomQuadRenderState(RenderPipelines.GUI, TextureSetup.empty(),
-				pose, x1, y1, x2, y1, xs2, ys1, xs1, ys1, shadowColor1,
-				shadowColor1, shadowColor2, shadowColor2, scissor));
+		context.state.addSimpleElement(new CustomQuadRenderState(pose, x1, y1,
+			x2, y1, xs2, ys1, xs1, ys1, shadowColor1, shadowColor1,
+			shadowColor2, shadowColor2, scissor));
 		
 		// left
-		context.state.addSimpleElement(
-			new CustomQuadRenderState(RenderPipelines.GUI, TextureSetup.empty(),
-				pose, xs1, ys1, xs1, ys2, x1, y2, x1, y1, shadowColor2,
-				shadowColor2, shadowColor1, shadowColor1, scissor));
+		context.state.addSimpleElement(new CustomQuadRenderState(pose, xs1, ys1,
+			xs1, ys2, x1, y2, x1, y1, shadowColor2, shadowColor2, shadowColor1,
+			shadowColor1, scissor));
 		
 		// right
-		context.state.addSimpleElement(
-			new CustomQuadRenderState(RenderPipelines.GUI, TextureSetup.empty(),
-				pose, x2, y1, x2, y2, xs2, ys2, xs2, ys1, shadowColor1,
-				shadowColor1, shadowColor2, shadowColor2, scissor));
+		context.state.addSimpleElement(new CustomQuadRenderState(pose, x2, y1,
+			x2, y2, xs2, ys2, xs2, ys1, shadowColor1, shadowColor1,
+			shadowColor2, shadowColor2, scissor));
 		
 		// bottom
-		context.state.addSimpleElement(
-			new CustomQuadRenderState(RenderPipelines.GUI, TextureSetup.empty(),
-				pose, x2, y2, x1, y2, xs1, ys2, xs2, ys2, shadowColor1,
-				shadowColor1, shadowColor2, shadowColor2, scissor));
+		context.state.addSimpleElement(new CustomQuadRenderState(pose, x2, y2,
+			x1, y2, xs1, ys2, xs2, ys2, shadowColor1, shadowColor1,
+			shadowColor2, shadowColor2, scissor));
 	}
 	
 	public record ColoredPoint(Vec3d point, int color)

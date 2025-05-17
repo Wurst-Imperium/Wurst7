@@ -12,6 +12,7 @@ import org.joml.Matrix3x2f;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState;
 import net.minecraft.client.render.VertexConsumer;
@@ -23,23 +24,21 @@ public record CustomQuadRenderState(RenderPipeline pipeline,
 	int color3, int color4, @Nullable ScreenRect scissorArea,
 	@Nullable ScreenRect bounds) implements SimpleGuiElementRenderState
 {
-	public CustomQuadRenderState(RenderPipeline pipeline,
-		TextureSetup textureSetup, Matrix3x2f pose, float x1, float y1,
-		float x2, float y2, float x3, float y3, float x4, float y4, int color1,
+	public CustomQuadRenderState(Matrix3x2f pose, float x1, float y1, float x2,
+		float y2, float x3, float y3, float x4, float y4, int color1,
 		int color2, int color3, int color4, @Nullable ScreenRect scissorArea)
 	{
-		this(pipeline, textureSetup, pose, x1, y1, x2, y2, x3, y3, x4, y4,
-			color1, color2, color3, color4, scissorArea,
+		this(RenderPipelines.GUI, TextureSetup.empty(), pose, x1, y1, x2, y2,
+			x3, y3, x4, y4, color1, color2, color3, color4, scissorArea,
 			createBounds(x1, y1, x2, y2, x3, y3, x4, y4, pose, scissorArea));
 	}
 	
-	public CustomQuadRenderState(RenderPipeline pipeline,
-		TextureSetup textureSetup, Matrix3x2f pose, float x1, float y1,
-		float x2, float y2, float x3, float y3, float x4, float y4, int color,
+	public CustomQuadRenderState(Matrix3x2f pose, float x1, float y1, float x2,
+		float y2, float x3, float y3, float x4, float y4, int color,
 		@Nullable ScreenRect scissorArea)
 	{
-		this(pipeline, textureSetup, pose, x1, y1, x2, y2, x3, y3, x4, y4,
-			color, color, color, color, scissorArea);
+		this(pose, x1, y1, x2, y2, x3, y3, x4, y4, color, color, color, color,
+			scissorArea);
 	}
 	
 	@Override
