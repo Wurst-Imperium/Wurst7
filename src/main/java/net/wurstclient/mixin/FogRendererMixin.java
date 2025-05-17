@@ -39,25 +39,7 @@ public abstract class FogRendererMixin
 		CameraSubmersionType cameraSubmersionType = camera.getSubmersionType();
 		if(cameraSubmersionType != CameraSubmersionType.NONE)
 			return original;
-			
-		// Entity entity = camera.getFocusedEntity();
-		// float tickProgress =
-		// mc.getRenderTickCounter().getTickProgress(false);
-		// if(BackgroundRenderer.getFogModifier(entity, tickProgress) != null)
-		// return original;
 		
 		return false;
 	}
-	
-	// TODO: Figure out how to do this in 1.21.6
-	// @Inject(at = @At("HEAD"),
-	// method =
-	// "getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;",
-	// cancellable = true)
-	// private static void onGetFogModifier(Entity entity, float tickDelta,
-	// CallbackInfoReturnable<StatusEffectFogModifier> ci)
-	// {
-	// if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
-	// ci.setReturnValue(null);
-	// }
 }
