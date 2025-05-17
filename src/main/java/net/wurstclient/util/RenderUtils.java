@@ -746,9 +746,9 @@ public enum RenderUtils
 			float x3 = vertices[i + 2][0];
 			float y3 = vertices[i + 2][1];
 			
-			context.state.addSimpleElement(new FakeTriangleRenderState(
+			context.state.addSimpleElement(new CustomQuadRenderState(
 				RenderPipelines.GUI, TextureSetup.empty(), pose, x1, y1, x2, y2,
-				x3, y3, color, scissor));
+				x3, y3, x3, y3, color, scissor));
 		}
 	}
 	
