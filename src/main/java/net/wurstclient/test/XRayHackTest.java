@@ -77,5 +77,9 @@ public enum XRayHackTest
 		runChatCommand("fill ~0 ~3 ~5 ~0 ~3 ~6 minecraft:copper_ore");
 		runChatCommand("fill ~2 ~3 ~5 ~2 ~3 ~6 minecraft:nether_gold_ore");
 		runChatCommand("fill ~4 ~3 ~5 ~4 ~3 ~6 minecraft:nether_quartz_ore");
+		
+		// Fluids
+		runChatCommand("setblock ~1 ~0 ~6 minecraft:water");
+		runChatCommand("setblock ~-1 ~0 ~6 minecraft:lava");
 	}
 }
