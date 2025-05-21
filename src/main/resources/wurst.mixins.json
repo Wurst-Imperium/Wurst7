@@ -7,12 +7,10 @@
   "client": [
     "AbstractBlockStateMixin",
     "AbstractSignEditScreenMixin",
-    "AbstractTerrainRenderContextMixin",
     "AllowedAddressResolverMixin",
     "BlockEntityRenderDispatcherMixin",
     "BlockMixin",
     "BlockModelRendererMixin",
-    "BlockRenderInfoMixin",
     "CactusBlockMixin",
     "CameraMixin",
     "ChatHudMixin",
