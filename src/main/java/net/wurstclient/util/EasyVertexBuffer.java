@@ -80,7 +80,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 	 * customizable view matrix. Use this if you need to translate/scale/rotate
 	 * the buffer.
 	 */
-	public void draw(MatrixStack matrixStack, RenderLayer layer)
+	public void draw(MatrixStack matrixStack, RenderLayer.MultiPhase layer)
 	{
 		Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
 		modelViewStack.pushMatrix();
@@ -94,14 +94,14 @@ public final class EasyVertexBuffer implements AutoCloseable
 	/**
 	 * Drop-in replacement for {@code VertexBuffer.draw(RenderLayer)}.
 	 */
-	public void draw(RenderLayer layer)
+	public void draw(RenderLayer.MultiPhase layer)
 	{
 		if(vertexBuffer == null)
 			return;
 		
 		layer.startDrawing();
-		Framebuffer framebuffer = layer.getTarget();
-		RenderPipeline pipeline = layer.getPipeline();
+		Framebuffer framebuffer = layer.phases.target.get();
+		RenderPipeline pipeline = layer.pipeline;
 		GpuBuffer indexBuffer = shapeIndexBuffer.getIndexBuffer(indexCount);
 		
 		try(RenderPass renderPass =

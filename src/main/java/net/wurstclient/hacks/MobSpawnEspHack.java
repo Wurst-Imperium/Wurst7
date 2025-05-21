@@ -124,7 +124,8 @@ public final class MobSpawnEspHack extends Hack
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		// RenderSystem.setShaderColor(1, 1, 1, opacity.getValueF());
-		RenderLayer layer = WurstRenderLayers.getLines(depthTest.isChecked());
+		RenderLayer.MultiPhase layer =
+			WurstRenderLayers.getLines(depthTest.isChecked());
 		
 		for(Entry<ChunkPos, EasyVertexBuffer> entry : coordinator.getBuffers())
 		{

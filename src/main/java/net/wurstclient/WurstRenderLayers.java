@@ -116,7 +116,7 @@ public enum WurstRenderLayers
 	 * Returns either {@link #QUADS} or {@link #ESP_QUADS} depending on the
 	 * value of {@code depthTest}.
 	 */
-	public static RenderLayer getQuads(boolean depthTest)
+	public static RenderLayer.MultiPhase getQuads(boolean depthTest)
 	{
 		return depthTest ? QUADS : ESP_QUADS;
 	}
@@ -125,7 +125,7 @@ public enum WurstRenderLayers
 	 * Returns either {@link #LINES} or {@link #ESP_LINES} depending on the
 	 * value of {@code depthTest}.
 	 */
-	public static RenderLayer getLines(boolean depthTest)
+	public static RenderLayer.MultiPhase getLines(boolean depthTest)
 	{
 		return depthTest ? LINES : ESP_LINES;
 	}
@@ -134,7 +134,7 @@ public enum WurstRenderLayers
 	 * Returns either {@link #LINE_STRIP} or {@link #ESP_LINE_STRIP} depending
 	 * on the value of {@code depthTest}.
 	 */
-	public static RenderLayer getLineStrip(boolean depthTest)
+	public static RenderLayer.MultiPhase getLineStrip(boolean depthTest)
 	{
 		return depthTest ? LINE_STRIP : ESP_LINE_STRIP;
 	}

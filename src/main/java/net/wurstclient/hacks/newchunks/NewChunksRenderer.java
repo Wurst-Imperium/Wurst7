@@ -35,7 +35,7 @@ public final class NewChunksRenderer
 		this.oldChunksColor = oldChunksColor;
 	}
 	
-	public void updateBuffer(int i, RenderLayer layer,
+	public void updateBuffer(int i, RenderLayer.MultiPhase layer,
 		Consumer<VertexConsumer> callback)
 	{
 		vertexBuffers[i] = BufferWithLayer.createAndUpload(layer, callback);

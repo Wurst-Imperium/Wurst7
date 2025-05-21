@@ -47,7 +47,7 @@ public final class NewChunksOutlineRenderer implements NewChunksChunkRenderer
 	}
 	
 	@Override
-	public RenderLayer getLayer()
+	public RenderLayer.MultiPhase getLayer()
 	{
 		return WurstRenderLayers.ESP_LINES;
 	}
