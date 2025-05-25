@@ -128,8 +128,8 @@ java {
 jar {
 	inputs.property "archivesName", project.base.archivesName
 	
-	from("LICENSE") {
-		rename {"${it}_${inputs.properties.archivesName}"}
+	from("LICENSE.txt") {
+		rename { "LICENSE-${inputs.properties.archivesName}.txt" }
 	}
 	
 	exclude("intentionally_untranslated.json")
