@@ -210,6 +210,11 @@ public abstract class MinecraftClientMixin
 	public void setSession(Session session)
 	{
 		wurstSession = session;
+		if(session == null)
+		{
+			wurstProfileKeys = null;
+			return;
+		}
 		
 		UserApiService userApiService =
 			session.getAccountType() == Session.AccountType.MSA
