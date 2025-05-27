@@ -11,9 +11,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.class_11515;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.wurstclient.WurstClient;
 
@@ -24,14 +23,14 @@ public abstract class RenderLayersMixin
 	 * Puts all blocks on the translucent layer if Opacity X-Ray is enabled.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "getBlockLayer(Lnet/minecraft/block/BlockState;)Lnet/minecraft/class_11515;",
+		method = "getBlockLayer(Lnet/minecraft/block/BlockState;)Lnet/minecraft/client/render/BlockRenderLayer;",
 		cancellable = true)
 	private static void onGetBlockLayer(BlockState state,
-		CallbackInfoReturnable<class_11515> cir)
+		CallbackInfoReturnable<BlockRenderLayer> cir)
 	{
 		if(!WurstClient.INSTANCE.getHax().xRayHack.isOpacityMode())
 			return;
 		
-		cir.setReturnValue(class_11515.TRANSLUCENT);
+		cir.setReturnValue(BlockRenderLayer.TRANSLUCENT);
 	}
 }
