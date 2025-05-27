@@ -23,6 +23,6 @@ public enum LoginManager
 			new Session(newName, Uuids.getOfflinePlayerUuid(newName), "",
 				Optional.empty(), Optional.empty(), Session.AccountType.MOJANG);
 		
-		WurstClient.IMC.setSession(session);
+		WurstClient.IMC.setWurstSession(session);
 	}
 }
