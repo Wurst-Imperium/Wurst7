@@ -9,6 +9,7 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -49,6 +50,7 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 				b -> LastServerRememberer
 					.joinLastServer((MultiplayerScreen)(Object)this))
 			.dimensions(width / 2 - 154, 10, 100, 20).build());
+		updateLastServerButton();
 		
 		addDrawableChild(
 			ButtonWidget
@@ -64,20 +66,21 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 			.dimensions(width / 2 + 154 + 4, height - 30, 100, 20).build());
 	}
 	
-	@Inject(at = @At("TAIL"), method = "tick()V")
-	private void onTick(CallbackInfo ci)
-	{
-		if(lastServerButton == null)
-			return;
-		
-		lastServerButton.active = LastServerRememberer.getLastServer() != null;
-	}
-	
 	@Inject(at = @At("HEAD"),
 		method = "connect(Lnet/minecraft/client/network/ServerInfo;)V")
 	private void onConnect(ServerInfo entry, CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(entry);
+		updateLastServerButton();
+	}
+	
+	@Unique
+	private void updateLastServerButton()
+	{
+		if(lastServerButton == null)
+			return;
+		
+		lastServerButton.active = LastServerRememberer.getLastServer() != null;
 	}
 	
 	@Override
