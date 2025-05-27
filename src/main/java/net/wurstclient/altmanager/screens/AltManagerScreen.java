@@ -153,10 +153,18 @@ public final class AltManagerScreen extends Screen
 			ButtonWidget.builder(Text.literal("Export"), b -> pressExportAlts())
 				.dimensions(58, 8, 50, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Logout"),
-				b -> ((IMinecraftClient)client).setSession(null))
-			.dimensions(width - 50 - 8, 8, 50, 20).build());
+		ButtonWidget logoutButton =
+			addDrawableChild(ButtonWidget.builder(Text.literal("Logout"), b -> {
+				((IMinecraftClient)client).setWurstSession(null);
+				updateLogoutButton(b);
+			}).dimensions(width - 50 - 8, 8, 50, 20).build());
+		updateLogoutButton(logoutButton);
+	}
+	
+	private void updateLogoutButton(ButtonWidget logoutButton)
+	{
+		logoutButton.active =
+			((IMinecraftClient)client).getWurstSession() != null;
 	}
 	
 	@Override
