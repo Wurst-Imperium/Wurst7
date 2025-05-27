@@ -2,6 +2,12 @@ buildscript {
 	dependencies {
 		classpath "org.kohsuke:github-api:1.327"
 	}
+	configurations.classpath {
+		resolutionStrategy {
+			// v6.10.0.202406032230-r, used by spotless-plugin-gradle 7.0.3, is vulnerable to CVE-2025-4949
+			force "org.eclipse.jgit:org.eclipse.jgit:6.10.1.202505221210-r"
+		}
+	}
 }
 
 plugins {
