@@ -22,7 +22,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-import net.wurstclient.mixinterface.IMinecraftClient;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonObject;
@@ -48,6 +47,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
+import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
