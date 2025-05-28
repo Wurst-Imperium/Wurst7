@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonObject;
@@ -144,6 +145,8 @@ public final class AltManagerScreen extends Screen
 			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
 			.dimensions(width / 2 + 80, height - 28, 75, 20).build());
 		
+		updateAltButtons(false);
+		
 		addDrawableChild(importButton =
 			ButtonWidget.builder(Text.literal("Import"), b -> pressImportAlts())
 				.dimensions(8, 8, 50, 20).build());
@@ -151,6 +154,18 @@ public final class AltManagerScreen extends Screen
 		addDrawableChild(exportButton =
 			ButtonWidget.builder(Text.literal("Export"), b -> pressExportAlts())
 				.dimensions(58, 8, 50, 20).build());
+		
+		boolean windowMode = !client.options.getFullscreen().getValue();
+		importButton.active = windowMode;
+		exportButton.active = windowMode;
+	}
+	
+	private void updateAltButtons(boolean altSelected)
+	{
+		useButton.active = altSelected;
+		starButton.active = altSelected;
+		editButton.active = altSelected;
+		deleteButton.active = altSelected;
 	}
 	
 	@Override
@@ -160,21 +175,6 @@ public final class AltManagerScreen extends Screen
 			useButton.onPress();
 		
 		return super.keyPressed(keyCode, scanCode, modifiers);
-	}
-	
-	@Override
-	public void tick()
-	{
-		boolean altSelected = listGui.getSelectedOrNull() != null;
-		
-		useButton.active = altSelected;
-		starButton.active = altSelected;
-		editButton.active = altSelected;
-		deleteButton.active = altSelected;
-		
-		boolean windowMode = !client.options.getFullscreen().getValue();
-		importButton.active = windowMode;
-		exportButton.active = windowMode;
 	}
 	
 	private void pressLogin()
@@ -600,6 +600,13 @@ public final class AltManagerScreen extends Screen
 			
 			list.stream().map(AltManagerScreen.Entry::new)
 				.forEach(this::addEntry);
+		}
+		
+		@Override
+		public void setSelected(@Nullable AltManagerScreen.Entry entry)
+		{
+			super.setSelected(entry);
+			AltManagerScreen.this.updateAltButtons(true);
 		}
 		
 		/**
