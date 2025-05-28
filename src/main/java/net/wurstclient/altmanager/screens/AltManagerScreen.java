@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import net.wurstclient.mixinterface.IMinecraftClient;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonObject;
@@ -151,6 +152,19 @@ public final class AltManagerScreen extends Screen
 		addDrawableChild(exportButton =
 			ButtonWidget.builder(Text.literal("Export"), b -> pressExportAlts())
 				.dimensions(58, 8, 50, 20).build());
+		
+		ButtonWidget logoutButton =
+			addDrawableChild(ButtonWidget.builder(Text.literal("Logout"), b -> {
+				((IMinecraftClient)client).setWurstSession(null);
+				updateLogoutButton(b);
+			}).dimensions(width - 50 - 8, 8, 50, 20).build());
+		updateLogoutButton(logoutButton);
+	}
+	
+	private void updateLogoutButton(ButtonWidget logoutButton)
+	{
+		logoutButton.active =
+			((IMinecraftClient)client).getWurstSession() != null;
 	}
 	
 	@Override
