@@ -13,66 +13,26 @@
         }
       ],
       "output": "swap",
-      "uniforms": [
-        {
-          "name": "ProjMat",
-          "type": "matrix4x4",
-          "count": 16,
-          "values": [
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ]
-        },
-        {
-          "name": "OutSize",
-          "type": "float",
-          "count": 2,
-          "values": [
-            1.0,
-            1.0
-          ]
-        },
-        {
-          "name": "GameTime",
-          "type": "float",
-          "count": 1,
-          "values": [
-            0.0
-          ]
-        },
-        {
-          "name": "Frequency",
-          "type": "float",
-          "count": 2,
-          "values": [
-            512.0,
-            288.0
-          ]
-        },
-        {
-          "name": "WobbleAmount",
-          "type": "float",
-          "count": 2,
-          "values": [
-            0.002,
-            0.002
-          ]
-        }
-      ]
+      "uniforms": {
+        "LSDConfig": [
+          {
+            "name": "Frequency",
+            "type": "vec2",
+            "value": [
+              512.0,
+              288.0
+            ]
+          },
+          {
+            "name": "WobbleAmount",
+            "type": "vec2",
+            "value": [
+              0.002,
+              0.002
+            ]
+          }
+        ]
+      }
     },
     {
       "vertex_shader": "minecraft:post/blit",
@@ -84,51 +44,20 @@
         }
       ],
       "output": "minecraft:main",
-      "uniforms": [
-        {
-          "name": "ProjMat",
-          "type": "matrix4x4",
-          "count": 16,
-          "values": [
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ]
-        },
-        {
-          "name": "OutSize",
-          "type": "float",
-          "count": 2,
-          "values": [
-            1.0,
-            1.0
-          ]
-        },
-        {
-          "name": "ColorModulate",
-          "type": "float",
-          "count": 4,
-          "values": [
-            1.0,
-            1.0,
-            1.0,
-            1.0
-          ]
-        }
-      ]
+      "uniforms": {
+        "BlitConfig": [
+          {
+            "name": "ColorModulate",
+            "type": "vec4",
+            "value": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        ]
+      }
     }
   ]
 }
