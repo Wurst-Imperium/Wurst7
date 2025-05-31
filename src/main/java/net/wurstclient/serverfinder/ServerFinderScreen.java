@@ -79,6 +79,7 @@ public class ServerFinderScreen extends Screen
 		addSelectableChild(maxThreadsBox);
 		
 		setFocused(ipBox);
+		searchButton.active = false;
 		state = ServerFinderState.NOT_RUNNING;
 	}
 	
@@ -87,11 +88,17 @@ public class ServerFinderScreen extends Screen
 		if(state.isRunning())
 		{
 			state = ServerFinderState.CANCELLED;
+			ipBox.active = true;
+			maxThreadsBox.active = true;
+			searchButton.setMessage(Text.literal("Search"));
 			return;
 		}
 		
 		state = ServerFinderState.RESOLVING;
 		maxThreads = Integer.parseInt(maxThreadsBox.getText());
+		ipBox.active = false;
+		maxThreadsBox.active = false;
+		searchButton.setMessage(Text.literal("Cancel"));
 		checked = 0;
 		working = 0;
 		
@@ -158,11 +165,6 @@ public class ServerFinderScreen extends Screen
 	@Override
 	public void tick()
 	{
-		searchButton
-			.setMessage(Text.literal(state.isRunning() ? "Cancel" : "Search"));
-		ipBox.active = !state.isRunning();
-		maxThreadsBox.active = !state.isRunning();
-		
 		searchButton.active = MathUtils.isInteger(maxThreadsBox.getText())
 			&& !ipBox.getText().isEmpty();
 	}
