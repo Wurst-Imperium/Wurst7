@@ -145,8 +145,6 @@ public final class AltManagerScreen extends Screen
 			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
 			.dimensions(width / 2 + 80, height - 28, 75, 20).build());
 		
-		updateAltButtons(false);
-		
 		addDrawableChild(importButton =
 			ButtonWidget.builder(Text.literal("Import"), b -> pressImportAlts())
 				.dimensions(8, 8, 50, 20).build());
@@ -155,13 +153,15 @@ public final class AltManagerScreen extends Screen
 			ButtonWidget.builder(Text.literal("Export"), b -> pressExportAlts())
 				.dimensions(58, 8, 50, 20).build());
 		
+		updateAltButtons();
 		boolean windowMode = !client.options.getFullscreen().getValue();
 		importButton.active = windowMode;
 		exportButton.active = windowMode;
 	}
 	
-	private void updateAltButtons(boolean altSelected)
+	private void updateAltButtons()
 	{
+		boolean altSelected = listGui.getSelectedOrNull() != null;
 		useButton.active = altSelected;
 		starButton.active = altSelected;
 		editButton.active = altSelected;
@@ -606,7 +606,15 @@ public final class AltManagerScreen extends Screen
 		public void setSelected(@Nullable AltManagerScreen.Entry entry)
 		{
 			super.setSelected(entry);
-			AltManagerScreen.this.updateAltButtons(true);
+			AltManagerScreen.this.updateAltButtons();
+		}
+		
+		// This method sets selected to null without calling setSelected().
+		@Override
+		protected void clearEntries()
+		{
+			super.clearEntries();
+			AltManagerScreen.this.updateAltButtons();
 		}
 		
 		/**
