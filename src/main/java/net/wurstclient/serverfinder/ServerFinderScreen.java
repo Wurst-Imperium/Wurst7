@@ -49,7 +49,7 @@ public class ServerFinderScreen extends Screen
 	public void init()
 	{
 		addDrawableChild(searchButton =
-			ButtonWidget.builder(Text.literal("Search"), this::searchOrCancel)
+			ButtonWidget.builder(Text.literal("Search"), b -> searchOrCancel())
 				.dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
 				.build());
 		
@@ -83,7 +83,7 @@ public class ServerFinderScreen extends Screen
 		state = ServerFinderState.NOT_RUNNING;
 	}
 	
-	private void searchOrCancel(ButtonWidget searchButton)
+	private void searchOrCancel()
 	{
 		if(state.isRunning())
 		{
