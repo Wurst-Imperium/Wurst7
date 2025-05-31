@@ -79,10 +79,10 @@ public abstract class AltEditorScreen extends Screen
 			.dimensions(width / 2 - 100, height / 4 + 72 + 12, 200, 20)
 			.build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
-			.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
-			.build());
+		addDrawableChild(
+			ButtonWidget.builder(Text.literal("Cancel"), b -> close())
+				.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
+				.build());
 		
 		addDrawableChild(ButtonWidget
 			.builder(Text.literal("Random Name"),
@@ -218,6 +218,12 @@ public abstract class AltEditorScreen extends Screen
 		
 		if(nameOrEmailBox.isFocused() || passwordBox.isFocused())
 			message = "";
+		
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			close();
+			return true;
+		}
 		
 		return super.mouseClicked(x, y, button);
 	}

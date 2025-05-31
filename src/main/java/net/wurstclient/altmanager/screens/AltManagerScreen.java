@@ -186,6 +186,18 @@ public final class AltManagerScreen extends Screen
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 	
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	{
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			close();
+			return true;
+		}
+		
+		return super.mouseClicked(mouseX, mouseY, button);
+	}
+	
 	private void pressLogin()
 	{
 		Alt alt = listGui.getSelectedAlt();
