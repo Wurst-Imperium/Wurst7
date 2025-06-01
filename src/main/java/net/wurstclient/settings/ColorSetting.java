@@ -61,12 +61,6 @@ public final class ColorSetting extends Setting
 		return new float[]{red, green, blue};
 	}
 	
-	public void setAsShaderColor(float opacity)
-	{
-		// float[] rgb = getColorF();
-		// RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], opacity);
-	}
-	
 	public int getColorI()
 	{
 		return color.getRGB() | 0xFF000000;

@@ -102,11 +102,6 @@ public enum RenderUtils
 		return rainbow;
 	}
 	
-	public static void setShaderColor(float[] rgb, float opacity)
-	{
-		// RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], opacity);
-	}
-	
 	public static int toIntColor(float[] rgb, float opacity)
 	{
 		return (int)(MathHelper.clamp(opacity, 0, 1) * 255) << 24
