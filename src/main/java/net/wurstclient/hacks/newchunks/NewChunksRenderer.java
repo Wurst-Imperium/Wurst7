@@ -71,18 +71,14 @@ public final class NewChunksRenderer
 			if(i == 0 || i == 2)
 				matrixStack.translate(0, altitudeD, 0);
 			
-			if(i < 2)
-				newChunksColor.setAsShaderColor(alpha);
-			else
-				oldChunksColor.setAsShaderColor(alpha);
+			float[] rgb =
+				i < 2 ? newChunksColor.getColorF() : oldChunksColor.getColorF();
 			
-			buffer.draw(matrixStack);
+			buffer.draw(matrixStack, rgb, alpha);
 			
 			matrixStack.pop();
 		}
 		
 		matrixStack.pop();
-		
-		// RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 }
