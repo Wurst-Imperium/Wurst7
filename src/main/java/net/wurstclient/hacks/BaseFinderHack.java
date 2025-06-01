@@ -157,16 +157,13 @@ public final class BaseFinderHack extends Hack
 		if(vertexBuffer == null)
 			return;
 		
-		color.setAsShaderColor(0.25F);
-		
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 		
-		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_QUADS);
+		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_QUADS,
+			color.getColorF(), 0.25F);
 		
 		matrixStack.pop();
-		
-		// RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	@Override
