@@ -16,6 +16,7 @@ import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.events.GUIRenderListener;
 import net.wurstclient.events.UpdateListener;
+import net.wurstclient.util.RenderUtils;
 
 public final class TacoCmd extends Command
 	implements GUIRenderListener, UpdateListener
@@ -80,16 +81,15 @@ public final class TacoCmd extends Command
 	@Override
 	public void onRenderGUI(DrawContext context, float partialTicks)
 	{
-		// if(WURST.getHax().rainbowUiHack.isEnabled())
-		// RenderUtils.setShaderColor(WURST.getGui().getAcColor(), 1);
-		// else
-		// RenderSystem.setShaderColor(1, 1, 1, 1);
+		int color = WURST.getHax().rainbowUiHack.isEnabled()
+			? RenderUtils.toIntColor(WURST.getGui().getAcColor(), 1)
+			: 0xFFFFFFFF;
 		
 		int x = context.getScaledWindowWidth() / 2 - 32 + 76;
 		int y = context.getScaledWindowHeight() - 32 - 19;
 		int w = 64;
 		int h = 32;
 		context.drawTexture(RenderPipelines.GUI_TEXTURED, tacos[ticks / 8], x,
-			y, 0, 0, w, h, w, h);
+			y, 0, 0, w, h, w, h, color);
 	}
 }
