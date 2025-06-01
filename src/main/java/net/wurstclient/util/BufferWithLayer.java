@@ -28,9 +28,25 @@ public record BufferWithLayer(EasyVertexBuffer buffer,
 		buffer.draw(matrixStack, layer);
 	}
 	
-	public void draw()
+	public void draw(MatrixStack matrixStack, float red, float green,
+		float blue, float alpha)
 	{
-		buffer.draw(layer);
+		buffer.draw(matrixStack, layer, red, green, blue, alpha);
+	}
+	
+	public void draw(MatrixStack matrixStack, float[] rgba)
+	{
+		buffer.draw(matrixStack, layer, rgba);
+	}
+	
+	public void draw(MatrixStack matrixStack, float[] rgb, float alpha)
+	{
+		buffer.draw(matrixStack, layer, rgb, alpha);
+	}
+	
+	public void draw(MatrixStack matrixStack, int argb)
+	{
+		buffer.draw(matrixStack, layer, argb);
 	}
 	
 	@Override

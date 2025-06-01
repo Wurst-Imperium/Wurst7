@@ -77,33 +77,47 @@ public final class EasyVertexBuffer implements AutoCloseable
 		vertexBuffer = null;
 	}
 	
-	/**
-	 * Similar to {@code VertexBuffer.draw(RenderLayer)}, but with a
-	 * customizable view matrix. Use this if you need to translate/scale/rotate
-	 * the buffer.
-	 */
 	public void draw(MatrixStack matrixStack, RenderLayer.MultiPhase layer)
 	{
-		Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
-		modelViewStack.pushMatrix();
-		modelViewStack.mul(matrixStack.peek().getPositionMatrix());
-		
-		draw(layer);
-		
-		modelViewStack.popMatrix();
+		draw(matrixStack, layer, 1, 1, 1, 1);
 	}
 	
-	/**
-	 * Drop-in replacement for {@code VertexBuffer.draw(RenderLayer)}.
-	 */
-	public void draw(RenderLayer.MultiPhase layer)
+	public void draw(MatrixStack matrixStack, RenderLayer.MultiPhase layer,
+		int argb)
+	{
+		float alpha = ((argb >> 24) & 0xFF) / 255F;
+		float red = ((argb >> 16) & 0xFF) / 255F;
+		float green = ((argb >> 8) & 0xFF) / 255F;
+		float blue = (argb & 0xFF) / 255F;
+		draw(matrixStack, layer, red, green, blue, alpha);
+	}
+	
+	public void draw(MatrixStack matrixStack, RenderLayer.MultiPhase layer,
+		float[] rgba)
+	{
+		draw(matrixStack, layer, rgba[0], rgba[1], rgba[2], rgba[3]);
+	}
+	
+	public void draw(MatrixStack matrixStack, RenderLayer.MultiPhase layer,
+		float[] rgb, float alpha)
+	{
+		draw(matrixStack, layer, rgb[0], rgb[1], rgb[2], alpha);
+	}
+	
+	public void draw(MatrixStack matrixStack, RenderLayer.MultiPhase layer,
+		float red, float green, float blue, float alpha)
 	{
 		if(vertexBuffer == null)
 			return;
 		
+		Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
+		modelViewStack.pushMatrix();
+		modelViewStack.mul(matrixStack.peek().getPositionMatrix());
+		
 		layer.startDrawing();
 		GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms().write(
-			RenderSystem.getModelViewMatrix(), new Vector4f(1, 1, 1, 1),
+			RenderSystem.getModelViewMatrix(),
+			new Vector4f(red, green, blue, alpha),
 			RenderSystem.getModelOffset(), RenderSystem.getTextureMatrix(),
 			RenderSystem.getShaderLineWidth());
 		
@@ -127,6 +141,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 		}
 		
 		layer.endDrawing();
+		modelViewStack.popMatrix();
 	}
 	
 	@Override
