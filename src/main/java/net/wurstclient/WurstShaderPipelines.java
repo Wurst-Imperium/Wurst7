@@ -13,6 +13,7 @@ import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.util.Identifier;
 
 public enum WurstShaderPipelines
 {
@@ -23,7 +24,7 @@ public enum WurstShaderPipelines
 	 */
 	public static final RenderPipeline ESP_LINES = RenderPipelines.register(
 		RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
-			.withLocation("pipeline/wurst_esp_lines")
+			.withLocation(Identifier.of("wurst:pipeline/wurst_esp_lines"))
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**
@@ -32,7 +33,7 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline ESP_LINE_STRIP =
 		RenderPipelines.register(RenderPipeline
 			.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
-			.withLocation("pipeline/wurst_esp_line_strip")
+			.withLocation(Identifier.of("wurst:pipeline/wurst_esp_line_strip"))
 			.withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL,
 				DrawMode.LINE_STRIP)
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
@@ -42,7 +43,7 @@ public enum WurstShaderPipelines
 	 */
 	public static final RenderPipeline QUADS = RenderPipelines
 		.register(RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-			.withLocation("pipeline/wurst_quads")
+			.withLocation(Identifier.of("wurst:pipeline/wurst_quads"))
 			.withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
 			.build());
 	
@@ -52,7 +53,7 @@ public enum WurstShaderPipelines
 	 */
 	public static final RenderPipeline ESP_QUADS = RenderPipelines
 		.register(RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-			.withLocation("pipeline/wurst_esp_quads")
+			.withLocation(Identifier.of("wurst:pipeline/wurst_esp_quads"))
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**
@@ -60,6 +61,7 @@ public enum WurstShaderPipelines
 	 */
 	public static final RenderPipeline ESP_QUADS_NO_CULLING = RenderPipelines
 		.register(RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
-			.withLocation("pipeline/wurst_esp_quads").withCull(false)
+			.withLocation(Identifier.of("wurst:pipeline/wurst_esp_quads"))
+			.withCull(false)
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 }
