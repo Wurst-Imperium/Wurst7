@@ -9,7 +9,6 @@ package net.wurstclient;
 
 import java.util.OptionalDouble;
 
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;
 
@@ -20,12 +19,12 @@ public enum WurstRenderLayers
 	/**
 	 * Similar to {@link RenderLayer#getLines()}, but with line width 2.
 	 */
-	public static final RenderLayer.MultiPhase LINES =
-		RenderLayer.of("wurst:lines", 1536, RenderPipelines.LINES,
-			RenderLayer.MultiPhaseParameters.builder()
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+	public static final RenderLayer.MultiPhase LINES = RenderLayer.of(
+		"wurst:lines", 1536, WurstShaderPipelines.DEPTH_TEST_LINES,
+		RenderLayer.MultiPhaseParameters.builder()
+			.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
+			.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
+			.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
 	
 	/**
 	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
@@ -41,12 +40,13 @@ public enum WurstRenderLayers
 	/**
 	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2.
 	 */
-	public static final RenderLayer.MultiPhase LINE_STRIP = RenderLayer.of(
-		"wurst:line_strip", 1536, false, true, RenderPipelines.LINE_STRIP,
-		RenderLayer.MultiPhaseParameters.builder()
-			.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-			.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-			.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+	public static final RenderLayer.MultiPhase LINE_STRIP =
+		RenderLayer.of("wurst:line_strip", 1536, false, true,
+			WurstShaderPipelines.DEPTH_TEST_LINE_STRIP,
+			RenderLayer.MultiPhaseParameters.builder()
+				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
+				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
+				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
 	
 	/**
 	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2 and

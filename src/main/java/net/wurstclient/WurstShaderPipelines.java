@@ -34,7 +34,16 @@ public enum WurstShaderPipelines
 		.buildSnippet();
 	
 	/**
-	 * Similar to the LINES ShaderPipeline, but with no depth test.
+	 * Similar to the LINES ShaderPipeline, but with no fog.
+	 */
+	public static final RenderPipeline DEPTH_TEST_LINES =
+		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
+			.withLocation(
+				Identifier.of("wurst:pipeline/wurst_depth_test_lines"))
+			.build());
+	
+	/**
+	 * Similar to the LINES ShaderPipeline, but with no depth test or fog.
 	 */
 	public static final RenderPipeline ESP_LINES =
 		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
@@ -42,7 +51,18 @@ public enum WurstShaderPipelines
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**
-	 * Similar to the LINE_STRIP ShaderPipeline, but with no depth test.
+	 * Similar to the LINE_STRIP ShaderPipeline, but with no fog.
+	 */
+	public static final RenderPipeline DEPTH_TEST_LINE_STRIP =
+		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
+			.withLocation(
+				Identifier.of("wurst:pipeline/wurst_depth_test_line_strip"))
+			.withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL,
+				DrawMode.LINE_STRIP)
+			.build());
+	
+	/**
+	 * Similar to the LINE_STRIP ShaderPipeline, but with no depth test or fog.
 	 */
 	public static final RenderPipeline ESP_LINE_STRIP =
 		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
