@@ -123,7 +123,6 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// RenderSystem.setShaderColor(1, 1, 1, opacity.getValueF());
 		RenderLayer.MultiPhase layer =
 			WurstRenderLayers.getLines(depthTest.isChecked());
 		
@@ -134,12 +133,11 @@ public final class MobSpawnEspHack extends Hack
 			matrixStack.push();
 			RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 			
-			entry.getValue().draw(matrixStack, layer);
+			entry.getValue().draw(matrixStack, layer, 1, 1, 1,
+				opacity.getValueF());
 			
 			matrixStack.pop();
 		}
-		
-		// RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	private boolean isSpawnable(BlockPos pos, BlockState state)
