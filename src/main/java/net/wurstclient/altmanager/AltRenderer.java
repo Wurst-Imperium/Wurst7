@@ -49,11 +49,7 @@ public final class AltRenderer
 		try
 		{
 			Identifier texture = getSkinTexture(name);
-			
-			// if(selected)
-			// RenderSystem.setShaderColor(1, 1, 1, 1);
-			// else
-			// RenderSystem.setShaderColor(0.9F, 0.9F, 0.9F, 1);
+			int color = selected ? 0xFFFFFFFF : 0xFFE0E0E0;
 			
 			// Face
 			int fw = 192;
@@ -61,7 +57,7 @@ public final class AltRenderer
 			float u = 24;
 			float v = 24;
 			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
-				v, w, h, fw, fh);
+				v, w, h, fw, fh, color);
 			
 			// Hat
 			fw = 192;
@@ -69,9 +65,7 @@ public final class AltRenderer
 			u = 120;
 			v = 24;
 			context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, u,
-				v, w, h, fw, fh);
-			
-			// RenderSystem.setShaderColor(1, 1, 1, 1);
+				v, w, h, fw, fh, color);
 			
 		}catch(Exception e)
 		{
@@ -85,7 +79,6 @@ public final class AltRenderer
 		try
 		{
 			Identifier texture = getSkinTexture(name);
-			// RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
@@ -225,7 +218,6 @@ public final class AltRenderer
 		try
 		{
 			Identifier texture = getSkinTexture(name);
-			// RenderSystem.setShaderColor(1, 1, 1, 1);
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
