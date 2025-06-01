@@ -7,7 +7,9 @@
  */
 package net.wurstclient;
 
+import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderPipeline.Snippet;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 
@@ -20,10 +22,22 @@ public enum WurstShaderPipelines
 	;
 	
 	/**
+	 * Similar to the RENDERTYPE_LINES Snippet, but without fog.
+	 */
+	public static final Snippet FOGLESS_LINES_SNIPPET = RenderPipeline
+		.builder(RenderPipelines.TRANSFORMS_PROJECTION_FOG_SNIPPET,
+			RenderPipelines.GLOBALS_SNIPPET)
+		.withVertexShader(Identifier.of("wurst:core/fogless_lines"))
+		.withFragmentShader(Identifier.of("wurst:core/fogless_lines"))
+		.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
+		.withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL, DrawMode.LINES)
+		.buildSnippet();
+	
+	/**
 	 * Similar to the LINES ShaderPipeline, but with no depth test.
 	 */
-	public static final RenderPipeline ESP_LINES = RenderPipelines.register(
-		RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
+	public static final RenderPipeline ESP_LINES =
+		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
 			.withLocation(Identifier.of("wurst:pipeline/wurst_esp_lines"))
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
@@ -31,8 +45,7 @@ public enum WurstShaderPipelines
 	 * Similar to the LINE_STRIP ShaderPipeline, but with no depth test.
 	 */
 	public static final RenderPipeline ESP_LINE_STRIP =
-		RenderPipelines.register(RenderPipeline
-			.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
+		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
 			.withLocation(Identifier.of("wurst:pipeline/wurst_esp_line_strip"))
 			.withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL,
 				DrawMode.LINE_STRIP)
