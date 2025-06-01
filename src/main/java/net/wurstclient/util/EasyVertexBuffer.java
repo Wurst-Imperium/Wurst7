@@ -12,8 +12,10 @@ import java.util.OptionalInt;
 import java.util.function.Consumer;
 
 import org.joml.Matrix4fStack;
+import org.joml.Vector4f;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -100,6 +102,11 @@ public final class EasyVertexBuffer implements AutoCloseable
 			return;
 		
 		layer.startDrawing();
+		GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms().write(
+			RenderSystem.getModelViewMatrix(), new Vector4f(1, 1, 1, 1),
+			RenderSystem.getModelOffset(), RenderSystem.getTextureMatrix(),
+			RenderSystem.getShaderLineWidth());
+		
 		Framebuffer framebuffer = layer.phases.target.get();
 		RenderPipeline pipeline = layer.pipeline;
 		GpuBuffer indexBuffer = shapeIndexBuffer.getIndexBuffer(indexCount);
@@ -111,10 +118,12 @@ public final class EasyVertexBuffer implements AutoCloseable
 				framebuffer.getDepthAttachmentView(), OptionalDouble.empty()))
 		{
 			renderPass.setPipeline(pipeline);
+			RenderSystem.bindDefaultUniforms(renderPass);
+			renderPass.setUniform("DynamicTransforms", gpuBufferSlice);
 			renderPass.setVertexBuffer(0, vertexBuffer);
 			renderPass.setIndexBuffer(indexBuffer,
 				shapeIndexBuffer.getIndexType());
-			renderPass.drawIndexed(0, indexCount, vertexBuffer.size, 1);
+			renderPass.drawIndexed(0, 0, indexCount, 1);
 		}
 		
 		layer.endDrawing();
