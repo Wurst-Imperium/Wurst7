@@ -18,35 +18,6 @@ public enum WurstRenderLayers
 	;
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but as a
-	 * non-srip version with support for transparency.
-	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	 *           layer doesn't support any other line width than 1px. Changing
-	 *           the line width number does nothing.
-	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINES = RenderLayer.of(
-		"wurst:1px_lines", 1536, WurstShaderPipelines.ONE_PIXEL_LINES,
-		RenderLayer.MultiPhaseParameters.builder()
-			.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-			.build(false));
-	
-	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but with
-	 * support for transparency.
-	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	 *           layer doesn't support any other line width than 1px. Changing
-	 *           the line width number does nothing.
-	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
-		RenderLayer.of("wurst:1px_line_strip", 1536,
-			WurstShaderPipelines.ONE_PIXEL_LINE_STRIP,
-			RenderLayer.MultiPhaseParameters.builder()
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-				.build(false));
-	
-	/**
 	 * Similar to {@link RenderLayer#getLines()}, but with line width 2.
 	 */
 	public static final RenderLayer.MultiPhase LINES =

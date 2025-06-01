@@ -7,7 +7,6 @@
  */
 package net.wurstclient;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
@@ -18,36 +17,6 @@ import net.minecraft.client.render.VertexFormats;
 public enum WurstShaderPipelines
 {
 	;
-	
-	/**
-	 * Similar to the DEBUG_LINE_STIP ShaderPipeline, but as a non-srip
-	 * version with support for transparency.
-	 */
-	public static final RenderPipeline ONE_PIXEL_LINES =
-		RenderPipelines.register(RenderPipeline
-			.builder(RenderPipelines.TRANSFORMS_AND_PROJECTION_SNIPPET)
-			.withLocation("pipeline/wurst_1px_lines")
-			.withVertexShader("core/position_color")
-			.withFragmentShader("core/position_color")
-			.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
-			.withVertexFormat(VertexFormats.POSITION_COLOR,
-				DrawMode.DEBUG_LINES)
-			.build());
-	
-	/**
-	 * Similar to the DEBUG_LINE_STIP ShaderPipeline, but with support for
-	 * transparency.
-	 */
-	public static final RenderPipeline ONE_PIXEL_LINE_STRIP =
-		RenderPipelines.register(RenderPipeline
-			.builder(RenderPipelines.TRANSFORMS_AND_PROJECTION_SNIPPET)
-			.withLocation("pipeline/wurst_1px_line_strip")
-			.withVertexShader("core/position_color")
-			.withFragmentShader("core/position_color")
-			.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
-			.withVertexFormat(VertexFormats.POSITION_COLOR,
-				DrawMode.DEBUG_LINE_STRIP)
-			.build());
 	
 	/**
 	 * Similar to the LINES ShaderPipeline, but with no depth test.
