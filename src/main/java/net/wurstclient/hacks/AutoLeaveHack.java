@@ -112,7 +112,8 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 	
 	public static enum Mode
 	{
-		QUIT("Quit", () -> MC.world.disconnect(ClientWorld.field_61021)),
+		QUIT("Quit",
+			() -> MC.world.disconnect(ClientWorld.QUITTING_MULTIPLAYER_TEXT)),
 		
 		CHARS("Chars", () -> MC.getNetworkHandler().sendChatMessage("\u00a7")),
 		

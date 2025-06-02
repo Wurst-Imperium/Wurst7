@@ -28,7 +28,7 @@ public final class LeaveCmd extends Command
 		else if(args.length != 0)
 			throw new CmdSyntaxError();
 		
-		MC.world.disconnect(ClientWorld.field_61021);
+		MC.world.disconnect(ClientWorld.QUITTING_MULTIPLAYER_TEXT);
 	}
 	
 	@Override
