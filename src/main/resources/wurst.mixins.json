@@ -27,7 +27,6 @@
     "CreativeInventoryScreenMixin",
     "DeathScreenMixin",
     "DirectConnectScreenMixin",
-    "DisconnectedRealmsScreenMixin",
     "DisconnectedScreenMixin",
     "EntityMixin",
     "EntityRenderDispatcherMixin",
