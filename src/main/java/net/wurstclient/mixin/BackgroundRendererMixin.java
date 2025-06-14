@@ -41,7 +41,8 @@ public abstract class BackgroundRendererMixin
 		BackgroundRenderer.FogType fogType, Vector4f color, float viewDistance,
 		boolean thickenFog, float tickDelta)
 	{
-		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled() || fogType != BackgroundRenderer.FogType.FOG_TERRAIN)
+		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled()
+			|| fogType != BackgroundRenderer.FogType.FOG_TERRAIN)
 			return original.call(start, end, shape, red, green, blue, alpha);
 		
 		CameraSubmersionType cameraSubmersionType = camera.getSubmersionType();
