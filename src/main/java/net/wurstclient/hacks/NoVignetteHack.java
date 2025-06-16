@@ -11,7 +11,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"no vignette", "no vignette overlay", "vignette"})
+@SearchTags({"no vignette", "AntiVignette", "anti vignette"})
 public final class NoVignetteHack extends Hack
 {
 	public NoVignetteHack()
