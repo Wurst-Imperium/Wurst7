@@ -633,7 +633,7 @@ public final class AltManagerScreen extends Screen
 		public void setSelected(@Nullable AltManagerScreen.Entry entry)
 		{
 			super.setSelected(entry);
-			AltManagerScreen.this.updateAltButtons();
+			updateAltButtons();
 		}
 		
 		// This method sets selected to null without calling setSelected().
@@ -641,7 +641,7 @@ public final class AltManagerScreen extends Screen
 		protected void clearEntries()
 		{
 			super.clearEntries();
-			AltManagerScreen.this.updateAltButtons();
+			updateAltButtons();
 		}
 		
 		/**
