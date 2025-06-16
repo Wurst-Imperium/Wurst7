@@ -7,8 +7,6 @@
  */
 package net.wurstclient.mixin;
 
-import net.minecraft.entity.Entity;
-import net.wurstclient.hack.HackList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,10 +18,12 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
+import net.wurstclient.hack.HackList;
 
 @Mixin(InGameHud.class)
 public class IngameHudMixin
