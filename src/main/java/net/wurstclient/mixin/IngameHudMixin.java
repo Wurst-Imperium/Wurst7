@@ -18,10 +18,12 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
+import net.wurstclient.hack.HackList;
 
 @Mixin(InGameHud.class)
 public class IngameHudMixin
@@ -56,5 +58,18 @@ public class IngameHudMixin
 		
 		if(WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
 			ci.cancel();
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "renderVignetteOverlay",
+		cancellable = true)
+	private void onRenderVignetteOverlay(DrawContext context, Entity entity,
+		CallbackInfo ci)
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.noVignetteHack.isEnabled())
+			return;
+		
+		ci.cancel();
 	}
 }
