@@ -52,11 +52,18 @@ public class IngameHudMixin
 	private void onRenderOverlay(DrawContext context, Identifier texture,
 		float opacity, CallbackInfo ci)
 	{
-		if(texture == null
-			|| !"textures/misc/pumpkinblur.png".equals(texture.getPath()))
+		if(texture == null)
 			return;
 		
-		if(WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
+		String path = texture.getPath();
+		HackList hax = WurstClient.INSTANCE.getHax();
+		
+		if("textures/misc/pumpkinblur.png".equals(path)
+			&& hax.noPumpkinHack.isEnabled())
+			ci.cancel();
+		
+		if("textures/misc/powder_snow_outline.png".equals(path)
+			&& hax.noOverlayHack.isEnabled())
 			ci.cancel();
 	}
 	

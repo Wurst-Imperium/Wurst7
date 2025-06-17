@@ -107,7 +107,7 @@
   "description.wurst.hack.nofall": "Te protejeaza de fall damage.",
   "description.wurst.hack.nofireoverlay": "Opreste overlayul focului.\n\n§c§lATENTIE:§r Asta te poate face sa arzi pana mori fara sa iti dai seama.",
   "description.wurst.hack.nohurtcam": "Opreste efectul de tremurat atunci cand iti iei damage.",
-  "description.wurst.hack.nooverlay": "Opreste overlayurile cauzate de apa si lava.",
+  "description.wurst.hack.nooverlay": "Opreste overlayurile cauzate de apa, lava si zăpadă-pudră.",
   "description.wurst.hack.nopumpkin": "Opreste overlayul cand porti un dovleac pe cap.",
   "description.wurst.hack.noslowdown": "Opreste efectul de incetinire al mierii, soul sandului si al folosirii de iteme.",
   "description.wurst.hack.noweather": "Iti permite sa schimbi timpul, vremea si starea lunii.",
