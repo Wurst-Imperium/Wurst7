@@ -22,6 +22,7 @@ import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
+import net.wurstclient.hack.HackList;
 
 @Mixin(InGameHud.class)
 public class IngameHudMixin
@@ -53,12 +54,15 @@ public class IngameHudMixin
 		if(texture == null)
 			return;
 		
-		if("textures/misc/pumpkinblur.png".equals(texture.getPath())
-			&& WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
+		String path = texture.getPath();
+		HackList hax = WurstClient.INSTANCE.getHax();
+		
+		if("textures/misc/pumpkinblur.png".equals(path)
+			&& hax.noPumpkinHack.isEnabled())
 			ci.cancel();
 		
-		if("textures/misc/powder_snow_outline.png".equals(texture.getPath())
-			&& WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
+		if("textures/misc/powder_snow_outline.png".equals(path)
+			&& hax.noOverlayHack.isEnabled())
 			ci.cancel();
 	}
 }

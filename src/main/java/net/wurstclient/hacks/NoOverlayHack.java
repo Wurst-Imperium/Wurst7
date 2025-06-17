@@ -11,8 +11,8 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"no overlay", "NoWaterOverlay", "NoSnowOverlay",
-	"no water overlay", "no snow overlay"})
+@SearchTags({"no overlay", "NoWaterOverlay", "no water overlay",
+	"NoSnowOverlay", "no snow overlay"})
 public final class NoOverlayHack extends Hack
 {
 	public NoOverlayHack()
@@ -21,7 +21,6 @@ public final class NoOverlayHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See CameraMixin.onGetSubmersionType() and
-	// InGameOverlayRendererMixin.onRenderUnderwaterOverlay() and
-	// IngameHudMixin.renderOverlay()
+	// See CameraMixin.onGetSubmersionType(), IngameHudMixin.renderOverlay(),
+	// InGameOverlayRendererMixin.onRenderUnderwaterOverlay()
 }
