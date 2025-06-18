@@ -33,7 +33,6 @@ public class FogRendererMixin
 	 *         Modifying these render variables at any other time point does not
 	 *         work.
 	 */
-	@SuppressWarnings("u")
 	@Inject(
 		method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
 		at = @At(value = "INVOKE",
