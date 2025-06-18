@@ -159,7 +159,8 @@ public final class NewChunksHack extends Hack
 		{
 			renderer.updateBuffer(0, chunkRenderer.getLayer(),
 			// FIX: Copy the set to avoid ConcurrentModificationException
-            			buffer -> chunkRenderer.buildBuffer(buffer, new HashSet<>(newChunks), dd));
+            			buffer -> chunkRenderer.buildBuffer(buffer,
+            				new HashSet<>(newChunks), dd));
 			
 			if(showReasons.isChecked())
 				renderer.updateBuffer(1, reasonsRenderer.getLayer(),
@@ -171,7 +172,8 @@ public final class NewChunksHack extends Hack
 		{
 			renderer.updateBuffer(2, chunkRenderer.getLayer(),
 			// FIX: Copy the set to avoid ConcurrentModificationException
-            			buffer -> chunkRenderer.buildBuffer(buffer, new HashSet<>(oldChunks), dd));
+            			 buffer -> chunkRenderer.buildBuffer(buffer,
+            				new HashSet<>(oldChunks), dd));
 			
 			if(showReasons.isChecked())
 				renderer.updateBuffer(3, reasonsRenderer.getLayer(),
