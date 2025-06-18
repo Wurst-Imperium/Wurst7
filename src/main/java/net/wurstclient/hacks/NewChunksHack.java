@@ -158,7 +158,7 @@ public final class NewChunksHack extends Hack
 		if(showSetting.includesNew())
 		{
 			renderer.updateBuffer(0, chunkRenderer.getLayer(),
-			// FIX: Copy the set to avoid ConcurrentModificationException
+				// FIX: Copy the set to avoid ConcurrentModificationException
             			buffer -> chunkRenderer.buildBuffer(buffer,
             				new HashSet<>(newChunks), dd));
 			
@@ -171,7 +171,7 @@ public final class NewChunksHack extends Hack
 		if(showSetting.includesOld())
 		{
 			renderer.updateBuffer(2, chunkRenderer.getLayer(),
-			// FIX: Copy the set to avoid ConcurrentModificationException
+				// FIX: Copy the set to avoid ConcurrentModificationException
             			 buffer -> chunkRenderer.buildBuffer(buffer,
             				new HashSet<>(oldChunks), dd));
 			
