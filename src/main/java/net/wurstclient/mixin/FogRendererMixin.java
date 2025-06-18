@@ -39,7 +39,7 @@ public class FogRendererMixin
 		at = @At(value = "INVOKE",
 			target = "Lcom/mojang/blaze3d/systems/RenderSystem;getDevice()Lcom/mojang/blaze3d/systems/GpuDevice;",
 			remap = false))
-	private void onShit(Camera camera, int viewDistance, boolean thick,
+	private void onApplyFog(Camera camera, int viewDistance, boolean thick,
 		RenderTickCounter tickCounter, float skyDarkness, ClientWorld world,
 		CallbackInfoReturnable<Vector4f> cir, @Local FogData fogData)
 	{
