@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.Map.Entry;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 
 import net.minecraft.block.BlockState;
@@ -124,8 +123,8 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderSystem.setShaderColor(1, 1, 1, opacity.getValueF());
-		RenderLayer layer = WurstRenderLayers.getLines(depthTest.isChecked());
+		RenderLayer.MultiPhase layer =
+			WurstRenderLayers.getLines(depthTest.isChecked());
 		
 		for(Entry<ChunkPos, EasyVertexBuffer> entry : coordinator.getBuffers())
 		{
@@ -134,12 +133,11 @@ public final class MobSpawnEspHack extends Hack
 			matrixStack.push();
 			RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 			
-			entry.getValue().draw(matrixStack, layer);
+			entry.getValue().draw(matrixStack, layer, 1, 1, 1,
+				opacity.getValueF());
 			
 			matrixStack.pop();
 		}
-		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	private boolean isSpawnable(BlockPos pos, BlockState state)

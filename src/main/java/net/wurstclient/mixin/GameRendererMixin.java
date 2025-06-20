@@ -8,7 +8,6 @@
 package net.wurstclient.mixin;
 
 import org.joml.Matrix4f;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -30,7 +28,6 @@ import net.minecraft.util.hit.HitResult;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
-import net.wurstclient.events.RenderListener.RenderEvent;
 import net.wurstclient.hacks.FullbrightHack;
 
 @Mixin(GameRenderer.class)
@@ -80,28 +77,11 @@ public abstract class GameRendererMixin implements AutoCloseable
 	 * renderWorld() method to ensure that cancelNextBobView is always reset
 	 * after the view-bobbing call.
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V")
-	private void onRenderHand(Camera camera, float tickDelta, Matrix4f matrix4f,
+	@Inject(at = @At("HEAD"), method = "renderHand(FZLorg/joml/Matrix4f;)V")
+	private void onRenderHand(float tickDelta, boolean bl, Matrix4f matrix4f,
 		CallbackInfo ci)
 	{
 		cancelNextBobView = false;
-	}
-	
-	@Inject(
-		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
-			opcode = Opcodes.GETFIELD,
-			ordinal = 0),
-		method = "renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V")
-	private void onRenderWorldHandRendering(RenderTickCounter tickCounter,
-		CallbackInfo ci, @Local(ordinal = 2) Matrix4f matrix4f3,
-		@Local(ordinal = 1) float tickDelta)
-	{
-		MatrixStack matrixStack = new MatrixStack();
-		matrixStack.multiplyPositionMatrix(matrix4f3);
-		RenderEvent event = new RenderEvent(matrixStack, tickDelta);
-		EventManager.fire(event);
 	}
 	
 	@Inject(at = @At(value = "RETURN", ordinal = 1),

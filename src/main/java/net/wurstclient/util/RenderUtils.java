@@ -9,17 +9,17 @@ package net.wurstclient.util;
 
 import java.util.List;
 
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -100,11 +100,6 @@ public enum RenderUtils
 		rainbow[1] = 0.5F + 0.5F * MathHelper.sin((x + 4F / 3F) * pi);
 		rainbow[2] = 0.5F + 0.5F * MathHelper.sin((x + 8F / 3F) * pi);
 		return rainbow;
-	}
-	
-	public static void setShaderColor(float[] rgb, float opacity)
-	{
-		RenderSystem.setShaderColor(rgb[0], rgb[1], rgb[2], opacity);
 	}
 	
 	public static int toIntColor(float[] rgb, float opacity)
@@ -639,38 +634,36 @@ public enum RenderUtils
 	public static void drawItem(DrawContext context, ItemStack stack, int x,
 		int y, boolean large)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		
-		matrixStack.push();
-		matrixStack.translate(x, y, 0);
+		matrixStack.pushMatrix();
+		matrixStack.translate(x, y);
 		if(large)
-			matrixStack.scale(1.5F, 1.5F, 1.5F);
+			matrixStack.scale(1.5F, 1.5F);
 		else
-			matrixStack.scale(0.75F, 0.75F, 0.75F);
+			matrixStack.scale(0.75F, 0.75F);
 		
 		ItemStack renderStack = stack.isEmpty() || stack.getItem() == null
 			? new ItemStack(Blocks.GRASS_BLOCK) : stack;
 		
-		DiffuseLighting.enableGuiDepthLighting();
 		context.drawItem(renderStack, 0, 0);
-		DiffuseLighting.disableGuiDepthLighting();
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 		
 		if(stack.isEmpty())
 		{
-			matrixStack.push();
-			matrixStack.translate(x, y, 250);
+			context.state.goUpLayer();
+			matrixStack.pushMatrix();
+			matrixStack.translate(x, y);
 			if(large)
-				matrixStack.scale(2, 2, 2);
+				matrixStack.scale(2, 2);
 			
 			TextRenderer tr = WurstClient.MC.textRenderer;
-			context.drawText(tr, "?", 3, 2, 0xf0f0f0, true);
+			context.drawText(tr, "?", 3, 2, WurstColors.VERY_LIGHT_GRAY, true);
 			
-			matrixStack.pop();
+			matrixStack.popMatrix();
+			context.state.goDownLayer();
 		}
-		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	/**
@@ -680,90 +673,120 @@ public enum RenderUtils
 	public static void fill2D(DrawContext context, float x1, float y1, float x2,
 		float y2, int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-			buffer.vertex(matrix, x1, y1, 0).color(color);
-			buffer.vertex(matrix, x1, y2, 0).color(color);
-			buffer.vertex(matrix, x2, y2, 0).color(color);
-			buffer.vertex(matrix, x2, y1, 0).color(color);
-		});
+		int scale = WurstClient.MC.getWindow().getScaleFactor();
+		int xs1 = (int)(x1 * scale);
+		int ys1 = (int)(y1 * scale);
+		int xs2 = (int)(x2 * scale);
+		int ys2 = (int)(y2 * scale);
+		
+		context.getMatrices().pushMatrix();
+		context.getMatrices().scale(1F / scale);
+		context.fill(xs1, ys1, xs2, ys2, color);
+		context.getMatrices().popMatrix();
 	}
 	
 	/**
 	 * Renders the given vertices in QUADS draw mode.
-	 *
-	 * @apiNote Due to back-face culling, quads will be invisible if their
-	 *          vertices are not supplied in counter-clockwise order.
 	 */
 	public static void fillQuads2D(DrawContext context, float[][] vertices,
 		int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-			for(float[] vertex : vertices)
-				buffer.vertex(matrix, vertex[0], vertex[1], 0).color(color);
-		});
+		Matrix3x2f pose = new Matrix3x2f(context.getMatrices());
+		ScreenRect scissor = context.scissorStack.peekLast();
+		
+		for(int i = 0; i < vertices.length - 3; i += 4)
+		{
+			if(i + 3 >= vertices.length)
+				break;
+			
+			float x1 = vertices[i][0];
+			float y1 = vertices[i][1];
+			float x2 = vertices[i + 1][0];
+			float y2 = vertices[i + 1][1];
+			float x3 = vertices[i + 2][0];
+			float y3 = vertices[i + 2][1];
+			float x4 = vertices[i + 3][0];
+			float y4 = vertices[i + 3][1];
+			
+			context.state.addSimpleElement(new CustomQuadRenderState(pose, x1,
+				y1, x2, y2, x3, y3, x4, y4, color, scissor));
+		}
 	}
 	
 	/**
-	 * Renders the given vertices in TRIANGLE_STRIP draw mode.
+	 * Pretends to render the given vertices in TRIANGLES draw mode
+	 * by squeezing a bunch of quads into triangle shapes.
 	 *
-	 * @apiNote Due to back-face culling, triangles will be invisible if their
-	 *          vertices are not supplied in counter-clockwise order.
+	 * <p>
+	 * ...blame Vibrant Visuals.
 	 */
 	public static void fillTriangle2D(DrawContext context, float[][] vertices,
 		int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(RenderLayer.getDebugFilledBox());
-			for(float[] vertex : vertices)
-				buffer.vertex(matrix, vertex[0], vertex[1], 0).color(color);
-		});
+		Matrix3x2f pose = new Matrix3x2f(context.getMatrices());
+		ScreenRect scissor = context.scissorStack.peekLast();
+		
+		for(int i = 0; i < vertices.length - 2; i += 3)
+		{
+			if(i + 2 >= vertices.length)
+				break;
+			
+			float x1 = vertices[i][0];
+			float y1 = vertices[i][1];
+			float x2 = vertices[i + 1][0];
+			float y2 = vertices[i + 1][1];
+			float x3 = vertices[i + 2][0];
+			float y3 = vertices[i + 2][1];
+			
+			context.state.addSimpleElement(new CustomQuadRenderState(pose, x1,
+				y1, x2, y2, x3, y3, x3, y3, color, scissor));
+		}
 	}
 	
 	/**
 	 * Similar to {@link DrawContext#drawHorizontalLine(int, int, int, int)} and
 	 * {@link DrawContext#drawVerticalLine(int, int, int, int)}, but supports
-	 * diagonal lines, uses floating-point coordinates instead of integers, is
-	 * one actual pixel wide instead of one scaled pixel, uses fewer draw calls
-	 * than the vanilla method, and uses a z value of 1 to ensure that lines
-	 * show up above fills.
+	 * diagonal lines, uses floating-point coordinates instead of integers, and
+	 * is one actual pixel wide instead of one scaled pixel.
 	 */
 	public static void drawLine2D(DrawContext context, float x1, float y1,
 		float x2, float y2, int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINES);
-			buffer.vertex(matrix, x1, y1, 1).color(color);
-			buffer.vertex(matrix, x2, y2, 1).color(color);
-		});
+		int scale = WurstClient.MC.getWindow().getScaleFactor();
+		float x = x1 * scale;
+		float y = y1 * scale;
+		float w = (x2 - x1) * scale;
+		float h = (y2 - y1) * scale;
+		float angle = (float)MathHelper.atan2(h, w);
+		int length = Math.round(MathHelper.sqrt(w * w + h * h));
+		
+		context.getMatrices().pushMatrix();
+		context.getMatrices().scale(1F / scale);
+		context.getMatrices().translate(x, y);
+		context.getMatrices().rotate(angle);
+		context.getMatrices().translate(-0.5F, -0.5F);
+		context.drawHorizontalLine(0, length - 1, 0, color);
+		context.getMatrices().popMatrix();
 	}
 	
 	/**
 	 * Similar to {@link DrawContext#drawBorder(int, int, int, int, int)}, but
-	 * uses floating-point coordinates instead of integers, is one actual pixel
-	 * wide instead of one scaled pixel, uses fewer draw calls than the vanilla
-	 * method, and uses a z value of 1 to ensure that lines show up above fills.
+	 * uses floating-point coordinates instead of integers, and is one actual
+	 * pixel wide instead of one scaled pixel.
 	 */
 	public static void drawBorder2D(DrawContext context, float x1, float y1,
 		float x2, float y2, int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
-			buffer.vertex(matrix, x1, y1, 1).color(color);
-			buffer.vertex(matrix, x2, y1, 1).color(color);
-			buffer.vertex(matrix, x2, y2, 1).color(color);
-			buffer.vertex(matrix, x1, y2, 1).color(color);
-			buffer.vertex(matrix, x1, y1, 1).color(color);
-		});
+		int scale = WurstClient.MC.getWindow().getScaleFactor();
+		int x = (int)(x1 * scale);
+		int y = (int)(y1 * scale);
+		int w = (int)((x2 - x1) * scale);
+		int h = (int)((y2 - y1) * scale);
+		
+		context.getMatrices().pushMatrix();
+		context.getMatrices().scale(1F / scale);
+		context.drawBorder(x, y, w, h, color);
+		context.getMatrices().popMatrix();
 	}
 	
 	/**
@@ -772,15 +795,15 @@ public enum RenderUtils
 	public static void drawLineStrip2D(DrawContext context, float[][] vertices,
 		int color)
 	{
-		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-		context.draw(consumers -> {
-			VertexConsumer buffer =
-				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
-			for(float[] vertex : vertices)
-				buffer.vertex(matrix, vertex[0], vertex[1], 1).color(color);
-			buffer.vertex(matrix, vertices[0][0], vertices[0][1], 1)
-				.color(color);
-		});
+		if(vertices.length < 2)
+			return;
+		
+		for(int i = 1; i < vertices.length; i++)
+			drawLine2D(context, vertices[i - 1][0], vertices[i - 1][1],
+				vertices[i][0], vertices[i][1], color);
+		drawLine2D(context, vertices[vertices.length - 1][0],
+			vertices[vertices.length - 1][1], vertices[0][0], vertices[0][1],
+			color);
 	}
 	
 	/**
@@ -792,13 +815,8 @@ public enum RenderUtils
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
 		// outline
-		float xo1 = x1 - 0.1F;
-		float xo2 = x2 + 0.1F;
-		float yo1 = y1 - 0.1F;
-		float yo2 = y2 + 0.1F;
-		
 		int outlineColor = toIntColor(acColor, 0.5F);
-		drawBorder2D(context, xo1, yo1, xo2, yo2, outlineColor);
+		drawBorder2D(context, x1, y1, x2, y2, outlineColor);
 		
 		// shadow
 		float xs1 = x1 - 1;
@@ -809,36 +827,28 @@ public enum RenderUtils
 		int shadowColor1 = toIntColor(acColor, 0.75F);
 		int shadowColor2 = 0x00000000;
 		
-		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Matrix3x2f pose = new Matrix3x2f(context.getMatrices());
+		ScreenRect scissor = context.scissorStack.peekLast();
 		
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-			
-			// top
-			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
-			buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
-			buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
-			
-			// left
-			buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
-			buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
-			buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
-			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-			
-			// right
-			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
-			buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
-			buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
-			buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
-			
-			// bottom
-			buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
-			buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
-			buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
-			buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
-		});
+		// top
+		context.state.addSimpleElement(new CustomQuadRenderState(pose, x1, y1,
+			x2, y1, xs2, ys1, xs1, ys1, shadowColor1, shadowColor1,
+			shadowColor2, shadowColor2, scissor));
+		
+		// left
+		context.state.addSimpleElement(new CustomQuadRenderState(pose, xs1, ys1,
+			xs1, ys2, x1, y2, x1, y1, shadowColor2, shadowColor2, shadowColor1,
+			shadowColor1, scissor));
+		
+		// right
+		context.state.addSimpleElement(new CustomQuadRenderState(pose, x2, y1,
+			x2, y2, xs2, ys2, xs2, ys1, shadowColor1, shadowColor1,
+			shadowColor2, shadowColor2, scissor));
+		
+		// bottom
+		context.state.addSimpleElement(new CustomQuadRenderState(pose, x2, y2,
+			x1, y2, xs1, ys2, xs2, ys2, shadowColor1, shadowColor1,
+			shadowColor2, shadowColor2, scissor));
 	}
 	
 	public record ColoredPoint(Vec3d point, int color)

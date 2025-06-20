@@ -7,6 +7,7 @@
  */
 package net.wurstclient.commands;
 
+import net.minecraft.client.world.ClientWorld;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
@@ -27,7 +28,7 @@ public final class LeaveCmd extends Command
 		else if(args.length != 0)
 			throw new CmdSyntaxError();
 		
-		MC.world.disconnect();
+		MC.world.disconnect(ClientWorld.QUITTING_MULTIPLAYER_TEXT);
 	}
 	
 	@Override

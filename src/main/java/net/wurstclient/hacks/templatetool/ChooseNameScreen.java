@@ -13,12 +13,12 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.wurstclient.WurstClient;
 
 public final class ChooseNameScreen extends Screen
@@ -46,7 +46,7 @@ public final class ChooseNameScreen extends Screen
 		nameField.setDrawsBackground(false);
 		nameField.setMaxLength(32);
 		nameField.setFocused(true);
-		nameField.setEditableColor(0xFFFFFF);
+		nameField.setEditableColor(Colors.WHITE);
 		addSelectableChild(nameField);
 		setFocused(nameField);
 		
@@ -104,10 +104,7 @@ public final class ChooseNameScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		// super.render(context, mouseX, mouseY, partialTicks);
-		applyBlur();
-		for(Drawable drawable : drawables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+		super.render(context, mouseX, mouseY, partialTicks);
 		
 		// middle
 		int middleX = width / 2;

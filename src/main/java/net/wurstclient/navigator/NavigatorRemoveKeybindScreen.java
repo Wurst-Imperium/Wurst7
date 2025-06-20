@@ -175,19 +175,23 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			drawBox(context, x1, y1, x2, y2, buttonColor);
 			
 			// text
+			context.state.goUpLayer();
 			context.drawTextWithShadow(tr, key.replace("key.keyboard.", "")
 				+ ": " + keybind.getDescription(), x1 + 1, y1 + 1, txtColor);
 			context.drawTextWithShadow(tr, keybind.getCommand(), x1 + 1,
 				y1 + 1 + tr.fontHeight, txtColor);
+			context.state.goDownLayer();
 		}
 		
 		// text
 		int textY = bgy1 + scroll + 2;
+		context.state.goUpLayer();
 		for(String line : text.split("\n"))
 		{
 			context.drawTextWithShadow(tr, line, bgx1 + 2, textY, txtColor);
 			textY += tr.fontHeight;
 		}
+		context.state.goDownLayer();
 		
 		context.disableScissor();
 		
@@ -215,8 +219,10 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			
 			// text
 			String buttonText = button.getMessage().getString();
+			context.state.goUpLayer();
 			context.drawCenteredTextWithShadow(tr, buttonText, (x1 + x2) / 2,
 				y1 + 5, txtColor);
+			context.state.goDownLayer();
 		}
 	}
 	

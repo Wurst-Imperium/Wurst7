@@ -234,8 +234,6 @@ public class ServerFinderScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context, mouseX, mouseY, partialTicks);
-		
 		context.drawCenteredTextWithShadow(textRenderer, "Server Finder",
 			width / 2, 20, 16777215);
 		context.drawCenteredTextWithShadow(textRenderer,

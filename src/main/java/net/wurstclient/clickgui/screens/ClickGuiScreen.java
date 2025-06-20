@@ -61,4 +61,11 @@ public final class ClickGuiScreen extends Screen
 		
 		gui.render(context, mouseX, mouseY, partialTicks);
 	}
+	
+	@Override
+	public void renderBackground(DrawContext context, int mouseX, int mouseY,
+		float deltaTicks)
+	{
+		// Don't blur
+	}
 }

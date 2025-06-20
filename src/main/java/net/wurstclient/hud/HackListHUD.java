@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.Colors;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -143,8 +144,10 @@ public final class HackListHUD implements UpdateListener
 			posX = screenWidth - stringWidth - 2;
 		}
 		
-		context.drawText(tr, s, posX + 1, posY + 1, 0xff000000, false);
-		context.drawText(tr, s, posX, posY, textColor | 0xff000000, false);
+		context.drawText(tr, s, posX + 1, posY + 1, Colors.BLACK, false);
+		context.state.goUpLayer();
+		context.drawText(tr, s, posX, posY, textColor | Colors.BLACK, false);
+		context.state.goDownLayer();
 		
 		posY += 9;
 	}
@@ -172,7 +175,9 @@ public final class HackListHUD implements UpdateListener
 		int alpha = (int)(255 * (1 - offset / 4)) << 24;
 		context.drawText(tr, s, (int)posX + 1, posY + 1, 0x04000000 | alpha,
 			false);
+		context.state.goUpLayer();
 		context.drawText(tr, s, (int)posX, posY, textColor | alpha, false);
+		context.state.goDownLayer();
 		
 		posY += 9;
 	}

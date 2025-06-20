@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.wurstclient.settings.TextFieldSetting;
 
 public final class EditTextFieldScreen extends Screen
@@ -85,9 +86,8 @@ public final class EditTextFieldScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(client.textRenderer,
-			setting.getName(), width / 2, 20, 0xFFFFFF);
+			setting.getName(), width / 2, 20, Colors.WHITE);
 		
 		valueField.render(context, mouseX, mouseY, partialTicks);
 		

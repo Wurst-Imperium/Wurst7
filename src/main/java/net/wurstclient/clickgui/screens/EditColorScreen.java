@@ -18,16 +18,18 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.ColorUtils;
+import net.wurstclient.util.WurstColors;
 
 public final class EditColorScreen extends Screen
 {
@@ -163,9 +165,8 @@ public final class EditColorScreen extends Screen
 	{
 		TextRenderer tr = client.textRenderer;
 		
-		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(client.textRenderer,
-			colorSetting.getName(), width / 2, 16, 0xF0F0F0);
+			colorSetting.getName(), width / 2, 16, WurstColors.VERY_LIGHT_GRAY);
 		
 		// Draw palette
 		int x = paletteX;
@@ -176,18 +177,18 @@ public final class EditColorScreen extends Screen
 		int fh = paletteHeight;
 		float u = 0;
 		float v = 0;
-		context.drawTexture(RenderLayer::getGuiTextured, paletteIdentifier, x,
+		context.drawTexture(RenderPipelines.GUI_TEXTURED, paletteIdentifier, x,
 			y, u, v, w, h, fw, fh);
 		
 		// RGB letters
 		context.drawText(tr, "#", fieldsX - 3 - tr.getWidth("#"), fieldsY + 6,
-			0xF0F0F0, false);
+			WurstColors.VERY_LIGHT_GRAY, false);
 		context.drawText(tr, "R:", fieldsX - 3 - tr.getWidth("R:"),
-			fieldsY + 6 + 35, 0xFF0000, false);
+			fieldsY + 6 + 35, Colors.RED, false);
 		context.drawText(tr, "G:", fieldsX + 75 - 3 - tr.getWidth("G:"),
-			fieldsY + 6 + 35, 0x00FF00, false);
+			fieldsY + 6 + 35, Colors.GREEN, false);
 		context.drawText(tr, "B:", fieldsX + 150 - 3 - tr.getWidth("B:"),
-			fieldsY + 6 + 35, 0x0000FF, false);
+			fieldsY + 6 + 35, Colors.BLUE, false);
 		
 		hexValueField.render(context, mouseX, mouseY, partialTicks);
 		redValueField.render(context, mouseX, mouseY, partialTicks);
@@ -205,7 +206,7 @@ public final class EditColorScreen extends Screen
 		// Border
 		context.fill(boxX - borderSize, boxY - borderSize,
 			boxX + boxWidth + borderSize, boxY + boxHeight + borderSize,
-			0xFFAAAAAA);
+			Colors.LIGHT_GRAY);
 		
 		// Color box
 		context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight,

@@ -20,9 +20,11 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.wurstclient.WurstClient;
 import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.KeybindList;
+import net.wurstclient.util.WurstColors;
 
 public final class KeybindManagerScreen extends Screen
 {
@@ -138,15 +140,14 @@ public final class KeybindManagerScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context, mouseX, mouseY, partialTicks);
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		context.drawCenteredTextWithShadow(textRenderer, "Keybind Manager",
-			width / 2, 8, 0xFFFFFF);
+			width / 2, 8, Colors.WHITE);
 		
 		int count = WurstClient.INSTANCE.getKeybinds().getAllKeybinds().size();
 		context.drawCenteredTextWithShadow(textRenderer, "Keybinds: " + count,
-			width / 2, 20, 0xFFFFFF);
+			width / 2, 20, Colors.WHITE);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
@@ -183,10 +184,12 @@ public final class KeybindManagerScreen extends Screen
 			
 			String keyText =
 				"Key: " + keybind.getKey().replace("key.keyboard.", "");
-			context.drawText(tr, keyText, x + 3, y + 3, 0xA0A0A0, false);
+			context.drawText(tr, keyText, x + 3, y + 3,
+				WurstColors.VERY_LIGHT_GRAY, false);
 			
 			String cmdText = "Commands: " + keybind.getCommands();
-			context.drawText(tr, cmdText, x + 3, y + 15, 0xA0A0A0, false);
+			context.drawText(tr, cmdText, x + 3, y + 15, Colors.LIGHT_GRAY,
+				false);
 		}
 	}
 	

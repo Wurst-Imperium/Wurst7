@@ -47,7 +47,7 @@ public final class NewChunksSquareRenderer implements NewChunksChunkRenderer
 	}
 	
 	@Override
-	public RenderLayer getLayer()
+	public RenderLayer.MultiPhase getLayer()
 	{
 		return WurstRenderLayers.ESP_QUADS_NO_CULLING;
 	}

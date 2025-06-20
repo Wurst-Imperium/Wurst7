@@ -1,13 +1,16 @@
 #version 150
 
+#moj_import <minecraft:globals.glsl>
+
 uniform sampler2D DiffuseSampler;
 
 in vec2 texCoord;
 in vec2 oneTexel;
 
-uniform float GameTime;
-uniform vec2 Frequency;
-uniform vec2 WobbleAmount;
+layout(std140) uniform LSDConfig {
+    vec2 Frequency;
+    vec2 WobbleAmount;
+};
 
 out vec4 fragColor;
 
