@@ -22,7 +22,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AtmosphericFogModifier.class)
 public class AtmosphericFogModifierMixin
 {
-	// this removes environmental fog
+	/**
+	 * Removes the foggy overlay in the Overworld (including rain fog), if
+	 * NoFog is enabled.
+	 */
 	@Inject(method = "applyStartEndModifier",
 		at = @At("TAIL"),
 		cancellable = true)
@@ -30,10 +33,10 @@ public class AtmosphericFogModifierMixin
 		BlockPos cameraPos, ClientWorld world, float viewDistance,
 		RenderTickCounter tickCounter, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
-		{
-			data.environmentalStart = 1000000;
-			data.environmentalEnd = 1000000;
-		}
+		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
+			return;
+		
+		data.environmentalStart = 1000000;
+		data.environmentalEnd = 1000000;
 	}
 }

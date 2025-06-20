@@ -22,7 +22,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(DimensionOrBossFogModifier.class)
 public class DimensionOrBossFogModifierMixin
 {
-	// this removes environmental fog
+	/**
+	 * Removes the thick fog in the Nether and during the Ender Dragon fight,
+	 * if NoFog is enabled.
+	 */
 	@Inject(method = "applyStartEndModifier",
 		at = @At("TAIL"),
 		cancellable = true)
@@ -30,10 +33,10 @@ public class DimensionOrBossFogModifierMixin
 		BlockPos cameraPos, ClientWorld world, float viewDistance,
 		RenderTickCounter tickCounter, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
-		{
-			data.environmentalStart = 1000000;
-			data.environmentalEnd = 1000000;
-		}
+		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
+			return;
+		
+		data.environmentalStart = 1000000;
+		data.environmentalEnd = 1000000;
 	}
 }
