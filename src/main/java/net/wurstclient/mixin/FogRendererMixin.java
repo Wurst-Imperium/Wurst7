@@ -7,39 +7,43 @@
  */
 package net.wurstclient.mixin;
 
+import java.nio.ByteBuffer;
+
+import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import net.minecraft.block.enums.CameraSubmersionType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.fog.FogRenderer;
 import net.wurstclient.WurstClient;
 
 @Mixin(FogRenderer.class)
-public abstract class FogRendererMixin
+public class FogRendererMixin
 {
 	/**
-	 * Removes the distance fog when NoFog is enabled.
-	 *
-	 * As of 25w16a, this also seems to disable clouds for some reason.
+	 * Removes the fog near the end of the render distance in all dimensions, if
+	 * NoFog is enabled.
 	 */
-	@ModifyExpressionValue(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/render/fog/FogRenderer;fogEnabled:Z"),
-		method = "getFogBuffer(Lnet/minecraft/client/render/fog/FogRenderer$FogType;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;")
-	private boolean onGetFogBuffer(boolean original)
+	@WrapOperation(
+		method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/render/fog/FogRenderer;applyFog(Ljava/nio/ByteBuffer;ILorg/joml/Vector4f;FFFFFF)V"))
+	private void wrapApplyFog(FogRenderer instance, ByteBuffer buffer,
+		int bufPos, Vector4f fogColor, float environmentalStart,
+		float environmentalEnd, float renderDistanceStart,
+		float renderDistanceEnd, float skyEnd, float cloudEnd,
+		Operation<Void> original)
 	{
-		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
-			return original;
+		if(WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
+		{
+			renderDistanceStart = 1000000;
+			renderDistanceEnd = 1000000;
+		}
 		
-		MinecraftClient mc = WurstClient.MC;
-		Camera camera = mc.gameRenderer.getCamera();
-		CameraSubmersionType cameraSubmersionType = camera.getSubmersionType();
-		if(cameraSubmersionType != CameraSubmersionType.NONE)
-			return original;
-		
-		return false;
+		original.call(instance, buffer, bufPos, fogColor, environmentalStart,
+			environmentalEnd, renderDistanceStart, renderDistanceEnd, skyEnd,
+			cloudEnd);
 	}
 }
