@@ -36,19 +36,19 @@ Thank you for considering to contribute! Here are some guidelines to help you ge
   - Can you explain how the feature works?
   - Can you add the feature in a Pull Request?
   - Do you know anything else about the feature that hasn't been mentioned?
-- helping with the [Wurst Wiki](https://wiki.wurstclient.net/)
+- helping with the [Wurst Wiki](https://wurst.wiki/)
   - translating Wurst Wiki articles to another language
   - adding screenshots of features where appropriate
   - making sure that changes from recent Wurst updates are documented
   - digging through old Wurst updates to find out when exactly a feature was added
 - helping people who can't figure out how to install Wurst
 - making tutorials / how-to videos
-  - how to make [AutoBuild templates](https://wiki.wurstclient.net/_detail/autobuild_templates_explained_ll.webp?id=autobuild)
+  - how to make [AutoBuild templates](https://wurst.wiki/autobuild#creating_templates)
   - how to use the [profile system](https://www.wurstclient.net/updates/wurst-7-1/)
 - creating more backups/archives of Wurst
   - [creating a fork](https://github.com/Wurst-Imperium/Wurst7/fork) / mirror of this repository
   - adding [WurstClient.net](https://www.wurstclient.net/) pages to the Internet Archive
-  - adding [Wurst Wiki](https://wiki.wurstclient.net/) articles to the Internet Archive
+  - adding [Wurst Wiki](https://wurst.wiki/) articles to the Internet Archive
   - archiving old [Wurst releases](https://www.wurstclient.net/download/) & source code in case they are ever taken down
   - archiving [WiZARDHAX Wurst videos](https://www.youtube.com/c/wizardhax/videos) in case the channel is ever taken down
 - just spreading the word, telling people about Wurst, etc.

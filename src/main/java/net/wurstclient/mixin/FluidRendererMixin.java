@@ -24,8 +24,7 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 public class FluidRendererMixin
 {
 	/**
-	 * This mixin hides and shows fluids when using X-Ray without Sodium
-	 * installed.
+	 * Shows and hides fluids when using X-Ray without Sodium installed.
 	 */
 	@Inject(at = @At("HEAD"),
 		method = "isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z",

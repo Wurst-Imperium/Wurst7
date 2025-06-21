@@ -51,6 +51,12 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 		return playerListEntry;
 	}
 	
+	@Override
+	protected void pushAway(Entity entity)
+	{
+		// Prevents pushing the real player away
+	}
+	
 	private void copyInventory()
 	{
 		getInventory().clone(player.getInventory());

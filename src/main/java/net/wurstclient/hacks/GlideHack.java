@@ -19,6 +19,7 @@ import net.wurstclient.Category;
 import net.wurstclient.events.AirStrafingSpeedListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
@@ -37,14 +38,30 @@ public final class GlideHack extends Hack
 		"Won't glide when you are too close to the ground.", 0, 0, 2, 0.01,
 		ValueDisplay.DECIMAL.withLabel(0, "disabled"));
 	
+	private final CheckboxSetting pauseOnSneak =
+		new CheckboxSetting("Pause when sneaking", true);
+	
 	public GlideHack()
 	{
 		super("Glide");
-		
 		setCategory(Category.MOVEMENT);
 		addSetting(fallSpeed);
 		addSetting(moveSpeed);
 		addSetting(minHeight);
+		addSetting(pauseOnSneak);
+	}
+	
+	@Override
+	public String getRenderName()
+	{
+		ClientPlayerEntity player = MC.player;
+		if(player == null)
+			return getName();
+		
+		if(pauseOnSneak.isChecked() && player.isSneaking())
+			return getName() + " (paused)";
+		
+		return getName();
 	}
 	
 	@Override
@@ -65,6 +82,10 @@ public final class GlideHack extends Hack
 	public void onUpdate()
 	{
 		ClientPlayerEntity player = MC.player;
+		
+		if(pauseOnSneak.isChecked() && player.isSneaking())
+			return;
+		
 		Vec3d v = player.getVelocity();
 		
 		if(player.isOnGround() || player.isTouchingWater() || player.isInLava()
