@@ -9,7 +9,11 @@ package net.wurstclient.util;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -22,9 +26,9 @@ public final class AutoBuildTemplate
 {
 	private final Path path;
 	private final String name;
-	private final int[][] blocks;
+	private final BlockData[] blocks;
 	
-	private AutoBuildTemplate(Path path, int[][] blocks)
+	private AutoBuildTemplate(Path path, BlockData[] blocks)
 	{
 		this.path = path;
 		String fileName = path.getFileName().toString();
@@ -36,39 +40,77 @@ public final class AutoBuildTemplate
 		throws IOException, JsonException
 	{
 		WsonObject json = JsonUtils.parseFileToObject(path);
-		int[][] blocks =
-			JsonUtils.GSON.fromJson(json.getElement("blocks"), int[][].class);
+		JsonElement blocksElement = json.getElement("blocks");
 		
-		if(blocks == null)
+		if(blocksElement == null)
 			throw new JsonException("Template has no blocks!");
 		
-		for(int i = 0; i < blocks.length; i++)
+		if(!blocksElement.isJsonArray())
+			throw new JsonException("'blocks' is not a JSON array.");
+		
+		JsonArray jsonBlocks = blocksElement.getAsJsonArray();
+		BlockData[] blocks = new BlockData[jsonBlocks.size()];
+		
+		if(jsonBlocks.isEmpty())
+			return new AutoBuildTemplate(path, blocks);
+		
+		JsonElement first = jsonBlocks.get(0);
+		
+		if(first.isJsonArray())
 		{
-			int length = blocks[i].length;
+			// old format compatibility
+			int[][] oldBlocks =
+				JsonUtils.GSON.fromJson(jsonBlocks, int[][].class);
+			for(int i = 0; i < oldBlocks.length; i++)
+			{
+				if(oldBlocks[i].length < 3)
+					throw new JsonException("Entry blocks[" + i
+						+ "] doesn't have X, Y and Z offset. Only found "
+						+ oldBlocks[i].length + " values");
+				
+				blocks[i] = new BlockData(oldBlocks[i], null);
+			}
 			
-			if(length < 3)
-				throw new JsonException("Entry blocks[" + i
-					+ "] doesn't have X, Y and Z offset. Only found " + length
-					+ " values");
-		}
+		}else if(first.isJsonObject())
+		{
+			// New format
+			for(int i = 0; i < jsonBlocks.size(); i++)
+			{
+				JsonObject blockObj = jsonBlocks.get(i).getAsJsonObject();
+				int[] pos =
+					JsonUtils.GSON.fromJson(blockObj.get("pos"), int[].class);
+				
+				if(pos == null || pos.length < 3)
+					throw new JsonException(
+						"Block " + i + " has invalid 'pos'.");
+				
+				String name = blockObj.has("name")
+					? blockObj.get("name").getAsString() : null;
+				blocks[i] = new BlockData(pos, name);
+			}
+			
+		}else
+			throw new JsonException(
+				"Unknown format for 'blocks' array elements.");
 		
 		return new AutoBuildTemplate(path, blocks);
 	}
 	
-	public LinkedHashSet<BlockPos> getPositions(BlockPos startPos,
+	public LinkedHashMap<BlockPos, String> getBlocksToPlace(BlockPos startPos,
 		Direction direction)
 	{
 		Direction front = direction;
 		Direction left = front.rotateYCounterclockwise();
-		LinkedHashSet<BlockPos> positions = new LinkedHashSet<>();
+		LinkedHashMap<BlockPos, String> positions = new LinkedHashMap<>();
 		
-		for(int[] block : blocks)
+		for(BlockData block : blocks)
 		{
+			int[] blockPosArray = block.getPos();
 			BlockPos pos = startPos;
-			pos = pos.offset(left, block[0]);
-			pos = pos.up(block[1]);
-			pos = pos.offset(front, block[2]);
-			positions.add(pos);
+			pos = pos.offset(left, blockPosArray[0]);
+			pos = pos.up(blockPosArray[1]);
+			pos = pos.offset(front, blockPosArray[2]);
+			positions.put(pos, block.getName());
 		}
 		
 		return positions;
@@ -94,8 +136,30 @@ public final class AutoBuildTemplate
 		return name;
 	}
 	
-	public int[][] getBlocks()
+	public BlockData[] getBlocks()
 	{
 		return blocks;
+	}
+	
+	public static final class BlockData
+	{
+		private final int[] pos;
+		private final String name;
+		
+		public BlockData(int[] pos, String name)
+		{
+			this.pos = pos;
+			this.name = name;
+		}
+		
+		public int[] getPos()
+		{
+			return pos;
+		}
+		
+		public String getName()
+		{
+			return name;
+		}
 	}
 }
