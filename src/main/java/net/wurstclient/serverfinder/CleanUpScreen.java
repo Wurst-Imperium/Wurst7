@@ -166,7 +166,7 @@ public class CleanUpScreen extends Screen
 	private boolean isSameProtocol(ServerInfo server)
 	{
 		return server.protocolVersion == SharedConstants.getGameVersion()
-			.getProtocolVersion();
+			.protocolVersion();
 	}
 	
 	private boolean isFailedPing(ServerInfo server)
@@ -215,7 +215,6 @@ public class CleanUpScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(textRenderer, "Clean Up", width / 2,
 			20, 16777215);
 		context.drawCenteredTextWithShadow(textRenderer,

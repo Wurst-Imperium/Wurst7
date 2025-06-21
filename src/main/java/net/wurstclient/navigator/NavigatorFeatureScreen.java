@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -22,9 +23,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -39,6 +40,7 @@ import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.WurstColors;
 
 public final class NavigatorFeatureScreen extends NavigatorScreen
 {
@@ -300,7 +302,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	protected void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
@@ -332,8 +334,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		window.validate();
 		
 		window.setY(windowY1 - 13);
-		matrixStack.push();
-		matrixStack.translate(bgx1, windowY1, 0);
+		matrixStack.pushMatrix();
+		matrixStack.translate(bgx1, windowY1);
 		
 		{
 			int x1 = 0;
@@ -392,7 +394,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			child.render(context, mouseX - bgx1, mouseY - windowY1,
 				partialTicks);
 		}
-		matrixStack.pop();
+		matrixStack.popMatrix();
 		
 		// buttons
 		activeButton = null;
@@ -422,20 +424,24 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				RenderUtils.toIntColor(rgb, alpha));
 			
 			// text
+			context.state.goUpLayer();
 			context.drawCenteredTextWithShadow(client.textRenderer,
 				buttonData.buttonText, (x1 + x2) / 2,
-				y1 + (buttonData.height - 10) / 2 + 1,
-				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
+				y1 + (buttonData.height - 10) / 2 + 1, buttonData.isLocked()
+					? WurstColors.VERY_LIGHT_GRAY : buttonData.textColor);
+			context.state.goDownLayer();
 		}
 		
 		// text
 		int textY = bgy1 + scroll + 2;
+		context.state.goUpLayer();
 		for(String line : text.split("\n"))
 		{
 			context.drawText(client.textRenderer, line, bgx1 + 2, textY,
 				txtColor, false);
 			textY += client.textRenderer.fontHeight;
 		}
+		context.state.goDownLayer();
 		
 		context.disableScissor();
 		
@@ -462,9 +468,11 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			
 			// text
 			String buttonText = button.getMessage().getString();
+			context.state.goUpLayer();
 			context.drawText(client.textRenderer, buttonText,
 				(x1 + x2 - client.textRenderer.getWidth(buttonText)) / 2,
 				y1 + 5, txtColor, false);
+			context.state.goDownLayer();
 		}
 		
 		// popups & tooltip
@@ -504,7 +512,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	{
 		public String buttonText;
 		public Color color;
-		public int textColor = 0xffffff;
+		public int textColor = Colors.WHITE;
 		
 		public ButtonData(int x, int y, int width, int height,
 			String buttonText, int color)

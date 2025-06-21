@@ -13,10 +13,10 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 
-public record BufferWithLayer(EasyVertexBuffer buffer, RenderLayer layer)
-	implements AutoCloseable
+public record BufferWithLayer(EasyVertexBuffer buffer,
+	RenderLayer.MultiPhase layer) implements AutoCloseable
 {
-	public static BufferWithLayer createAndUpload(RenderLayer layer,
+	public static BufferWithLayer createAndUpload(RenderLayer.MultiPhase layer,
 		Consumer<VertexConsumer> callback)
 	{
 		return new BufferWithLayer(EasyVertexBuffer.createAndUpload(
@@ -28,9 +28,25 @@ public record BufferWithLayer(EasyVertexBuffer buffer, RenderLayer layer)
 		buffer.draw(matrixStack, layer);
 	}
 	
-	public void draw()
+	public void draw(MatrixStack matrixStack, float red, float green,
+		float blue, float alpha)
 	{
-		buffer.draw(layer);
+		buffer.draw(matrixStack, layer, red, green, blue, alpha);
+	}
+	
+	public void draw(MatrixStack matrixStack, float[] rgba)
+	{
+		buffer.draw(matrixStack, layer, rgba);
+	}
+	
+	public void draw(MatrixStack matrixStack, float[] rgb, float alpha)
+	{
+		buffer.draw(matrixStack, layer, rgb, alpha);
+	}
+	
+	public void draw(MatrixStack matrixStack, int argb)
+	{
+		buffer.draw(matrixStack, layer, argb);
 	}
 	
 	@Override

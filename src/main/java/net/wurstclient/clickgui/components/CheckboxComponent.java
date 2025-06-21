@@ -74,6 +74,8 @@ public final class CheckboxComponent extends Component
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
 		RenderUtils.drawBorder2D(context, x1, y1, x3, y2, outlineColor);
 		
+		context.state.goUpLayer();
+		
 		// check
 		if(setting.isChecked())
 			ClickGuiIcons.drawCheck(context, x1, y1, x3, y2, hovering,
@@ -82,6 +84,8 @@ public final class CheckboxComponent extends Component
 		// text
 		String name = setting.getName();
 		context.drawText(TR, name, x3 + 2, y1 + 2, GUI.getTxtColor(), false);
+		
+		context.state.goDownLayer();
 	}
 	
 	private int getFillColor(boolean hovering)

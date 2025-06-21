@@ -203,7 +203,7 @@ public enum WurstClientTestHelper
 		File gameDir = FabricLoader.getInstance().getGameDir().toFile();
 		
 		submitAndWait(mc -> ScreenshotRecorder.saveScreenshot(gameDir, filename,
-			mc.getFramebuffer(), message -> {}));
+			mc.getFramebuffer(), 1, message -> {}));
 	}
 	
 	/**
