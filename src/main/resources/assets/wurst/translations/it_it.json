@@ -111,7 +111,7 @@
   "description.wurst.hack.nofireoverlay": "Blocca le animazioni di quando sei in fiamme.\n\n§c§lATTENZIONE:§r Questo può causare morte per il fuoco senza che tu te ne accorga.",
   "description.wurst.hack.nohurtcam": "Disattiva l'oscillamento della telecamera quando ti fai male.",
   "description.wurst.hack.nolevitation": "Disabilita l'effetto levitazione quando si viene colpiti da uno Shulker.\n\n§c§lATTENZIONE:§r Cadrai se attiverai questo mentre l'effetto levitazione è già attivo!",
-  "description.wurst.hack.nooverlay": "Blocca gli overlay di lava e acqua.",
+  "description.wurst.hack.nooverlay": "Blocca gli overlay di acqua, lava e neve polverosa.",
   "description.wurst.hack.nopumpkin": "Blocca la copertura di quando indossi una zucca in testa.",
   "description.wurst.hack.noslowdown": "Rimuove la lentezza applicata da blocchi come la sabbia delle anime o i blocchi di miele.",
   "description.wurst.hack.noweather": "Consente di modificare il tempo, l'ora e le fasi lunari lato client.",

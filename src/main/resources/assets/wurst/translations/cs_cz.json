@@ -111,7 +111,7 @@
   "description.wurst.hack.nofireoverlay": "Blokuje překrytí ohně.\n\n§c§lUPOZORNĚNÍ:§r Může způsobit uhoření bez povšimnutí.",
   "description.wurst.hack.nohurtcam": "Zakáže třes obrazovky při zranění.",
   "description.wurst.hack.nolevitation": "Odstraní efekt levitace, když vás zasáhne Shulker.\n\n§c§lVAROVÁNÍ:§r Pokud toto zapnete během levitace, spadnete!",
-  "description.wurst.hack.nooverlay": "Blokuje překrytí vody a lávy.",
+  "description.wurst.hack.nooverlay": "Blokuje překrytí vody, lávy a prašanu.",
   "description.wurst.hack.nopumpkin": "Blokuje překrytí dýně na hlavě.",
   "description.wurst.hack.noslowdown": "Zruší zpomalení medem, písekm duší i používáním itemů.",
   "description.wurst.hack.noweather": "Umožňuje změnit počasí, čas a fázi měsíce na straně klienta.",
