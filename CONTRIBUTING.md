@@ -1,5 +1,5 @@
 # Contributing Guidelines
-Thank you for considering to contribute! Here are some guidelines to help you get started.
+Thank you for considering to contribute! Here are some guidelines to help you get started. ![](https://img.wimods.net/github.com/Wurst-Imperium/Wurst7/CONTRIBUTING.md)
 
 ## Pull Requests
 

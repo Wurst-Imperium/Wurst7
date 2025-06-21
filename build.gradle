@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
 	id "fabric-loom" version "1.10-SNAPSHOT"
-	id "com.diffplug.spotless" version "7.0.2"
+	id "com.diffplug.spotless" version "7.0.3"
 }
 
 def ENV = System.getenv()
@@ -150,7 +150,6 @@ spotless {
 	}
 	format("licenseHeader") {
 		target("src/*/java/**/*.java", "src/test/java/**/*.java")
-		targetExclude("src/main/java/net/wurstclient/analytics/dmurph/**/*.java")
 		def header_file = file("codestyle/license_header.txt")
 		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
 		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
