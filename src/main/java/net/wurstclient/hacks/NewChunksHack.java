@@ -158,7 +158,8 @@ public final class NewChunksHack extends Hack
 		if(showSetting.includesNew())
 		{
 			renderer.updateBuffer(0, chunkRenderer.getLayer(),
-				buffer -> chunkRenderer.buildBuffer(buffer, newChunks, dd));
+				buffer -> chunkRenderer.buildBuffer(buffer,
+					new HashSet<>(newChunks), dd));
 			
 			if(showReasons.isChecked())
 				renderer.updateBuffer(1, reasonsRenderer.getLayer(),
@@ -169,7 +170,8 @@ public final class NewChunksHack extends Hack
 		if(showSetting.includesOld())
 		{
 			renderer.updateBuffer(2, chunkRenderer.getLayer(),
-				buffer -> chunkRenderer.buildBuffer(buffer, oldChunks, dd));
+				buffer -> chunkRenderer.buildBuffer(buffer,
+					new HashSet<>(oldChunks), dd));
 			
 			if(showReasons.isChecked())
 				renderer.updateBuffer(3, reasonsRenderer.getLayer(),
