@@ -16,7 +16,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -210,7 +209,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	protected void onRender(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
 		
@@ -252,8 +250,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// tooltip
 		if(tooltip != null)
 		{
-			matrixStack.push();
-			matrixStack.translate(0, 0, 300);
+			context.state.goUpLayer();
 			
 			String[] lines = tooltip.split("\n");
 			TextRenderer tr = client.textRenderer;
@@ -284,11 +281,13 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			RenderUtils.drawBorder2D(context, xt1, yt1, xt2, yt2, acColor);
 			
 			// text
+			context.state.goUpLayer();
 			for(int i = 0; i < lines.length; i++)
 				context.drawText(tr, lines[i], xt1 + 2,
 					yt1 + 2 + i * tr.fontHeight, txtColor, false);
+			context.state.goDownLayer();
 			
-			matrixStack.pop();
+			context.state.goDownLayer();
 		}
 	}
 	
@@ -366,6 +365,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		if(hovering)
 			hoveringArrow = mouseX >= bx1;
 		
+		context.state.goUpLayer();
+		
 		// arrow
 		ClickGuiIcons.drawMinimizeArrow(context, bx1 + 2, area.y + 2.5F,
 			area.x + area.width - 2, area.y + area.height - 3, hovering, true);
@@ -380,6 +381,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			int txtColor = gui.getTxtColor();
 			context.drawText(tr, buttonText, bx, by, txtColor, false);
 		}
+		
+		context.state.goDownLayer();
 	}
 	
 	public void setExpanding(boolean expanding)

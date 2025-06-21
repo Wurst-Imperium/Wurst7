@@ -172,7 +172,7 @@
   "description.wurst.hack.nofog": "Dünyadaki mesafe sisini kaldırır.",
   "description.wurst.hack.nohurtcam": "Yaralandığınızda sarsılma efektini devre dışı bırakır.",
   "description.wurst.hack.nolevitation": "Bir Shulker tarafından vurulduğunuzda yükselme efektini devre dışı bırakır.\n\n§c§lUYARI:§r Yükselme efekti zaten aktifken bunu etkinleştirirseniz düşersiniz!",
-  "description.wurst.hack.nooverlay": "Su ve lav kaplamalarını engeller.",
+  "description.wurst.hack.nooverlay": "Su, lav ve tozlaşmış kar kaplamalarını engeller.",
   "description.wurst.hack.nopumpkin": "Kafanızda balkabağı varken görünen kaplamayı engeller.",
   "description.wurst.hack.noshieldoverlay": "Kalkanı daha az ekran kaplayacak şekilde indirir.",
   "description.wurst.hack.noslowdown": "Bal, ruh kumu ve eşya kullanımının neden olduğu yavaşlama efektlerini iptal eder.",

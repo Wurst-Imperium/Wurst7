@@ -18,5 +18,5 @@ public interface NewChunksChunkRenderer
 	public void buildBuffer(VertexConsumer buffer, Set<ChunkPos> chunks,
 		int drawDistance);
 	
-	public RenderLayer getLayer();
+	public RenderLayer.MultiPhase getLayer();
 }

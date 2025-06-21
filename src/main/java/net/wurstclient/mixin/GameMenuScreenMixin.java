@@ -16,15 +16,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -64,8 +62,6 @@ public abstract class GameMenuScreenMixin extends Screen
 		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)
 			return;
 		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		
 		int x = wurstOptionsButton.getX() + 34;
 		int y = wurstOptionsButton.getY() + 2;
 		int w = 63;
@@ -74,8 +70,10 @@ public abstract class GameMenuScreenMixin extends Screen
 		int fh = 16;
 		float u = 0;
 		float v = 0;
-		context.drawTexture(RenderLayer::getGuiTextured, WURST_TEXTURE, x, y, u,
-			v, w, h, fw, fh);
+		context.state.goUpLayer();
+		context.drawTexture(RenderPipelines.GUI_TEXTURED, WURST_TEXTURE, x, y,
+			u, v, w, h, fw, fh);
+		context.state.goDownLayer();
 	}
 	
 	@Unique

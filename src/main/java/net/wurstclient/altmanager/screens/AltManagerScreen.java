@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonObject;
@@ -42,11 +43,13 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
+import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -70,6 +73,7 @@ public final class AltManagerScreen extends Screen
 	
 	private ButtonWidget importButton;
 	private ButtonWidget exportButton;
+	private ButtonWidget logoutButton;
 	
 	public AltManagerScreen(Screen prevScreen, AltManager altManager)
 	{
@@ -151,6 +155,27 @@ public final class AltManagerScreen extends Screen
 		addDrawableChild(exportButton =
 			ButtonWidget.builder(Text.literal("Export"), b -> pressExportAlts())
 				.dimensions(58, 8, 50, 20).build());
+		
+		addDrawableChild(logoutButton =
+			ButtonWidget.builder(Text.literal("Logout"), b -> pressLogout())
+				.dimensions(width - 50 - 8, 8, 50, 20).build());
+		
+		updateAltButtons();
+		boolean windowMode = !client.options.getFullscreen().getValue();
+		importButton.active = windowMode;
+		exportButton.active = windowMode;
+	}
+	
+	private void updateAltButtons()
+	{
+		boolean altSelected = listGui.getSelectedOrNull() != null;
+		useButton.active = altSelected;
+		starButton.active = altSelected;
+		editButton.active = altSelected;
+		deleteButton.active = altSelected;
+		
+		logoutButton.active =
+			((IMinecraftClient)client).getWurstSession() != null;
 	}
 	
 	@Override
@@ -163,18 +188,15 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public void tick()
+	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
-		boolean altSelected = listGui.getSelectedOrNull() != null;
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			close();
+			return true;
+		}
 		
-		useButton.active = altSelected;
-		starButton.active = altSelected;
-		editButton.active = altSelected;
-		deleteButton.active = altSelected;
-		
-		boolean windowMode = !client.options.getFullscreen().getValue();
-		importButton.active = windowMode;
-		exportButton.active = windowMode;
+		return super.mouseClicked(mouseX, mouseY, button);
 	}
 	
 	private void pressLogin()
@@ -194,6 +216,12 @@ public final class AltManagerScreen extends Screen
 			errorTimer = 8;
 			failedLogins.add(alt);
 		}
+	}
+	
+	private void pressLogout()
+	{
+		((IMinecraftClient)client).setWurstSession(null);
+		updateAltButtons();
 	}
 	
 	private void pressFavorite()
@@ -378,7 +406,6 @@ public final class AltManagerScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderBackground(context, mouseX, mouseY, partialTicks);
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		// skin preview
@@ -394,13 +421,14 @@ public final class AltManagerScreen extends Screen
 		
 		// title text
 		context.drawCenteredTextWithShadow(textRenderer, "Alt Manager",
-			width / 2, 4, 16777215);
+			width / 2, 4, Colors.WHITE);
 		context.drawCenteredTextWithShadow(textRenderer,
-			"Alts: " + altManager.getList().size(), width / 2, 14, 10526880);
+			"Alts: " + altManager.getList().size(), width / 2, 14,
+			Colors.LIGHT_GRAY);
 		context.drawCenteredTextWithShadow(
 			textRenderer, "premium: " + altManager.getNumPremium()
 				+ ", cracked: " + altManager.getNumCracked(),
-			width / 2, 24, 10526880);
+			width / 2, 24, Colors.LIGHT_GRAY);
 		
 		// red flash for errors
 		if(errorTimer > 0)
@@ -567,11 +595,11 @@ public final class AltManagerScreen extends Screen
 			
 			// name / email
 			context.drawText(tr, "Name: " + alt.getDisplayName(), x + 31, y + 3,
-				0xA0A0A0, false);
+				Colors.LIGHT_GRAY, false);
 			
 			// status
-			context.drawText(tr, getBottomText(), x + 31, y + 15, 10526880,
-				false);
+			context.drawText(tr, getBottomText(), x + 31, y + 15,
+				Colors.LIGHT_GRAY, false);
 		}
 		
 		private String getBottomText()
@@ -600,6 +628,21 @@ public final class AltManagerScreen extends Screen
 			
 			list.stream().map(AltManagerScreen.Entry::new)
 				.forEach(this::addEntry);
+		}
+		
+		@Override
+		public void setSelected(@Nullable AltManagerScreen.Entry entry)
+		{
+			super.setSelected(entry);
+			updateAltButtons();
+		}
+		
+		// This method sets selected to null without calling setSelected().
+		@Override
+		protected void clearEntries()
+		{
+			super.clearEntries();
+			updateAltButtons();
 		}
 		
 		/**

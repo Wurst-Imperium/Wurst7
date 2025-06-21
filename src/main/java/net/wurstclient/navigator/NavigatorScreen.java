@@ -9,13 +9,8 @@ package net.wurstclient.navigator;
 
 import java.awt.Rectangle;
 
-import org.joml.Matrix4f;
-
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -168,13 +163,22 @@ public abstract class NavigatorScreen extends Screen
 			y1 += scrollKnobPosition;
 			y2 = y1 + 24;
 			drawBackgroundBox(context, x1, y1, x2, y2);
-			int i;
-			for(x1++, x2--, y1 += 8, y2 -= 15, i = 0; i < 3; y1 += 4, y2 +=
-				4, i++)
+			x1++;
+			x2--;
+			y1 += 8;
+			y2 -= 15;
+			for(int i = 0; i < 3; y1 += 4, y2 += 4, i++)
 				drawDownShadow(context, x1, y1, x2, y2);
 		}
 		
 		onRender(context, mouseX, mouseY, partialTicks);
+	}
+	
+	@Override
+	public void renderBackground(DrawContext context, int mouseX, int mouseY,
+		float deltaTicks)
+	{
+		// Don't blur
 	}
 	
 	@Override
@@ -228,24 +232,14 @@ public abstract class NavigatorScreen extends Screen
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
 		// line
-		float yi1 = y1 + 0.1F;
 		int lineColor = RenderUtils.toIntColor(acColor, 0.5F);
-		RenderUtils.drawLine2D(context, x1, yi1, x2, yi1, lineColor);
+		RenderUtils.drawLine2D(context, x1 + 0.1F, y1, x2 + 0.1F, y1,
+			lineColor);
 		
 		// shadow
 		int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);
 		int shadowColor2 = 0x00000000;
-		
-		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-		
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-			buffer.vertex(matrix, x1, y2, 0).color(shadowColor2);
-			buffer.vertex(matrix, x2, y2, 0).color(shadowColor2);
-			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
-		});
+		context.fillGradient(x1, y1, x2, y2, shadowColor1, shadowColor2);
 	}
 	
 	protected final void drawBox(DrawContext context, int x1, int y1, int x2,

@@ -15,7 +15,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 
 import net.minecraft.block.Blocks;
@@ -167,16 +166,14 @@ public final class CaveFinderHack extends Hack
 		float alpha = 0.25F + 0.25F * MathHelper.sin(x * MathHelper.PI);
 		if(opacity.getValue() > 0)
 			alpha = opacity.getValueF();
-		color.setAsShaderColor(alpha);
 		
 		matrixStack.push();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
 		
-		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_QUADS);
+		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_QUADS,
+			color.getColorF(), alpha);
 		
 		matrixStack.pop();
-		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 	
 	private void stopBuildingBuffer()

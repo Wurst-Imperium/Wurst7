@@ -45,7 +45,7 @@ public final class NewChunksReasonsRenderer
 		}
 	}
 	
-	public RenderLayer getLayer()
+	public RenderLayer.MultiPhase getLayer()
 	{
 		return WurstRenderLayers.ESP_QUADS;
 	}

@@ -108,7 +108,7 @@
   "description.wurst.hack.nofireoverlay": "Bloque l'overlay lorsque vous êtes en feu.\n\n§c§lATTENTION:§r Cela peut vous faire brûler jusqu'à la mort sans que vous vous en apercevez.",
   "description.wurst.hack.nohurtcam": "Désactive l'effet de tremblement lorsque vous vous blessez.",
   "description.wurst.hack.nolevitation": "Désactive l'effet de lévitation quand vous êtes touché par un Shulker.\n\n§c§lATTENTION:§r Vous tomberez si vous activez ceci alors que l'effet de lévitation est déjà actif!",
-  "description.wurst.hack.nooverlay": "Bloque les overlays d'eau et de lave.",
+  "description.wurst.hack.nooverlay": "Bloque les overlays d'eau, de lave et de neige poudreuse.",
   "description.wurst.hack.nopumpkin": "Bloque l'overlay lorsque vous portez une citrouille sur la tête.",
   "description.wurst.hack.noslowdown": "Annule les effets de lenteur causés par le miel, le sable des âmes et l'utilisation d'objets.",
   "description.wurst.hack.noweather": "Vous permet de modifier la météo, l'heure et la phase de lune côté client.",

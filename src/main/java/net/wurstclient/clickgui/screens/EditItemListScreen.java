@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.screens;
 import java.util.List;
 import java.util.Objects;
 
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.MinecraftClient;
@@ -21,15 +22,16 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.WurstColors;
 
 public final class EditItemListScreen extends Screen
 {
@@ -136,37 +138,32 @@ public final class EditItemListScreen extends Screen
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
-		renderBackground(context, mouseX, mouseY, partialTicks);
+		Matrix3x2fStack matrixStack = context.getMatrices();
 		
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
 		context.drawCenteredTextWithShadow(client.textRenderer,
 			itemList.getName() + " (" + itemList.getItemNames().size() + ")",
-			width / 2, 12, 0xFFFFFF);
+			width / 2, 12, Colors.WHITE);
 		
-		matrixStack.push();
-		matrixStack.translate(0, 0, 300);
+		matrixStack.pushMatrix();
 		
 		itemNameField.render(context, mouseX, mouseY, partialTicks);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		matrixStack.push();
-		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
+		context.state.goUpLayer();
+		matrixStack.pushMatrix();
+		matrixStack.translate(-64 + width / 2 - 152, 0);
 		
 		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
-		{
-			matrixStack.push();
-			matrixStack.translate(0, 0, 300);
 			context.drawTextWithShadow(client.textRenderer, "item name or ID",
-				68, height - 50, 0x808080);
-			matrixStack.pop();
-		}
+				68, height - 50, Colors.GRAY);
 		
-		int border = itemNameField.isFocused() ? 0xFFFFFFFF : 0xFFA0A0A0;
-		int black = 0xFF000000;
+		int border =
+			itemNameField.isFocused() ? Colors.WHITE : Colors.LIGHT_GRAY;
+		int black = Colors.BLACK;
 		
 		context.fill(48, height - 56, 64, height - 36, border);
 		context.fill(49, height - 55, 65, height - 37, black);
@@ -178,13 +175,14 @@ public final class EditItemListScreen extends Screen
 		context.fill(213, height - 55, 216, height - 37, black);
 		context.fill(242, height - 55, 245, height - 37, black);
 		
-		matrixStack.pop();
+		matrixStack.popMatrix();
 		
 		RenderUtils.drawItem(context,
 			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
 		
-		matrixStack.pop();
+		context.state.goDownLayer();
+		matrixStack.popMatrix();
 	}
 	
 	@Override
@@ -230,11 +228,12 @@ public final class EditItemListScreen extends Screen
 			TextRenderer tr = client.textRenderer;
 			
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
-			context.drawText(tr, getDisplayName(stack), x + 28, y, 0xF0F0F0,
+			context.drawText(tr, getDisplayName(stack), x + 28, y,
+				WurstColors.VERY_LIGHT_GRAY, false);
+			context.drawText(tr, itemName, x + 28, y + 9, Colors.LIGHT_GRAY,
 				false);
-			context.drawText(tr, itemName, x + 28, y + 9, 0xA0A0A0, false);
-			context.drawText(tr, getIdText(item), x + 28, y + 18, 0xA0A0A0,
-				false);
+			context.drawText(tr, getIdText(item), x + 28, y + 18,
+				Colors.LIGHT_GRAY, false);
 		}
 		
 		private String getDisplayName(ItemStack stack)
