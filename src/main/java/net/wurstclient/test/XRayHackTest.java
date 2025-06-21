@@ -63,30 +63,23 @@ public enum XRayHackTest
 	
 	private static void buildTestRig()
 	{
+		// Stone wall (9 wide, 5 high, 3 deep)
 		runChatCommand("fill ~-5 ~ ~5 ~5 ~5 ~7 stone");
 		
-		// Hidden ores
-		runChatCommand("setblock ~-4 ~1 ~6 minecraft:coal_ore");
-		runChatCommand("setblock ~-2 ~1 ~6 minecraft:iron_ore");
-		runChatCommand("setblock ~0 ~1 ~6 minecraft:gold_ore");
-		runChatCommand("setblock ~2 ~1 ~6 minecraft:diamond_ore");
-		runChatCommand("setblock ~4 ~1 ~6 minecraft:emerald_ore");
-		runChatCommand("setblock ~-4 ~3 ~6 minecraft:lapis_ore");
-		runChatCommand("setblock ~-2 ~3 ~6 minecraft:redstone_ore");
-		runChatCommand("setblock ~0 ~3 ~6 minecraft:copper_ore");
-		runChatCommand("setblock ~2 ~3 ~6 minecraft:nether_gold_ore");
-		runChatCommand("setblock ~4 ~3 ~6 minecraft:nether_quartz_ore");
+		// Ores (1 exposed and 1 hidden each)
+		runChatCommand("fill ~-4 ~1 ~5 ~-4 ~1 ~6 minecraft:coal_ore");
+		runChatCommand("fill ~-2 ~1 ~5 ~-2 ~1 ~6 minecraft:iron_ore");
+		runChatCommand("fill ~0 ~1 ~5 ~0 ~1 ~6 minecraft:gold_ore");
+		runChatCommand("fill ~2 ~1 ~5 ~2 ~1 ~6 minecraft:diamond_ore");
+		runChatCommand("fill ~4 ~1 ~5 ~4 ~1 ~6 minecraft:emerald_ore");
+		runChatCommand("fill ~-4 ~3 ~5 ~-4 ~3 ~6 minecraft:lapis_ore");
+		runChatCommand("fill ~-2 ~3 ~5 ~-2 ~3 ~6 minecraft:redstone_ore");
+		runChatCommand("fill ~0 ~3 ~5 ~0 ~3 ~6 minecraft:copper_ore");
+		runChatCommand("fill ~2 ~3 ~5 ~2 ~3 ~6 minecraft:nether_gold_ore");
+		runChatCommand("fill ~4 ~3 ~5 ~4 ~3 ~6 minecraft:nether_quartz_ore");
 		
-		// Partially exposed ores (air block in front)
-		runChatCommand("setblock ~-4 ~1 ~5 minecraft:coal_ore");
-		runChatCommand("setblock ~-2 ~1 ~5 minecraft:iron_ore");
-		runChatCommand("setblock ~0 ~1 ~5 minecraft:gold_ore");
-		runChatCommand("setblock ~2 ~1 ~5 minecraft:diamond_ore");
-		runChatCommand("setblock ~4 ~1 ~5 minecraft:emerald_ore");
-		runChatCommand("setblock ~-4 ~3 ~5 minecraft:lapis_ore");
-		runChatCommand("setblock ~-2 ~3 ~5 minecraft:redstone_ore");
-		runChatCommand("setblock ~0 ~3 ~5 minecraft:copper_ore");
-		runChatCommand("setblock ~2 ~3 ~5 minecraft:nether_gold_ore");
-		runChatCommand("setblock ~4 ~3 ~5 minecraft:nether_quartz_ore");
+		// Fluids
+		runChatCommand("setblock ~1 ~0 ~6 minecraft:water");
+		runChatCommand("setblock ~-1 ~0 ~6 minecraft:lava");
 	}
 }

@@ -74,7 +74,8 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:sculk_shrieker", "minecraft:spawner",
 		"minecraft:suspicious_gravel", "minecraft:suspicious_sand",
 		"minecraft:tnt", "minecraft:torch", "minecraft:trapped_chest",
-		"minecraft:trial_spawner", "minecraft:vault", "minecraft:water");
+		"minecraft:trial_spawner", "minecraft:vault", "minecraft:wall_torch",
+		"minecraft:water");
 	
 	private final CheckboxSetting onlyExposed = new CheckboxSetting(
 		"Only show exposed",

@@ -61,6 +61,9 @@ public class BlockListSetting extends Setting
 	
 	public int indexOf(String name)
 	{
+		if(name == null)
+			return -1;
+		
 		return Collections.binarySearch(blockNames, name);
 	}
 	

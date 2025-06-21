@@ -88,6 +88,11 @@ public final class WurstE2ETestClient implements ModInitializer
 		runChatCommand("seed");
 		System.out.println("Reached singleplayer world");
 		takeScreenshot("in_game", Duration.ZERO);
+		runChatCommand("gamerule doDaylightCycle false");
+		runChatCommand("gamerule doWeatherCycle false");
+		runChatCommand("gamerule doTraderSpawning false");
+		runChatCommand("gamerule doPatrolSpawning false");
+		runChatCommand("time set noon");
 		clearChat();
 		
 		System.out.println("Opening debug menu");
