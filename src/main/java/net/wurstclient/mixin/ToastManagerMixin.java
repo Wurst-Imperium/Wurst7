@@ -24,6 +24,9 @@ public class ToastManagerMixin
 		if(!WurstClient.INSTANCE.getHax().noToastsHack.isEnabled())
 			return;
 		
+		if(toast == null)
+			return;
+		
 		if(toast instanceof AdvancementToast || toast instanceof NowPlayingToast
 			|| toast instanceof RecipeToast || toast instanceof TutorialToast)
 			ci.cancel();
