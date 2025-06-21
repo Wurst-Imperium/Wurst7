@@ -118,7 +118,7 @@
   "description.wurst.hack.nofog": "移除世界天边交界处的迷雾。",
   "description.wurst.hack.nohurtcam": "关闭因受伤而产生视野摇晃效果。",
   "description.wurst.hack.nolevitation": "禁用被潜影贝击中时获得的漂浮效果。\n\n§c§l警告:§r 如果你已经处于漂浮状态下，启用此功能将会使你从高空坠落！",
-  "description.wurst.hack.nooverlay": "关闭因在水或岩浆中的视野阻挡。",
+  "description.wurst.hack.nooverlay": "关闭因在水、岩浆或细雪中的视野阻挡。",
   "description.wurst.hack.nopumpkin": "关闭南瓜头的视野阻挡。",
   "description.wurst.hack.noshieldoverlay": "降低盾牌使其覆盖更少的屏幕。",
   "description.wurst.hack.noslowdown": "取消在蜂蜜、灵魂沙上或使用物品时产生的减速效果。",

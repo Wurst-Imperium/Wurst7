@@ -208,9 +208,20 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Override
-	public void setSession(Session session)
+	public Session getWurstSession()
+	{
+		return wurstSession;
+	}
+	
+	@Override
+	public void setWurstSession(Session session)
 	{
 		wurstSession = session;
+		if(session == null)
+		{
+			wurstProfileKeys = null;
+			return;
+		}
 		
 		UserApiService userApiService =
 			session.getAccountType() == Session.AccountType.MSA

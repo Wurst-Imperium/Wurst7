@@ -134,7 +134,7 @@
   "description.wurst.hack.nofog": "ワールドから距離フォグを取り除く。",
   "description.wurst.hack.nohurtcam": "ダメージを受けた時の画面の揺れを無効化する。",
   "description.wurst.hack.nolevitation": "シュルカーの弾に当たったときの浮遊効果を無効にします。\n\n§c§l注意:§r 浮遊効果が既にアクティブになっているときにこれを有効にすると落下します！",
-  "description.wurst.hack.nooverlay": "水と溶岩のオーバーレイを無効化する。",
+  "description.wurst.hack.nooverlay": "水、溶岩、粉雪のオーバーレイを無効化する。",
   "description.wurst.hack.nopumpkin": "カボチャを頭に装着している時のオーバーレイを無効化する。",
   "description.wurst.hack.noshieldoverlay": "盾を下げ、画面を覆う面積を減らす。",
   "description.wurst.hack.noslowdown": "はちみつやソウルサンド、そしてアイテムの使用時に発生する移動速度低下を無効化する。",

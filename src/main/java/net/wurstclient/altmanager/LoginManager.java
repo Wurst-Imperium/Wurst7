@@ -46,7 +46,7 @@ public enum LoginManager
 			Session session = new Session(username, uuid, accessToken,
 				Optional.empty(), Optional.empty(), Session.AccountType.MOJANG);
 			
-			WurstClient.IMC.setSession(session);
+			WurstClient.IMC.setWurstSession(session);
 			
 		}catch(AuthenticationUnavailableException e)
 		{
@@ -86,6 +86,6 @@ public enum LoginManager
 		Session session = new Session(newName, "", "", Optional.empty(),
 			Optional.empty(), Session.AccountType.MOJANG);
 		
-		WurstClient.IMC.setSession(session);
+		WurstClient.IMC.setWurstSession(session);
 	}
 }

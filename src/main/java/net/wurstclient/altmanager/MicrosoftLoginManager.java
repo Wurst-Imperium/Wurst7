@@ -105,7 +105,7 @@ public enum MicrosoftLoginManager
 			mcProfile.getAccessToken(), Optional.empty(), Optional.empty(),
 			Session.AccountType.MSA);
 		
-		WurstClient.IMC.setSession(session);
+		WurstClient.IMC.setWurstSession(session);
 	}
 	
 	private static MinecraftProfile getAccount(String email, String password)

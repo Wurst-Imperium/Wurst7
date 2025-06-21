@@ -112,7 +112,7 @@
   "description.wurst.hack.nofireoverlay": "防止火焰阻擋視野。\n\n§c§l警告：§r這可能會導致你，因不知道身上有火而燒傷致死。",
   "description.wurst.hack.nohurtcam": "關閉因受傷而產生視野搖晃效果。",
   "description.wurst.hack.nolevitation": "當你被界伏蚌擊中時禁用懸浮效果。\n\n§c§l警告：§r如果你在懸浮效果已經激活的情況下開啟此選項，你會摔倒！",
-  "description.wurst.hack.nooverlay": "防止因在水中或岩漿產生視野阻擋。",
+  "description.wurst.hack.nooverlay": "防止因在水中、岩漿或粉雪產生視野阻擋。",
   "description.wurst.hack.nopumpkin": "防止因帶南瓜頭而導致視野阻擋。",
   "description.wurst.hack.noslowdown": "取消减速的效果。像蜂蜜、靈魂沙或者使用物品。",
   "description.wurst.hack.noweather": "允許改變你當地用戶端所在的時間，和月亮的階段（僅在本地生效，與服務器無關）。",

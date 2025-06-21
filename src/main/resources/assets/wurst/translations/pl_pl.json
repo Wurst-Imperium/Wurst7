@@ -172,7 +172,7 @@
   "description.wurst.hack.nofog": "Usuwa mgłę odległościową ze świata.",
   "description.wurst.hack.nohurtcam": "Wyłącza efekt trzęsienia, gdy ponosisz obrażenia.",
   "description.wurst.hack.nolevitation": "Wyłącza efekt lewitacji po uderzeniu przez Shulkera.\n\n§c§lOSTRZEŻENIE:§r Spadniesz, jeśli aktywujesz to, gdy efekt lewitacji jest już aktywny!",
-  "description.wurst.hack.nooverlay": "Blokuje nakładki wody i lawy.",
+  "description.wurst.hack.nooverlay": "Blokuje nakładki wody, lawy i sypkiego śniegu.",
   "description.wurst.hack.nopumpkin": "Blokuje nakładkę podczas noszenia dyni na głowie.",
   "description.wurst.hack.noshieldoverlay": "Obniża tarczę, aby zakrywała mniejszą część ekranu.",
   "description.wurst.hack.noslowdown": "Anuluje efekty spowolnienia wywołane przez miód, piasek dusz i używanie przedmiotów.",

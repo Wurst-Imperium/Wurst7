@@ -91,7 +91,7 @@
   "description.wurst.hack.nofall": "낙하 피해를 방지합니다.",
   "description.wurst.hack.nofireoverlay": "불에 탔을 때 오버레이를 제거합니다.\n\n§c§l주의:§r 이로 인해 알지 못하고 타죽을 수 있습니다.",
   "description.wurst.hack.nohurtcam": "피해를 입었을 때 흔들림 효과를 제거합니다.",
-  "description.wurst.hack.nooverlay": "물과 용암의 오버레이를 제거합니다.",
+  "description.wurst.hack.nooverlay": "물, 용암, 가루눈의 오버레이를 제거합니다.",
   "description.wurst.hack.nopumpkin": "호박을 머리에 쓸 때 오버레이를 제거합니다.",
   "description.wurst.hack.noslowdown": "꿀, 영혼 모래 및 아이템 사용으로 인한 속도 감소 효과를 제거합니다.",
   "description.wurst.hack.noweather": "클라이언트 측의 날씨, 시간 및 달의 위상을 변경할 수 있게 해줍니다.",

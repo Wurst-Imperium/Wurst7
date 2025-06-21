@@ -105,7 +105,7 @@
   "description.wurst.hack.nofall": "從高處仆落嚟免受傷害。",
   "description.wurst.hack.nofireoverlay": "防止火焰阻擋視野。\n\n§c§l警告：§r呢可能會導致你因唔知身上有火而燒傷致死。",
   "description.wurst.hack.nohurtcam": "關閉因受傷而產生視野搖晃效果。",
-  "description.wurst.hack.nooverlay": "防止因喺水中或岩漿產生視野阻擋。",
+  "description.wurst.hack.nooverlay": "防止因喺水中、岩漿或幼雪產生視野阻擋。",
   "description.wurst.hack.nopumpkin": "防止因帶南瓜頭而導致視野阻擋。",
   "description.wurst.hack.noslowdown": "解除減速嘅效果。例如蜂蜜、靈魂沙抑或使用物品。",
   "description.wurst.hack.noweather": "允許改變你當地客戶端當前時間，同埋月相（僅喺本地生效，同伺服器無關）。",

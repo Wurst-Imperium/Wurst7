@@ -14,10 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
+import net.wurstclient.hack.HackList;
 
 @Mixin(InGameHud.class)
 public class IngameHudMixin
@@ -42,11 +44,31 @@ public class IngameHudMixin
 	private void onRenderOverlay(DrawContext context, Identifier texture,
 		float opacity, CallbackInfo ci)
 	{
-		if(texture == null
-			|| !"textures/misc/pumpkinblur.png".equals(texture.getPath()))
+		if(texture == null)
 			return;
 		
-		if(WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
+		String path = texture.getPath();
+		HackList hax = WurstClient.INSTANCE.getHax();
+		
+		if("textures/misc/pumpkinblur.png".equals(path)
+			&& hax.noPumpkinHack.isEnabled())
 			ci.cancel();
+		
+		if("textures/misc/powder_snow_outline.png".equals(path)
+			&& hax.noOverlayHack.isEnabled())
+			ci.cancel();
+	}
+	
+	@Inject(at = @At("HEAD"),
+		method = "renderVignetteOverlay",
+		cancellable = true)
+	private void onRenderVignetteOverlay(DrawContext context, Entity entity,
+		CallbackInfo ci)
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax == null || !hax.noVignetteHack.isEnabled())
+			return;
+		
+		ci.cancel();
 	}
 }
