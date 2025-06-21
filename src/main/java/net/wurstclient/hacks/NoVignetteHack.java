@@ -11,16 +11,14 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
 
-@SearchTags({"no overlay", "NoWaterOverlay", "no water overlay",
-	"NoSnowOverlay", "no snow overlay"})
-public final class NoOverlayHack extends Hack
+@SearchTags({"no vignette", "AntiVignette", "anti vignette"})
+public final class NoVignetteHack extends Hack
 {
-	public NoOverlayHack()
+	public NoVignetteHack()
 	{
-		super("NoOverlay");
+		super("NoVignette");
 		setCategory(Category.RENDER);
 	}
 	
-	// See CameraMixin.onGetSubmersionType(), IngameHudMixin.renderOverlay(),
-	// InGameOverlayRendererMixin.onRenderUnderwaterOverlay()
+	// See IngameHudMixin.onRenderVignetteOverlay()
 }

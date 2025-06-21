@@ -47,9 +47,8 @@ public class CleanUpScreen extends Screen
 	@Override
 	public void init()
 	{
-		addDrawableChild(
-			new CleanUpButton(width / 2 - 100, height / 4 + 168 + 12,
-				() -> "Cancel", "", b -> client.setScreen(prevScreen)));
+		addDrawableChild(new CleanUpButton(width / 2 - 100,
+			height / 4 + 168 + 12, () -> "Cancel", "", b -> close()));
 		
 		addDrawableChild(cleanUpButton = new CleanUpButton(width / 2 - 100,
 			height / 4 + 144 + 12, () -> "Clean Up",
@@ -201,6 +200,18 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	{
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			close();
+			return true;
+		}
+		
+		return super.mouseClicked(mouseX, mouseY, button);
+	}
+	
+	@Override
 	public void render(DrawContext context, int mouseX, int mouseY,
 		float partialTicks)
 	{
@@ -233,6 +244,12 @@ public class CleanUpScreen extends Screen
 			context.drawTooltip(textRenderer, cuButton.tooltip, mouseX, mouseY);
 			break;
 		}
+	}
+	
+	@Override
+	public void close()
+	{
+		client.setScreen(prevScreen);
 	}
 	
 	private final class CleanUpButton extends ButtonWidget
