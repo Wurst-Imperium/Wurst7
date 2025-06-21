@@ -17,10 +17,12 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
+import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.network.ServerInfo.ServerType;
+import net.minecraft.client.option.ServerList;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
@@ -28,7 +30,7 @@ import net.wurstclient.util.MathUtils;
 
 public class ServerFinderScreen extends Screen
 {
-	private MultiplayerScreen prevScreen;
+	private final MultiplayerScreen prevScreen;
 	
 	private TextFieldWidget ipBox;
 	private TextFieldWidget maxThreadsBox;
@@ -39,10 +41,10 @@ public class ServerFinderScreen extends Screen
 	private int checked;
 	private int working;
 	
-	public ServerFinderScreen(MultiplayerScreen prevMultiplayerMenu)
+	public ServerFinderScreen(MultiplayerScreen prevScreen)
 	{
-		super(Text.literal(""));
-		prevScreen = prevMultiplayerMenu;
+		super(Text.literal("Server Finder"));
+		this.prevScreen = prevScreen;
 	}
 	
 	@Override
@@ -52,6 +54,7 @@ public class ServerFinderScreen extends Screen
 			ButtonWidget.builder(Text.literal("Search"), b -> searchOrCancel())
 				.dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
 				.build());
+		searchButton.active = false;
 		
 		addDrawableChild(
 			ButtonWidget
@@ -61,24 +64,23 @@ public class ServerFinderScreen extends Screen
 				.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
 				.build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
-			.dimensions(width / 2 - 100, height / 4 + 144 + 12, 200, 20)
-			.build());
+		addDrawableChild(
+			ButtonWidget.builder(Text.literal("Back"), b -> close())
+				.dimensions(width / 2 - 100, height / 4 + 144 + 12, 200, 20)
+				.build());
 		
 		ipBox = new TextFieldWidget(textRenderer, width / 2 - 100,
-			height / 4 + 34, 200, 20, Text.literal(""));
+			height / 4 + 34, 200, 20, Text.empty());
 		ipBox.setMaxLength(200);
-		ipBox.setFocused(true);
 		addSelectableChild(ipBox);
+		setFocused(ipBox);
 		
 		maxThreadsBox = new TextFieldWidget(textRenderer, width / 2 - 32,
-			height / 4 + 58, 26, 12, Text.literal(""));
+			height / 4 + 58, 26, 12, Text.empty());
 		maxThreadsBox.setMaxLength(3);
 		maxThreadsBox.setText("128");
 		addSelectableChild(maxThreadsBox);
 		
-		setFocused(ipBox);
 		state = ServerFinderState.NOT_RUNNING;
 	}
 	
@@ -87,11 +89,17 @@ public class ServerFinderScreen extends Screen
 		if(state.isRunning())
 		{
 			state = ServerFinderState.CANCELLED;
+			ipBox.active = true;
+			maxThreadsBox.active = true;
+			searchButton.setMessage(Text.literal("Search"));
 			return;
 		}
 		
 		state = ServerFinderState.RESOLVING;
 		maxThreads = Integer.parseInt(maxThreadsBox.getText());
+		ipBox.active = false;
+		maxThreadsBox.active = false;
+		searchButton.setMessage(Text.literal("Cancel"));
 		checked = 0;
 		working = 0;
 		
@@ -155,53 +163,50 @@ public class ServerFinderScreen extends Screen
 		}
 	}
 	
-	@Override
-	public void tick()
-	{
-		searchButton
-			.setMessage(Text.literal(state.isRunning() ? "Cancel" : "Search"));
-		ipBox.active = !state.isRunning();
-		maxThreadsBox.active = !state.isRunning();
-		
-		searchButton.active = MathUtils.isInteger(maxThreadsBox.getText())
-			&& !ipBox.getText().isEmpty();
-	}
-	
-	private boolean isServerInList(String ip)
-	{
-		for(int i = 0; i < prevScreen.getServerList().size(); i++)
-			if(prevScreen.getServerList().get(i).address.equals(ip))
-				return true;
-			
-		return false;
-	}
-	
 	private void updatePingers(ArrayList<WurstServerPinger> pingers)
 	{
 		for(int i = 0; i < pingers.size(); i++)
-			if(!pingers.get(i).isStillPinging())
+		{
+			WurstServerPinger pinger = pingers.get(i);
+			if(pinger.isStillPinging())
+				continue;
+			
+			checked++;
+			if(pinger.isWorking())
 			{
-				checked++;
-				if(pingers.get(i).isWorking())
-				{
-					working++;
-					
-					if(!isServerInList(pingers.get(i).getServerIP()))
-					{
-						prevScreen.getServerList()
-							.add(new ServerInfo("Grief me #" + working,
-								pingers.get(i).getServerIP(), ServerType.OTHER),
-								false);
-						prevScreen.getServerList().saveFile();
-						((IMultiplayerScreen)prevScreen).getServerListSelector()
-							.setSelected(null);
-						((IMultiplayerScreen)prevScreen).getServerListSelector()
-							.setServers(prevScreen.getServerList());
-					}
-				}
-				pingers.remove(i);
-				i -= 1;
+				working++;
+				String name = "Grief me #" + working;
+				String ip = pinger.getServerIP();
+				addServerToList(name, ip);
 			}
+			
+			pingers.remove(i);
+			i--;
+		}
+	}
+	
+	// Basically what MultiplayerScreen.addEntry() does,
+	// but without changing the current screen.
+	private void addServerToList(String name, String ip)
+	{
+		ServerList serverList = prevScreen.getServerList();
+		if(serverList.get(ip) != null)
+			return;
+		
+		serverList.add(new ServerInfo(name, ip, ServerType.OTHER), false);
+		serverList.saveFile();
+		
+		MultiplayerServerListWidget selector =
+			((IMultiplayerScreen)prevScreen).getServerListSelector();
+		selector.setSelected(null);
+		selector.setServers(serverList);
+	}
+	
+	@Override
+	public void tick()
+	{
+		searchButton.active = MathUtils.isInteger(maxThreadsBox.getText())
+			&& !ipBox.getText().isEmpty();
 	}
 	
 	@Override
@@ -211,6 +216,18 @@ public class ServerFinderScreen extends Screen
 			searchButton.onPress();
 		
 		return super.keyPressed(keyCode, scanCode, int_3);
+	}
+	
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	{
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			close();
+			return true;
+		}
+		
+		return super.mouseClicked(mouseX, mouseY, button);
 	}
 	
 	@Override
@@ -254,7 +271,7 @@ public class ServerFinderScreen extends Screen
 	public void close()
 	{
 		state = ServerFinderState.CANCELLED;
-		super.close();
+		client.setScreen(prevScreen);
 	}
 	
 	enum ServerFinderState

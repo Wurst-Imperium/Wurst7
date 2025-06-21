@@ -5,7 +5,7 @@ buildscript {
 }
 
 plugins {
-	id "fabric-loom" version "1.10-SNAPSHOT"
+	id "fabric-loom" version "${loom_version}"
 	id "com.diffplug.spotless" version "7.0.4"
 }
 
@@ -128,8 +128,8 @@ java {
 jar {
 	inputs.property "archivesName", project.base.archivesName
 	
-	from("LICENSE") {
-		rename {"${it}_${inputs.properties.archivesName}"}
+	from("LICENSE.txt") {
+		rename { "LICENSE-${inputs.properties.archivesName}.txt" }
 	}
 	
 	exclude("intentionally_untranslated.json")

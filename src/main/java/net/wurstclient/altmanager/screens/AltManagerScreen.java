@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonObject;
@@ -48,6 +49,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
+import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -71,6 +73,7 @@ public final class AltManagerScreen extends Screen
 	
 	private ButtonWidget importButton;
 	private ButtonWidget exportButton;
+	private ButtonWidget logoutButton;
 	
 	public AltManagerScreen(Screen prevScreen, AltManager altManager)
 	{
@@ -152,6 +155,27 @@ public final class AltManagerScreen extends Screen
 		addDrawableChild(exportButton =
 			ButtonWidget.builder(Text.literal("Export"), b -> pressExportAlts())
 				.dimensions(58, 8, 50, 20).build());
+		
+		addDrawableChild(logoutButton =
+			ButtonWidget.builder(Text.literal("Logout"), b -> pressLogout())
+				.dimensions(width - 50 - 8, 8, 50, 20).build());
+		
+		updateAltButtons();
+		boolean windowMode = !client.options.getFullscreen().getValue();
+		importButton.active = windowMode;
+		exportButton.active = windowMode;
+	}
+	
+	private void updateAltButtons()
+	{
+		boolean altSelected = listGui.getSelectedOrNull() != null;
+		useButton.active = altSelected;
+		starButton.active = altSelected;
+		editButton.active = altSelected;
+		deleteButton.active = altSelected;
+		
+		logoutButton.active =
+			((IMinecraftClient)client).getWurstSession() != null;
 	}
 	
 	@Override
@@ -164,18 +188,15 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public void tick()
+	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
-		boolean altSelected = listGui.getSelectedOrNull() != null;
+		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		{
+			close();
+			return true;
+		}
 		
-		useButton.active = altSelected;
-		starButton.active = altSelected;
-		editButton.active = altSelected;
-		deleteButton.active = altSelected;
-		
-		boolean windowMode = !client.options.getFullscreen().getValue();
-		importButton.active = windowMode;
-		exportButton.active = windowMode;
+		return super.mouseClicked(mouseX, mouseY, button);
 	}
 	
 	private void pressLogin()
@@ -195,6 +216,12 @@ public final class AltManagerScreen extends Screen
 			errorTimer = 8;
 			failedLogins.add(alt);
 		}
+	}
+	
+	private void pressLogout()
+	{
+		((IMinecraftClient)client).setWurstSession(null);
+		updateAltButtons();
 	}
 	
 	private void pressFavorite()
@@ -601,6 +628,21 @@ public final class AltManagerScreen extends Screen
 			
 			list.stream().map(AltManagerScreen.Entry::new)
 				.forEach(this::addEntry);
+		}
+		
+		@Override
+		public void setSelected(@Nullable AltManagerScreen.Entry entry)
+		{
+			super.setSelected(entry);
+			updateAltButtons();
+		}
+		
+		// This method sets selected to null without calling setSelected().
+		@Override
+		protected void clearEntries()
+		{
+			super.clearEntries();
+			updateAltButtons();
 		}
 		
 		/**
