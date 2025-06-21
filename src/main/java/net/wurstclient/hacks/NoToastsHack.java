@@ -7,18 +7,29 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.client.toast.ToastManager;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"no toasts", "no advancements", "no recipes"})
-public class NoToastsHack extends Hack
+public final class NoToastsHack extends Hack
 {
 	
 	public NoToastsHack()
 	{
 		super("NoToasts");
 		setCategory(Category.OTHER);
+	}
+	
+	@Override
+	protected void onEnable()
+	{
+		ToastManager toastManager = WurstClient.MC.getToastManager();
+		
+		if(toastManager != null)
+			toastManager.clear();
 	}
 	// see ToastManagerMixin.onAdd().
 }
