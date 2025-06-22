@@ -19,4 +19,5 @@ public final class InfiniChatHack extends Hack
 		super("InfiniChat");
 		setCategory(Category.CHAT);
 	}
+	// See ChatScreenMixin.onInit()
 }
