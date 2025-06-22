@@ -263,4 +263,6 @@ public final class NewChunksHack extends Hack
 		
 		renderer.render(matrixStack, partialTicks);
 	}
+	// See ClientPlayNetworkHandlerMixin.onLoadChunk(), onOnBlockUpdate(),
+	// onOnChunkDeltaUpdate()
 }

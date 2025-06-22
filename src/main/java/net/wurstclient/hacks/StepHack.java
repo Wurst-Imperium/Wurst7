@@ -127,4 +127,5 @@ public final class StepHack extends Hack implements UpdateListener
 			return name;
 		}
 	}
+	// See ClientPlayerEntityMixin.onIsAutoJumpEnabled(), getStepHeight()
 }

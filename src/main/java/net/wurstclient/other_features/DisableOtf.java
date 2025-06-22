@@ -35,4 +35,5 @@ public final class DisableOtf extends OtherFeature
 	{
 		return !WURST.isEnabled() && hideEnableButton.isChecked();
 	}
+	// See StatsScreenMixin.onCreateButtons()
 }
