@@ -31,5 +31,5 @@ public final class NoToastsHack extends Hack
 		if(toastManager != null)
 			toastManager.clear();
 	}
-	// See ToastManagerMixin.onAdd().
+	// See ToastManagerMixin.onAdd()
 }
