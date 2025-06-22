@@ -42,6 +42,27 @@ public final class XRayHack extends Hack implements UpdateListener,
 	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
 	ShouldDrawSideListener, RenderBlockEntityListener
 {
+	private final CheckboxSetting refreshable = new CheckboxSetting(
+		"Refresh renders live",
+		"Refresh renders while the module is enabled. Disable this if lagging while"
+			+ " updating opacity.\n\n"
+			+ "Don't forget to toggle the module after changes if this is disabled!",
+		true)
+	{
+		@Override
+		public void update()
+		{
+			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
+			
+			if(xRayHack == null || !xRayHack.isEnabled()
+				|| !xRayHack.refreshable.isChecked())
+				return;
+			
+			refreshOreNamesCache();
+			refreshXray();
+		}
+	};
+	
 	private final BlockListSetting ores = new BlockListSetting("Ores",
 		"A list of blocks that X-Ray will show. They don't have to be just ores"
 			+ " - you can add any block you want.",
@@ -80,8 +101,10 @@ public final class XRayHack extends Hack implements UpdateListener,
 		@Override
 		public void update()
 		{
+			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
 			
-			if(!WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
+			if(xRayHack == null || !xRayHack.isEnabled()
+				|| !xRayHack.refreshable.isChecked())
 				return;
 			
 			refreshOreNamesCache();
@@ -98,8 +121,10 @@ public final class XRayHack extends Hack implements UpdateListener,
 		@Override
 		public void update()
 		{
+			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
 			
-			if(!WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
+			if(xRayHack == null || !xRayHack.isEnabled()
+				|| !xRayHack.refreshable.isChecked())
 				return;
 			
 			refreshXray();
@@ -114,8 +139,10 @@ public final class XRayHack extends Hack implements UpdateListener,
 		@Override
 		public void update()
 		{
+			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
 			
-			if(!WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
+			if(xRayHack == null || !xRayHack.isEnabled()
+				|| !xRayHack.refreshable.isChecked())
 				return;
 			
 			refreshXray();
@@ -134,6 +161,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		super("X-Ray");
 		setCategory(Category.RENDER);
+		addSetting(refreshable);
 		addSetting(ores);
 		addSetting(onlyExposed);
 		addSetting(opacity);
