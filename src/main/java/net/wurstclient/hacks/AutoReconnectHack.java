@@ -33,6 +33,6 @@ public final class AutoReconnectHack extends Hack
 	{
 		return (int)(waitTime.getValue() * 20);
 	}
-	
-	// See DisconnectedScreenMixin
+	// See DisconnectedScreenMixin.onInit(), addReconnectButtons(),
+	// pressAutoReconnect(), tick()
 }

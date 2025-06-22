@@ -178,4 +178,5 @@ public final class JesusHack extends Hack
 			&& !MC.options.sneakKey.isPressed() && !MC.player.isTouchingWater()
 			&& !MC.player.isInLava();
 	}
+	// See AbstractBlockStateMixin.onGetCollisionShape()
 }

@@ -52,4 +52,5 @@ public final class AutoRespawnHack extends Hack implements DeathListener
 		return WurstClient.INSTANCE.isEnabled() && !isEnabled()
 			&& button.isChecked();
 	}
+	// See DeathScreenMixin.onInit()
 }

@@ -156,7 +156,5 @@ public final class NoChatReportsOtf extends OtherFeature
 	{
 		return Category.CHAT;
 	}
-	
-	// See ChatHudMixin, ClientPlayNetworkHandlerMixin.onOnServerMetadata(),
-	// MinecraftClientMixin.onGetProfileKeys()
+	// ChatHudMixin.onAddMessage(); See MinecraftClientMixin.onGetProfileKeys(),
 }

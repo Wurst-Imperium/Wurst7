@@ -181,4 +181,5 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		RenderUtils.drawTracer(matrixStack, partialTicks,
 			fakePlayer.getBoundingBox().getCenter(), colorI, false);
 	}
+	// See ClientPlayerEntityMixin.isSpectator()
 }

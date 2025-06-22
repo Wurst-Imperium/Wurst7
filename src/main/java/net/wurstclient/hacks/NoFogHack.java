@@ -19,6 +19,7 @@ public final class NoFogHack extends Hack
 		super("NoFog");
 		setCategory(Category.RENDER);
 	}
-	
-	// See BackgroundRendererMixin
+	// See AtmosphericFogModifierMixin.onApplyStartEndModifier();
+	// DimensionOrBossFogModifierMixin.onApplyStartEndModifier();
+	// FogRendererMixin.wrapApplyFog()
 }

@@ -41,6 +41,5 @@ public final class NoBackgroundHack extends Hack
 		
 		return true;
 	}
-	
-	// See ScreenMixin.onRenderBackground()
+	// See ScreenMixin.onRenderInGameBackground()
 }

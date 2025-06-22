@@ -251,6 +251,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
-	
-	// See AbstractBlockRenderContextMixin, RenderLayersMixin
+	// See AbstractTerrainRenderContextMixin.onShadeQuad();
+	// BlockModelRendererMixin.onRenderSmoothOrFlat(), modifyOpacity();
+	// RenderLayersMixin.onGetBlockLayer()
 }

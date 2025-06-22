@@ -155,4 +155,6 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	{
 		return scroll;
 	}
+	// See ControlsListWidgetMixin.dontAddZoomEntry();
+	// MouseMixin.wrapOnMouseScroll()
 }

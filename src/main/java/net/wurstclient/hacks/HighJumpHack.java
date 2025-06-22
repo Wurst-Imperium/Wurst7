@@ -33,4 +33,5 @@ public final class HighJumpHack extends Hack
 	{
 		return isEnabled() ? height.getValueF() * 0.1F : 0;
 	}
+	// See ClientPlayerEntityMixin.getJumpVelocity()
 }

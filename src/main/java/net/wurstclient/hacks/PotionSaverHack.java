@@ -50,4 +50,5 @@ public final class PotionSaverHack extends Hack implements PacketOutputListener
 			&& !MC.player.getActiveStatusEffects().isEmpty()
 			&& MC.player.getVelocity().x == 0 && MC.player.getVelocity().z == 0;
 	}
+	// See StatusEffectInstanceMixin.onUpdateDuration()
 }

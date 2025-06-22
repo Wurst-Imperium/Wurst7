@@ -66,4 +66,5 @@ public final class NoWeatherHack extends Hack
 	{
 		return moonPhase.getValueI();
 	}
+	// See WorldMixin.onGetRainGradient(), getSkyAngle(), getMoonPhase()
 }
