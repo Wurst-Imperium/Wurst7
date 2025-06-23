@@ -47,7 +47,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"Refresh renders while the module is enabled. Disable this if lagging while"
 			+ " updating opacity.\n\n"
 			+ "Don't forget to toggle the module after changes if this is disabled!",
-		true)
+		false)
 	{
 		@Override
 		public void update()
