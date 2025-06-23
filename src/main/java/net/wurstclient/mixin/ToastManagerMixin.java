@@ -27,8 +27,8 @@ public class ToastManagerMixin
 		if(toast == null)
 			return;
 		
-		if(toast instanceof AdvancementToast || toast instanceof NowPlayingToast
-			|| toast instanceof RecipeToast || toast instanceof TutorialToast)
+		if(toast instanceof AdvancementToast || toast instanceof RecipeToast
+			|| toast instanceof TutorialToast)
 			ci.cancel();
 	}
 }

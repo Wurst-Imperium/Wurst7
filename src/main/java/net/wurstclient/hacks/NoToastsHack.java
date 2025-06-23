@@ -20,7 +20,7 @@ public final class NoToastsHack extends Hack
 	public NoToastsHack()
 	{
 		super("NoToasts");
-		setCategory(Category.OTHER);
+		setCategory(Category.RENDER);
 	}
 	
 	@Override
