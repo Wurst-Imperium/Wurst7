@@ -131,7 +131,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 			SliderComponent sliderComponent =
 				(SliderComponent)this.getComponent();
 			
-			if(triggeredOpacityRefresh || sliderComponent.isDragging())
+			if(sliderComponent.isDragging())
 			{
 				triggeredOpacityRefresh = true;
 				return;
