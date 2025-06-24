@@ -22,6 +22,7 @@ import net.minecraft.util.math.Direction;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
+import net.wurstclient.clickgui.components.SliderComponent;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
 import net.wurstclient.events.RenderBlockEntityListener;
@@ -42,27 +43,6 @@ public final class XRayHack extends Hack implements UpdateListener,
 	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
 	ShouldDrawSideListener, RenderBlockEntityListener
 {
-	private final CheckboxSetting refreshable = new CheckboxSetting(
-		"Refresh renders live",
-		"Refresh renders while the module is enabled. Disable this if lagging while"
-			+ " updating opacity.\n\n"
-			+ "Don't forget to toggle the module after changes if this is disabled!",
-		false)
-	{
-		@Override
-		public void update()
-		{
-			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
-			
-			if(xRayHack == null || !xRayHack.isEnabled()
-				|| !xRayHack.refreshable.isChecked())
-				return;
-			
-			refreshOreNamesCache();
-			refreshXray();
-		}
-	};
-	
 	private final BlockListSetting ores = new BlockListSetting("Ores",
 		"A list of blocks that X-Ray will show. They don't have to be just ores"
 			+ " - you can add any block you want.",
@@ -103,8 +83,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		{
 			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
 			
-			if(xRayHack == null || !xRayHack.isEnabled()
-				|| !xRayHack.refreshable.isChecked())
+			if(xRayHack == null || !xRayHack.isEnabled())
 				return;
 			
 			refreshOreNamesCache();
@@ -123,8 +102,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		{
 			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
 			
-			if(xRayHack == null || !xRayHack.isEnabled()
-				|| !xRayHack.refreshable.isChecked())
+			if(xRayHack == null || !xRayHack.isEnabled())
 				return;
 			
 			refreshXray();
@@ -141,14 +119,29 @@ public final class XRayHack extends Hack implements UpdateListener,
 		{
 			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
 			
-			if(xRayHack == null || !xRayHack.isEnabled()
-				|| !xRayHack.refreshable.isChecked())
+			if(xRayHack == null || !xRayHack.isEnabled())
 				return;
+				
+			// Checks to see if the player is dragging the slider for opacity.
+			// If so, the world will not refresh... Prevents the world from
+			// being refreshed for every value.
+			// Modification of the triggeredOpacityRefresh boolean is monitored
+			// by onUpdate, where the refresh is then triggered if the player is
+			// no longer dragging.
+			SliderComponent sliderComponent =
+				(SliderComponent)this.getComponent();
+			
+			if(triggeredOpacityRefresh || sliderComponent.isDragging())
+			{
+				triggeredOpacityRefresh = true;
+				return;
+			}
 			
 			refreshXray();
 		}
 	};
 	
+	private boolean triggeredOpacityRefresh = false;
 	private final String optiFineWarning;
 	private final String renderName =
 		Math.random() < 0.01 ? "X-Wurst" : getName();
@@ -161,7 +154,6 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		super("X-Ray");
 		setCategory(Category.RENDER);
-		addSetting(refreshable);
 		addSetting(ores);
 		addSetting(onlyExposed);
 		addSetting(opacity);
@@ -218,6 +210,11 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		// force gamma to 16 so that ores are bright enough to see
 		ISimpleOption.get(MC.options.getGamma()).forceSetValue(16.0);
+		
+		// refreshes renders once opacity slider is no longer being moved
+		if(this.triggeredOpacityRefresh
+			&& !((SliderComponent)opacity.getComponent()).isDragging())
+			refreshXray();
 	}
 	
 	@Override
@@ -322,6 +319,9 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		if(MC.worldRenderer == null)
 			return;
+		
+		if(this.triggeredOpacityRefresh)
+			this.triggeredOpacityRefresh = false;
 		
 		MC.worldRenderer.reload();
 	}
