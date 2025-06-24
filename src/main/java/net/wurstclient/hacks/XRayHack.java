@@ -21,6 +21,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
+import net.wurstclient.clickgui.components.SliderComponent;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
 import net.wurstclient.events.RenderBlockEntityListener;
@@ -43,8 +45,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 {
 	private final BlockListSetting ores = new BlockListSetting("Ores",
 		"A list of blocks that X-Ray will show. They don't have to be just ores"
-			+ " - you can add any block you want.\n\n"
-			+ "Remember to restart X-Ray when changing this setting.",
+			+ " - you can add any block you want.",
 		"minecraft:amethyst_cluster", "minecraft:ancient_debris",
 		"minecraft:anvil", "minecraft:beacon", "minecraft:bone_block",
 		"minecraft:bookshelf", "minecraft:brewing_stand",
@@ -75,21 +76,72 @@ public final class XRayHack extends Hack implements UpdateListener,
 		"minecraft:suspicious_gravel", "minecraft:suspicious_sand",
 		"minecraft:tnt", "minecraft:torch", "minecraft:trapped_chest",
 		"minecraft:trial_spawner", "minecraft:vault", "minecraft:wall_torch",
-		"minecraft:water");
+		"minecraft:water")
+	{
+		@Override
+		public void update()
+		{
+			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
+			
+			if(xRayHack == null || !xRayHack.isEnabled())
+				return;
+			
+			refreshOreNamesCache();
+			refreshXray();
+		}
+	};
 	
 	private final CheckboxSetting onlyExposed = new CheckboxSetting(
 		"Only show exposed",
 		"Only shows ores that would be visible in caves. This can help against"
-			+ " anti-X-Ray plugins.\n\n"
-			+ "Remember to restart X-Ray when changing this setting.",
-		false);
+			+ " anti-X-Ray plugins.",
+		false)
+	{
+		@Override
+		public void update()
+		{
+			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
+			
+			if(xRayHack == null || !xRayHack.isEnabled())
+				return;
+			
+			refreshXray();
+		}
+	};
 	
 	private final SliderSetting opacity = new SliderSetting("Opacity",
 		"Opacity of non-ore blocks when X-Ray is enabled.\n\n"
-			+ "Does not work when Sodium is installed.\n\n"
-			+ "Remember to restart X-Ray when changing this setting.",
-		0, 0, 0.99, 0.01, ValueDisplay.PERCENTAGE.withLabel(0, "off"));
+			+ "Does not work when Sodium is installed.",
+		0, 0, 0.99, 0.01, ValueDisplay.PERCENTAGE.withLabel(0, "off"))
+	{
+		@Override
+		public void update()
+		{
+			XRayHack xRayHack = WurstClient.INSTANCE.getHax().xRayHack;
+			
+			if(xRayHack == null || !xRayHack.isEnabled())
+				return;
+				
+			// Checks to see if the player is dragging the slider for opacity.
+			// If so, the world will not refresh... Prevents the world from
+			// being refreshed for every value.
+			// Modification of the triggeredOpacityRefresh boolean is monitored
+			// by onUpdate, where the refresh is then triggered if the player is
+			// no longer dragging.
+			SliderComponent sliderComponent =
+				(SliderComponent)this.getComponent();
+			
+			if(sliderComponent.isDragging())
+			{
+				triggeredOpacityRefresh = true;
+				return;
+			}
+			
+			refreshXray();
+		}
+	};
 	
+	private boolean triggeredOpacityRefresh = false;
 	private final String optiFineWarning;
 	private final String renderName =
 		Math.random() < 0.01 ? "X-Wurst" : getName();
@@ -117,8 +169,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	protected void onEnable()
 	{
-		// cache block names in case the setting changes while X-Ray is enabled
-		oreNamesCache = new ArrayList<>(ores.getBlockNames());
+		refreshOreNamesCache();
 		
 		// add event listeners
 		EVENTS.add(UpdateListener.class, this);
@@ -127,8 +178,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.add(ShouldDrawSideListener.class, this);
 		EVENTS.add(RenderBlockEntityListener.class, this);
 		
-		// reload chunks
-		MC.worldRenderer.reload();
+		refreshXray();
 		
 		// display warning if OptiFine is detected
 		if(optiFineWarning != null)
@@ -146,7 +196,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		EVENTS.remove(RenderBlockEntityListener.class, this);
 		
 		// reload chunks
-		MC.worldRenderer.reload();
+		refreshXray();
 		
 		// reset gamma
 		FullbrightHack fullbright = WURST.getHax().fullbrightHack;
@@ -160,6 +210,11 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		// force gamma to 16 so that ores are bright enough to see
 		ISimpleOption.get(MC.options.getGamma()).forceSetValue(16.0);
+		
+		// refreshes renders once opacity slider is no longer being moved
+		if(this.triggeredOpacityRefresh
+			&& !((SliderComponent)opacity.getComponent()).isDragging())
+			refreshXray();
 	}
 	
 	@Override
@@ -251,6 +306,24 @@ public final class XRayHack extends Hack implements UpdateListener,
 	public void openBlockListEditor(Screen prevScreen)
 	{
 		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
+	}
+	
+	// cache block names in case the setting changes while X-Ray is enabled
+	private void refreshOreNamesCache()
+	{
+		oreNamesCache = new ArrayList<>(ores.getBlockNames());
+	}
+	
+	// reload chunks
+	private void refreshXray()
+	{
+		if(MC.worldRenderer == null)
+			return;
+		
+		if(this.triggeredOpacityRefresh)
+			this.triggeredOpacityRefresh = false;
+		
+		MC.worldRenderer.reload();
 	}
 	
 	// See AbstractBlockRenderContextMixin, RenderLayersMixin
