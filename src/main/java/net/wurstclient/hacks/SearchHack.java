@@ -20,17 +20,14 @@ import net.minecraft.block.Block;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstRenderLayers;
-import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.BlockSetting;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -39,14 +36,13 @@ import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.EasyVertexBuffer;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RenderUtils.ColoredPoint;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.chunk.ChunkSearcher;
 import net.wurstclient.util.chunk.ChunkSearcherCoordinator;
 
 @SearchTags({"BlockESP", "block esp"})
-public final class SearchHack extends Hack implements UpdateListener,
-	RenderListener, CameraTransformViewBobbingListener
+public final class SearchHack extends Hack
+	implements UpdateListener, RenderListener
 {
 	private final BlockSetting block = new BlockSetting("Block",
 		"The type of block to search for.", "minecraft:diamond_ore", false);
@@ -63,9 +59,6 @@ public final class SearchHack extends Hack implements UpdateListener,
 	private int prevLimit;
 	private boolean notify;
 	
-	private final CheckboxSetting drawTracers = new CheckboxSetting("Tracers",
-		"Draws lines from your crosshair to the found blocks", false);
-	
 	private final ChunkSearcherCoordinator coordinator =
 		new ChunkSearcherCoordinator(area);
 	
@@ -76,7 +69,6 @@ public final class SearchHack extends Hack implements UpdateListener,
 	private EasyVertexBuffer vertexBuffer;
 	private RegionPos bufferRegion;
 	private boolean bufferUpToDate;
-	private final HashSet<BlockPos> foundBlocks = new HashSet<>();
 	
 	public SearchHack()
 	{
@@ -85,7 +77,6 @@ public final class SearchHack extends Hack implements UpdateListener,
 		addSetting(block);
 		addSetting(area);
 		addSetting(limit);
-		addSetting(drawTracers);
 	}
 	
 	@Override
@@ -106,12 +97,10 @@ public final class SearchHack extends Hack implements UpdateListener,
 		forkJoinPool = new ForkJoinPool();
 		
 		bufferUpToDate = false;
-		foundBlocks.clear();
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketInputListener.class, coordinator);
 		EVENTS.add(RenderListener.class, this);
-		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 	}
 	
 	@Override
@@ -120,7 +109,6 @@ public final class SearchHack extends Hack implements UpdateListener,
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PacketInputListener.class, coordinator);
 		EVENTS.remove(RenderListener.class, this);
-		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		
 		stopBuildingBuffer();
 		coordinator.reset();
@@ -182,43 +170,19 @@ public final class SearchHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onCameraTransformViewBobbing(
-		CameraTransformViewBobbingEvent event)
-	{
-		if(drawTracers.isChecked())
-			event.cancel();
-	}
-	
-	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		if((vertexBuffer == null || bufferRegion == null)
-			&& (!drawTracers.isChecked() || foundBlocks.isEmpty()))
+		if(vertexBuffer == null || bufferRegion == null)
 			return;
 		
+		matrixStack.push();
+		RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
+		
 		float[] rainbow = RenderUtils.getRainbowColor();
+		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_QUADS, rainbow,
+			0.5F);
 		
-		if(vertexBuffer != null && bufferRegion != null)
-		{
-			matrixStack.push();
-			RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
-			
-			vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_QUADS, rainbow,
-				0.5F);
-			
-			matrixStack.pop();
-		}
-		
-		if(drawTracers.isChecked() && !foundBlocks.isEmpty())
-		{
-			int color = RenderUtils.toIntColor(rainbow, 0.5F);
-			
-			ArrayList<ColoredPoint> points = foundBlocks.stream()
-				.map(pos -> new ColoredPoint(Vec3d.ofCenter(pos), color))
-				.collect(Collectors.toCollection(ArrayList::new));
-			
-			RenderUtils.drawTracers(matrixStack, partialTicks, points, false);
-		}
+		matrixStack.pop();
 	}
 	
 	private void stopBuildingBuffer()
@@ -232,7 +196,6 @@ public final class SearchHack extends Hack implements UpdateListener,
 		compileVerticesTask = null;
 		
 		bufferUpToDate = false;
-		foundBlocks.clear();
 	}
 	
 	private void startGetMatchingBlocksTask()
@@ -250,8 +213,6 @@ public final class SearchHack extends Hack implements UpdateListener,
 	private void startCompileVerticesTask()
 	{
 		HashSet<BlockPos> matchingBlocks = getMatchingBlocksTask.join();
-		foundBlocks.clear();
-		foundBlocks.addAll(matchingBlocks);
 		
 		if(matchingBlocks.size() < limit.getValueLog())
 			notify = true;
