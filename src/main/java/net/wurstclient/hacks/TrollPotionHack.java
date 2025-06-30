@@ -71,6 +71,7 @@ public final class TrollPotionHack extends Hack
 			if(!MC.player.getInventory().getStack(i).isEmpty())
 				continue;
 			
+			MC.player.getInventory().setStack(i, stack);
 			MC.player.networkHandler.sendPacket(
 				new CreativeInventoryActionC2SPacket(36 + i, stack));
 			return true;
