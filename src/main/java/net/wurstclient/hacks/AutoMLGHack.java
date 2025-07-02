@@ -78,6 +78,9 @@ public final class AutoMLGHack extends Hack
 		new CheckboxSetting("Pickup after landing",
 			"Picks up the water after you land safely", true);
 	
+	private final SliderSetting pickupDelay = new SliderSetting("Pickup delay",
+		"", 1, 0, 20, 1, ValueDisplay.INTEGER);
+	
 	private final CheckboxSetting predictLanding = new CheckboxSetting(
 		"Better landing prediction",
 		"Predicts your landing position based on your velocity, hitbox (more computation intensive)",
@@ -138,6 +141,7 @@ public final class AutoMLGHack extends Hack
 		addSetting(mode);
 		addSetting(minFallDistance);
 		addSetting(pickupAfter);
+		addSetting(pickupDelay);
 		addSetting(predictLanding);
 		addSetting(ignoreSolidCheck);
 		addSetting(onlyWhenHolding);
@@ -201,26 +205,26 @@ public final class AutoMLGHack extends Hack
 	{
 		ClientPlayerEntity player = MC.player;
 		
-		if(player.isOnGround() || player.isSubmergedInWater())
+		if(state == State.LANDED)
 		{
-			if(state == State.PLACED)
+			if(pickupDelayTicks > 0)
 			{
-				state = State.LANDED;
-				pickupDelayTicks = 4;
+				pickupDelayTicks--;
 				return;
 			}
-			
-			if(state == State.LANDED)
-			{
-				if(pickupDelayTicks > 0)
-				{
-					pickupDelayTicks--;
-					return;
-				}
-				pickup();
-				return;
-			}
-			
+			pickup();
+			return;
+		}
+		
+		if(state == State.PLACED && player.fallDistance == 0)
+		{
+			state = State.LANDED;
+			pickupDelayTicks = pickupDelay.getValueI();
+			return;
+		}
+		
+		if(player.isOnGround())
+		{
 			reset();
 			return;
 		}
@@ -230,7 +234,8 @@ public final class AutoMLGHack extends Hack
 			|| (pauseForMace.isChecked() && isHoldingMace(player))
 			|| player.fallDistance < minFallDistance.getValueI())
 		{
-			reset();
+			if(state == State.IDLE)
+				reset();
 			return;
 		}
 		
@@ -252,11 +257,14 @@ public final class AutoMLGHack extends Hack
 			originalSlot = player.getInventory().getSelectedSlot();
 		
 		if(!player.getMainHandStack().isOf(currentSolution.item()))
+		{
 			if(!InventoryUtils.selectItem(currentSolution.item()))
 			{
 				reset();
 				return;
 			}
+			return;
+		}
 		
 		if(currentSolution.timeToImpact() <= 2)
 		{
