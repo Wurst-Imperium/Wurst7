@@ -66,7 +66,7 @@ public final class AutoMLGHack extends Hack
 	
 	private final EnumSetting<MlgMode> mode = new EnumSetting<>("Mode",
 		"Legit: Smoothly rotates your camera like a player\n"
-			+ "Packet: Instantly snaps serverside\nNOTE: THIS MIGHT FAIL WITH WATER",
+			+ "Packet: Instantly snaps serverside\nNOTE: THIS MIGHT FAIL WITH BUCKETS",
 		MlgMode.values(), MlgMode.LEGIT);
 	
 	private final SliderSetting minFallDistance =
@@ -79,7 +79,8 @@ public final class AutoMLGHack extends Hack
 			"Picks up the water after you land safely", true);
 	
 	private final SliderSetting pickupDelay = new SliderSetting("Pickup delay",
-		"", 1, 0, 20, 1, ValueDisplay.INTEGER);
+		"Improved AutoPickup reliability + custom pickup delay", 1, 0, 20, 1,
+		ValueDisplay.INTEGER);
 	
 	private final CheckboxSetting predictLanding = new CheckboxSetting(
 		"Better landing prediction",
@@ -343,10 +344,10 @@ public final class AutoMLGHack extends Hack
 		Vec3d pos = MC.player.getPos();
 		Vec3d vel = MC.player.getVelocity();
 		
-		// NOTE: 800 ticks limit is used because the game becomes sometimes
-		// laggy if more, theoretically 400 works too, but 800 is more stable
-		// (400 in findLandingSurfaceVertical)
-		for(int i = 0; i < 800; i++)
+		// NOTE: 600 ticks limit is used because the game becomes sometimes
+		// laggy if more (800 works too), theoretically 200-400 works too, but
+		// 600 is more stable (400 in findLandingSurfaceVertical)
+		for(int i = 0; i < 600; i++)
 		{
 			Vec3d nextPos = pos.add(vel);
 			
