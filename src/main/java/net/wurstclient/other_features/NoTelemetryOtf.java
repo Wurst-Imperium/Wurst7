@@ -43,6 +43,6 @@ public final class NoTelemetryOtf extends OtherFeature
 	{
 		disableTelemetry.setChecked(!disableTelemetry.isChecked());
 	}
-	
-	// See TelemetrySenderMixin
+	// See MinecraftClientMixin.onIsTelemetryEnabledByApi(),
+	// onIsOptionalTelemetryEnabledByApi(); TelemetryManagerMixin.onGetSender()
 }

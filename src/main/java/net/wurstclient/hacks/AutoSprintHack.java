@@ -72,4 +72,5 @@ public final class AutoSprintHack extends Hack implements UpdateListener
 	{
 		return isEnabled() && hungry.isChecked();
 	}
+	// See ClientPlayerEntityMixin.wrapHasForwardMovement(), onCanSprint()
 }
