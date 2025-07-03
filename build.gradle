@@ -32,7 +32,7 @@ configurations.all {
 		// v2.5.1, used by Minecraft 1.21.4 - 1.21.7, is vulnerable to CVE-2024-57699
 		force "net.minidev:json-smart:2.5.2"
 		// v2.13.4, used by Minecraft 1.21.4 - 1.21.7, is vulnerable to CVE-2025-52999
-		force "com.fasterxml.jackson.core:jackson-core:2.15.0"
+		force "com.fasterxml.jackson.core:jackson-core:2.19.1"
 	}
 }
 
