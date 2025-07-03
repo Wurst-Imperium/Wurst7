@@ -12,17 +12,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -54,6 +59,7 @@ public final class TemplateToolHack extends Hack
 	private Area area;
 	private Template template;
 	private File file;
+	private Map<BlockPos, Block> scannedBlocks;
 	
 	public TemplateToolHack()
 	{
@@ -89,6 +95,7 @@ public final class TemplateToolHack extends Hack
 		area = null;
 		template = null;
 		file = null;
+		scannedBlocks = null;
 	}
 	
 	@Override
@@ -133,6 +140,7 @@ public final class TemplateToolHack extends Hack
 			if(area == null)
 			{
 				area = new Area(Step.START_POS.getPos(), Step.END_POS.getPos());
+				scannedBlocks = new HashMap<>();
 				Step.START_POS.setPos(null);
 				Step.END_POS.setPos(null);
 			}
@@ -144,8 +152,12 @@ public final class TemplateToolHack extends Hack
 				area.setScannedBlocks(area.getScannedBlocks() + 1);
 				BlockPos pos = area.getIterator().next();
 				
-				if(!BlockUtils.getState(pos).isReplaceable())
+				BlockState state = BlockUtils.getState(pos);
+				if(!state.isReplaceable())
+				{
 					area.getBlocksFound().add(pos);
+					scannedBlocks.put(pos, state.getBlock());
+				}
 			}
 			
 			// update progress
@@ -364,6 +376,10 @@ public final class TemplateToolHack extends Hack
 		JsonArray jsonBlocks = new JsonArray();
 		for(BlockPos pos : template.getSortedBlocks())
 		{
+			Block block = scannedBlocks.get(pos);
+			if(block == null)
+				continue;
+			
 			// translate
 			pos = pos.subtract(Step.FIRST_BLOCK.getPos());
 			
@@ -372,8 +388,12 @@ public final class TemplateToolHack extends Hack
 				.offset(left, pos.getX());
 			
 			// add to json
-			jsonBlocks.add(JsonUtils.GSON.toJsonTree(
+			JsonObject blockJson = new JsonObject();
+			blockJson.add("pos", JsonUtils.GSON.toJsonTree(
 				new int[]{pos.getX(), pos.getY(), pos.getZ()}, int[].class));
+			blockJson.addProperty("name",
+				Registries.BLOCK.getId(block).toString());
+			jsonBlocks.add(blockJson);
 		}
 		json.add("blocks", jsonBlocks);
 		
