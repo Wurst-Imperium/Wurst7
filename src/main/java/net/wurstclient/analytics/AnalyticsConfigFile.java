@@ -53,6 +53,11 @@ public final class AnalyticsConfigFile
 		try
 		{
 			disableSaving = true;
+			
+			// v1 was bugged, don't load it
+			if(!wson.has("version"))
+				return;
+			
 			plausible.setEnabled(wson.getBoolean("enabled"));
 			
 		}finally
@@ -82,6 +87,7 @@ public final class AnalyticsConfigFile
 	private JsonObject createJson(PlausibleAnalytics plausible)
 	{
 		JsonObject json = new JsonObject();
+		json.addProperty("version", 2);
 		json.addProperty("enabled", plausible.isEnabled());
 		return json;
 	}
