@@ -134,6 +134,7 @@ public final class PlausibleAnalytics
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
+		configFile.save(this);
 	}
 	
 	private boolean isDebugMode()
