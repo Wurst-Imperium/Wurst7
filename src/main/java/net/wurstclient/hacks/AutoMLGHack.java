@@ -113,7 +113,7 @@ public final class AutoMLGHack extends Hack
 			"Allows using a powdered snow bucket (Nether-safe!)", false);
 	
 	private final CheckboxSetting useTwistingVines =
-		new CheckboxSetting("Use Dimension awareness, Twisting Vines Vines",
+		new CheckboxSetting("Use Twisting Vines",
 			"Allows using twisting vines (Nether-safe!)", true);
 	
 	private final CheckboxSetting useSlime = new CheckboxSetting(
@@ -368,6 +368,8 @@ public final class AutoMLGHack extends Hack
 			}
 			
 			pos = nextPos;
+			// 0.98 is (drag coefficient) -> air resistance of 2%
+			// 0.08 is (gravity force) -> subtracted from Y velocity each tick
 			vel = new Vec3d(vel.x * 0.98, (vel.y - 0.08) * 0.98, vel.z * 0.98);
 			
 			if(pos.getY() < MC.world.getBottomY())
