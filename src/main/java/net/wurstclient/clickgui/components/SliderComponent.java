@@ -186,6 +186,11 @@ public final class SliderComponent extends Component
 		return tooltip;
 	}
 	
+	public boolean isDragging()
+	{
+		return this.dragging;
+	}
+	
 	@Override
 	public int getDefaultWidth()
 	{
