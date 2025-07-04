@@ -23,6 +23,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
@@ -41,7 +42,7 @@ import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
 
-@SearchTags({"mlg", "clutch", "autowater"})
+@SearchTags({"mlg", "clutch", "nofall", "autoclutch", "autowater"})
 public final class AutoMLGHack extends Hack
 	implements UpdateListener, MouseUpdateListener
 {
@@ -71,16 +72,15 @@ public final class AutoMLGHack extends Hack
 	
 	private final SliderSetting minFallDistance =
 		new SliderSetting("Min fall distance",
-			"How far you have to fall before the hack will activate", 8, 4, 256,
-			1, ValueDisplay.INTEGER);
+			"How far you have to fall before the hack will activate", 10, 4,
+			256, 1, ValueDisplay.INTEGER);
 	
 	private final CheckboxSetting pickupAfter =
 		new CheckboxSetting("Pickup after landing",
 			"Picks up the water after you land safely", true);
 	
 	private final SliderSetting pickupDelay = new SliderSetting("Pickup delay",
-		"Improved AutoPickup reliability + custom pickup delay", 1, 0, 20, 1,
-		ValueDisplay.INTEGER);
+		"Custom pickup delay after landing", 0, 0, 20, 1, ValueDisplay.INTEGER);
 	
 	private final CheckboxSetting predictLanding = new CheckboxSetting(
 		"Better landing prediction",
@@ -110,7 +110,11 @@ public final class AutoMLGHack extends Hack
 	
 	private final CheckboxSetting usePowderedSnow =
 		new CheckboxSetting("Use Powdered Snow",
-			"Allows using a powdered snow bucket (Nether-safe!)", true);
+			"Allows using a powdered snow bucket (Nether-safe!)", false);
+	
+	private final CheckboxSetting useTwistingVines =
+		new CheckboxSetting("Use Dimension awareness, Twisting Vines Vines",
+			"Allows using twisting vines (Nether-safe!)", true);
 	
 	private final CheckboxSetting useSlime = new CheckboxSetting(
 		"Use Slime Block", "Allows using a slime block", true);
@@ -150,6 +154,7 @@ public final class AutoMLGHack extends Hack
 		addSetting(pauseForMace);
 		addSetting(useWater);
 		addSetting(usePowderedSnow);
+		addSetting(useTwistingVines);
 		addSetting(useSlime);
 		addSetting(useCobweb);
 		addSetting(useHoney);
@@ -394,10 +399,13 @@ public final class AutoMLGHack extends Hack
 	private Item findMlgItem()
 	{
 		List<Item> preferredItems = new ArrayList<>();
-		if(useWater.isChecked())
+		
+		if(useWater.isChecked() && !(MC.world.getRegistryKey() == World.NETHER))
 			preferredItems.add(Items.WATER_BUCKET);
 		if(usePowderedSnow.isChecked())
 			preferredItems.add(Items.POWDER_SNOW_BUCKET);
+		if(useTwistingVines.isChecked())
+			preferredItems.add(Items.TWISTING_VINES);
 		if(useSlime.isChecked())
 			preferredItems.add(Items.SLIME_BLOCK);
 		if(useCobweb.isChecked())
