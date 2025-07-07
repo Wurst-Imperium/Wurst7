@@ -194,6 +194,16 @@ public final class WsonArray
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
+	public int size()
+	{
+		return json.size();
+	}
+	
+	public boolean isEmpty()
+	{
+		return json.isEmpty();
+	}
+	
 	public JsonArray toJsonArray()
 	{
 		return json;

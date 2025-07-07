@@ -16,6 +16,7 @@ import net.minecraft.util.math.Direction;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.json.WsonArray;
 import net.wurstclient.util.json.WsonObject;
 
 public final class AutoBuildTemplate
@@ -36,23 +37,31 @@ public final class AutoBuildTemplate
 		throws IOException, JsonException
 	{
 		WsonObject json = JsonUtils.parseFileToObject(path);
-		int[][] blocks =
-			JsonUtils.GSON.fromJson(json.getElement("blocks"), int[][].class);
+		WsonArray jsonBlocks = json.getArray("blocks");
 		
-		if(blocks == null)
+		if(jsonBlocks.isEmpty())
 			throw new JsonException("Template has no blocks!");
 		
-		for(int i = 0; i < blocks.length; i++)
+		int[][] intBlocks = new int[jsonBlocks.size()][];
+		for(int i = 0; i < jsonBlocks.size(); i++)
 		{
-			int length = blocks[i].length;
-			
-			if(length < 3)
-				throw new JsonException("Entry blocks[" + i
-					+ "] doesn't have X, Y and Z offset. Only found " + length
-					+ " values");
+			WsonArray jsonBlock = jsonBlocks.getArray(i);
+			try
+			{
+				int[] intBlock = new int[3];
+				intBlock[0] = jsonBlock.getInt(0);
+				intBlock[1] = jsonBlock.getInt(1);
+				intBlock[2] = jsonBlock.getInt(2);
+				intBlocks[i] = intBlock;
+				
+			}catch(JsonException e)
+			{
+				throw new JsonException("Entry blocks[" + i + "] is not valid",
+					e);
+			}
 		}
 		
-		return new AutoBuildTemplate(path, blocks);
+		return new AutoBuildTemplate(path, intBlocks);
 	}
 	
 	public LinkedHashSet<BlockPos> getPositions(BlockPos startPos,
