@@ -10,66 +10,51 @@ package net.wurstclient.hacks;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
-import java.util.List;
 
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
-import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.*;
+import net.wurstclient.settings.SwingHandSetting.SwingHand;
+import net.wurstclient.util.AutoBuildTemplate;
+import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
+import net.wurstclient.util.BlockUtils;
+import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.InteractionSimulator;
 import net.wurstclient.util.json.JsonException;
 
-public final class AutoBuildHack extends Hack
-	implements UpdateListener, RightClickListener, RenderListener
+public final class InstaBuildHack extends Hack
+	implements UpdateListener, RightClickListener
 {
-	private static final Box BLOCK_BOX =
-		new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0, 15 / 16.0, 15 / 16.0);
-	
 	private final FileSetting templateSetting = new FileSetting("Template",
 		"Determines what to build.\n\n"
 			+ "Templates are just JSON files. Feel free to add your own or to edit / delete the default templates.\n\n"
 			+ "If you mess up, simply press the 'Reset to Defaults' button or delete the folder.",
-		"autobuild", DefaultAutoBuildTemplates::createFiles);
+		"autobuild", path -> {});
 	
 	private final SliderSetting range = new SliderSetting("Range",
 		"How far to reach when placing blocks.\n" + "Recommended values:\n"
 			+ "6.0 for vanilla\n" + "4.25 for NoCheat+",
 		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final CheckboxSetting checkLOS = new CheckboxSetting(
-		"Check line of sight",
-		"Makes sure that you don't reach through walls when placing blocks. Can help with AntiCheat plugins but slows down building.",
-		false);
-	
-	private final CheckboxSetting fastPlace =
-		new CheckboxSetting("Always FastPlace",
-			"Builds as if FastPlace was enabled, even if it's not.", true);
-	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
 	private LinkedHashSet<BlockPos> remainingBlocks = new LinkedHashSet<>();
 	
-	public AutoBuildHack()
+	public InstaBuildHack()
 	{
-		super("AutoBuild");
+		super("InstaBuild");
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
 		addSetting(range);
-		addSetting(checkLOS);
-		addSetting(fastPlace);
 	}
 	
 	@Override
@@ -89,13 +74,6 @@ public final class AutoBuildHack extends Hack
 			case IDLE:
 			name += " [" + template.getName() + "]";
 			break;
-			
-			case BUILDING:
-			double total = template.size();
-			double placed = total - remainingBlocks.size();
-			double progress = Math.round(placed / total * 1e4) / 1e2;
-			name += " [" + template.getName() + "] " + progress + "%";
-			break;
 		}
 		
 		return name;
@@ -104,12 +82,11 @@ public final class AutoBuildHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		WURST.getHax().instaBuildHack.setEnabled(false);
+		WURST.getHax().autoBuildHack.setEnabled(false);
 		WURST.getHax().templateToolHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RightClickListener.class, this);
-		EVENTS.add(RenderListener.class, this);
 	}
 	
 	@Override
@@ -117,7 +94,6 @@ public final class AutoBuildHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RightClickListener.class, this);
-		EVENTS.remove(RenderListener.class, this);
 		
 		remainingBlocks.clear();
 		
@@ -146,7 +122,7 @@ public final class AutoBuildHack extends Hack
 		Direction direction = MC.player.getHorizontalFacing();
 		remainingBlocks = template.getPositions(startPos, direction);
 		
-		status = Status.BUILDING;
+		buildInstantly();
 	}
 	
 	@Override
@@ -158,6 +134,7 @@ public final class AutoBuildHack extends Hack
 			loadSelectedTemplate();
 			break;
 			
+			default:
 			case LOADING:
 			break;
 			
@@ -165,66 +142,27 @@ public final class AutoBuildHack extends Hack
 			if(!template.isSelected(templateSetting))
 				loadSelectedTemplate();
 			break;
-			
-			case BUILDING:
-			buildNormally();
-			break;
 		}
 	}
 	
-	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	private void buildInstantly()
 	{
-		if(status != Status.BUILDING)
-			return;
-		
-		List<BlockPos> blocksToDraw = remainingBlocks.stream()
-			.filter(pos -> BlockUtils.getState(pos).isReplaceable()).limit(1024)
-			.toList();
-		
-		int black = 0x80000000;
-		List<Box> outlineBoxes =
-			blocksToDraw.stream().map(pos -> BLOCK_BOX.offset(pos)).toList();
-		RenderUtils.drawOutlinedBoxes(matrixStack, outlineBoxes, black, true);
-		
-		int green = 0x2600FF00;
-		Vec3d eyesPos = RotationUtils.getEyesPos();
 		double rangeSq = range.getValueSq();
-		List<Box> greenBoxes = blocksToDraw.stream()
-			.filter(pos -> pos.getSquaredDistance(eyesPos) <= rangeSq)
-			.map(pos -> BLOCK_BOX.offset(pos)).toList();
-		RenderUtils.drawSolidBoxes(matrixStack, greenBoxes, green, true);
-	}
-	
-	private void buildNormally()
-	{
-		remainingBlocks
-			.removeIf(pos -> !BlockUtils.getState(pos).isReplaceable());
 		
-		if(remainingBlocks.isEmpty())
-		{
-			status = Status.IDLE;
-			return;
-		}
-		
-		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
-			return;
-		
-		double rangeSq = range.getValueSq();
 		for(BlockPos pos : remainingBlocks)
 		{
+			if(!BlockUtils.getState(pos).isReplaceable())
+				continue;
+			
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
 			if(params == null || params.distanceSq() > rangeSq)
 				continue;
-			if(checkLOS.isChecked() && !params.lineOfSight())
-				continue;
 			
-			MC.itemUseCooldown = 4;
-			RotationUtils.getNeededRotations(params.hitVec())
-				.sendPlayerLookPacket();
-			InteractionSimulator.rightClickBlock(params.toHitResult());
-			break;
+			InteractionSimulator.rightClickBlock(params.toHitResult(),
+				SwingHand.OFF);
 		}
+		
+		remainingBlocks.clear();
 	}
 	
 	private void loadSelectedTemplate()
@@ -251,16 +189,10 @@ public final class AutoBuildHack extends Hack
 		}
 	}
 	
-	public Path getFolder()
-	{
-		return templateSetting.getFolder();
-	}
-	
 	private enum Status
 	{
 		NO_TEMPLATE,
 		LOADING,
-		IDLE,
-		BUILDING;
+		IDLE;
 	}
 }

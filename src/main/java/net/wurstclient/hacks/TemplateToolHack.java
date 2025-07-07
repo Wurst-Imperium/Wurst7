@@ -66,6 +66,7 @@ public final class TemplateToolHack extends Hack
 	{
 		// disable conflicting hacks
 		WURST.getHax().autoBuildHack.setEnabled(false);
+		WURST.getHax().instaBuildHack.setEnabled(false);
 		WURST.getHax().bowAimbotHack.setEnabled(false);
 		WURST.getHax().excavatorHack.setEnabled(false);
 		

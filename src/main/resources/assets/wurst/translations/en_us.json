@@ -129,6 +129,7 @@
   "description.wurst.hack.healthtags": "Shows the health of players in their nametags.",
   "description.wurst.hack.highjump": "Allows you to jump higher.\n\n§c§lWARNING:§r You will take fall damage if you don't use NoFall.",
   "description.wurst.hack.infinichat": "Removes the 256 character limit from the chat.\nUseful for long commands that modify NBT data.\n\n§6§lNOTICE:§r Not recommended for talking to people. Most servers will cut messages to 256 characters on their end.",
+  "description.wurst.hack.instabuild": "Similar to AutoBuild, but tries to build the entire template in one tick.\nOnly works with very simple templates.",
   "description.wurst.hack.instantbunker": "Builds a small bunker around you. Needs 57 blocks.",
   "description.wurst.hack.invwalk": "Allows you to move around while the inventory is open.",
   "description.wurst.setting.invwalk.allow_clickgui": "Allows you to move around while Wurst's ClickGUI is open.",
