@@ -14,7 +14,14 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -27,6 +34,7 @@ import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.InteractionSimulator;
 import net.wurstclient.util.RenderUtils;
 
 @DontSaveState
@@ -34,7 +42,8 @@ import net.wurstclient.util.RenderUtils;
 public final class FreecamHack extends Hack implements UpdateListener,
 	PacketOutputListener, IsPlayerInWaterListener, AirStrafingSpeedListener,
 	IsPlayerInLavaListener, CameraTransformViewBobbingListener,
-	IsNormalCubeListener, SetOpaqueCubeListener, RenderListener
+	IsNormalCubeListener, SetOpaqueCubeListener, RenderListener,
+	RightClickListener, HandleBlockBreakingListener
 {
 	private final SliderSetting speed =
 		new SliderSetting("Speed", 1, 0.05, 10, 0.05, ValueDisplay.DECIMAL);
@@ -45,6 +54,11 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	private final ColorSetting color =
 		new ColorSetting("Tracer color", Color.WHITE);
 	
+	private final CheckboxSetting lockInteraction = new CheckboxSetting(
+		"Lock Interaction",
+		"Locks interactions to the real player position instead of the FreeCam's",
+		false);
+	
 	private FakePlayerEntity fakePlayer;
 	
 	public FreecamHack()
@@ -52,6 +66,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		super("Freecam");
 		setCategory(Category.RENDER);
 		addSetting(speed);
+		addSetting(lockInteraction);
 		addSetting(tracer);
 		addSetting(color);
 	}
@@ -68,6 +83,8 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		EVENTS.add(IsNormalCubeListener.class, this);
 		EVENTS.add(SetOpaqueCubeListener.class, this);
 		EVENTS.add(RenderListener.class, this);
+		EVENTS.add(RightClickListener.class, this);
+		EVENTS.add(HandleBlockBreakingListener.class, this);
 		
 		fakePlayer = new FakePlayerEntity();
 		
@@ -91,6 +108,8 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		EVENTS.remove(IsNormalCubeListener.class, this);
 		EVENTS.remove(SetOpaqueCubeListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
+		EVENTS.remove(RightClickListener.class, this);
+		EVENTS.remove(HandleBlockBreakingListener.class, this);
 		
 		fakePlayer.resetPlayerPosition();
 		fakePlayer.despawn();
@@ -180,5 +199,82 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		// line
 		RenderUtils.drawTracer(matrixStack, partialTicks,
 			fakePlayer.getBoundingBox().getCenter(), colorI, false);
+	}
+	
+	@Override
+	public void onRightClick(RightClickEvent event)
+	{
+		if(!lockInteraction.isChecked())
+			return;
+		
+		event.cancel();
+		
+		if(MC.player.getItemUseTime() > 0)
+			return;
+		
+		MC.itemUseCooldown = 4;
+		
+		HitResult hitResult = fakePlayer
+			.raycast(5.0/* MC.player.getEntityInteractionRange() */, 0, false);
+		
+		if(hitResult.getType() == HitResult.Type.ENTITY)
+		{
+			EntityHitResult entityHitResult = (EntityHitResult)hitResult;
+			for(Hand hand : Hand.values())
+			{
+				// general interaction
+				ActionResult result = MC.interactionManager.interactEntity(
+					MC.player, entityHitResult.getEntity(), hand);
+				if(result.isAccepted())
+				{
+					MC.player.swingHand(hand);
+					return;
+				}
+				// specific hit interaction
+				result =
+					MC.interactionManager.interactEntityAtLocation(MC.player,
+						entityHitResult.getEntity(), entityHitResult, hand);
+				if(result.isAccepted())
+				{
+					MC.player.swingHand(hand);
+					return;
+				}
+			}
+		}
+		
+		BlockHitResult blockHitResult =
+			hitResult.getType() == HitResult.Type.BLOCK
+				? (BlockHitResult)hitResult
+				: new BlockHitResult(hitResult.getPos(), Direction.UP,
+					BlockPos.ofFloored(hitResult.getPos()), false);
+		
+		InteractionSimulator.rightClickBlock(blockHitResult);
+	}
+	
+	@Override
+	public void onHandleBlockBreaking(HandleBlockBreakingEvent event)
+	{
+		if(!lockInteraction.isChecked())
+			return;
+		
+		event.cancel();
+		
+		if(!MC.options.attackKey.isPressed() || MC.player.isUsingItem())
+		{
+			MC.interactionManager.cancelBlockBreaking();
+			return;
+		}
+		HitResult hitResult = fakePlayer
+			.raycast(5.0/* MC.player.getEntityInteractionRange() */, 0, false);
+		if(hitResult.getType() != HitResult.Type.BLOCK)
+		{
+			MC.interactionManager.cancelBlockBreaking();
+			return;
+		}
+		
+		BlockHitResult blockHitResult = (BlockHitResult)hitResult;
+		BlockPos pos = blockHitResult.getBlockPos();
+		MC.interactionManager.updateBlockBreakingProgress(pos,
+			blockHitResult.getSide());
 	}
 }
