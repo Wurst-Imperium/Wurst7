@@ -53,9 +53,9 @@ public final class Area
 		return progress;
 	}
 	
-	public void setProgress(float progress)
+	public void updateProgress()
 	{
-		this.progress = progress;
+		progress = scannedBlocks / (float)totalBlocks;
 	}
 	
 	public int getTotalBlocks()

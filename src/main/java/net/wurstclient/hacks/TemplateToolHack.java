@@ -149,9 +149,7 @@ public final class TemplateToolHack extends Hack
 					area.getBlocksFound().add(pos);
 			}
 			
-			// update progress
-			area.setProgress(
-				(float)area.getScannedBlocks() / (float)area.getTotalBlocks());
+			area.updateProgress();
 			
 			// continue with next step
 			if(!area.getIterator().hasNext())
