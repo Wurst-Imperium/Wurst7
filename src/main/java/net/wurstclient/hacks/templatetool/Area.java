@@ -17,8 +17,7 @@ import net.wurstclient.util.BlockUtils;
 
 public final class Area
 {
-	private final int minX, minY, minZ;
-	private final int sizeX, sizeY, sizeZ;
+	private final Box box;
 	
 	private final int totalBlocks, scanSpeed;
 	private final Iterator<BlockPos> iterator;
@@ -30,23 +29,11 @@ public final class Area
 	
 	public Area(BlockPos start, BlockPos end)
 	{
-		int startX = start.getX();
-		int startY = start.getY();
-		int startZ = start.getZ();
-		
-		int endX = end.getX();
-		int endY = end.getY();
-		int endZ = end.getZ();
-		
-		minX = Math.min(startX, endX);
-		minY = Math.min(startY, endY);
-		minZ = Math.min(startZ, endZ);
-		
-		sizeX = Math.abs(startX - endX);
-		sizeY = Math.abs(startY - endY);
-		sizeZ = Math.abs(startZ - endZ);
-		
-		totalBlocks = (sizeX + 1) * (sizeY + 1) * (sizeZ + 1);
+		box = Box.enclosing(start, end);
+		int lengthX = Math.abs(start.getX() - end.getX()) + 1;
+		int lengthY = Math.abs(start.getY() - end.getY()) + 1;
+		int lengthZ = Math.abs(start.getZ() - end.getZ()) + 1;
+		totalBlocks = lengthX * lengthY * lengthZ;
 		scanSpeed = MathHelper.clamp(totalBlocks / 30, 1, 1024);
 		iterator = BlockUtils.getAllInBox(start, end).iterator();
 	}
@@ -71,36 +58,6 @@ public final class Area
 		this.progress = progress;
 	}
 	
-	public int getMinX()
-	{
-		return minX;
-	}
-	
-	public int getMinY()
-	{
-		return minY;
-	}
-	
-	public int getMinZ()
-	{
-		return minZ;
-	}
-	
-	public int getSizeX()
-	{
-		return sizeX;
-	}
-	
-	public int getSizeY()
-	{
-		return sizeY;
-	}
-	
-	public int getSizeZ()
-	{
-		return sizeZ;
-	}
-	
 	public int getTotalBlocks()
 	{
 		return totalBlocks;
@@ -123,7 +80,6 @@ public final class Area
 	
 	public Box toBox()
 	{
-		return new Box(minX, minY, minZ, minX + sizeX + 1, minY + sizeY + 1,
-			minZ + sizeZ + 1);
+		return box;
 	}
 }
