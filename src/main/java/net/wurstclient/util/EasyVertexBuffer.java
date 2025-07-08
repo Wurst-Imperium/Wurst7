@@ -85,9 +85,9 @@ public final class EasyVertexBuffer implements AutoCloseable
 	public void draw(MatrixStack matrixStack, RenderLayer.MultiPhase layer,
 		int argb)
 	{
-		float alpha = ((argb >> 24) & 0xFF) / 255F;
-		float red = ((argb >> 16) & 0xFF) / 255F;
-		float green = ((argb >> 8) & 0xFF) / 255F;
+		float alpha = (argb >> 24 & 0xFF) / 255F;
+		float red = (argb >> 16 & 0xFF) / 255F;
+		float green = (argb >> 8 & 0xFF) / 255F;
 		float blue = (argb & 0xFF) / 255F;
 		draw(matrixStack, layer, red, green, blue, alpha);
 	}
