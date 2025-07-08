@@ -153,7 +153,7 @@ public final class TemplateToolHack extends Hack
 			
 			// continue with next step
 			if(!area.getIterator().hasNext())
-				step = Step.values()[step.ordinal() + 1];
+				step = Step.FIRST_BLOCK;
 			
 			// creating template step
 		}else if(step == Step.CREATE_TEMPLATE)
@@ -230,7 +230,7 @@ public final class TemplateToolHack extends Hack
 			// continue with next step
 			if(template.getSortedBlocks().size() == template.getTotalBlocks())
 			{
-				step = Step.values()[step.ordinal() + 1];
+				step = Step.FILE_NAME;
 				MC.setScreen(new ChooseNameScreen());
 			}
 		}
@@ -352,7 +352,7 @@ public final class TemplateToolHack extends Hack
 	
 	public void saveFile()
 	{
-		step = Step.values()[step.ordinal() + 1];
+		step = Step.SAVE_FILE;
 		JsonObject json = new JsonObject();
 		
 		// get facings
