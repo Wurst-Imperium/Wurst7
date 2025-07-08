@@ -64,6 +64,10 @@ public final class AutoBuildHack extends Hack
 		new CheckboxSetting("Always FastPlace",
 			"Builds as if FastPlace was enabled, even if it's not.", true);
 	
+	private final CheckboxSetting hideTemplate = new CheckboxSetting(
+		"Don't show working template",
+		"Hides the template name from the HUD display when building.", false);
+	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
 	private LinkedHashSet<BlockPos> remainingBlocks = new LinkedHashSet<>();
@@ -77,6 +81,7 @@ public final class AutoBuildHack extends Hack
 		addSetting(checkLOS);
 		addSetting(instaBuild);
 		addSetting(fastPlace);
+		addSetting(hideTemplate);
 	}
 	
 	@Override
@@ -90,18 +95,23 @@ public final class AutoBuildHack extends Hack
 			break;
 			
 			case LOADING:
-			name += " [Loading...]";
+			if(!hideTemplate.isChecked())
+				name += " [Loading...]";
 			break;
 			
 			case IDLE:
-			name += " [" + template.getName() + "]";
+			if(!hideTemplate.isChecked())
+				name += " [" + template.getName() + "]";
 			break;
 			
 			case BUILDING:
-			double total = template.size();
-			double placed = total - remainingBlocks.size();
-			double progress = Math.round(placed / total * 1e4) / 1e2;
-			name += " [" + template.getName() + "] " + progress + "%";
+			if(!hideTemplate.isChecked())
+			{
+				double total = template.size();
+				double placed = total - remainingBlocks.size();
+				double progress = Math.round(placed / total * 1e4) / 1e2;
+				name += " [" + template.getName() + "] " + progress + "%";
+			}
 			break;
 		}
 		
