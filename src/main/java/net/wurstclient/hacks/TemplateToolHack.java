@@ -265,7 +265,7 @@ public final class TemplateToolHack extends Hack
 			}
 			
 			// area box
-			Box areaBox = area.toBox();
+			Box areaBox = area.toBox().contract(1 / 16.0);
 			RenderUtils.drawOutlinedBox(matrixStack, areaBox, black, true);
 			
 			// area scanner

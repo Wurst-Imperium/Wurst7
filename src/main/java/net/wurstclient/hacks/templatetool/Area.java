@@ -123,7 +123,7 @@ public final class Area
 	
 	public Box toBox()
 	{
-		return new Box(minX, minY, minZ, minX + sizeX, minY + sizeY,
-			minZ + sizeZ);
+		return new Box(minX, minY, minZ, minX + sizeX + 1, minY + sizeY + 1,
+			minZ + sizeZ + 1);
 	}
 }
