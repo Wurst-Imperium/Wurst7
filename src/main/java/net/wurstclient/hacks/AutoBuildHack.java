@@ -15,8 +15,11 @@ import java.util.Map;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -272,6 +275,17 @@ public final class AutoBuildHack extends Hack
 					
 					if(!MC.player.getMainHandStack().isOf(requiredItem))
 					{
+						if(InventoryUtils.count(requiredItem) == 0
+							&& MC.player.getAbilities().creativeMode)
+						{
+							// Note: giveItem() in CmdUtils (same for
+							// InstaBuild) (can be easily changed)
+							// was not used here because of
+							// 1.I assume the throws CmdError isnt feasible here
+							// 2. CmdUtils probably for cmd usage only
+							giveCreativeItem(new ItemStack(requiredItem));
+							return;
+						}
 						
 						if(InventoryUtils.selectItem(requiredItem, 36, true))
 							return;
@@ -290,6 +304,24 @@ public final class AutoBuildHack extends Hack
 			InteractionSimulator.rightClickBlock(params.toHitResult());
 			break;
 		}
+	}
+	
+	private void giveCreativeItem(ItemStack stack)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		int slot = inventory.getEmptySlot();
+		if(slot < 0)
+		{
+			ChatUtils.error("Cannot get " + stack.getName().getString()
+				+ ". Your inventory is full.");
+			return;
+		}
+		
+		inventory.setStack(slot, stack);
+		CreativeInventoryActionC2SPacket packet =
+			new CreativeInventoryActionC2SPacket(
+				InventoryUtils.toNetworkSlot(slot), stack);
+		MC.player.networkHandler.sendPacket(packet);
 	}
 	
 	private void loadSelectedTemplate()

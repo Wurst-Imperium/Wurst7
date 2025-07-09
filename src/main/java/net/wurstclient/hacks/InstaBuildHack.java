@@ -13,8 +13,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -196,7 +199,21 @@ public final class InstaBuildHack extends Hack
 					
 					if(hotbarSlot == -1)
 					{
-						continue;
+						if(MC.player.getAbilities().creativeMode
+							&& InventoryUtils.count(requiredItem) == 0)
+						{
+							// Note: giveItem() in CmdUtils (same for
+							// AutoBuild) (can be easily changed)
+							// was not used here because of
+							// 1.I assume the throws CmdError isnt feasible here
+							// 2. CmdUtils probably for cmd usage only
+							giveCreativeItem(new ItemStack(requiredItem));
+							hotbarSlot =
+								InventoryUtils.indexOf(requiredItem, 9);
+						}
+						
+						if(hotbarSlot == -1)
+							continue;
 					}
 					
 					if(MC.player.getInventory().getSelectedSlot() != hotbarSlot)
@@ -215,6 +232,35 @@ public final class InstaBuildHack extends Hack
 			MC.player.getInventory().setSelectedSlot(originalSlot);
 		
 		remainingBlocks.clear();
+	}
+	
+	private void giveCreativeItem(ItemStack stack)
+	{
+		PlayerInventory inventory = MC.player.getInventory();
+		
+		int slot = -1;
+		for(int i = 0; i < 9; i++)
+			if(inventory.getStack(i).isEmpty())
+			{
+				slot = i;
+				break;
+			}
+		
+		if(slot == -1)
+			slot = inventory.getEmptySlot();
+		
+		if(slot == -1)
+		{
+			ChatUtils.error("Cannot get " + stack.getName().getString()
+				+ ". Your inventory is full.");
+			return;
+		}
+		
+		inventory.setStack(slot, stack);
+		CreativeInventoryActionC2SPacket packet =
+			new CreativeInventoryActionC2SPacket(
+				InventoryUtils.toNetworkSlot(slot), stack);
+		MC.player.networkHandler.sendPacket(packet);
 	}
 	
 	private void loadSelectedTemplate()
