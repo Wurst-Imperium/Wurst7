@@ -9,8 +9,14 @@ package net.wurstclient.hacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -19,6 +25,7 @@ import net.wurstclient.Category;
 import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -28,7 +35,9 @@ import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.DefaultAutoBuildTemplates;
 import net.wurstclient.util.InteractionSimulator;
+import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.json.JsonException;
 
 public final class InstaBuildHack extends Hack
@@ -38,16 +47,23 @@ public final class InstaBuildHack extends Hack
 		"Determines what to build.\n\n"
 			+ "Templates are just JSON files. Feel free to add your own or to edit / delete the default templates.\n\n"
 			+ "If you mess up, simply press the 'Reset to Defaults' button or delete the folder.",
-		"autobuild", path -> {});
+		"autobuild", DefaultAutoBuildTemplates::createFiles);
 	
 	private final SliderSetting range = new SliderSetting("Range",
 		"How far to reach when placing blocks.\n" + "Recommended values:\n"
 			+ "6.0 for vanilla\n" + "4.25 for NoCheat+",
 		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
+	private final CheckboxSetting useSavedBlocks =
+		new CheckboxSetting("Use saved blocks",
+			"Tries to place the same blocks that were saved in the template\n"
+				+ "If disabled, it will use whatever block you are holding",
+			true);
+	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
-	private LinkedHashSet<BlockPos> remainingBlocks = new LinkedHashSet<>();
+	private LinkedHashMap<BlockPos, String> remainingBlocks =
+		new LinkedHashMap<>();
 	
 	public InstaBuildHack()
 	{
@@ -55,6 +71,7 @@ public final class InstaBuildHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
 		addSetting(range);
+		addSetting(useSavedBlocks);
 	}
 	
 	@Override
@@ -120,7 +137,7 @@ public final class InstaBuildHack extends Hack
 		
 		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
 		Direction direction = MC.player.getHorizontalFacing();
-		remainingBlocks = template.getPositions(startPos, direction);
+		remainingBlocks = template.getBlocksToPlace(startPos, direction);
 		
 		buildInstantly();
 	}
@@ -147,20 +164,55 @@ public final class InstaBuildHack extends Hack
 	
 	private void buildInstantly()
 	{
-		double rangeSq = range.getValueSq();
+		int originalSlot = MC.player.getInventory().getSelectedSlot();
+		boolean switchedSlot = false;
 		
-		for(BlockPos pos : remainingBlocks)
+		for(Map.Entry<BlockPos, String> entry : remainingBlocks.entrySet())
 		{
+			BlockPos pos = entry.getKey();
 			if(!BlockUtils.getState(pos).isReplaceable())
 				continue;
 			
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
-			if(params == null || params.distanceSq() > rangeSq)
+			if(params == null || params.distanceSq() > range.getValueSq())
 				continue;
+			
+			if(useSavedBlocks.isChecked())
+			{
+				String blockName = entry.getValue();
+				if(blockName != null)
+				{
+					Identifier id = Identifier.tryParse(blockName);
+					if(id == null)
+						continue;
+					
+					Block block = Registries.BLOCK.get(id);
+					Item requiredItem = block.asItem();
+					
+					if(requiredItem == Items.AIR)
+						continue;
+					
+					int hotbarSlot = InventoryUtils.indexOf(requiredItem, 9);
+					
+					if(hotbarSlot == -1)
+					{
+						continue;
+					}
+					
+					if(MC.player.getInventory().getSelectedSlot() != hotbarSlot)
+					{
+						MC.player.getInventory().setSelectedSlot(hotbarSlot);
+						switchedSlot = true;
+					}
+				}
+			}
 			
 			InteractionSimulator.rightClickBlock(params.toHitResult(),
 				SwingHand.OFF);
 		}
+		
+		if(switchedSlot)
+			MC.player.getInventory().setSelectedSlot(originalSlot);
 		
 		remainingBlocks.clear();
 	}

@@ -14,6 +14,8 @@ import java.io.PrintWriter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -44,6 +46,10 @@ public final class SavingFileState extends TemplateToolState
 		JsonArray jsonBlocks = new JsonArray();
 		for(BlockPos pos : hack.getSortedBlocks())
 		{
+			BlockState state = hack.getNonEmptyBlocks().get(pos);
+			if(state == null)
+				continue;
+			
 			// Translate
 			pos = pos.subtract(origin);
 			
@@ -52,11 +58,16 @@ public final class SavingFileState extends TemplateToolState
 				.offset(left, pos.getX());
 			
 			// Add to json
-			JsonArray xyz = new JsonArray();
-			xyz.add(pos.getX());
-			xyz.add(pos.getY());
-			xyz.add(pos.getZ());
-			jsonBlocks.add(xyz);
+			JsonObject blockJson = new JsonObject();
+			JsonArray posArray = new JsonArray();
+			posArray.add(pos.getX());
+			posArray.add(pos.getY());
+			posArray.add(pos.getZ());
+			
+			blockJson.add("pos", posArray);
+			blockJson.addProperty("name",
+				Registries.BLOCK.getId(state.getBlock()).toString());
+			jsonBlocks.add(blockJson);
 		}
 		json.add("blocks", jsonBlocks);
 		

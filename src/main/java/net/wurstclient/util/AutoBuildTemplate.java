@@ -9,8 +9,9 @@ package net.wurstclient.util;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 
+import com.google.gson.JsonElement;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.settings.FileSetting;
@@ -23,9 +24,9 @@ public final class AutoBuildTemplate
 {
 	private final Path path;
 	private final String name;
-	private final int[][] blocks;
+	private final BlockData[] blocks;
 	
-	private AutoBuildTemplate(Path path, int[][] blocks)
+	private AutoBuildTemplate(Path path, BlockData[] blocks)
 	{
 		this.path = path;
 		String fileName = path.getFileName().toString();
@@ -42,42 +43,66 @@ public final class AutoBuildTemplate
 		if(jsonBlocks.isEmpty())
 			throw new JsonException("Template has no blocks!");
 		
-		int[][] intBlocks = new int[jsonBlocks.size()][];
-		for(int i = 0; i < jsonBlocks.size(); i++)
+		BlockData[] blocks = new BlockData[jsonBlocks.size()];
+		JsonElement first = jsonBlocks.getElement(0);
+		
+		if(first.isJsonArray())
 		{
-			WsonArray jsonBlock = jsonBlocks.getArray(i);
-			try
+			// old format compatilibility
+			for(int i = 0; i < jsonBlocks.size(); i++)
 			{
-				int[] intBlock = new int[3];
-				intBlock[0] = jsonBlock.getInt(0);
-				intBlock[1] = jsonBlock.getInt(1);
-				intBlock[2] = jsonBlock.getInt(2);
-				intBlocks[i] = intBlock;
-				
-			}catch(JsonException e)
-			{
-				throw new JsonException("Entry blocks[" + i + "] is not valid",
-					e);
+				WsonArray jsonBlock = jsonBlocks.getArray(i);
+				try
+				{
+					int[] pos = new int[3];
+					pos[0] = jsonBlock.getInt(0);
+					pos[1] = jsonBlock.getInt(1);
+					pos[2] = jsonBlock.getInt(2);
+					blocks[i] = new BlockData(pos, null);
+					
+				}catch(JsonException e)
+				{
+					throw new JsonException(
+						"Entry blocks[" + i + "] is not valid", e);
+				}
 			}
+			
+		}else if(first.isJsonObject())
+		{
+			// new format (included blocks)
+			for(int i = 0; i < jsonBlocks.size(); i++)
+			{
+				WsonObject blockObj = jsonBlocks.getObject(i);
+				WsonArray posArray = blockObj.getArray("pos");
+				int[] pos = {posArray.getInt(0), posArray.getInt(1),
+					posArray.getInt(2)};
+				String name = blockObj.getString("name", null);
+				blocks[i] = new BlockData(pos, name);
+			}
+			
+		}else
+		{
+			throw new JsonException("Unknown format for blocks arr elements");
 		}
 		
-		return new AutoBuildTemplate(path, intBlocks);
+		return new AutoBuildTemplate(path, blocks);
 	}
 	
-	public LinkedHashSet<BlockPos> getPositions(BlockPos startPos,
+	public LinkedHashMap<BlockPos, String> getBlocksToPlace(BlockPos startPos,
 		Direction direction)
 	{
 		Direction front = direction;
 		Direction left = front.rotateYCounterclockwise();
-		LinkedHashSet<BlockPos> positions = new LinkedHashSet<>();
+		LinkedHashMap<BlockPos, String> positions = new LinkedHashMap<>();
 		
-		for(int[] block : blocks)
+		for(BlockData block : blocks)
 		{
+			int[] blockPosArray = block.pos();
 			BlockPos pos = startPos;
-			pos = pos.offset(left, block[0]);
-			pos = pos.up(block[1]);
-			pos = pos.offset(front, block[2]);
-			positions.add(pos);
+			pos = pos.offset(left, blockPosArray[0]);
+			pos = pos.up(blockPosArray[1]);
+			pos = pos.offset(front, blockPosArray[2]);
+			positions.put(pos, block.name());
 		}
 		
 		return positions;
@@ -103,8 +128,13 @@ public final class AutoBuildTemplate
 		return name;
 	}
 	
-	public int[][] getBlocks()
+	public BlockData[] getBlocks()
 	{
 		return blocks;
+	}
+	
+	public record BlockData(int[] pos, String name)
+	{
+		
 	}
 }
