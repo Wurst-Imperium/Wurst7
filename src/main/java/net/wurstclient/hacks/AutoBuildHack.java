@@ -83,6 +83,7 @@ public final class AutoBuildHack extends Hack
 	private AutoBuildTemplate template;
 	private LinkedHashMap<BlockPos, String> remainingBlocks =
 		new LinkedHashMap<>();
+	private String missingBlockName;
 	
 	public AutoBuildHack()
 	{
@@ -169,6 +170,7 @@ public final class AutoBuildHack extends Hack
 		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
 		Direction direction = MC.player.getHorizontalFacing();
 		remainingBlocks = template.getBlocksToPlace(startPos, direction);
+		missingBlockName = null;
 		
 		status = Status.BUILDING;
 	}
@@ -231,6 +233,15 @@ public final class AutoBuildHack extends Hack
 			return;
 		}
 		
+		if(missingBlockName != null)
+		{
+			Identifier id = Identifier.tryParse(missingBlockName);
+			if(id == null || InventoryUtils.count(Registries.ITEM.get(id)) > 0)
+				missingBlockName = null;
+			else
+				return;
+		}
+		
 		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
 			return;
 		
@@ -283,7 +294,11 @@ public final class AutoBuildHack extends Hack
 							// was not used here because of
 							// 1.I assume the throws CmdError isnt feasible here
 							// 2. CmdUtils probably for cmd usage only
-							giveCreativeItem(new ItemStack(requiredItem));
+							if(!giveCreativeItem(new ItemStack(requiredItem)))
+							{
+								missingBlockName = blockName;
+								return;
+							}
 							return;
 						}
 						
@@ -306,15 +321,15 @@ public final class AutoBuildHack extends Hack
 		}
 	}
 	
-	private void giveCreativeItem(ItemStack stack)
+	private boolean giveCreativeItem(ItemStack stack)
 	{
 		PlayerInventory inventory = MC.player.getInventory();
 		int slot = inventory.getEmptySlot();
 		if(slot < 0)
 		{
 			ChatUtils.error("Cannot get " + stack.getName().getString()
-				+ ". Your inventory is full.");
-			return;
+				+ ". Your inventory is full. Please retrive it manually!");
+			return false;
 		}
 		
 		inventory.setStack(slot, stack);
@@ -322,6 +337,7 @@ public final class AutoBuildHack extends Hack
 			new CreativeInventoryActionC2SPacket(
 				InventoryUtils.toNetworkSlot(slot), stack);
 		MC.player.networkHandler.sendPacket(packet);
+		return true;
 	}
 	
 	private void loadSelectedTemplate()

@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -169,6 +170,7 @@ public final class InstaBuildHack extends Hack
 	{
 		int originalSlot = MC.player.getInventory().getSelectedSlot();
 		boolean switchedSlot = false;
+		HashSet<String> notifiedFailures = new HashSet<>();
 		
 		for(Map.Entry<BlockPos, String> entry : remainingBlocks.entrySet())
 		{
@@ -197,24 +199,24 @@ public final class InstaBuildHack extends Hack
 					
 					int hotbarSlot = InventoryUtils.indexOf(requiredItem, 9);
 					
-					if(hotbarSlot == -1)
+					if(hotbarSlot == -1
+						&& MC.player.getAbilities().creativeMode)
 					{
-						if(MC.player.getAbilities().creativeMode
-							&& InventoryUtils.count(requiredItem) == 0)
-						{
-							// Note: giveItem() in CmdUtils (same for
-							// AutoBuild) (can be easily changed)
-							// was not used here because of
-							// 1.I assume the throws CmdError isnt feasible here
-							// 2. CmdUtils probably for cmd usage only
-							giveCreativeItem(new ItemStack(requiredItem));
+						
+						// Note: giveItem() in CmdUtils (same for
+						// AutoBuild) (can be easily changed)
+						// was not used here because of
+						// 1.I assume the throws CmdError isnt feasible here
+						// 2. CmdUtils probably for cmd usage only
+						// 3. Method is modified to suit InstaBuild
+						if(giveCreativeItem(new ItemStack(requiredItem),
+							notifiedFailures))
 							hotbarSlot =
 								InventoryUtils.indexOf(requiredItem, 9);
-						}
-						
-						if(hotbarSlot == -1)
-							continue;
 					}
+					
+					if(hotbarSlot == -1)
+						continue;
 					
 					if(MC.player.getInventory().getSelectedSlot() != hotbarSlot)
 					{
@@ -234,7 +236,8 @@ public final class InstaBuildHack extends Hack
 		remainingBlocks.clear();
 	}
 	
-	private void giveCreativeItem(ItemStack stack)
+	private boolean giveCreativeItem(ItemStack stack,
+		HashSet<String> notifiedFailures)
 	{
 		PlayerInventory inventory = MC.player.getInventory();
 		
@@ -251,9 +254,14 @@ public final class InstaBuildHack extends Hack
 		
 		if(slot == -1)
 		{
-			ChatUtils.error("Cannot get " + stack.getName().getString()
-				+ ". Your inventory is full.");
-			return;
+			String itemName = stack.getName().getString();
+			if(!notifiedFailures.contains(itemName))
+			{
+				ChatUtils.error(
+					"Cannot get " + itemName + ". Your inventory is full.");
+				notifiedFailures.add(itemName);
+			}
+			return false;
 		}
 		
 		inventory.setStack(slot, stack);
@@ -261,6 +269,7 @@ public final class InstaBuildHack extends Hack
 			new CreativeInventoryActionC2SPacket(
 				InventoryUtils.toNetworkSlot(slot), stack);
 		MC.player.networkHandler.sendPacket(packet);
+		return true;
 	}
 	
 	private void loadSelectedTemplate()
