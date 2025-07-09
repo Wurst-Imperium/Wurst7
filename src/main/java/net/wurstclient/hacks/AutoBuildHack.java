@@ -58,6 +58,12 @@ public final class AutoBuildHack extends Hack
 		new CheckboxSetting("Always FastPlace",
 			"Builds as if FastPlace was enabled, even if it's not.", true);
 	
+	private final CheckboxSetting strictBuildOrder = new CheckboxSetting(
+		"Strict build order",
+		"Places blocks in exactly the same order that they appear in the"
+			+ " template. This is slower, but provides more consistent results.",
+		false);
+	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
 	private LinkedHashSet<BlockPos> remainingBlocks = new LinkedHashSet<>();
@@ -70,6 +76,7 @@ public final class AutoBuildHack extends Hack
 		addSetting(range);
 		addSetting(checkLOS);
 		addSetting(fastPlace);
+		addSetting(strictBuildOrder);
 	}
 	
 	@Override
@@ -214,11 +221,13 @@ public final class AutoBuildHack extends Hack
 		for(BlockPos pos : remainingBlocks)
 		{
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
-			if(params == null || params.distanceSq() > rangeSq)
-				continue;
-			if(checkLOS.isChecked() && !params.lineOfSight())
-				continue;
-			
+			if(params == null || params.distanceSq() > rangeSq
+				|| checkLOS.isChecked() && !params.lineOfSight())
+				if(strictBuildOrder.isChecked())
+					break;
+				else
+					continue;
+				
 			MC.itemUseCooldown = 4;
 			RotationUtils.getNeededRotations(params.hitVec())
 				.sendPlayerLookPacket();
