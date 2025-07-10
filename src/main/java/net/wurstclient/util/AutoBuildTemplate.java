@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
 import com.google.gson.JsonElement;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.settings.FileSetting;
@@ -47,7 +48,6 @@ public final class AutoBuildTemplate
 		JsonElement first = jsonBlocks.getElement(0);
 		
 		if(first.isJsonArray())
-		{
 			// old format compatilibility
 			for(int i = 0; i < jsonBlocks.size(); i++)
 			{
@@ -66,9 +66,7 @@ public final class AutoBuildTemplate
 						"Entry blocks[" + i + "] is not valid", e);
 				}
 			}
-			
-		}else if(first.isJsonObject())
-		{
+		else if(first.isJsonObject())
 			// new format (included blocks)
 			for(int i = 0; i < jsonBlocks.size(); i++)
 			{
@@ -79,11 +77,8 @@ public final class AutoBuildTemplate
 				String name = blockObj.getString("name", null);
 				blocks[i] = new BlockData(pos, name);
 			}
-			
-		}else
-		{
+		else
 			throw new JsonException("Unknown format for blocks arr elements");
-		}
 		
 		return new AutoBuildTemplate(path, blocks);
 	}

@@ -236,10 +236,10 @@ public final class AutoBuildHack extends Hack
 		if(missingBlockName != null)
 		{
 			Identifier id = Identifier.tryParse(missingBlockName);
-			if(id == null || InventoryUtils.count(Registries.ITEM.get(id)) > 0)
-				missingBlockName = null;
-			else
+			if(id != null && InventoryUtils.count(Registries.ITEM.get(id)) <= 0)
 				return;
+			
+			missingBlockName = null;
 		}
 		
 		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
@@ -252,13 +252,11 @@ public final class AutoBuildHack extends Hack
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
 			if(params == null || params.distanceSq() > rangeSq
 				|| checkLOS.isChecked() && !params.lineOfSight())
-			{
 				if(strictBuildOrder.isChecked())
 					break;
 				else
 					continue;
-			}
-			
+				
 			if(useSavedBlocks.isChecked())
 			{
 				String blockName = entry.getValue();
@@ -266,24 +264,20 @@ public final class AutoBuildHack extends Hack
 				{
 					Identifier id = Identifier.tryParse(blockName);
 					if(id == null)
-					{
 						if(strictBuildOrder.isChecked())
 							break;
 						else
 							continue;
-					}
-					
+						
 					Block block = Registries.BLOCK.get(id);
 					Item requiredItem = block.asItem();
 					
 					if(requiredItem == Items.AIR)
-					{
 						if(strictBuildOrder.isChecked())
 							break;
 						else
 							continue;
-					}
-					
+						
 					if(!MC.player.getMainHandStack().isOf(requiredItem))
 					{
 						if(InventoryUtils.count(requiredItem) == 0
@@ -295,10 +289,7 @@ public final class AutoBuildHack extends Hack
 							// 1.I assume the throws CmdError isnt feasible here
 							// 2. CmdUtils probably for cmd usage only
 							if(!giveCreativeItem(new ItemStack(requiredItem)))
-							{
 								missingBlockName = blockName;
-								return;
-							}
 							return;
 						}
 						
@@ -307,8 +298,8 @@ public final class AutoBuildHack extends Hack
 						
 						if(strictBuildOrder.isChecked())
 							break;
-						else
-							continue;
+						
+						continue;
 					}
 				}
 			}

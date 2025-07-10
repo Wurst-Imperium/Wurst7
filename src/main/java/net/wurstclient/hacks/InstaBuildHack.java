@@ -199,8 +199,6 @@ public final class InstaBuildHack extends Hack
 					
 					if(hotbarSlot == -1
 						&& MC.player.getAbilities().creativeMode)
-					{
-						
 						// Note: giveItem() in CmdUtils (same for
 						// AutoBuild) (can be easily changed)
 						// was not used here because of
@@ -211,8 +209,7 @@ public final class InstaBuildHack extends Hack
 							notifiedFailures))
 							hotbarSlot =
 								InventoryUtils.indexOf(requiredItem, 9);
-					}
-					
+						
 					if(hotbarSlot == -1)
 						continue;
 					
