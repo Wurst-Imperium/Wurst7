@@ -39,7 +39,6 @@ import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.DefaultAutoBuildTemplates;
 import net.wurstclient.util.InteractionSimulator;
 import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.json.JsonException;
@@ -51,7 +50,7 @@ public final class InstaBuildHack extends Hack
 		"Determines what to build.\n\n"
 			+ "Templates are just JSON files. Feel free to add your own or to edit / delete the default templates.\n\n"
 			+ "If you mess up, simply press the 'Reset to Defaults' button or delete the folder.",
-		"autobuild", DefaultAutoBuildTemplates::createFiles);
+		"autobuild", path -> {});
 	
 	private final SliderSetting range = new SliderSetting("Range",
 		"How far to reach when placing blocks.\n" + "Recommended values:\n"
@@ -169,7 +168,6 @@ public final class InstaBuildHack extends Hack
 	private void buildInstantly()
 	{
 		int originalSlot = MC.player.getInventory().getSelectedSlot();
-		boolean switchedSlot = false;
 		HashSet<String> notifiedFailures = new HashSet<>();
 		
 		for(Map.Entry<BlockPos, String> entry : remainingBlocks.entrySet())
@@ -218,11 +216,7 @@ public final class InstaBuildHack extends Hack
 					if(hotbarSlot == -1)
 						continue;
 					
-					if(MC.player.getInventory().getSelectedSlot() != hotbarSlot)
-					{
-						MC.player.getInventory().setSelectedSlot(hotbarSlot);
-						switchedSlot = true;
-					}
+					MC.player.getInventory().setSelectedSlot(hotbarSlot);
 				}
 			}
 			
@@ -230,8 +224,7 @@ public final class InstaBuildHack extends Hack
 				SwingHand.OFF);
 		}
 		
-		if(switchedSlot)
-			MC.player.getInventory().setSelectedSlot(originalSlot);
+		MC.player.getInventory().setSelectedSlot(originalSlot);
 		
 		remainingBlocks.clear();
 	}
