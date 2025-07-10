@@ -283,8 +283,8 @@ public final class AutoMLGHack extends Hack
 	@Override
 	public void onMouseUpdate(MouseUpdateEvent e)
 	{
-		if(mode.getSelected() != MlgMode.LEGIT || targetRotation == null
-			|| state != State.ACTIVE)
+		if(MC.player == null || mode.getSelected() != MlgMode.LEGIT
+			|| targetRotation == null || state != State.ACTIVE)
 			return;
 		
 		Rotation next = RotationUtils.slowlyTurnTowards(targetRotation, 1440F);
