@@ -66,7 +66,8 @@ public final class AutoBuildHack extends Hack
 	
 	private final CheckboxSetting hideTemplate = new CheckboxSetting(
 		"Don't show working template",
-		"Hides the template name from the HUD display when building.", false);
+		"Hides the template name from the HUD display when building. Progress percentage will still be shown.",
+		false);
 	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
@@ -105,13 +106,14 @@ public final class AutoBuildHack extends Hack
 			break;
 			
 			case BUILDING:
-			if(!hideTemplate.isChecked())
-			{
-				double total = template.size();
-				double placed = total - remainingBlocks.size();
-				double progress = Math.round(placed / total * 1e4) / 1e2;
+			double total = template.size();
+			double placed = total - remainingBlocks.size();
+			double progress = Math.round(placed / total * 1e4) / 1e2;
+			
+			if(hideTemplate.isChecked())
+				name += " " + progress + "%";
+			else
 				name += " [" + template.getName() + "] " + progress + "%";
-			}
 			break;
 		}
 		
