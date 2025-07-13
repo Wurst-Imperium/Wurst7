@@ -38,6 +38,8 @@ public final class SavingFileState extends TemplateToolState
 	public void onEnter(TemplateToolHack hack)
 	{
 		JsonObject json = new JsonObject();
+		json.addProperty("version", 2);
+		
 		Direction front = MC.player.getHorizontalFacing();
 		Direction left = front.rotateYCounterclockwise();
 		BlockPos origin = hack.getOriginPos();
