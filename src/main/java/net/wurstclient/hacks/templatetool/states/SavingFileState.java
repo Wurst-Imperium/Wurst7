@@ -53,6 +53,12 @@ public final class SavingFileState extends TemplateToolState
 				throw new IllegalStateException("Block at " + pos
 					+ " exists in sortedBlocks but not in nonEmptyBlocks.");
 			
+			JsonObject jsonBlock = new JsonObject();
+			
+			if(hack.areBlockTypesEnabled())
+				jsonBlock.addProperty("name",
+					BlockUtils.getName(state.getBlock()));
+			
 			// Translate
 			pos = pos.subtract(origin);
 			
@@ -61,13 +67,12 @@ public final class SavingFileState extends TemplateToolState
 				.offset(left, pos.getX());
 			
 			// Add to json
-			JsonObject jsonBlock = new JsonObject();
-			jsonBlock.addProperty("name", BlockUtils.getName(state.getBlock()));
 			JsonArray jsonPos = new JsonArray();
 			jsonPos.add(pos.getX());
 			jsonPos.add(pos.getY());
 			jsonPos.add(pos.getZ());
 			jsonBlock.add("pos", jsonPos);
+			
 			jsonBlocks.add(jsonBlock);
 		}
 		json.add("blocks", jsonBlocks);
