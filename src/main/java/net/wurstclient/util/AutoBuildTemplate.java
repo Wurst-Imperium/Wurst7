@@ -69,7 +69,7 @@ public final class AutoBuildTemplate
 				pos[0] = jsonPos.getInt(0);
 				pos[1] = jsonPos.getInt(1);
 				pos[2] = jsonPos.getInt(2);
-				String name = jsonBlock.getString("name", "");
+				String name = jsonBlock.getString("block", "");
 				loadedBlocks[i] = new BlockData(pos, name);
 				
 			}catch(JsonException e)

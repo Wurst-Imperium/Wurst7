@@ -56,7 +56,7 @@ public final class SavingFileState extends TemplateToolState
 			JsonObject jsonBlock = new JsonObject();
 			
 			if(hack.areBlockTypesEnabled())
-				jsonBlock.addProperty("name",
+				jsonBlock.addProperty("block",
 					BlockUtils.getName(state.getBlock()));
 			
 			// Translate
