@@ -80,7 +80,6 @@ public final class AutoBuildHack extends Hack
 	private AutoBuildTemplate template;
 	private LinkedHashMap<BlockPos, Item> remainingBlocks =
 		new LinkedHashMap<>();
-	private Item missingItem;
 	
 	public AutoBuildHack()
 	{
@@ -167,7 +166,6 @@ public final class AutoBuildHack extends Hack
 		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
 		Direction direction = MC.player.getHorizontalFacing();
 		remainingBlocks = template.getBlocksToPlace(startPos, direction);
-		missingItem = null;
 		
 		status = Status.BUILDING;
 	}
@@ -230,14 +228,6 @@ public final class AutoBuildHack extends Hack
 			return;
 		}
 		
-		if(missingItem != null)
-		{
-			if(InventoryUtils.count(missingItem) == 0)
-				return;
-			
-			missingItem = null;
-		}
-		
 		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
 			return;
 		
@@ -258,27 +248,8 @@ public final class AutoBuildHack extends Hack
 			if(useSavedBlocks.isChecked() && item != Items.AIR
 				&& !MC.player.getMainHandStack().isOf(item))
 			{
-				if(InventoryUtils.count(item, 36, true) == 0
-					&& MC.player.isInCreativeMode())
-				{
-					// Note: giveItem() in CmdUtils (same for
-					// InstaBuild) (can be easily changed)
-					// was not used here because of
-					// 1.I assume the throws CmdError isnt feasible here
-					// 2. CmdUtils probably for cmd usage only
-					if(!giveCreativeItem(new ItemStack(item)))
-						missingItem = item;
-					
-					return;
-				}
-				
-				if(InventoryUtils.selectItem(item, 36, true))
-					return;
-				
-				if(strictBuildOrder.isChecked())
-					return;
-				
-				continue;
+				giveOrSelectItem(item);
+				return;
 			}
 			
 			MC.itemUseCooldown = 4;
@@ -289,23 +260,25 @@ public final class AutoBuildHack extends Hack
 		}
 	}
 	
-	private boolean giveCreativeItem(ItemStack stack)
+	private void giveOrSelectItem(Item item)
 	{
+		if(InventoryUtils.selectItem(item, 36, true))
+			return;
+		
+		if(!MC.player.isInCreativeMode())
+			return;
+		
 		PlayerInventory inventory = MC.player.getInventory();
 		int slot = inventory.getEmptySlot();
 		if(slot < 0)
-		{
-			ChatUtils.error("Cannot get " + stack.getName().getString()
-				+ ". Your inventory is full. Please retrive it manually!");
-			return false;
-		}
+			slot = inventory.getSelectedSlot();
 		
+		ItemStack stack = new ItemStack(item);
 		inventory.setStack(slot, stack);
 		CreativeInventoryActionC2SPacket packet =
 			new CreativeInventoryActionC2SPacket(
 				InventoryUtils.toNetworkSlot(slot), stack);
 		MC.player.networkHandler.sendPacket(packet);
-		return true;
 	}
 	
 	private void loadSelectedTemplate()

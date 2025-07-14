@@ -9,7 +9,6 @@ package net.wurstclient.hacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -166,7 +165,6 @@ public final class InstaBuildHack extends Hack
 	{
 		PlayerInventory inventory = MC.player.getInventory();
 		int oldSlot = inventory.getSelectedSlot();
-		HashSet<String> notifiedFailures = new HashSet<>();
 		
 		for(Map.Entry<BlockPos, Item> entry : remainingBlocks.entrySet())
 		{
@@ -182,67 +180,35 @@ public final class InstaBuildHack extends Hack
 			
 			if(useSavedBlocks.isChecked() && item != Items.AIR
 				&& !MC.player.getMainHandStack().isOf(item))
-			{
-				int hotbarSlot = InventoryUtils.indexOf(item, 9);
-				
-				if(hotbarSlot == -1 && MC.player.isInCreativeMode())
-					// Note: giveItem() in CmdUtils (same for
-					// AutoBuild) (can be easily changed)
-					// was not used here because of
-					// 1.I assume the throws CmdError isnt feasible here
-					// 2. CmdUtils probably for cmd usage only
-					// 3. Method is modified to suit InstaBuild
-					if(giveCreativeItem(new ItemStack(item), notifiedFailures))
-						hotbarSlot = InventoryUtils.indexOf(item, 9);
-					
-				if(hotbarSlot != -1)
-					inventory.setSelectedSlot(hotbarSlot);
-			}
+				giveOrSelectItem(item);
 			
 			InteractionSimulator.rightClickBlock(params.toHitResult(),
 				SwingHand.OFF);
 		}
 		
 		inventory.setSelectedSlot(oldSlot);
-		
 		remainingBlocks.clear();
-		
 	}
 	
-	private boolean giveCreativeItem(ItemStack stack,
-		HashSet<String> notifiedFailures)
+	private void giveOrSelectItem(Item item)
 	{
+		if(InventoryUtils.selectItem(item, 9))
+			return;
+		
+		if(!MC.player.isInCreativeMode())
+			return;
+		
 		PlayerInventory inventory = MC.player.getInventory();
+		int slot = inventory.getEmptySlot();
+		if(!PlayerInventory.isValidHotbarIndex(slot))
+			slot = inventory.getSelectedSlot();
 		
-		int slot = -1;
-		for(int i = 0; i < 9; i++)
-			if(inventory.getStack(i).isEmpty())
-			{
-				slot = i;
-				break;
-			}
-		
-		if(slot == -1)
-			slot = inventory.getEmptySlot();
-		
-		if(slot == -1)
-		{
-			String itemName = stack.getName().getString();
-			if(!notifiedFailures.contains(itemName))
-			{
-				ChatUtils.error(
-					"Cannot get " + itemName + ". Your inventory is full.");
-				notifiedFailures.add(itemName);
-			}
-			return false;
-		}
-		
+		ItemStack stack = new ItemStack(item);
 		inventory.setStack(slot, stack);
 		CreativeInventoryActionC2SPacket packet =
 			new CreativeInventoryActionC2SPacket(
 				InventoryUtils.toNetworkSlot(slot), stack);
 		MC.player.networkHandler.sendPacket(packet);
-		return true;
 	}
 	
 	private void loadSelectedTemplate()
