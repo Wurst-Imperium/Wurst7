@@ -346,33 +346,66 @@ public final class AutoMLGHack extends Hack
 	
 	private PredictionResult findLandingSurfacePredicted()
 	{
-		Vec3d pos = MC.player.getPos();
-		Vec3d vel = MC.player.getVelocity();
+		ClientPlayerEntity player = MC.player;
+		float halfWidth = player.getWidth() / 2F;
+		
+		Vec3d[] offsets =
+			{new Vec3d(0, 0, 0), new Vec3d(-halfWidth, 0, -halfWidth),
+				new Vec3d(-halfWidth, 0, halfWidth),
+				new Vec3d(halfWidth, 0, -halfWidth),
+				new Vec3d(halfWidth, 0, halfWidth)};
+		
+		Vec3d[] positions = new Vec3d[offsets.length];
+		for(int i = 0; i < offsets.length; i++)
+			positions[i] = player.getPos().add(offsets[i]);
+		
+		Vec3d vel = player.getVelocity();
 		
 		// NOTE: 600 ticks limit is used because the game becomes sometimes
 		// laggy if more (800 works too), theoretically 200-400 works too, but
 		// 600 is more stable (400 in findLandingSurfaceVertical)
 		for(int i = 0; i < 600; i++)
 		{
-			Vec3d nextPos = pos.add(vel);
-			
-			BlockHitResult hit = MC.world.raycast(new RaycastContext(pos,
-				nextPos, RaycastContext.ShapeType.COLLIDER,
-				RaycastContext.FluidHandling.NONE, MC.player));
-			
-			if(hit.getType() == HitResult.Type.BLOCK)
+			for(int j = 0; j < positions.length; j++)
 			{
-				BlockPos hitPos = hit.getBlockPos();
-				if(isValidSurface(hitPos))
-					return new PredictionResult(hitPos, i);
+				if(positions[j] == null)
+					continue;
+				
+				Vec3d pos = positions[j];
+				Vec3d nextPos = pos.add(vel);
+				
+				BlockHitResult hit = MC.world.raycast(new RaycastContext(pos,
+					nextPos, RaycastContext.ShapeType.COLLIDER,
+					RaycastContext.FluidHandling.NONE, player));
+				
+				if(hit.getType() == HitResult.Type.BLOCK)
+				{
+					BlockPos hitPos = hit.getBlockPos();
+					if(isValidSurface(hitPos))
+						return new PredictionResult(hitPos, i);
+					
+					positions[j] = null;
+				}else
+				{
+					positions[j] = nextPos;
+					if(nextPos.getY() < MC.world.getBottomY())
+						positions[j] = null;
+				}
 			}
 			
-			pos = nextPos;
 			// 0.98 is (drag coefficient) -> air resistance of 2%
 			// 0.08 is (gravity force) -> subtracted from Y velocity each tick
 			vel = new Vec3d(vel.x * 0.98, (vel.y - 0.08) * 0.98, vel.z * 0.98);
 			
-			if(pos.getY() < MC.world.getBottomY())
+			boolean allLanded = true;
+			for(Vec3d pos : positions)
+				if(pos != null)
+				{
+					allLanded = false;
+					break;
+				}
+			
+			if(allLanded)
 				return null;
 		}
 		
