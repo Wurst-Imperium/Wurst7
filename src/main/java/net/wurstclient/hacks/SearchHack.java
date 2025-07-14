@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
@@ -64,19 +65,23 @@ public final class SearchHack extends Hack implements UpdateListener,
 	private boolean notify;
 	
 	private final CheckboxSetting drawTracers = new CheckboxSetting("Tracers",
-		"Draws lines from your crosshair to the found blocks", false);
+		"Draws lines from your crosshair to the found blocks.", false);
+	
+	private final SliderSetting tracerLimit = new SliderSetting("Tracer limit",
+		"The maximum number of tracers to display.", 4, 1, 5, 1,
+		ValueDisplay.LOGARITHMIC);
 	
 	private final ChunkSearcherCoordinator coordinator =
 		new ChunkSearcherCoordinator(area);
 	
 	private ForkJoinPool forkJoinPool;
-	private ForkJoinTask<HashSet<BlockPos>> getMatchingBlocksTask;
+	private ForkJoinTask<ArrayList<BlockPos>> getMatchingBlocksTask;
 	private ForkJoinTask<ArrayList<int[]>> compileVerticesTask;
 	
 	private EasyVertexBuffer vertexBuffer;
 	private RegionPos bufferRegion;
 	private boolean bufferUpToDate;
-	private final HashSet<BlockPos> foundBlocks = new HashSet<>();
+	private final ArrayList<BlockPos> foundBlocks = new ArrayList<>();
 	
 	public SearchHack()
 	{
@@ -86,6 +91,7 @@ public final class SearchHack extends Hack implements UpdateListener,
 		addSetting(area);
 		addSetting(limit);
 		addSetting(drawTracers);
+		addSetting(tracerLimit);
 	}
 	
 	@Override
@@ -211,11 +217,12 @@ public final class SearchHack extends Hack implements UpdateListener,
 		
 		if(drawTracers.isChecked() && !foundBlocks.isEmpty())
 		{
-			int color = RenderUtils.toIntColor(rainbow, 0.5F);
-			
-			ArrayList<ColoredPoint> points = foundBlocks.stream()
-				.map(pos -> new ColoredPoint(Vec3d.ofCenter(pos), color))
-				.collect(Collectors.toCollection(ArrayList::new));
+			List<BlockPos> blocksToTrace = foundBlocks.subList(0,
+				Math.min(foundBlocks.size(), tracerLimit.getValueLog()));
+			ArrayList<ColoredPoint> points = new ArrayList<>();
+			for(BlockPos pos : blocksToTrace)
+				points.add(new ColoredPoint(Vec3d.ofCenter(pos),
+					RenderUtils.toIntColor(rainbow, 0.5F)));
 			
 			RenderUtils.drawTracers(matrixStack, partialTicks, points, false);
 		}
@@ -231,6 +238,7 @@ public final class SearchHack extends Hack implements UpdateListener,
 			compileVerticesTask.cancel(true);
 		compileVerticesTask = null;
 		
+		foundBlocks.clear();
 		bufferUpToDate = false;
 	}
 	
@@ -243,12 +251,12 @@ public final class SearchHack extends Hack implements UpdateListener,
 		getMatchingBlocksTask = forkJoinPool.submit(() -> coordinator
 			.getMatches().parallel().map(ChunkSearcher.Result::pos)
 			.sorted(comparator).limit(limit.getValueLog())
-			.collect(Collectors.toCollection(HashSet::new)));
+			.collect(Collectors.toCollection(ArrayList::new)));
 	}
 	
 	private void startCompileVerticesTask()
 	{
-		HashSet<BlockPos> matchingBlocks = getMatchingBlocksTask.join();
+		ArrayList<BlockPos> matchingBlocks = getMatchingBlocksTask.join();
 		foundBlocks.clear();
 		foundBlocks.addAll(matchingBlocks);
 		
@@ -262,8 +270,8 @@ public final class SearchHack extends Hack implements UpdateListener,
 			notify = false;
 		}
 		
-		compileVerticesTask = forkJoinPool
-			.submit(() -> BlockVertexCompiler.compile(matchingBlocks));
+		compileVerticesTask = forkJoinPool.submit(
+			() -> BlockVertexCompiler.compile(new HashSet<>(matchingBlocks)));
 	}
 	
 	private void setBufferFromTask()
