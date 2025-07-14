@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
+import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.settings.FileSetting;
@@ -68,7 +69,7 @@ public final class AutoBuildTemplate
 				pos[0] = jsonPos.getInt(0);
 				pos[1] = jsonPos.getInt(1);
 				pos[2] = jsonPos.getInt(2);
-				String name = jsonBlock.getString("name", null);
+				String name = jsonBlock.getString("name", "");
 				loadedBlocks[i] = new BlockData(pos, name);
 				
 			}catch(JsonException e)
@@ -91,7 +92,7 @@ public final class AutoBuildTemplate
 				pos[0] = jsonBlock.getInt(0);
 				pos[1] = jsonBlock.getInt(1);
 				pos[2] = jsonBlock.getInt(2);
-				loadedBlocks[i] = new BlockData(pos, null);
+				loadedBlocks[i] = new BlockData(pos, "");
 				
 			}catch(JsonException e)
 			{
@@ -101,24 +102,21 @@ public final class AutoBuildTemplate
 		}
 	}
 	
-	public LinkedHashMap<BlockPos, String> getBlocksToPlace(BlockPos startPos,
+	public LinkedHashMap<BlockPos, Item> getBlocksToPlace(BlockPos origin,
 		Direction direction)
 	{
 		Direction front = direction;
 		Direction left = front.rotateYCounterclockwise();
-		LinkedHashMap<BlockPos, String> positions = new LinkedHashMap<>();
+		LinkedHashMap<BlockPos, Item> blocksToPlace = new LinkedHashMap<>();
 		
 		for(BlockData block : blocks)
 		{
-			int[] blockPosArray = block.pos();
-			BlockPos pos = startPos;
-			pos = pos.offset(left, blockPosArray[0]);
-			pos = pos.up(blockPosArray[1]);
-			pos = pos.offset(front, blockPosArray[2]);
-			positions.put(pos, block.name());
+			BlockPos pos = block.toBlockPos(origin, front, left);
+			Item item = block.toItem();
+			blocksToPlace.put(pos, item);
 		}
 		
-		return positions;
+		return blocksToPlace;
 	}
 	
 	public int size()
@@ -136,6 +134,17 @@ public final class AutoBuildTemplate
 		return name;
 	}
 	
-	public record BlockData(int[] pos, String name)
-	{}
+	private record BlockData(int[] pos, String name)
+	{
+		public BlockPos toBlockPos(BlockPos origin, Direction front,
+			Direction left)
+		{
+			return origin.offset(left, pos[0]).up(pos[1]).offset(front, pos[2]);
+		}
+		
+		public Item toItem()
+		{
+			return BlockUtils.getBlockFromName(name).asItem();
+		}
+	}
 }

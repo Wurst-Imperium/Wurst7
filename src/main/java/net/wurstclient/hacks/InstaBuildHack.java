@@ -13,14 +13,11 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -65,7 +62,7 @@ public final class InstaBuildHack extends Hack
 	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
-	private LinkedHashMap<BlockPos, String> remainingBlocks =
+	private LinkedHashMap<BlockPos, Item> remainingBlocks =
 		new LinkedHashMap<>();
 	
 	public InstaBuildHack()
@@ -167,12 +164,15 @@ public final class InstaBuildHack extends Hack
 	
 	private void buildInstantly()
 	{
-		int originalSlot = MC.player.getInventory().getSelectedSlot();
+		PlayerInventory inventory = MC.player.getInventory();
+		int oldSlot = inventory.getSelectedSlot();
 		HashSet<String> notifiedFailures = new HashSet<>();
 		
-		for(Map.Entry<BlockPos, String> entry : remainingBlocks.entrySet())
+		for(Map.Entry<BlockPos, Item> entry : remainingBlocks.entrySet())
 		{
 			BlockPos pos = entry.getKey();
+			Item item = entry.getValue();
+			
 			if(!BlockUtils.getState(pos).isReplaceable())
 				continue;
 			
@@ -180,50 +180,33 @@ public final class InstaBuildHack extends Hack
 			if(params == null || params.distanceSq() > range.getValueSq())
 				continue;
 			
-			if(useSavedBlocks.isChecked())
+			if(useSavedBlocks.isChecked() && item != Items.AIR
+				&& !MC.player.getMainHandStack().isOf(item))
 			{
-				String blockName = entry.getValue();
-				if(blockName != null)
-				{
-					Identifier id = Identifier.tryParse(blockName);
-					if(id == null)
-						continue;
+				int hotbarSlot = InventoryUtils.indexOf(item, 9);
+				
+				if(hotbarSlot == -1 && MC.player.isInCreativeMode())
+					// Note: giveItem() in CmdUtils (same for
+					// AutoBuild) (can be easily changed)
+					// was not used here because of
+					// 1.I assume the throws CmdError isnt feasible here
+					// 2. CmdUtils probably for cmd usage only
+					// 3. Method is modified to suit InstaBuild
+					if(giveCreativeItem(new ItemStack(item), notifiedFailures))
+						hotbarSlot = InventoryUtils.indexOf(item, 9);
 					
-					Block block = Registries.BLOCK.get(id);
-					Item requiredItem = block.asItem();
-					
-					if(requiredItem == Items.AIR)
-						continue;
-					
-					int hotbarSlot = InventoryUtils.indexOf(requiredItem, 9);
-					
-					if(hotbarSlot == -1
-						&& MC.player.getAbilities().creativeMode)
-						// Note: giveItem() in CmdUtils (same for
-						// AutoBuild) (can be easily changed)
-						// was not used here because of
-						// 1.I assume the throws CmdError isnt feasible here
-						// 2. CmdUtils probably for cmd usage only
-						// 3. Method is modified to suit InstaBuild
-						if(giveCreativeItem(new ItemStack(requiredItem),
-							notifiedFailures))
-							hotbarSlot =
-								InventoryUtils.indexOf(requiredItem, 9);
-						
-					if(hotbarSlot == -1)
-						continue;
-					
-					MC.player.getInventory().setSelectedSlot(hotbarSlot);
-				}
+				if(hotbarSlot != -1)
+					inventory.setSelectedSlot(hotbarSlot);
 			}
 			
 			InteractionSimulator.rightClickBlock(params.toHitResult(),
 				SwingHand.OFF);
 		}
 		
-		MC.player.getInventory().setSelectedSlot(originalSlot);
+		inventory.setSelectedSlot(oldSlot);
 		
 		remainingBlocks.clear();
+		
 	}
 	
 	private boolean giveCreativeItem(ItemStack stack,

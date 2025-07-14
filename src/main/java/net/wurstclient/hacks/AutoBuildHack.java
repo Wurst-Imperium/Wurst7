@@ -13,15 +13,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -81,9 +78,9 @@ public final class AutoBuildHack extends Hack
 	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
-	private LinkedHashMap<BlockPos, String> remainingBlocks =
+	private LinkedHashMap<BlockPos, Item> remainingBlocks =
 		new LinkedHashMap<>();
-	private String missingBlockName;
+	private Item missingItem;
 	
 	public AutoBuildHack()
 	{
@@ -170,7 +167,7 @@ public final class AutoBuildHack extends Hack
 		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
 		Direction direction = MC.player.getHorizontalFacing();
 		remainingBlocks = template.getBlocksToPlace(startPos, direction);
-		missingBlockName = null;
+		missingItem = null;
 		
 		status = Status.BUILDING;
 	}
@@ -233,82 +230,62 @@ public final class AutoBuildHack extends Hack
 			return;
 		}
 		
-		if(missingBlockName != null)
+		if(missingItem != null)
 		{
-			Identifier id = Identifier.tryParse(missingBlockName);
-			if(id != null && InventoryUtils.count(Registries.ITEM.get(id)) <= 0)
+			if(InventoryUtils.count(missingItem) == 0)
 				return;
 			
-			missingBlockName = null;
+			missingItem = null;
 		}
 		
 		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
 			return;
 		
 		double rangeSq = range.getValueSq();
-		for(Map.Entry<BlockPos, String> entry : remainingBlocks.entrySet())
+		for(Map.Entry<BlockPos, Item> entry : remainingBlocks.entrySet())
 		{
 			BlockPos pos = entry.getKey();
+			Item item = entry.getValue();
+			
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
 			if(params == null || params.distanceSq() > rangeSq
 				|| checkLOS.isChecked() && !params.lineOfSight())
 				if(strictBuildOrder.isChecked())
-					break;
+					return;
 				else
 					continue;
 				
-			if(useSavedBlocks.isChecked())
+			if(useSavedBlocks.isChecked() && item != Items.AIR
+				&& !MC.player.getMainHandStack().isOf(item))
 			{
-				String blockName = entry.getValue();
-				if(blockName != null)
+				if(InventoryUtils.count(item, 36, true) == 0
+					&& MC.player.isInCreativeMode())
 				{
-					Identifier id = Identifier.tryParse(blockName);
-					if(id == null)
-						if(strictBuildOrder.isChecked())
-							break;
-						else
-							continue;
-						
-					Block block = Registries.BLOCK.get(id);
-					Item requiredItem = block.asItem();
+					// Note: giveItem() in CmdUtils (same for
+					// InstaBuild) (can be easily changed)
+					// was not used here because of
+					// 1.I assume the throws CmdError isnt feasible here
+					// 2. CmdUtils probably for cmd usage only
+					if(!giveCreativeItem(new ItemStack(item)))
+						missingItem = item;
 					
-					if(requiredItem == Items.AIR)
-						if(strictBuildOrder.isChecked())
-							break;
-						else
-							continue;
-						
-					if(!MC.player.getMainHandStack().isOf(requiredItem))
-					{
-						if(InventoryUtils.count(requiredItem) == 0
-							&& MC.player.getAbilities().creativeMode)
-						{
-							// Note: giveItem() in CmdUtils (same for
-							// InstaBuild) (can be easily changed)
-							// was not used here because of
-							// 1.I assume the throws CmdError isnt feasible here
-							// 2. CmdUtils probably for cmd usage only
-							if(!giveCreativeItem(new ItemStack(requiredItem)))
-								missingBlockName = blockName;
-							return;
-						}
-						
-						if(InventoryUtils.selectItem(requiredItem, 36, true))
-							return;
-						
-						if(strictBuildOrder.isChecked())
-							break;
-						
-						continue;
-					}
+					return;
 				}
+				
+				if(InventoryUtils.selectItem(item, 36, true))
+					return;
+				
+				if(strictBuildOrder.isChecked())
+					return;
+				
+				continue;
 			}
 			
 			MC.itemUseCooldown = 4;
 			RotationUtils.getNeededRotations(params.hitVec())
 				.sendPlayerLookPacket();
 			InteractionSimulator.rightClickBlock(params.toHitResult());
-			break;
+			return;
 		}
 	}
 	
