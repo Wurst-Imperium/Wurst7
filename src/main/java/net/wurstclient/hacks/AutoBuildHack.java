@@ -60,11 +60,12 @@ public final class AutoBuildHack extends Hack
 		"Makes sure that you don't reach through walls when placing blocks. Can help with AntiCheat plugins but slows down building.",
 		false);
 	
-	private final CheckboxSetting useSavedBlocks =
-		new CheckboxSetting("Use saved blocks",
-			"Tries to place the same blocks that were saved in the template.\n"
-				+ "If disabled, it will use whatever block you are holding.",
-			true);
+	private final CheckboxSetting useSavedBlocks = new CheckboxSetting(
+		"Use saved blocks",
+		"Tries to place the same blocks that were saved in the template.\n\n"
+			+ "If the template does not specify block types, it will be built"
+			+ " from whatever block you are holding.",
+		true);
 	
 	private final CheckboxSetting fastPlace =
 		new CheckboxSetting("Always FastPlace",

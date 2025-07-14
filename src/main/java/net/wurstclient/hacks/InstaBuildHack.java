@@ -53,11 +53,12 @@ public final class InstaBuildHack extends Hack
 			+ "6.0 for vanilla\n" + "4.25 for NoCheat+",
 		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final CheckboxSetting useSavedBlocks =
-		new CheckboxSetting("Use saved blocks",
-			"Tries to place the same blocks that were saved in the template.\n"
-				+ "If disabled, it will use whatever block you are holding.",
-			false);
+	private final CheckboxSetting useSavedBlocks = new CheckboxSetting(
+		"Use saved blocks",
+		"Tries to place the same blocks that were saved in the template.\n\n"
+			+ "If the template does not specify block types, it will be built"
+			+ " from whatever block you are holding.",
+		false);
 	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
