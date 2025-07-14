@@ -55,8 +55,8 @@ public final class InstaBuildHack extends Hack
 	
 	private final CheckboxSetting useSavedBlocks =
 		new CheckboxSetting("Use saved blocks",
-			"Tries to place the same blocks that were saved in the template\n"
-				+ "If disabled, it will use whatever block you are holding",
+			"Tries to place the same blocks that were saved in the template.\n"
+				+ "If disabled, it will use whatever block you are holding.",
 			true);
 	
 	private Status status = Status.NO_TEMPLATE;
