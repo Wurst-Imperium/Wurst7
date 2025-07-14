@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -21,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.hacks.TemplateToolHack;
 import net.wurstclient.hacks.templatetool.TemplateToolState;
+import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.json.JsonUtils;
 
@@ -36,6 +38,8 @@ public final class SavingFileState extends TemplateToolState
 	public void onEnter(TemplateToolHack hack)
 	{
 		JsonObject json = new JsonObject();
+		json.addProperty("version", 2);
+		
 		Direction front = MC.player.getHorizontalFacing();
 		Direction left = front.rotateYCounterclockwise();
 		BlockPos origin = hack.getOriginPos();
@@ -44,6 +48,17 @@ public final class SavingFileState extends TemplateToolState
 		JsonArray jsonBlocks = new JsonArray();
 		for(BlockPos pos : hack.getSortedBlocks())
 		{
+			BlockState state = hack.getNonEmptyBlocks().get(pos);
+			if(state == null)
+				throw new IllegalStateException("Block at " + pos
+					+ " exists in sortedBlocks but not in nonEmptyBlocks.");
+			
+			JsonObject jsonBlock = new JsonObject();
+			
+			if(hack.areBlockTypesEnabled())
+				jsonBlock.addProperty("block",
+					BlockUtils.getName(state.getBlock()));
+			
 			// Translate
 			pos = pos.subtract(origin);
 			
@@ -52,11 +67,13 @@ public final class SavingFileState extends TemplateToolState
 				.offset(left, pos.getX());
 			
 			// Add to json
-			JsonArray xyz = new JsonArray();
-			xyz.add(pos.getX());
-			xyz.add(pos.getY());
-			xyz.add(pos.getZ());
-			jsonBlocks.add(xyz);
+			JsonArray jsonPos = new JsonArray();
+			jsonPos.add(pos.getX());
+			jsonPos.add(pos.getY());
+			jsonPos.add(pos.getZ());
+			jsonBlock.add("pos", jsonPos);
+			
+			jsonBlocks.add(jsonBlock);
 		}
 		json.add("blocks", jsonBlocks);
 		

@@ -9,10 +9,16 @@ package net.wurstclient.hacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -54,6 +60,13 @@ public final class AutoBuildHack extends Hack
 		"Makes sure that you don't reach through walls when placing blocks. Can help with AntiCheat plugins but slows down building.",
 		false);
 	
+	private final CheckboxSetting useSavedBlocks = new CheckboxSetting(
+		"Use saved blocks",
+		"Tries to place the same blocks that were saved in the template.\n\n"
+			+ "If the template does not specify block types, it will be built"
+			+ " from whatever block you are holding.",
+		true);
+	
 	private final CheckboxSetting fastPlace =
 		new CheckboxSetting("Always FastPlace",
 			"Builds as if FastPlace was enabled, even if it's not.", true);
@@ -66,7 +79,8 @@ public final class AutoBuildHack extends Hack
 	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
-	private LinkedHashSet<BlockPos> remainingBlocks = new LinkedHashSet<>();
+	private LinkedHashMap<BlockPos, Item> remainingBlocks =
+		new LinkedHashMap<>();
 	
 	public AutoBuildHack()
 	{
@@ -75,6 +89,7 @@ public final class AutoBuildHack extends Hack
 		addSetting(templateSetting);
 		addSetting(range);
 		addSetting(checkLOS);
+		addSetting(useSavedBlocks);
 		addSetting(fastPlace);
 		addSetting(strictBuildOrder);
 	}
@@ -151,7 +166,7 @@ public final class AutoBuildHack extends Hack
 		
 		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
 		Direction direction = MC.player.getHorizontalFacing();
-		remainingBlocks = template.getPositions(startPos, direction);
+		remainingBlocks = template.getBlocksToPlace(startPos, direction);
 		
 		status = Status.BUILDING;
 	}
@@ -185,7 +200,7 @@ public final class AutoBuildHack extends Hack
 		if(status != Status.BUILDING)
 			return;
 		
-		List<BlockPos> blocksToDraw = remainingBlocks.stream()
+		List<BlockPos> blocksToDraw = remainingBlocks.keySet().stream()
 			.filter(pos -> BlockUtils.getState(pos).isReplaceable()).limit(1024)
 			.toList();
 		
@@ -205,7 +220,7 @@ public final class AutoBuildHack extends Hack
 	
 	private void buildNormally()
 	{
-		remainingBlocks
+		remainingBlocks.keySet()
 			.removeIf(pos -> !BlockUtils.getState(pos).isReplaceable());
 		
 		if(remainingBlocks.isEmpty())
@@ -218,22 +233,53 @@ public final class AutoBuildHack extends Hack
 			return;
 		
 		double rangeSq = range.getValueSq();
-		for(BlockPos pos : remainingBlocks)
+		for(Map.Entry<BlockPos, Item> entry : remainingBlocks.entrySet())
 		{
+			BlockPos pos = entry.getKey();
+			Item item = entry.getValue();
+			
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
 			if(params == null || params.distanceSq() > rangeSq
 				|| checkLOS.isChecked() && !params.lineOfSight())
 				if(strictBuildOrder.isChecked())
-					break;
+					return;
 				else
 					continue;
 				
+			if(useSavedBlocks.isChecked() && item != Items.AIR
+				&& !MC.player.getMainHandStack().isOf(item))
+			{
+				giveOrSelectItem(item);
+				return;
+			}
+			
 			MC.itemUseCooldown = 4;
 			RotationUtils.getNeededRotations(params.hitVec())
 				.sendPlayerLookPacket();
 			InteractionSimulator.rightClickBlock(params.toHitResult());
-			break;
+			return;
 		}
+	}
+	
+	private void giveOrSelectItem(Item item)
+	{
+		if(InventoryUtils.selectItem(item, 36, true))
+			return;
+		
+		if(!MC.player.isInCreativeMode())
+			return;
+		
+		PlayerInventory inventory = MC.player.getInventory();
+		int slot = inventory.getEmptySlot();
+		if(slot < 0)
+			slot = inventory.getSelectedSlot();
+		
+		ItemStack stack = new ItemStack(item);
+		inventory.setStack(slot, stack);
+		CreativeInventoryActionC2SPacket packet =
+			new CreativeInventoryActionC2SPacket(
+				InventoryUtils.toNetworkSlot(slot), stack);
+		MC.player.networkHandler.sendPacket(packet);
 	}
 	
 	private void loadSelectedTemplate()

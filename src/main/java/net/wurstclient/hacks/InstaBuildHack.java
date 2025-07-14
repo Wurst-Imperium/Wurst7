@@ -9,8 +9,14 @@ package net.wurstclient.hacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -19,6 +25,7 @@ import net.wurstclient.Category;
 import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -29,6 +36,7 @@ import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.InteractionSimulator;
+import net.wurstclient.util.InventoryUtils;
 import net.wurstclient.util.json.JsonException;
 
 public final class InstaBuildHack extends Hack
@@ -45,9 +53,17 @@ public final class InstaBuildHack extends Hack
 			+ "6.0 for vanilla\n" + "4.25 for NoCheat+",
 		6, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
+	private final CheckboxSetting useSavedBlocks = new CheckboxSetting(
+		"Use saved blocks",
+		"Tries to place the same blocks that were saved in the template.\n\n"
+			+ "If the template does not specify block types, it will be built"
+			+ " from whatever block you are holding.",
+		false);
+	
 	private Status status = Status.NO_TEMPLATE;
 	private AutoBuildTemplate template;
-	private LinkedHashSet<BlockPos> remainingBlocks = new LinkedHashSet<>();
+	private LinkedHashMap<BlockPos, Item> remainingBlocks =
+		new LinkedHashMap<>();
 	
 	public InstaBuildHack()
 	{
@@ -55,6 +71,7 @@ public final class InstaBuildHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(templateSetting);
 		addSetting(range);
+		addSetting(useSavedBlocks);
 	}
 	
 	@Override
@@ -120,7 +137,7 @@ public final class InstaBuildHack extends Hack
 		
 		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
 		Direction direction = MC.player.getHorizontalFacing();
-		remainingBlocks = template.getPositions(startPos, direction);
+		remainingBlocks = template.getBlocksToPlace(startPos, direction);
 		
 		buildInstantly();
 	}
@@ -147,22 +164,52 @@ public final class InstaBuildHack extends Hack
 	
 	private void buildInstantly()
 	{
-		double rangeSq = range.getValueSq();
+		PlayerInventory inventory = MC.player.getInventory();
+		int oldSlot = inventory.getSelectedSlot();
 		
-		for(BlockPos pos : remainingBlocks)
+		for(Map.Entry<BlockPos, Item> entry : remainingBlocks.entrySet())
 		{
+			BlockPos pos = entry.getKey();
+			Item item = entry.getValue();
+			
 			if(!BlockUtils.getState(pos).isReplaceable())
 				continue;
 			
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
-			if(params == null || params.distanceSq() > rangeSq)
+			if(params == null || params.distanceSq() > range.getValueSq())
 				continue;
+			
+			if(useSavedBlocks.isChecked() && item != Items.AIR
+				&& !MC.player.getMainHandStack().isOf(item))
+				giveOrSelectItem(item);
 			
 			InteractionSimulator.rightClickBlock(params.toHitResult(),
 				SwingHand.OFF);
 		}
 		
+		inventory.setSelectedSlot(oldSlot);
 		remainingBlocks.clear();
+	}
+	
+	private void giveOrSelectItem(Item item)
+	{
+		if(InventoryUtils.selectItem(item, 9))
+			return;
+		
+		if(!MC.player.isInCreativeMode())
+			return;
+		
+		PlayerInventory inventory = MC.player.getInventory();
+		int slot = inventory.getEmptySlot();
+		if(!PlayerInventory.isValidHotbarIndex(slot))
+			slot = inventory.getSelectedSlot();
+		
+		ItemStack stack = new ItemStack(item);
+		inventory.setStack(slot, stack);
+		CreativeInventoryActionC2SPacket packet =
+			new CreativeInventoryActionC2SPacket(
+				InventoryUtils.toNetworkSlot(slot), stack);
+		MC.player.networkHandler.sendPacket(packet);
 	}
 	
 	private void loadSelectedTemplate()

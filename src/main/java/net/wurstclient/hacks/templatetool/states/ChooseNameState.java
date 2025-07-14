@@ -16,6 +16,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -54,6 +55,7 @@ public final class ChooseNameState extends TemplateToolState
 		private final TemplateToolHack hack;
 		
 		private TextFieldWidget nameField;
+		private CheckboxWidget includeTypesBox;
 		private ButtonWidget doneButton;
 		private ButtonWidget cancelButton;
 		
@@ -79,18 +81,24 @@ public final class ChooseNameState extends TemplateToolState
 			addSelectableChild(nameField);
 			setFocused(nameField);
 			
+			includeTypesBox =
+				CheckboxWidget.builder(Text.literal("Include block types"), tr)
+					.pos(middleX - 99, middleY + 32).checked(true).build();
+			addDrawableChild(includeTypesBox);
+			
 			doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
-				.dimensions(middleX - 75, middleY + 38, 150, 20).build();
+				.dimensions(middleX - 75, middleY + 56, 150, 20).build();
 			addDrawableChild(doneButton);
 			
 			cancelButton =
 				ButtonWidget.builder(Text.literal("Cancel"), b -> cancel())
-					.dimensions(middleX - 50, middleY + 62, 100, 15).build();
+					.dimensions(middleX - 50, middleY + 80, 100, 15).build();
 			addDrawableChild(cancelButton);
 		}
 		
 		private void done()
 		{
+			hack.setBlockTypesEnabled(includeTypesBox.isChecked());
 			hack.setState(new SavingFileState());
 		}
 		

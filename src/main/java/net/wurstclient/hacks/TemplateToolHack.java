@@ -35,6 +35,7 @@ public final class TemplateToolHack extends Hack
 	private final LinkedHashMap<BlockPos, BlockState> nonEmptyBlocks =
 		new LinkedHashMap<>();
 	private final LinkedHashSet<BlockPos> sortedBlocks = new LinkedHashSet<>();
+	private boolean blockTypesEnabled;
 	private File file;
 	
 	public TemplateToolHack()
@@ -71,6 +72,7 @@ public final class TemplateToolHack extends Hack
 		originPos = null;
 		nonEmptyBlocks.clear();
 		sortedBlocks.clear();
+		blockTypesEnabled = false;
 		file = null;
 	}
 	
@@ -163,6 +165,16 @@ public final class TemplateToolHack extends Hack
 	public LinkedHashSet<BlockPos> getSortedBlocks()
 	{
 		return sortedBlocks;
+	}
+	
+	public boolean areBlockTypesEnabled()
+	{
+		return blockTypesEnabled;
+	}
+	
+	public void setBlockTypesEnabled(boolean blockTypesEnabled)
+	{
+		this.blockTypesEnabled = blockTypesEnabled;
 	}
 	
 	public File getFile()
