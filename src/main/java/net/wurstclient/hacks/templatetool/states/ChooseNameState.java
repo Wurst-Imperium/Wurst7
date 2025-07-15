@@ -159,6 +159,13 @@ public final class ChooseNameState extends TemplateToolState
 		}
 		
 		@Override
+		public void renderBackground(DrawContext context, int mouseX,
+			int mouseY, float deltaTicks)
+		{
+			// Don't blur
+		}
+		
+		@Override
 		public boolean shouldPause()
 		{
 			return false;
