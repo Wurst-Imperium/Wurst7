@@ -43,7 +43,7 @@ configurations.all {
 		// v3.17.0, used by Minecraft 1.21.4 - 1.21.7, is vulnerable to CVE-2025-48924
 		force "org.apache.commons:commons-lang3:3.18.0"
 		// v9.40, used by Minecraft 1.21.4 - 1.21.7, is vulnerable to CVE-2025-53864
-		force "com.nimbusds:nimbus-jose-jwt:10.0.2"
+		force "com.nimbusds:nimbus-jose-jwt:10.3.1"
 	}
 }
 
