@@ -123,9 +123,15 @@ public final class SavingFileState extends TemplateToolState
 	private BlockPos toTemplatePos(BlockPos pos, BlockPos origin,
 		Direction front)
 	{
+		BlockPos translated = pos.subtract(origin);
 		Direction left = front.rotateYCounterclockwise();
-		return new BlockPos(0, pos.getY() - origin.getY(), 0)
-			.offset(front, pos.getZ() - origin.getZ())
-			.offset(left, pos.getX() - origin.getX());
+		
+		int leftDist = translated.getX() * left.getOffsetX()
+			+ translated.getZ() * left.getOffsetZ();
+		int upDist = translated.getY();
+		int frontDist = translated.getX() * front.getOffsetX()
+			+ translated.getZ() * front.getOffsetZ();
+		
+		return new BlockPos(leftDist, upDist, frontDist);
 	}
 }
