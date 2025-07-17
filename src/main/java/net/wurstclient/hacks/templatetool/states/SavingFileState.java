@@ -37,45 +37,8 @@ public final class SavingFileState extends TemplateToolState
 	@Override
 	public void onEnter(TemplateToolHack hack)
 	{
-		JsonObject json = new JsonObject();
-		json.addProperty("version", 2);
-		
-		Direction front = MC.player.getHorizontalFacing();
-		Direction left = front.rotateYCounterclockwise();
-		BlockPos origin = hack.getOriginPos();
-		
-		// Add the blocks
-		JsonArray jsonBlocks = new JsonArray();
-		for(BlockPos pos : hack.getSortedBlocks())
-		{
-			BlockState state = hack.getNonEmptyBlocks().get(pos);
-			if(state == null)
-				throw new IllegalStateException("Block at " + pos
-					+ " exists in sortedBlocks but not in nonEmptyBlocks.");
-			
-			JsonObject jsonBlock = new JsonObject();
-			
-			if(hack.areBlockTypesEnabled())
-				jsonBlock.addProperty("block",
-					BlockUtils.getName(state.getBlock()));
-			
-			// Translate
-			pos = pos.subtract(origin);
-			
-			// Rotate
-			pos = new BlockPos(0, pos.getY(), 0).offset(front, pos.getZ())
-				.offset(left, pos.getX());
-			
-			// Add to json
-			JsonArray jsonPos = new JsonArray();
-			jsonPos.add(pos.getX());
-			jsonPos.add(pos.getY());
-			jsonPos.add(pos.getZ());
-			jsonBlock.add("pos", jsonPos);
-			
-			jsonBlocks.add(jsonBlock);
-		}
-		json.add("blocks", jsonBlocks);
+		JsonObject json = hack.areBlockTypesEnabled() ? createV2Json(hack)
+			: createV1Json(hack);
 		
 		// Save the file
 		try(PrintWriter save = new PrintWriter(new FileWriter(hack.getFile())))
@@ -100,5 +63,69 @@ public final class SavingFileState extends TemplateToolState
 		ChatUtils.component(message);
 		
 		hack.setEnabled(false);
+	}
+	
+	private JsonObject createV2Json(TemplateToolHack hack)
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("version", 2);
+		
+		Direction front = MC.player.getHorizontalFacing();
+		BlockPos origin = hack.getOriginPos();
+		
+		JsonArray jsonBlocks = new JsonArray();
+		for(BlockPos pos : hack.getSortedBlocks())
+		{
+			BlockState state = hack.getNonEmptyBlocks().get(pos);
+			if(state == null)
+				throw new IllegalStateException("Block at " + pos
+					+ " exists in sortedBlocks but not in nonEmptyBlocks.");
+			
+			JsonObject jsonBlock = new JsonObject();
+			jsonBlock.addProperty("block",
+				BlockUtils.getName(state.getBlock()));
+			
+			JsonArray jsonPos = new JsonArray();
+			pos = toTemplatePos(pos, origin, front);
+			jsonPos.add(pos.getX());
+			jsonPos.add(pos.getY());
+			jsonPos.add(pos.getZ());
+			jsonBlock.add("pos", jsonPos);
+			
+			jsonBlocks.add(jsonBlock);
+		}
+		json.add("blocks", jsonBlocks);
+		return json;
+	}
+	
+	private JsonObject createV1Json(TemplateToolHack hack)
+	{
+		JsonObject json = new JsonObject();
+		json.addProperty("version", 1);
+		
+		Direction front = MC.player.getHorizontalFacing();
+		BlockPos origin = hack.getOriginPos();
+		
+		JsonArray jsonBlocks = new JsonArray();
+		for(BlockPos pos : hack.getSortedBlocks())
+		{
+			JsonArray jsonPos = new JsonArray();
+			pos = toTemplatePos(pos, origin, front);
+			jsonPos.add(pos.getX());
+			jsonPos.add(pos.getY());
+			jsonPos.add(pos.getZ());
+			jsonBlocks.add(jsonPos);
+		}
+		json.add("blocks", jsonBlocks);
+		return json;
+	}
+	
+	private BlockPos toTemplatePos(BlockPos pos, BlockPos origin,
+		Direction front)
+	{
+		Direction left = front.rotateYCounterclockwise();
+		return new BlockPos(0, pos.getY() - origin.getY(), 0)
+			.offset(front, pos.getZ() - origin.getZ())
+			.offset(left, pos.getX() - origin.getX());
 	}
 }
