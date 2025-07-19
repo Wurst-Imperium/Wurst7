@@ -31,6 +31,7 @@ public class SliderSetting extends Setting implements SliderLock
 	private final double maximum;
 	private final double increment;
 	private final ValueDisplay display;
+	private SliderComponent sliderComponent = null;
 	
 	private SliderLock lock;
 	private boolean disabled;
@@ -253,7 +254,12 @@ public class SliderSetting extends Setting implements SliderLock
 	@Override
 	public final Component getComponent()
 	{
-		return new SliderComponent(this);
+		if(this.sliderComponent == null)
+		{
+			this.sliderComponent = new SliderComponent(this);
+		}
+		
+		return this.sliderComponent;
 	}
 	
 	@Override
