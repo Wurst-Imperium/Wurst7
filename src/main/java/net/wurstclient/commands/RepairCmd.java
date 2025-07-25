@@ -9,12 +9,12 @@ package net.wurstclient.commands;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.InventoryUtils;
 
 public final class RepairCmd extends Command
 {
@@ -35,11 +35,10 @@ public final class RepairCmd extends Command
 		if(!player.getAbilities().creativeMode)
 			throw new CmdError("Creative mode only.");
 		
+		int slot = player.getInventory().getSelectedSlot();
 		ItemStack stack = getHeldStack(player);
 		stack.setDamage(0);
-		MC.player.networkHandler
-			.sendPacket(new CreativeInventoryActionC2SPacket(
-				36 + player.getInventory().getSelectedSlot(), stack));
+		InventoryUtils.setCreativeStack(slot, stack);
 		
 		ChatUtils.message("Item repaired.");
 	}

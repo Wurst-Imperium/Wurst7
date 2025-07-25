@@ -16,7 +16,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -205,11 +204,7 @@ public final class InstaBuildHack extends Hack
 			slot = inventory.getSelectedSlot();
 		
 		ItemStack stack = new ItemStack(item);
-		inventory.setStack(slot, stack);
-		CreativeInventoryActionC2SPacket packet =
-			new CreativeInventoryActionC2SPacket(
-				InventoryUtils.toNetworkSlot(slot), stack);
-		MC.player.networkHandler.sendPacket(packet);
+		InventoryUtils.setCreativeStack(slot, stack);
 	}
 	
 	private void loadSelectedTemplate()

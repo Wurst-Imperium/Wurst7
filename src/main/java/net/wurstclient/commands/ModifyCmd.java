@@ -18,8 +18,8 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentType;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.wurstclient.command.CmdError;
@@ -27,6 +27,7 @@ import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.InventoryUtils;
 
 public final class ModifyCmd extends Command
 {
@@ -48,7 +49,9 @@ public final class ModifyCmd extends Command
 		if(args.length < 2)
 			throw new CmdSyntaxError();
 		
-		ItemStack stack = player.getInventory().getSelectedStack();
+		PlayerInventory inventory = player.getInventory();
+		int slot = inventory.getSelectedSlot();
+		ItemStack stack = inventory.getSelectedStack();
 		if(stack == null)
 			throw new CmdError("You must hold an item in your main hand.");
 		
@@ -66,10 +69,7 @@ public final class ModifyCmd extends Command
 			throw new CmdSyntaxError();
 		}
 		
-		MC.player.networkHandler
-			.sendPacket(new CreativeInventoryActionC2SPacket(
-				36 + player.getInventory().getSelectedSlot(), stack));
-		
+		InventoryUtils.setCreativeStack(slot, stack);
 		ChatUtils.message("Item modified.");
 	}
 	
