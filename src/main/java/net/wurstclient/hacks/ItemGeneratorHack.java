@@ -50,12 +50,6 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
-		
-		if(!MC.player.getAbilities().creativeMode)
-		{
-			ChatUtils.error("Creative mode only.");
-			setEnabled(false);
-		}
 	}
 	
 	@Override
@@ -67,6 +61,12 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		if(!MC.player.isInCreativeMode())
+		{
+			ChatUtils.error("Creative mode only.");
+			setEnabled(false);
+		}
+		
 		int stacks = speed.getValueI();
 		for(int slot = 9; slot < 9 + stacks; slot++)
 		{
