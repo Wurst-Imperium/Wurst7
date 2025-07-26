@@ -10,6 +10,7 @@ package net.wurstclient.util;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
@@ -24,9 +25,9 @@ public final class AutoBuildTemplate
 {
 	private final Path path;
 	private final String name;
-	private final BlockData[] blocks;
+	private final LinkedHashSet<BlockData> blocks;
 	
-	private AutoBuildTemplate(Path path, BlockData[] blocks)
+	private AutoBuildTemplate(Path path, LinkedHashSet<BlockData> blocks)
 	{
 		this.path = path;
 		String fileName = path.getFileName().toString();
@@ -41,7 +42,7 @@ public final class AutoBuildTemplate
 		int version = json.getInt("version", 1);
 		
 		WsonArray jsonBlocks = json.getArray("blocks");
-		BlockData[] loadedBlocks = new BlockData[jsonBlocks.size()];
+		LinkedHashSet<BlockData> loadedBlocks = new LinkedHashSet<>();
 		if(jsonBlocks.isEmpty())
 			throw new JsonException("Template has no blocks!");
 		
@@ -56,8 +57,8 @@ public final class AutoBuildTemplate
 		return new AutoBuildTemplate(path, loadedBlocks);
 	}
 	
-	private static void loadV2(WsonArray jsonBlocks, BlockData[] loadedBlocks)
-		throws JsonException
+	private static void loadV2(WsonArray jsonBlocks,
+		LinkedHashSet<BlockData> loadedBlocks) throws JsonException
 	{
 		for(int i = 0; i < jsonBlocks.size(); i++)
 		{
@@ -70,7 +71,7 @@ public final class AutoBuildTemplate
 				pos[1] = jsonPos.getInt(1);
 				pos[2] = jsonPos.getInt(2);
 				String name = jsonBlock.getString("block", "");
-				loadedBlocks[i] = new BlockData(pos, name);
+				loadedBlocks.add(new BlockData(pos, name));
 				
 			}catch(JsonException e)
 			{
@@ -80,8 +81,8 @@ public final class AutoBuildTemplate
 		}
 	}
 	
-	private static void loadV1(WsonArray jsonBlocks, BlockData[] loadedBlocks)
-		throws JsonException
+	private static void loadV1(WsonArray jsonBlocks,
+		LinkedHashSet<BlockData> loadedBlocks) throws JsonException
 	{
 		for(int i = 0; i < jsonBlocks.size(); i++)
 		{
@@ -92,7 +93,7 @@ public final class AutoBuildTemplate
 				pos[0] = jsonBlock.getInt(0);
 				pos[1] = jsonBlock.getInt(1);
 				pos[2] = jsonBlock.getInt(2);
-				loadedBlocks[i] = new BlockData(pos, "");
+				loadedBlocks.add(new BlockData(pos, ""));
 				
 			}catch(JsonException e)
 			{
@@ -121,7 +122,7 @@ public final class AutoBuildTemplate
 	
 	public int size()
 	{
-		return blocks.length;
+		return blocks.size();
 	}
 	
 	public boolean isSelected(FileSetting setting)
