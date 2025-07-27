@@ -95,6 +95,7 @@ public class BlockListSetting extends Setting
 		
 		blockNames.add(name);
 		Collections.sort(blockNames);
+		update();
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
@@ -104,6 +105,7 @@ public class BlockListSetting extends Setting
 			return;
 		
 		blockNames.remove(index);
+		update();
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
@@ -111,6 +113,7 @@ public class BlockListSetting extends Setting
 	{
 		blockNames.clear();
 		blockNames.addAll(Arrays.asList(defaultNames));
+		update();
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
