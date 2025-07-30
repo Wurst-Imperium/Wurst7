@@ -1,11 +1,4 @@
 buildscript {
-	configurations.all {
-		resolutionStrategy {
-			// v3.17.0, used by org.kohsuke:github-api 1.327, is vulnerable to CVE-2025-48924
-			force "org.apache.commons:commons-lang3:3.18.0"
-		}
-	}
-	
 	dependencies {
 		classpath "org.kohsuke:github-api:1.329"
 	}
