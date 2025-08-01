@@ -188,7 +188,8 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	public boolean mouseClicked(double mouseX, double mouseY, int button,
+		boolean doubleClick)
 	{
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
@@ -196,7 +197,7 @@ public final class AltManagerScreen extends Screen
 			return true;
 		}
 		
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(mouseX, mouseY, button, doubleClick);
 	}
 	
 	private void pressLogin()
@@ -557,7 +558,7 @@ public final class AltManagerScreen extends Screen
 		
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY,
-			int mouseButton)
+			int mouseButton, boolean doubleClick)
 		{
 			if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
 				return false;

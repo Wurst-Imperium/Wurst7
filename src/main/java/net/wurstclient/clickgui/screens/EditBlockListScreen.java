@@ -90,10 +90,11 @@ public final class EditBlockListScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton,
+		boolean doubleClick)
 	{
-		blockNameField.mouseClicked(mouseX, mouseY, mouseButton);
-		return super.mouseClicked(mouseX, mouseY, mouseButton);
+		blockNameField.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
+		return super.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
 	}
 	
 	@Override

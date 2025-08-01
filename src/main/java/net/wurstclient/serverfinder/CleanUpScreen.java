@@ -200,7 +200,8 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	public boolean mouseClicked(double mouseX, double mouseY, int button,
+		boolean doubleClick)
 	{
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
@@ -208,7 +209,7 @@ public class CleanUpScreen extends Screen
 			return true;
 		}
 		
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(mouseX, mouseY, button, doubleClick);
 	}
 	
 	@Override

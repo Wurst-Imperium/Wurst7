@@ -92,10 +92,11 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton,
+		boolean doubleClick)
 	{
-		itemNameField.mouseClicked(mouseX, mouseY, mouseButton);
-		return super.mouseClicked(mouseX, mouseY, mouseButton);
+		itemNameField.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
+		return super.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
 	}
 	
 	@Override

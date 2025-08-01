@@ -224,12 +224,14 @@ public final class AddBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton,
+		boolean doubleClick)
 	{
-		boolean childClicked = super.mouseClicked(mouseX, mouseY, mouseButton);
+		boolean childClicked =
+			super.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
 		
-		levelField.mouseClicked(mouseX, mouseY, mouseButton);
-		priceField.mouseClicked(mouseX, mouseY, mouseButton);
+		levelField.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
+		priceField.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
 		
 		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_4)
 			cancelButton.onPress();
@@ -351,7 +353,7 @@ public final class AddBookOfferScreen extends Screen
 		
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY,
-			int mouseButton)
+			int mouseButton, boolean doubleClick)
 		{
 			if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
 				return false;

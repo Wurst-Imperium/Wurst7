@@ -222,11 +222,11 @@ public abstract class MinecraftClientMixin
 			return;
 		}
 		
-		UserApiService userApiService =
-			session.getAccountType() == Session.AccountType.MSA
-				? authenticationService.createUserApiService(
-					session.getAccessToken())
-				: UserApiService.OFFLINE;
+		String accessToken = session.getAccessToken();
+		boolean isOffline = accessToken == null || accessToken.isBlank()
+			|| accessToken.equals("0") || accessToken.equals("null");
+		UserApiService userApiService = isOffline ? UserApiService.OFFLINE
+			: authenticationService.createUserApiService(accessToken);
 		wurstProfileKeys =
 			ProfileKeys.create(userApiService, session, runDirectory.toPath());
 	}

@@ -30,10 +30,11 @@ public final class ClickGuiScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton,
+		boolean doubleClick)
 	{
 		gui.handleMouseClick((int)mouseX, (int)mouseY, mouseButton);
-		return super.mouseClicked(mouseX, mouseY, mouseButton);
+		return super.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
 	}
 	
 	@Override

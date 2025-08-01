@@ -250,13 +250,14 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	public boolean mouseClicked(double mouseX, double mouseY, int button,
+		boolean doubleClick)
 	{
 		if(mouseX >= paletteX && mouseX <= paletteX + paletteWidth
 			&& mouseY >= paletteY && mouseY <= paletteY + paletteHeight)
 		{
 			if(paletteAsBufferedImage == null)
-				return super.mouseClicked(mouseX, mouseY, button);
+				return super.mouseClicked(mouseX, mouseY, button, doubleClick);
 			
 			int x = (int)Math.round((mouseX - paletteX) / paletteWidth
 				* paletteAsBufferedImage.getWidth());
@@ -275,7 +276,7 @@ public final class EditColorScreen extends Screen
 			}
 		}
 		
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(mouseX, mouseY, button, doubleClick);
 	}
 	
 	private void setColor(Color color)

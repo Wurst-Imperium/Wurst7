@@ -212,10 +212,11 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double x, double y, int button)
+	public boolean mouseClicked(double x, double y, int button,
+		boolean doubleClick)
 	{
-		nameOrEmailBox.mouseClicked(x, y, button);
-		passwordBox.mouseClicked(x, y, button);
+		nameOrEmailBox.mouseClicked(x, y, button, doubleClick);
+		passwordBox.mouseClicked(x, y, button, doubleClick);
 		
 		if(nameOrEmailBox.isFocused() || passwordBox.isFocused())
 			message = "";
@@ -226,7 +227,7 @@ public abstract class AltEditorScreen extends Screen
 			return true;
 		}
 		
-		return super.mouseClicked(x, y, button);
+		return super.mouseClicked(x, y, button, doubleClick);
 	}
 	
 	@Override

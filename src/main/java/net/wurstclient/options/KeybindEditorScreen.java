@@ -84,10 +84,11 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton,
+		boolean doubleClick)
 	{
-		commandField.mouseClicked(mouseX, mouseY, mouseButton);
-		return super.mouseClicked(mouseX, mouseY, mouseButton);
+		commandField.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
+		return super.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
 	}
 	
 	@Override

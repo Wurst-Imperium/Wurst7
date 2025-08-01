@@ -48,7 +48,8 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final boolean mouseClicked(double x, double y, int button)
+	public final boolean mouseClicked(double x, double y, int button,
+		boolean doubleClick)
 	{
 		// scrollbar
 		if(new Rectangle(width / 2 + 170, 60, 12, height - 103).contains(x, y))
@@ -57,7 +58,7 @@ public abstract class NavigatorScreen extends Screen
 		onMouseClick(x, y, button);
 		
 		// vanilla buttons
-		return super.mouseClicked(x, y, button);
+		return super.mouseClicked(x, y, button, doubleClick);
 	}
 	
 	@Override
