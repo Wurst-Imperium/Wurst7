@@ -7,6 +7,7 @@
  */
 package net.wurstclient.options;
 
+import net.minecraft.util.Colors;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.DrawContext;
@@ -55,7 +56,7 @@ public class PressAKeyScreen extends Screen
 		float partialTicks)
 	{
 		context.drawCenteredTextWithShadow(textRenderer, "Press a key",
-			width / 2, height / 4 + 48, 16777215);
+			width / 2, height / 4 + 48, Colors.WHITE);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
