@@ -78,6 +78,6 @@ public final class NameTagsHack extends Hack
 		return isEnabled() && forcePlayerNametags.isChecked();
 	}
 	
-	// See EntityRendererMixin.wurstRenderLabelIfPresent(),
+	// See EntityRenderCommandQueueImpl, EntityRendererMixin,
 	// LivingEntityRendererMixin, MobEntityRendererMixin
 }

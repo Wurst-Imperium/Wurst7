@@ -32,7 +32,7 @@
     "DirectConnectScreenMixin",
     "DisconnectedScreenMixin",
     "EntityMixin",
-    "EntityRenderDispatcherMixin",
+    "EntityRenderCommandQueueImplMixin",
     "EntityRendererMixin",
     "FluidRendererMixin",
     "FogRendererMixin",
