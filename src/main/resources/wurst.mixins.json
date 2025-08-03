@@ -66,6 +66,7 @@
     "TelemetryManagerMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
+    "ToastManagerMixin",
     "WorldMixin",
     "WorldRendererMixin"
   ],
