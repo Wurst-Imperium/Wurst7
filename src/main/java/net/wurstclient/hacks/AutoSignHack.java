@@ -40,4 +40,5 @@ public final class AutoSignHack extends Hack
 		if(isEnabled() && this.signText == null)
 			this.signText = signText;
 	}
+	// See AbstractSignEditScreenMixin.onInit(), onFinishEditing()
 }

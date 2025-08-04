@@ -87,6 +87,5 @@ public final class SafeWalkHack extends Hack
 		
 		this.sneaking = sneaking;
 	}
-	
-	// See ClientPlayerEntityMixin
+	// See ClientPlayerEntityMixin.clipAtLedge(), adjustMovementForSneaking()
 }

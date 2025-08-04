@@ -53,4 +53,5 @@ public final class NameProtectHack extends Hack
 		
 		return string;
 	}
+	// See TextVisitFactoryMixin.adjustText()
 }
