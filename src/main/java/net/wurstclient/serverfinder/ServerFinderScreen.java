@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import net.minecraft.util.Colors;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.DrawContext;
@@ -235,33 +236,33 @@ public class ServerFinderScreen extends Screen
 		float partialTicks)
 	{
 		context.drawCenteredTextWithShadow(textRenderer, "Server Finder",
-			width / 2, 20, 16777215);
+			width / 2, 20, Colors.WHITE);
 		context.drawCenteredTextWithShadow(textRenderer,
 			"This will search for servers with similar IPs", width / 2, 40,
-			10526880);
+			Colors.LIGHT_GRAY);
 		context.drawCenteredTextWithShadow(textRenderer,
 			"to the IP you type into the field below.", width / 2, 50,
-			10526880);
+			Colors.LIGHT_GRAY);
 		context.drawCenteredTextWithShadow(textRenderer,
 			"The servers it finds will be added to your server list.",
-			width / 2, 60, 10526880);
+			width / 2, 60, Colors.LIGHT_GRAY);
 		
 		context.drawTextWithShadow(textRenderer, "Server address:",
-			width / 2 - 100, height / 4 + 24, 10526880);
+			width / 2 - 100, height / 4 + 24, Colors.LIGHT_GRAY);
 		ipBox.render(context, mouseX, mouseY, partialTicks);
 		
 		context.drawTextWithShadow(textRenderer, "Max. threads:",
-			width / 2 - 100, height / 4 + 60, 10526880);
+			width / 2 - 100, height / 4 + 60, Colors.LIGHT_GRAY);
 		maxThreadsBox.render(context, mouseX, mouseY, partialTicks);
 		
 		context.drawCenteredTextWithShadow(textRenderer, state.toString(),
-			width / 2, height / 4 + 73, 10526880);
+			width / 2, height / 4 + 73, Colors.LIGHT_GRAY);
 		
 		context.drawTextWithShadow(textRenderer,
 			"Checked: " + checked + " / 1792", width / 2 - 100, height / 4 + 84,
-			10526880);
+			Colors.LIGHT_GRAY);
 		context.drawTextWithShadow(textRenderer, "Working: " + working,
-			width / 2 - 100, height / 4 + 94, 10526880);
+			width / 2 - 100, height / 4 + 94, Colors.LIGHT_GRAY);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
