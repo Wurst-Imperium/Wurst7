@@ -462,7 +462,6 @@ public final class ClickGui
 		matrixStack.pushMatrix();
 		
 		tooltip = "";
-		int windowLayers = 0;
 		for(Window window : windows)
 		{
 			if(window.isInvisible())
@@ -486,7 +485,6 @@ public final class ClickGui
 					window.stopDraggingScrollbar();
 				
 			context.state.goUpLayer();
-			windowLayers++;
 			renderWindow(context, window, mouseX, mouseY, partialTicks);
 		}
 		
@@ -494,8 +492,6 @@ public final class ClickGui
 		renderTooltip(context, mouseX, mouseY);
 		
 		matrixStack.popMatrix();
-		for(int i = 0; i < windowLayers; i++)
-			context.state.goDownLayer();
 	}
 	
 	public void renderPopups(DrawContext context, int mouseX, int mouseY)
@@ -518,7 +514,6 @@ public final class ClickGui
 			int cMouseY = mouseY - y1;
 			popup.render(context, cMouseX, cMouseY);
 			
-			context.state.goDownLayer();
 			matrixStack.popMatrix();
 		}
 	}
@@ -562,27 +557,19 @@ public final class ClickGui
 		for(int i = 0; i < lines.length; i++)
 			context.drawText(tr, lines[i], xt1 + 2, yt1 + 2 + i * tr.fontHeight,
 				txtColor, false);
-		context.state.goDownLayer();
-		
-		context.state.goDownLayer();
 	}
 	
 	public void renderPinnedWindows(DrawContext context, float partialTicks)
 	{
-		int windowLayers = 0;
 		for(Window window : windows)
 		{
 			if(!window.isPinned() || window.isInvisible())
 				continue;
 			
 			context.state.goUpLayer();
-			windowLayers++;
 			renderWindow(context, window, Integer.MIN_VALUE, Integer.MIN_VALUE,
 				partialTicks);
 		}
-		
-		for(int i = 0; i < windowLayers; i++)
-			context.state.goDownLayer();
 	}
 	
 	public void updateColors()
@@ -774,7 +761,6 @@ public final class ClickGui
 			.getString();
 		context.state.goUpLayer();
 		context.drawText(tr, title, x1 + 2, y1 + 3, txtColor, false);
-		context.state.goDownLayer();
 	}
 	
 	private void renderTitleBarButton(DrawContext context, int x1, int y1,

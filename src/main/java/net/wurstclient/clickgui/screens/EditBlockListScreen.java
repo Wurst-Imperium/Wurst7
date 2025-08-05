@@ -180,7 +180,6 @@ public final class EditBlockListScreen extends Screen
 			blockToAdd == null ? ItemStack.EMPTY : new ItemStack(blockToAdd),
 			width / 2 - 164, height - 52, false);
 		
-		context.state.goDownLayer();
 		matrixStack.popMatrix();
 	}
 	

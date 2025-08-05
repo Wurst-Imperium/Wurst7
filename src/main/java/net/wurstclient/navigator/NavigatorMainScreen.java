@@ -285,9 +285,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			for(int i = 0; i < lines.length; i++)
 				context.drawText(tr, lines[i], xt1 + 2,
 					yt1 + 2 + i * tr.fontHeight, txtColor, false);
-			context.state.goDownLayer();
-			
-			context.state.goDownLayer();
 		}
 	}
 	
@@ -381,8 +378,6 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			int txtColor = gui.getTxtColor();
 			context.drawText(tr, buttonText, bx, by, txtColor, false);
 		}
-		
-		context.state.goDownLayer();
 	}
 	
 	public void setExpanding(boolean expanding)

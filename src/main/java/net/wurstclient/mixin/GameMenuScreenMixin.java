@@ -73,7 +73,6 @@ public abstract class GameMenuScreenMixin extends Screen
 		context.state.goUpLayer();
 		context.drawTexture(RenderPipelines.GUI_TEXTURED, WURST_TEXTURE, x, y,
 			u, v, w, h, fw, fh);
-		context.state.goDownLayer();
 	}
 	
 	@Unique

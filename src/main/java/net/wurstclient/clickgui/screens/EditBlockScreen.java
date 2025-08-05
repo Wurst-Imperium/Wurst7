@@ -139,7 +139,6 @@ public final class EditBlockScreen extends Screen
 		
 		RenderUtils.drawItem(context, new ItemStack(blockToAdd),
 			-64 + width / 2 - 100 + 52, 115 - 52, false);
-		context.state.goDownLayer();
 	}
 	
 	@Override

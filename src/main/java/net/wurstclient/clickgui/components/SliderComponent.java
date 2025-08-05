@@ -159,8 +159,6 @@ public final class SliderComponent extends Component
 		int txtColor = GUI.getTxtColor();
 		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
 		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
-		
-		context.state.goDownLayer();
 	}
 	
 	private String getTextTooltip()

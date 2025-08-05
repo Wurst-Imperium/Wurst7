@@ -89,7 +89,6 @@ public final class ColorComponent extends Component
 		context.state.goUpLayer();
 		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
 		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
-		context.state.goDownLayer();
 	}
 	
 	private String getColorTooltip()

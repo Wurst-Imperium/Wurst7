@@ -182,7 +182,6 @@ public final class EditItemListScreen extends Screen
 			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
 		
-		context.state.goDownLayer();
 		matrixStack.popMatrix();
 	}
 	

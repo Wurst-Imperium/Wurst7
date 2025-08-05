@@ -16,6 +16,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
+
 import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.state.EntityRenderState;
@@ -31,7 +32,7 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	 * Disables the nametag distance limit if configured in NameTags.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getSquaredDistanceToCamera(Lnet/minecraft/entity/Entity;)D"),
+		target = "Lnet/minecraft/client/render/entity/EntityRenderManager;getSquaredDistanceToCamera(Lnet/minecraft/entity/Entity;)D"),
 		method = "updateRenderState(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/entity/state/EntityRenderState;F)V")
 	private double fakeSquaredDistanceToCamera(EntityRenderManager dispatcher,
 		Entity entity, Operation<Double> original,

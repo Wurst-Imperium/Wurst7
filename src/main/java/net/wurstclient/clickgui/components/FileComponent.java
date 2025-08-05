@@ -78,7 +78,6 @@ public final class FileComponent extends Component
 		context.state.goUpLayer();
 		context.drawText(TR, labelText, x1, y1 + 2, txtColor, false);
 		context.drawText(TR, buttonText, x3 + 2, y1 + 2, txtColor, false);
-		context.state.goDownLayer();
 	}
 	
 	private int getFillColor(boolean hovering)

@@ -662,7 +662,6 @@ public enum RenderUtils
 			context.drawText(tr, "?", 3, 2, WurstColors.VERY_LIGHT_GRAY, true);
 			
 			matrixStack.popMatrix();
-			context.state.goDownLayer();
 		}
 	}
 	

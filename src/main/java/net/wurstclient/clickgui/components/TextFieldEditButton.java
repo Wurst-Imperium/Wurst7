@@ -96,7 +96,6 @@ public final class TextFieldEditButton extends Component
 		if(maxLength < value.length())
 			value = value.substring(0, maxLength) + "...";
 		context.drawText(TR, value, x1 + 2, y3 + 2, txtColor, false);
-		context.state.goDownLayer();
 	}
 	
 	@Override

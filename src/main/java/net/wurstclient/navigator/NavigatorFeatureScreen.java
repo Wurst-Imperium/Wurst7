@@ -429,7 +429,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1, buttonData.isLocked()
 					? WurstColors.VERY_LIGHT_GRAY : buttonData.textColor);
-			context.state.goDownLayer();
 		}
 		
 		// text
@@ -441,7 +440,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				txtColor, false);
 			textY += client.textRenderer.fontHeight;
 		}
-		context.state.goDownLayer();
 		
 		context.disableScissor();
 		
@@ -472,7 +470,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			context.drawText(client.textRenderer, buttonText,
 				(x1 + x2 - client.textRenderer.getWidth(buttonText)) / 2,
 				y1 + 5, txtColor, false);
-			context.state.goDownLayer();
 		}
 		
 		// popups & tooltip

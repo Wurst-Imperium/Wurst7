@@ -122,8 +122,6 @@ public final class FeatureButton extends Component
 		int tx = x1 + (x3 - x1 - TR.getWidth(name)) / 2;
 		int ty = y1 + 2;
 		context.drawText(TR, name, tx, ty, GUI.getTxtColor(), false);
-		
-		context.state.goDownLayer();
 	}
 	
 	private int getButtonColor(boolean enabled, boolean hovering)

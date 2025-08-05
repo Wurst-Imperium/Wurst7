@@ -88,8 +88,6 @@ public final class BlockComponent extends Component
 		// block
 		ItemStack stack = new ItemStack(setting.getBlock());
 		RenderUtils.drawItem(context, stack, x3, y1, true);
-		
-		context.state.goDownLayer();
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int y1, int x2,

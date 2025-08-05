@@ -212,7 +212,6 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					y1 + 1, txtColor);
 				context.drawTextWithShadow(tr, pkb.getCommand(), x1 + 1,
 					y1 + 1 + tr.fontHeight, txtColor);
-				context.state.goDownLayer();
 			}
 		}
 		
@@ -224,7 +223,6 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			context.drawTextWithShadow(tr, line, bgx1 + 2, textY, txtColor);
 			textY += tr.fontHeight;
 		}
-		context.state.goDownLayer();
 		
 		context.disableScissor();
 		
@@ -255,7 +253,6 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			context.drawCenteredTextWithShadow(tr,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 5,
 				txtColor);
-			context.state.goDownLayer();
 		}
 	}
 	
