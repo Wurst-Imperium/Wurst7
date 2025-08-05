@@ -19,26 +19,25 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-
+import net.minecraft.client.render.entity.command.BatchingEntityRenderCommandQueue;
 import net.minecraft.client.render.entity.command.EntityRenderCommandQueue;
-import net.minecraft.client.render.entity.command.EntityRenderCommandQueueImpl;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NameTagsHack;
 
-@Mixin(EntityRenderCommandQueueImpl.class)
+@Mixin(BatchingEntityRenderCommandQueue.class)
 public abstract class EntityRenderCommandQueueImplMixin
 	implements EntityRenderCommandQueue
 {
 	@Shadow
 	@Final
-	private List<EntityRenderCommandQueueImpl.LabelCommand> seeThroughLabelCommands;
+	private List<BatchingEntityRenderCommandQueue.LabelCommand> seeThroughLabelCommands;
 	
 	@Shadow
 	@Final
-	private List<EntityRenderCommandQueueImpl.LabelCommand> labelCommands;
+	private List<BatchingEntityRenderCommandQueue.LabelCommand> labelCommands;
 	
 	/**
 	 * Intercepts the matrices.scale() call in pushLabel to apply NameTags scale
@@ -91,8 +90,8 @@ public abstract class EntityRenderCommandQueueImplMixin
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
 			ordinal = 0),
 		method = "pushLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
-	private List<EntityRenderCommandQueueImpl.LabelCommand> swapFirstList(
-		List<EntityRenderCommandQueueImpl.LabelCommand> originalList,
+	private List<BatchingEntityRenderCommandQueue.LabelCommand> swapFirstList(
+		List<BatchingEntityRenderCommandQueue.LabelCommand> originalList,
 		Object labelCommand)
 	{
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
@@ -114,8 +113,8 @@ public abstract class EntityRenderCommandQueueImplMixin
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
 			ordinal = 1),
 		method = "pushLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
-	private List<EntityRenderCommandQueueImpl.LabelCommand> swapSecondList(
-		List<EntityRenderCommandQueueImpl.LabelCommand> originalList,
+	private List<BatchingEntityRenderCommandQueue.LabelCommand> swapSecondList(
+		List<BatchingEntityRenderCommandQueue.LabelCommand> originalList,
 		Object labelCommand)
 	{
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;

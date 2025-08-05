@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
 
-@Mixin(BlockEntityRenderDispatcher.class)
+@Mixin(BlockEntityRenderManager.class)
 public class BlockEntityRenderDispatcherMixin
 {
 	@Inject(at = @At("HEAD"),

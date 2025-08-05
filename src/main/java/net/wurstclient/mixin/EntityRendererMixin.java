@@ -16,8 +16,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
-
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.entity.Entity;
@@ -34,9 +33,8 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	@WrapOperation(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getSquaredDistanceToCamera(Lnet/minecraft/entity/Entity;)D"),
 		method = "updateRenderState(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/entity/state/EntityRenderState;F)V")
-	private double fakeSquaredDistanceToCamera(
-		EntityRenderDispatcher dispatcher, Entity entity,
-		Operation<Double> original,
+	private double fakeSquaredDistanceToCamera(EntityRenderManager dispatcher,
+		Entity entity, Operation<Double> original,
 		@Share("actualDistanceSq") LocalDoubleRef actualDistanceSq)
 	{
 		actualDistanceSq.set(original.call(dispatcher, entity));
