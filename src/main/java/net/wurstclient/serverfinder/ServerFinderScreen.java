@@ -23,6 +23,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.util.MathUtils;
@@ -236,33 +237,33 @@ public class ServerFinderScreen extends Screen
 		renderBackground(context);
 		
 		context.drawCenteredTextWithShadow(textRenderer, "Server Finder",
-			width / 2, 20, 16777215);
+			width / 2, 20, Colors.WHITE);
 		context.drawCenteredTextWithShadow(textRenderer,
 			"This will search for servers with similar IPs", width / 2, 40,
-			10526880);
+			0xFFA0A0A0);
 		context.drawCenteredTextWithShadow(textRenderer,
 			"to the IP you type into the field below.", width / 2, 50,
-			10526880);
+			0xFFA0A0A0);
 		context.drawCenteredTextWithShadow(textRenderer,
 			"The servers it finds will be added to your server list.",
-			width / 2, 60, 10526880);
+			width / 2, 60, 0xFFA0A0A0);
 		
 		context.drawTextWithShadow(textRenderer, "Server address:",
-			width / 2 - 100, height / 4 + 24, 10526880);
+			width / 2 - 100, height / 4 + 24, 0xFFA0A0A0);
 		ipBox.render(context, mouseX, mouseY, partialTicks);
 		
 		context.drawTextWithShadow(textRenderer, "Max. threads:",
-			width / 2 - 100, height / 4 + 60, 10526880);
+			width / 2 - 100, height / 4 + 60, 0xFFA0A0A0);
 		maxThreadsBox.render(context, mouseX, mouseY, partialTicks);
 		
 		context.drawCenteredTextWithShadow(textRenderer, state.toString(),
-			width / 2, height / 4 + 73, 10526880);
+			width / 2, height / 4 + 73, 0xFFA0A0A0);
 		
 		context.drawTextWithShadow(textRenderer,
 			"Checked: " + checked + " / 1792", width / 2 - 100, height / 4 + 84,
-			10526880);
+			0xFFA0A0A0);
 		context.drawTextWithShadow(textRenderer, "Working: " + working,
-			width / 2 - 100, height / 4 + 94, 10526880);
+			width / 2 - 100, height / 4 + 94, 0xFFA0A0A0);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);

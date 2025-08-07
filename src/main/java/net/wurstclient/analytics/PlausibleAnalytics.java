@@ -56,7 +56,7 @@ public final class PlausibleAnalytics
 		new LinkedBlockingQueue<>();
 	private final JsonObject sessionProps = new JsonObject();
 	private final AnalyticsConfigFile configFile;
-	private boolean enabled = false;
+	private boolean enabled = true;
 	
 	/**
 	 * Creates a new PlausibleAnalytics instance and starts a background thread
@@ -131,6 +131,7 @@ public final class PlausibleAnalytics
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
+		configFile.save(this);
 	}
 	
 	private boolean isDebugMode()
