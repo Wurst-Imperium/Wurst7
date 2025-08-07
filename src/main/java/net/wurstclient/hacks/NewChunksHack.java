@@ -8,10 +8,9 @@
 package net.wurstclient.hacks;
 
 import java.awt.Color;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.FluidState;
@@ -72,17 +71,12 @@ public final class NewChunksHack extends Hack
 	private final CheckboxSetting logChunks = new CheckboxSetting("Log chunks",
 		"Writes to the log file when a new/old chunk is found.", false);
 	
-	private final Set<ChunkPos> newChunks =
-		Collections.synchronizedSet(new HashSet<>());
-	private final Set<ChunkPos> oldChunks =
-		Collections.synchronizedSet(new HashSet<>());
-	private final Set<ChunkPos> dontCheckAgain =
-		Collections.synchronizedSet(new HashSet<>());
+	private final Set<ChunkPos> newChunks = ConcurrentHashMap.newKeySet();
+	private final Set<ChunkPos> oldChunks = ConcurrentHashMap.newKeySet();
+	private final Set<ChunkPos> dontCheckAgain = ConcurrentHashMap.newKeySet();
 	
-	private final Set<BlockPos> newChunkReasons =
-		Collections.synchronizedSet(new HashSet<>());
-	private final Set<BlockPos> oldChunkReasons =
-		Collections.synchronizedSet(new HashSet<>());
+	private final Set<BlockPos> newChunkReasons = ConcurrentHashMap.newKeySet();
+	private final Set<BlockPos> oldChunkReasons = ConcurrentHashMap.newKeySet();
 	
 	private final NewChunksRenderer renderer = new NewChunksRenderer(altitude,
 		opacity, newChunksColor, oldChunksColor);

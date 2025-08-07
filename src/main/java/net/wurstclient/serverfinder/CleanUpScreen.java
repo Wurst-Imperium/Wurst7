@@ -24,6 +24,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 
 public class CleanUpScreen extends Screen
@@ -217,10 +218,10 @@ public class CleanUpScreen extends Screen
 	{
 		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(textRenderer, "Clean Up", width / 2,
-			20, 16777215);
+			20, Colors.WHITE);
 		context.drawCenteredTextWithShadow(textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
-			10526880);
+			Colors.LIGHT_GRAY);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);

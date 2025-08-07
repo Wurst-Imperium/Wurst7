@@ -14,6 +14,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 
 public class PressAKeyScreen extends Screen
 {
@@ -56,7 +57,7 @@ public class PressAKeyScreen extends Screen
 	{
 		renderBackground(context, mouseX, mouseY, partialTicks);
 		context.drawCenteredTextWithShadow(textRenderer, "Press a key",
-			width / 2, height / 4 + 48, 16777215);
+			width / 2, height / 4 + 48, Colors.WHITE);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);

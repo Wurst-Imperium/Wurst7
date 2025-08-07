@@ -43,7 +43,7 @@ on:
         required: false
 
 permissions:
-  # To push changes to the new snapshot branch.
+  # To push changes to the snapshot branch.
   contents: write
   # To trigger the CI workflow.
   actions: write
@@ -58,9 +58,6 @@ jobs:
 
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        # Include all branches in case the new snapshot branch already exists.
-        fetch-depth: 0
 
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
@@ -82,21 +79,6 @@ jobs:
         build-scan-publish: true
         build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
         build-scan-terms-of-use-agree: "yes"
-
-    - name: Create and checkout new snapshot branch
-      run: |
-        BRANCH_NAME="${{ github.event.inputs.mc_version }}"
-        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        
-        if [ "$CURRENT_BRANCH" = "$BRANCH_NAME" ]; then
-          echo "Already on branch $BRANCH_NAME. Skipping branch creation."
-        elif git show-ref --quiet refs/heads/$BRANCH_NAME; then
-          echo "Branch $BRANCH_NAME already exists but is not currently checked out. Failing the workflow."
-          exit 1
-        else
-          git checkout -b $BRANCH_NAME
-          echo "Created and checked out new branch: $BRANCH_NAME"
-        fi
 
     - name: Run migrateMappings task
       run: |
@@ -125,16 +107,16 @@ jobs:
         git config --global user.email "contact.wurstimperium@gmail.com"
         git add .
         git commit -m "[Wurst-Bot] Update to ${{ github.event.inputs.mc_version }}"
-        git push --set-upstream origin ${{ github.event.inputs.mc_version }}
+        git push
 
-    - name: Trigger CI on the new branch
+    - name: Trigger CI
       id: ci_dispatch
       uses: codex-/return-dispatch@v2
       with:
         token: ${{ github.token }}
         owner: Wurst-Imperium
         repo: Wurst7
-        ref: ${{ github.event.inputs.mc_version }}
+        ref: ${{ github.ref }}
         workflow: gradle.yml
 
     - name: Wait for CI to finish (run ${{ steps.ci_dispatch.outputs.run_id }})
