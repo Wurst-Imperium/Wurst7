@@ -33,7 +33,7 @@ public final class WsonArray
 	{
 		try
 		{
-			return JsonUtils.getAsBoolean(json.get(index));
+			return JsonUtils.getAsBoolean(getElement(index));
 			
 		}catch(JsonException e)
 		{
@@ -43,14 +43,14 @@ public final class WsonArray
 	
 	public boolean getBoolean(int index, boolean fallback)
 	{
-		return JsonUtils.getAsBoolean(json.get(index), fallback);
+		return JsonUtils.getAsBoolean(getElement(index, null), fallback);
 	}
 	
 	public int getInt(int index) throws JsonException
 	{
 		try
 		{
-			return JsonUtils.getAsInt(json.get(index));
+			return JsonUtils.getAsInt(getElement(index));
 			
 		}catch(JsonException e)
 		{
@@ -60,14 +60,14 @@ public final class WsonArray
 	
 	public int getInt(int index, int fallback)
 	{
-		return JsonUtils.getAsInt(json.get(index), fallback);
+		return JsonUtils.getAsInt(getElement(index, null), fallback);
 	}
 	
 	public long getLong(int index) throws JsonException
 	{
 		try
 		{
-			return JsonUtils.getAsLong(json.get(index));
+			return JsonUtils.getAsLong(getElement(index));
 			
 		}catch(JsonException e)
 		{
@@ -77,14 +77,14 @@ public final class WsonArray
 	
 	public long getLong(int index, long fallback)
 	{
-		return JsonUtils.getAsLong(json.get(index), fallback);
+		return JsonUtils.getAsLong(getElement(index, null), fallback);
 	}
 	
 	public float getFloat(int index) throws JsonException
 	{
 		try
 		{
-			return JsonUtils.getAsFloat(json.get(index));
+			return JsonUtils.getAsFloat(getElement(index));
 			
 		}catch(JsonException e)
 		{
@@ -94,14 +94,14 @@ public final class WsonArray
 	
 	public float getFloat(int index, float fallback)
 	{
-		return JsonUtils.getAsFloat(json.get(index), fallback);
+		return JsonUtils.getAsFloat(getElement(index, null), fallback);
 	}
 	
 	public double getDouble(int index) throws JsonException
 	{
 		try
 		{
-			return JsonUtils.getAsDouble(json.get(index));
+			return JsonUtils.getAsDouble(getElement(index));
 			
 		}catch(JsonException e)
 		{
@@ -111,14 +111,14 @@ public final class WsonArray
 	
 	public double getDouble(int index, double fallback)
 	{
-		return JsonUtils.getAsDouble(json.get(index), fallback);
+		return JsonUtils.getAsDouble(getElement(index, null), fallback);
 	}
 	
 	public String getString(int index) throws JsonException
 	{
 		try
 		{
-			return JsonUtils.getAsString(json.get(index));
+			return JsonUtils.getAsString(getElement(index));
 			
 		}catch(JsonException e)
 		{
@@ -128,14 +128,14 @@ public final class WsonArray
 	
 	public String getString(int index, String fallback)
 	{
-		return JsonUtils.getAsString(json.get(index), fallback);
+		return JsonUtils.getAsString(getElement(index, null), fallback);
 	}
 	
 	public WsonArray getArray(int index) throws JsonException
 	{
 		try
 		{
-			return JsonUtils.getAsArray(json.get(index));
+			return JsonUtils.getAsArray(getElement(index));
 			
 		}catch(JsonException e)
 		{
@@ -147,7 +147,7 @@ public final class WsonArray
 	{
 		try
 		{
-			return JsonUtils.getAsObject(json.get(index));
+			return JsonUtils.getAsObject(getElement(index));
 			
 		}catch(JsonException e)
 		{
@@ -155,9 +155,28 @@ public final class WsonArray
 		}
 	}
 	
-	public JsonElement getElement(int index)
+	public JsonElement getElement(int index) throws JsonException
 	{
-		return json.get(index);
+		try
+		{
+			return json.get(index);
+			
+		}catch(IndexOutOfBoundsException e)
+		{
+			throw new JsonException(e.getMessage());
+		}
+	}
+	
+	public JsonElement getElement(int index, JsonElement fallback)
+	{
+		try
+		{
+			return json.get(index);
+			
+		}catch(IndexOutOfBoundsException e)
+		{
+			return fallback;
+		}
 	}
 	
 	public ArrayList<String> getAllStrings()
@@ -173,6 +192,16 @@ public final class WsonArray
 			.filter(JsonElement::isJsonObject).map(JsonElement::getAsJsonObject)
 			.map(WsonObject::new)
 			.collect(Collectors.toCollection(ArrayList::new));
+	}
+	
+	public int size()
+	{
+		return json.size();
+	}
+	
+	public boolean isEmpty()
+	{
+		return json.isEmpty();
 	}
 	
 	public JsonArray toJsonArray()

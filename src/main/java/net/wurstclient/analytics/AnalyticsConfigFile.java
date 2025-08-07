@@ -20,6 +20,7 @@ import net.wurstclient.util.json.WsonObject;
 public final class AnalyticsConfigFile
 {
 	private final Path path;
+	private boolean disableSaving;
 	
 	public AnalyticsConfigFile(Path path)
 	{
@@ -31,7 +32,7 @@ public final class AnalyticsConfigFile
 		try
 		{
 			WsonObject wson = JsonUtils.parseFileToObject(path);
-			plausible.setEnabled(wson.getBoolean("enabled"));
+			loadJson(wson, plausible);
 			
 		}catch(NoSuchFileException e)
 		{
@@ -46,8 +47,30 @@ public final class AnalyticsConfigFile
 		save(plausible);
 	}
 	
+	private void loadJson(WsonObject wson, PlausibleAnalytics plausible)
+		throws JsonException
+	{
+		try
+		{
+			disableSaving = true;
+			
+			// v1 was bugged, don't load it
+			if(!wson.has("version"))
+				return;
+			
+			plausible.setEnabled(wson.getBoolean("enabled"));
+			
+		}finally
+		{
+			disableSaving = false;
+		}
+	}
+	
 	public void save(PlausibleAnalytics plausible)
 	{
+		if(disableSaving)
+			return;
+		
 		JsonObject json = createJson(plausible);
 		
 		try
@@ -64,6 +87,7 @@ public final class AnalyticsConfigFile
 	private JsonObject createJson(PlausibleAnalytics plausible)
 	{
 		JsonObject json = new JsonObject();
+		json.addProperty("version", 2);
 		json.addProperty("enabled", plausible.isEnabled());
 		return json;
 	}

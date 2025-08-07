@@ -1,12 +1,12 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.327"
+		classpath "org.kohsuke:github-api:1.329"
 	}
 }
 
 plugins {
 	id "fabric-loom" version "${loom_version}"
-	id "com.diffplug.spotless" version "7.0.4"
+	id "com.diffplug.spotless" version "7.2.1"
 }
 
 def ENV = System.getenv()
@@ -29,8 +29,9 @@ repositories {
 // Override vulnerable dependencies until Minecraft updates to newer versions
 configurations.all {
 	resolutionStrategy {
-		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2024-47535
-		force "io.netty:netty-common:4.1.115.Final"
+		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2024-47535 and CVE-2025-25193
+		force "io.netty:netty-common:4.1.118.Final"
+		force "io.netty:netty-handler:4.1.118.Final"
 	}
 }
 

@@ -9,22 +9,25 @@ package net.wurstclient.util;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
+import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
+import net.wurstclient.util.json.WsonArray;
 import net.wurstclient.util.json.WsonObject;
 
 public final class AutoBuildTemplate
 {
 	private final Path path;
 	private final String name;
-	private final int[][] blocks;
+	private final LinkedHashSet<BlockData> blocks;
 	
-	private AutoBuildTemplate(Path path, int[][] blocks)
+	private AutoBuildTemplate(Path path, LinkedHashSet<BlockData> blocks)
 	{
 		this.path = path;
 		String fileName = path.getFileName().toString();
@@ -36,47 +39,90 @@ public final class AutoBuildTemplate
 		throws IOException, JsonException
 	{
 		WsonObject json = JsonUtils.parseFileToObject(path);
-		int[][] blocks =
-			JsonUtils.GSON.fromJson(json.getElement("blocks"), int[][].class);
+		int version = json.getInt("version", 1);
 		
-		if(blocks == null)
+		WsonArray jsonBlocks = json.getArray("blocks");
+		LinkedHashSet<BlockData> loadedBlocks = new LinkedHashSet<>();
+		if(jsonBlocks.isEmpty())
 			throw new JsonException("Template has no blocks!");
 		
-		for(int i = 0; i < blocks.length; i++)
+		switch(version)
 		{
-			int length = blocks[i].length;
-			
-			if(length < 3)
-				throw new JsonException("Entry blocks[" + i
-					+ "] doesn't have X, Y and Z offset. Only found " + length
-					+ " values");
+			case 1 -> loadV1(jsonBlocks, loadedBlocks);
+			case 2 -> loadV2(jsonBlocks, loadedBlocks);
+			default -> throw new JsonException(
+				"Unknown template version: " + version);
 		}
 		
-		return new AutoBuildTemplate(path, blocks);
+		return new AutoBuildTemplate(path, loadedBlocks);
 	}
 	
-	public LinkedHashSet<BlockPos> getPositions(BlockPos startPos,
+	private static void loadV2(WsonArray jsonBlocks,
+		LinkedHashSet<BlockData> loadedBlocks) throws JsonException
+	{
+		for(int i = 0; i < jsonBlocks.size(); i++)
+		{
+			WsonObject jsonBlock = jsonBlocks.getObject(i);
+			try
+			{
+				WsonArray jsonPos = jsonBlock.getArray("pos");
+				int[] pos = new int[3];
+				pos[0] = jsonPos.getInt(0);
+				pos[1] = jsonPos.getInt(1);
+				pos[2] = jsonPos.getInt(2);
+				String name = jsonBlock.getString("block", "");
+				loadedBlocks.add(new BlockData(pos, name));
+				
+			}catch(JsonException e)
+			{
+				throw new JsonException("Entry blocks[" + i + "] is not valid",
+					e);
+			}
+		}
+	}
+	
+	private static void loadV1(WsonArray jsonBlocks,
+		LinkedHashSet<BlockData> loadedBlocks) throws JsonException
+	{
+		for(int i = 0; i < jsonBlocks.size(); i++)
+		{
+			WsonArray jsonBlock = jsonBlocks.getArray(i);
+			try
+			{
+				int[] pos = new int[3];
+				pos[0] = jsonBlock.getInt(0);
+				pos[1] = jsonBlock.getInt(1);
+				pos[2] = jsonBlock.getInt(2);
+				loadedBlocks.add(new BlockData(pos, ""));
+				
+			}catch(JsonException e)
+			{
+				throw new JsonException("Entry blocks[" + i + "] is not valid",
+					e);
+			}
+		}
+	}
+	
+	public LinkedHashMap<BlockPos, Item> getBlocksToPlace(BlockPos origin,
 		Direction direction)
 	{
 		Direction front = direction;
 		Direction left = front.rotateYCounterclockwise();
-		LinkedHashSet<BlockPos> positions = new LinkedHashSet<>();
+		LinkedHashMap<BlockPos, Item> blocksToPlace = new LinkedHashMap<>();
 		
-		for(int[] block : blocks)
+		for(BlockData block : blocks)
 		{
-			BlockPos pos = startPos;
-			pos = pos.offset(left, block[0]);
-			pos = pos.up(block[1]);
-			pos = pos.offset(front, block[2]);
-			positions.add(pos);
+			BlockPos pos = block.toBlockPos(origin, front, left);
+			Item item = block.toItem();
+			blocksToPlace.put(pos, item);
 		}
 		
-		return positions;
+		return blocksToPlace;
 	}
 	
 	public int size()
 	{
-		return blocks.length;
+		return blocks.size();
 	}
 	
 	public boolean isSelected(FileSetting setting)
@@ -84,18 +130,22 @@ public final class AutoBuildTemplate
 		return path.equals(setting.getSelectedFile());
 	}
 	
-	public Path getPath()
-	{
-		return path;
-	}
-	
 	public String getName()
 	{
 		return name;
 	}
 	
-	public int[][] getBlocks()
+	private record BlockData(int[] pos, String name)
 	{
-		return blocks;
+		public BlockPos toBlockPos(BlockPos origin, Direction front,
+			Direction left)
+		{
+			return origin.offset(left, pos[0]).up(pos[1]).offset(front, pos[2]);
+		}
+		
+		public Item toItem()
+		{
+			return BlockUtils.getBlockFromName(name).asItem();
+		}
 	}
 }
