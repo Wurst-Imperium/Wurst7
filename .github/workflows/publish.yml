@@ -46,7 +46,7 @@ jobs:
       run: echo ${{ github.event.inputs.distinct_id }}
 
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         # Include all tags in case the new tag already exists.
         fetch-tags: true
