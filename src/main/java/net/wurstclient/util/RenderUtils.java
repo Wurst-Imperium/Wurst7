@@ -784,7 +784,10 @@ public enum RenderUtils
 		
 		context.getMatrices().pushMatrix();
 		context.getMatrices().scale(1F / scale);
-		context.drawBorder(x, y, w, h, color);
+		context.drawHorizontalLine(x, x + w - 1, y, color);
+		context.drawHorizontalLine(x, x + w - 1, y + h - 1, color);
+		context.drawVerticalLine(x, y + 1, y + h - 1, color);
+		context.drawVerticalLine(x + w - 1, y + 1, y + h - 1, color);
 		context.getMatrices().popMatrix();
 	}
 	

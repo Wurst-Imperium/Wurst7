@@ -113,7 +113,8 @@ public final class ForcedChatReportsScreen extends Screen
 		
 		context.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
 			Colors.LIGHT_GRAY);
-		reasonFormatted.drawCenterWithShadow(context, centerX, reasonY);
+		reasonFormatted.method_73212(context, MultilineText.class_11735.CENTER,
+			centerX, reasonY, 9, true, -1);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);

@@ -66,12 +66,9 @@ public abstract class AltEditorScreen extends Screen
 		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
 			200, 20, Text.literal(""));
 		passwordBox.setText(getDefaultPassword());
-		passwordBox.setRenderTextProvider((text, int_1) -> {
-			String stars = "";
-			for(int i = 0; i < text.length(); i++)
-				stars += "*";
-			return OrderedText.styledForwardsVisitedString(stars, Style.EMPTY);
-		});
+		passwordBox.method_73210(
+			(text, startIndex) -> OrderedText.styledForwardsVisitedString(
+				"*".repeat(text.length()), Style.EMPTY));
 		passwordBox.setMaxLength(256);
 		addSelectableChild(passwordBox);
 		
