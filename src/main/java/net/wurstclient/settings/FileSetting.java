@@ -156,7 +156,7 @@ public final class FileSetting extends Setting
 			String newFile = JsonUtils.getAsString(json);
 			
 			if(newFile.isEmpty() || !Files.exists(folder.resolve(newFile)))
-				throw new JsonException();
+				throw new JsonException("File not found: " + newFile);
 			
 			selectedFile = newFile;
 			

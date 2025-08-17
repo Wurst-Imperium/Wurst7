@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
+import net.minecraft.util.Colors;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -216,10 +217,10 @@ public class CleanUpScreen extends Screen
 		float partialTicks)
 	{
 		context.drawCenteredTextWithShadow(textRenderer, "Clean Up", width / 2,
-			20, 16777215);
+			20, Colors.WHITE);
 		context.drawCenteredTextWithShadow(textRenderer,
 			"Please select the servers you want to remove:", width / 2, 36,
-			10526880);
+			Colors.LIGHT_GRAY);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);

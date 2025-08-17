@@ -86,7 +86,6 @@ public final class XRayHack extends Hack implements UpdateListener,
 	
 	private final SliderSetting opacity = new SliderSetting("Opacity",
 		"Opacity of non-ore blocks when X-Ray is enabled.\n\n"
-			+ "Does not work when Sodium is installed.\n\n"
 			+ "Remember to restart X-Ray when changing this setting.",
 		0, 0, 0.99, 0.01, ValueDisplay.PERCENTAGE.withLabel(0, "off"));
 	

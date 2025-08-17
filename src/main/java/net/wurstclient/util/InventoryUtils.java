@@ -14,6 +14,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
@@ -244,5 +245,19 @@ public enum InventoryUtils
 		
 		// everything else
 		return slot;
+	}
+	
+	/**
+	 * Spawns/modifies/deletes the given item stack in Creative Mode. If the
+	 * given slot is negative, this method will do nothing.
+	 */
+	public static void setCreativeStack(int slot, ItemStack stack)
+	{
+		if(slot < 0)
+			return;
+		
+		MC.player.getInventory().setStack(slot, stack);
+		MC.player.networkHandler.sendPacket(
+			new CreativeInventoryActionC2SPacket(toNetworkSlot(slot), stack));
 	}
 }

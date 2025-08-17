@@ -13,7 +13,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.command.CmdError;
@@ -71,10 +70,6 @@ public enum CmdUtils
 		if(slot < 0)
 			throw new CmdError("Cannot give item. Your inventory is full.");
 		
-		inventory.setStack(slot, stack);
-		CreativeInventoryActionC2SPacket packet =
-			new CreativeInventoryActionC2SPacket(
-				InventoryUtils.toNetworkSlot(slot), stack);
-		MC.player.networkHandler.sendPacket(packet);
+		InventoryUtils.setCreativeStack(slot, stack);
 	}
 }
