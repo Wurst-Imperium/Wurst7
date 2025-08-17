@@ -22,15 +22,7 @@ import net.wurstclient.settings.TextFieldSetting;
 public final class ModelSettings
 {
 	public final EnumSetting<OpenAiModel> openAiModel = new EnumSetting<>(
-		"OpenAI model",
-		"The model to use for OpenAI API calls.\nRecommended models:\n\n"
-			+ "\u00a7lGPT-4o-2024-08-06\u00a7r is one of the smartest models at"
-			+ " the time of writing and will often produce the best completions."
-			+ " However, it's meant to be an assistant rather than an"
-			+ " auto-completion system, so you will see it produce some odd"
-			+ " completions at times.\n\n"
-			+ "\u00a7lGPT-3.5-Turbo-Instruct\u00a7r is an older, non-chat model"
-			+ " based on GPT-3.5 that works well for auto-completion tasks.",
+		"OpenAI model", "The model to use for OpenAI API calls.",
 		OpenAiModel.values(), OpenAiModel.GPT_4O_2024_08_06);
 	
 	public enum OpenAiModel

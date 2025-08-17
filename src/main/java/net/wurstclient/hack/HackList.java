@@ -109,6 +109,7 @@ public final class HackList implements UpdateListener
 	public final HealthTagsHack healthTagsHack = new HealthTagsHack();
 	public final HighJumpHack highJumpHack = new HighJumpHack();
 	public final InfiniChatHack infiniChatHack = new InfiniChatHack();
+	public final InstaBuildHack instaBuildHack = new InstaBuildHack();
 	public final InstantBunkerHack instantBunkerHack = new InstantBunkerHack();
 	public final InvWalkHack invWalkHack = new InvWalkHack();
 	public final ItemEspHack itemEspHack = new ItemEspHack();
