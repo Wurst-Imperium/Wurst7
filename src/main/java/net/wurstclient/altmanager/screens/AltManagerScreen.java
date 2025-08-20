@@ -573,10 +573,12 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public void render(DrawContext context, int index, int y, int x,
-			int entryWidth, int entryHeight, int mouseX, int mouseY,
+		public void render(DrawContext context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
+			int x = method_73380();
+			int y = method_73382();
+			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))
 			{
@@ -625,7 +627,7 @@ public final class AltManagerScreen extends Screen
 		public ListGui(MinecraftClient minecraft, AltManagerScreen screen,
 			List<Alt> list)
 		{
-			super(minecraft, screen.width, screen.height - 96, 36, 30, 0);
+			super(minecraft, screen.width, screen.height - 96, 36, 30);
 			
 			list.stream().map(AltManagerScreen.Entry::new)
 				.forEach(this::addEntry);

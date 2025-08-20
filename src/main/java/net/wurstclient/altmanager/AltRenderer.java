@@ -73,7 +73,7 @@ public final class AltRenderer
 			
 			UUID uuid = SkinStealer.getUUIDOrNull(name);
 			ProfileResult result =
-				mc.getSessionService().fetchProfile(uuid, false);
+				mc.method_73361().sessionService().fetchProfile(uuid, false);
 			
 			return result == null ? null : result.profile();
 			

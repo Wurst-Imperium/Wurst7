@@ -190,10 +190,12 @@ public final class EditBookOffersScreen extends Screen
 		}
 		
 		@Override
-		public void render(DrawContext context, int index, int y, int x,
-			int entryWidth, int entryHeight, int mouseX, int mouseY,
+		public void render(DrawContext context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
+			int x = method_73380();
+			int y = method_73382();
+			
 			Item item = Registries.ITEM.get(Identifier.of("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
@@ -234,7 +236,7 @@ public final class EditBookOffersScreen extends Screen
 		public ListGui(MinecraftClient minecraft, EditBookOffersScreen screen,
 			List<BookOffer> list)
 		{
-			super(minecraft, screen.width, screen.height - 108, 36, 30, 0);
+			super(minecraft, screen.width, screen.height - 108, 36, 30);
 			
 			list.stream().map(EditBookOffersScreen.Entry::new)
 				.forEach(this::addEntry);

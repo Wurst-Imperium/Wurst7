@@ -10,7 +10,6 @@ package net.wurstclient.mixin;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,26 +27,24 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NameTagsHack;
 
-@Mixin(BatchingEntityRenderCommandQueue.class)
+@Mixin(net.minecraft.class_11788.class)
 public abstract class EntityRenderCommandQueueImplMixin
 	implements EntityRenderCommandQueue
 {
 	@Shadow
-	@Final
-	private List<BatchingEntityRenderCommandQueue.LabelCommand> seeThroughLabelCommands;
+	private List<BatchingEntityRenderCommandQueue.LabelCommand> field_62226;
 	
 	@Shadow
-	@Final
-	private List<BatchingEntityRenderCommandQueue.LabelCommand> labelCommands;
+	private List<BatchingEntityRenderCommandQueue.LabelCommand> field_62227;
 	
 	/**
-	 * Intercepts the matrices.scale() call in pushLabel to apply NameTags scale
-	 * adjustments.
+	 * Intercepts the matrices.scale() call in method_73482 to apply NameTags
+	 * scale adjustments.
 	 */
 	@WrapOperation(
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/util/math/MatrixStack;scale(FFF)V"),
-		method = "pushLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
+		method = "method_73482(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
 	private void wrapLabelScale(MatrixStack matrices, float x, float y, float z,
 		Operation<Void> original, MatrixStack matrices2, @Nullable Vec3d pos,
 		Text label, boolean notSneaking, int light,
@@ -73,7 +70,7 @@ public abstract class EntityRenderCommandQueueImplMixin
 	 * is enabled.
 	 */
 	@ModifyVariable(at = @At("HEAD"),
-		method = "pushLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V",
+		method = "method_73482(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V",
 		argsOnly = true)
 	private boolean forceNotSneaking(boolean notSneaking)
 	{
@@ -83,47 +80,47 @@ public abstract class EntityRenderCommandQueueImplMixin
 	
 	/**
 	 * Swaps the target list for the first add() call
-	 * (labelCommands -> seeThroughLabelCommands)
-	 * if NameTags is enabled in see-through mode.
+	 * (field_62227 -> field_62226) if NameTags is enabled in see-through mode.
 	 */
 	@ModifyReceiver(
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
 			ordinal = 0),
-		method = "pushLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
+		method = "method_73482(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
 	private List<BatchingEntityRenderCommandQueue.LabelCommand> swapFirstList(
 		List<BatchingEntityRenderCommandQueue.LabelCommand> originalList,
 		Object labelCommand)
 	{
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		
-		if(nameTags.isEnabled() && nameTags.isSeeThrough()
-			&& originalList == labelCommands)
-			return seeThroughLabelCommands;
-		
+		if(nameTags.isEnabled() && nameTags.isSeeThrough())
+			// field_62227 = see-through labels, field_62226 = regular labels
+			if(originalList == field_62227) // see-through labels
+				return field_62226; // return regular labels
+				
 		return originalList;
 	}
 	
 	/**
 	 * Swaps the target list for the second add() call
-	 * (seeThroughLabelCommands -> labelCommands)
-	 * if NameTags is enabled in see-through mode.
+	 * (field_62226 -> field_62227) if NameTags is enabled in see-through mode.
 	 */
 	@ModifyReceiver(
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
 			ordinal = 1),
-		method = "pushLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
+		method = "method_73482(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
 	private List<BatchingEntityRenderCommandQueue.LabelCommand> swapSecondList(
 		List<BatchingEntityRenderCommandQueue.LabelCommand> originalList,
 		Object labelCommand)
 	{
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		
-		if(nameTags.isEnabled() && nameTags.isSeeThrough()
-			&& originalList == seeThroughLabelCommands)
-			return labelCommands;
-		
+		if(nameTags.isEnabled() && nameTags.isSeeThrough())
+			// field_62226 = regular labels, field_62227 = see-through labels
+			if(originalList == field_62226) // regular labels
+				return field_62227; // return see-through labels
+				
 		return originalList;
 	}
 }

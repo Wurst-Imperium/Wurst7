@@ -217,10 +217,12 @@ public final class EditBlockListScreen extends Screen
 		}
 		
 		@Override
-		public void render(DrawContext context, int index, int y, int x,
-			int entryWidth, int entryHeight, int mouseX, int mouseY,
+		public void render(DrawContext context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
+			int x = method_73380();
+			int y = method_73382();
+			
 			Block block = BlockUtils.getBlockFromName(blockName);
 			ItemStack stack = new ItemStack(block);
 			TextRenderer tr = client.textRenderer;
@@ -252,7 +254,7 @@ public final class EditBlockListScreen extends Screen
 		public ListGui(MinecraftClient minecraft, EditBlockListScreen screen,
 			List<String> list)
 		{
-			super(minecraft, screen.width, screen.height - 96, 36, 30, 0);
+			super(minecraft, screen.width, screen.height - 96, 36, 30);
 			
 			list.stream().map(EditBlockListScreen.Entry::new)
 				.forEach(this::addEntry);

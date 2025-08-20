@@ -174,10 +174,12 @@ public final class SelectFileScreen extends Screen
 		}
 		
 		@Override
-		public void render(DrawContext context, int index, int y, int x,
-			int entryWidth, int entryHeight, int mouseX, int mouseY,
+		public void render(DrawContext context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
+			int x = method_73380();
+			int y = method_73382();
+			
 			TextRenderer tr = client.textRenderer;
 			
 			String fileName = "" + path.getFileName();
@@ -196,7 +198,7 @@ public final class SelectFileScreen extends Screen
 		public ListGui(MinecraftClient mc, SelectFileScreen screen,
 			List<Path> list)
 		{
-			super(mc, screen.width, screen.height - 96, 36, 20, 0);
+			super(mc, screen.width, screen.height - 96, 36, 20);
 			
 			list.stream().map(SelectFileScreen.Entry::new)
 				.forEach(this::addEntry);

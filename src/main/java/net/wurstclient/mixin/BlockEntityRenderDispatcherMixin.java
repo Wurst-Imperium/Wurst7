@@ -13,8 +13,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
+import net.minecraft.client.render.entity.command.EntityRenderCommandQueue;
+import net.minecraft.client.render.entity.command.ModelCommandRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
@@ -23,11 +24,12 @@ import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
 public class BlockEntityRenderDispatcherMixin
 {
 	@Inject(at = @At("HEAD"),
-		method = "render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V",
+		method = "render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/entity/command/ModelCommandRenderer$class_11792;Lnet/minecraft/client/render/entity/command/EntityRenderCommandQueue;)V",
 		cancellable = true)
 	private <E extends BlockEntity> void onRender(E blockEntity,
-		float tickDelta, MatrixStack matrices,
-		VertexConsumerProvider vertexConsumers, CallbackInfo ci)
+		float tickProgress, MatrixStack matrices,
+		ModelCommandRenderer.class_11792 arg,
+		EntityRenderCommandQueue entityRenderCommandQueue, CallbackInfo ci)
 	{
 		RenderBlockEntityEvent event = new RenderBlockEntityEvent(blockEntity);
 		EventManager.fire(event);

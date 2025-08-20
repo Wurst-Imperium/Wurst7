@@ -12,21 +12,25 @@ import java.io.File;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.UserApiService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.RunArgs;
 import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.session.ProfileKeys;
 import net.minecraft.client.session.Session;
+import net.minecraft.util.ApiServices;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
@@ -54,7 +58,10 @@ public abstract class MinecraftClientMixin
 	public ClientPlayerEntity player;
 	@Shadow
 	@Final
-	private YggdrasilAuthenticationService authenticationService;
+	private ApiServices field_62106;
+	
+	@Unique
+	private YggdrasilAuthenticationService wurstAuthenticationService;
 	
 	private Session wurstSession;
 	private ProfileKeys wurstProfileKeys;
@@ -62,6 +69,15 @@ public abstract class MinecraftClientMixin
 	private MinecraftClientMixin(WurstClient wurst, String name)
 	{
 		super(name);
+	}
+	
+	@Inject(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/util/ApiServices;create(Lcom/mojang/authlib/yggdrasil/YggdrasilAuthenticationService;Ljava/io/File;)Lnet/minecraft/util/ApiServices;",
+		shift = At.Shift.AFTER), method = "<init>")
+	private void captureAuthenticationService(RunArgs args, CallbackInfo ci,
+		@Local YggdrasilAuthenticationService yggdrasilAuthenticationService)
+	{
+		wurstAuthenticationService = yggdrasilAuthenticationService;
 	}
 	
 	/**
@@ -226,7 +242,7 @@ public abstract class MinecraftClientMixin
 		boolean isOffline = accessToken == null || accessToken.isBlank()
 			|| accessToken.equals("0") || accessToken.equals("null");
 		UserApiService userApiService = isOffline ? UserApiService.OFFLINE
-			: authenticationService.createUserApiService(accessToken);
+			: wurstAuthenticationService.createUserApiService(accessToken);
 		wurstProfileKeys =
 			ProfileKeys.create(userApiService, session, runDirectory.toPath());
 	}

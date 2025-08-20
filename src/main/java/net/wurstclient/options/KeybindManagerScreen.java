@@ -176,10 +176,12 @@ public final class KeybindManagerScreen extends Screen
 		}
 		
 		@Override
-		public void render(DrawContext context, int index, int y, int x,
-			int entryWidth, int entryHeight, int mouseX, int mouseY,
+		public void render(DrawContext context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
+			int x = method_73380();
+			int y = method_73382();
+			
 			TextRenderer tr = client.textRenderer;
 			
 			String keyText =
@@ -198,7 +200,7 @@ public final class KeybindManagerScreen extends Screen
 	{
 		public ListGui(MinecraftClient mc, KeybindManagerScreen screen)
 		{
-			super(mc, screen.width, screen.height - 96, 36, 30, 0);
+			super(mc, screen.width, screen.height - 96, 36, 30);
 			
 			WurstClient.INSTANCE.getKeybinds().getAllKeybinds().stream()
 				.map(KeybindManagerScreen.Entry::new).forEach(this::addEntry);
