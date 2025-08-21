@@ -234,9 +234,9 @@
   "description.wurst.setting.treebot.swing_hand": "TreeBot'un kütükleri ve yaprakları kırarken elinizi nasıl sallaması gerektiği.",
   "description.wurst.hack.triggerbot": "Baktığınız varlığa otomatik olarak saldırır.",
   "description.wurst.setting.triggerbot.swing_hand": "TriggerBot'un saldırırken elinizi nasıl sallaması gerektiği. (\"Fare tıklamasını simüle et\" etkinse bu ayar yok sayılır.)",
+  "description.wurst.hack.trollpotion": "Üzerinde birçok can sıkıcı etki bulunan bir iksir oluşturur.",
   "description.wurst.hack.truesight": "Görünmez varlıkları görmenize olanak tanır.",
   "description.wurst.hack.tunneller": "Otomatik olarak tünel kazar.\n\n§c§lUYARI:§r Lava ve diğer tehlikelerden kaçınmaya çalışsa da, garanti verilemez. Yalnızca kaybetmek istemediğiniz ekipmanlarla gönderin.",
-  "description.wurst.hack.trollpotion": "Üzerinde birçok can sıkıcı etki bulunan bir iksir oluşturur.",
   "description.wurst.hack.veinminer": "Cevher damarlarını otomatik olarak maden çıkarır.",
   "description.wurst.hack.x-ray": "Duvarların arkasındaki cevherleri görmenize olanak tanır.",
   "description.wurst.other_feature.nochatreports": "1.19 sürümünden itibaren sohbet mesajlarınıza eklenen kriptografik imzaları devre dışı bırakır.\n\n§c§lUYARI: §cEğer §csohbet §cmesajlarınıza §cimza §ceklerseniz, §cMinecraft §chesabınız §cşikayet §cedilip §cmultiplayer'dan §cküresel §cyasak §cyiyebilir!§r\n\nSohbette zararsız şeyler söyleseniz bile, imzalı mesajlarınız kötüye kullanılarak haksız yere hesabınızın yasaklanmasına neden olabilir.\n\nBir sunucuda sohbet etmek için sohbet imzalarını yeniden etkinleştirmeniz gerekiyorsa, kaybetmeyi göze alabileceğiniz bir yan hesap kullanmayı düşünün.",
@@ -272,12 +272,12 @@
   "description.wurst.setting.generic.filter_sleeping_vision": "Uyuyan oyuncuları göstermez.",
   "description.wurst.setting.generic.filter_villagers_combat": "Köylülere ve gezgin tüccarlara saldırmaz.",
   "description.wurst.setting.generic.filter_villagers_vision": "Köylüleri ve gezgin tüccarları göstermez.",
-  "description.wurst.setting.generic.pause_attack_on_containers": "Bir konteyner ekranı (sandık, hoperlor vb.) açıkken saldırı yapmaz.\nMini oyun sunucuları için faydalıdır, çünkü sandık benzeri menüler görüntüler.",
-  "description.wurst.setting.generic.swing_hand_mining": "%s'nin madencilik yaparken elini nasıl sallaması gerektiği.",
   "description.wurst.setting.generic.filter_zombie_piglins_combat": "§lAçık§r olarak ayarlandığında, zombileşmiş piglinlere hiç saldırılmaz.\n\n§lSakinse§r olarak ayarlandığında, zombileşmiş piglinlere ancak onlar ilk saldırdığında saldırılır. Bu filtrenin, zombileşmiş piglinlerin size mi yoksa başka birine mi saldırdığını tespit edemeyeceğini unutmayın.\n\n§lKapalı§r olarak ayarlandığında, bu filtre hiçbir şey yapmaz ve zombileşmiş piglinlere saldırılabilir.",
   "description.wurst.setting.generic.filter_zombie_piglins_vision": "§lAçık§r olarak ayarlandığında, zombileşmiş piglinler hiç gösterilmez.\n\n§lSakinse§r olarak ayarlandığında, zombileşmiş piglinler bir şeye saldırana kadar gösterilmez.\n\n§lKapalı§r olarak ayarlandığında, bu filtre hiçbir şey yapmaz ve zombileşmiş piglinler gösterilebilir.",
   "description.wurst.setting.generic.filter_zombie_villagers_combat": "Zombileşmiş köylülere saldırmaz.",
   "description.wurst.setting.generic.filter_zombie_villagers_vision": "Zombileşmiş köylüleri göstermez.",
+  "description.wurst.setting.generic.pause_attack_on_containers": "Bir konteyner ekranı (sandık, hoperlor vb.) açıkken saldırı yapmaz.\nMini oyun sunucuları için faydalıdır, çünkü sandık benzeri menüler görüntüler.",
+  "description.wurst.setting.generic.swing_hand_mining": "%s'nin madencilik yaparken elini nasıl sallaması gerektiği.",
   "description.wurst.setting.generic.swing_hand_combat": "%s'nin savaşırken elini nasıl sallaması gerektiği.",
   "description.wurst.setting.generic.swing_hand.off": "Elinizi sallamanızı engeller. Anti-hile eklentileri tarafından tespit edilebilir.",
   "description.wurst.setting.generic.swing_hand.server": "Eli sadece sunucu tarafında sallayın, animasyonu istemci tarafında oynamayın.",
@@ -307,5 +307,3 @@
   "gui.wurst.generic.allcaps_allowed": "İZİN VERİLDİ",
   "key.wurst.zoom": "Zoom"
 }
-
-
