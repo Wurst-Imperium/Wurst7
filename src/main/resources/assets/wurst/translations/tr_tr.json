@@ -233,7 +233,7 @@
   "description.wurst.hack.treebot": "Deneysel bir bot, küçük ağaçları otomatik olarak keser.",
   "description.wurst.setting.treebot.swing_hand": "TreeBot'un kütükleri ve yaprakları kırarken elinizi nasıl sallaması gerektiği.",
   "description.wurst.hack.triggerbot": "Baktığınız varlığa otomatik olarak saldırır.",
-  "description.wurst.setting.triggerbot.swing_hand": "TriggerBot'un saldırırken elinizi nasıl sallaması gerektiği. (\"Fare tıklamasını simüle et\" etkinse bu ayar yok sayılır.)",
+  "description.wurst.setting.triggerbot.swing_hand": "TriggerBot'un saldırırken elinizi nasıl sallaması gerektiği. (\"Simulate mouse click\" (Fare tıklamasını simüle et) etkinse bu ayar yok sayılır.)",
   "description.wurst.hack.trollpotion": "Üzerinde birçok can sıkıcı etki bulunan bir iksir oluşturur.",
   "description.wurst.hack.truesight": "Görünmez varlıkları görmenize olanak tanır.",
   "description.wurst.hack.tunneller": "Otomatik olarak tünel kazar.\n\n§c§lUYARI:§r Lava ve diğer tehlikelerden kaçınmaya çalışsa da, garanti verilemez. Yalnızca kaybetmek istemediğiniz ekipmanlarla gönderin.",
