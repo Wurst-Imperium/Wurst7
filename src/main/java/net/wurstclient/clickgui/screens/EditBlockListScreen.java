@@ -220,8 +220,8 @@ public final class EditBlockListScreen extends Screen
 		public void render(DrawContext context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
-			int x = method_73380();
-			int y = method_73382();
+			int x = getContentX();
+			int y = getContentY();
 			
 			Block block = BlockUtils.getBlockFromName(blockName);
 			ItemStack stack = new ItemStack(block);

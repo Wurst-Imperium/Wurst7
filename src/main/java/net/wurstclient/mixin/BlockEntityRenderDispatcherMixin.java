@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
-import net.minecraft.client.render.entity.command.EntityRenderCommandQueue;
-import net.minecraft.client.render.entity.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
@@ -28,8 +28,8 @@ public class BlockEntityRenderDispatcherMixin
 		cancellable = true)
 	private <E extends BlockEntity> void onRender(E blockEntity,
 		float tickProgress, MatrixStack matrices,
-		ModelCommandRenderer.class_11792 arg,
-		EntityRenderCommandQueue entityRenderCommandQueue, CallbackInfo ci)
+		ModelCommandRenderer.CrumblingOverlayCommand arg,
+		OrderedRenderCommandQueue entityRenderCommandQueue, CallbackInfo ci)
 	{
 		RenderBlockEntityEvent event = new RenderBlockEntityEvent(blockEntity);
 		EventManager.fire(event);

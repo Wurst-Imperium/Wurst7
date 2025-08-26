@@ -179,8 +179,8 @@ public final class KeybindManagerScreen extends Screen
 		public void render(DrawContext context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
-			int x = method_73380();
-			int y = method_73382();
+			int x = getContentX();
+			int y = getContentY();
 			
 			TextRenderer tr = client.textRenderer;
 			

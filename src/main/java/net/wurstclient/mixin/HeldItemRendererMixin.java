@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.entity.command.EntityRenderCommandQueue;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -35,7 +35,7 @@ public abstract class HeldItemRendererMixin
 	private void onApplyEquipOffsetBlocking(AbstractClientPlayerEntity player,
 		float tickProgress, float pitch, Hand hand, float swingProgress,
 		ItemStack item, float equipProgress, MatrixStack matrices,
-		EntityRenderCommandQueue entityRenderCommandQueue, int light,
+		OrderedRenderCommandQueue entityRenderCommandQueue, int light,
 		CallbackInfo ci)
 	{
 		// lower shield when blocking
@@ -55,8 +55,9 @@ public abstract class HeldItemRendererMixin
 	private void onApplySwingOffsetNotBlocking(
 		AbstractClientPlayerEntity player, float tickProgress, float pitch,
 		Hand hand, float swingProgress, ItemStack item, float equipProgress,
-		MatrixStack matrices, EntityRenderCommandQueue entityRenderCommandQueue,
-		int light, CallbackInfo ci)
+		MatrixStack matrices,
+		OrderedRenderCommandQueue entityRenderCommandQueue, int light,
+		CallbackInfo ci)
 	{
 		// lower shield when not blocking
 		if(item.getItem() == Items.SHIELD)
