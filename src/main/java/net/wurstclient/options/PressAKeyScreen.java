@@ -7,7 +7,6 @@
  */
 package net.wurstclient.options;
 
-import net.minecraft.util.Colors;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.DrawContext;
@@ -15,6 +14,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 
 public class PressAKeyScreen extends Screen
 {

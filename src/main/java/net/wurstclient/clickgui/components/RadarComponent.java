@@ -67,10 +67,8 @@ public final class RadarComponent extends Component
 		
 		ClientPlayerEntity player = MC.player;
 		if(!hack.isRotateEnabled())
-		{
 			matrixStack.rotate(
 				(180 + player.getYaw()) * MathHelper.RADIANS_PER_DEGREE);
-		}
 		
 		// arrow
 		ClickGuiIcons.drawRadarArrow(context, -2, -2, 2, 2);
