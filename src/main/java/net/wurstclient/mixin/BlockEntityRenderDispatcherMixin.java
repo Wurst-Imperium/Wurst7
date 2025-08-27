@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,12 +25,12 @@ import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
 public class BlockEntityRenderDispatcherMixin
 {
 	@Inject(at = @At("HEAD"),
-		method = "render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/entity/command/ModelCommandRenderer$class_11792;Lnet/minecraft/client/render/entity/command/EntityRenderCommandQueue;)V",
+		method = "render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/ModelCommandRenderer$CrumblingOverlayCommand;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;)V",
 		cancellable = true)
 	private <E extends BlockEntity> void onRender(E blockEntity,
 		float tickProgress, MatrixStack matrices,
-		ModelCommandRenderer.CrumblingOverlayCommand arg,
-		OrderedRenderCommandQueue entityRenderCommandQueue, CallbackInfo ci)
+		@Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlayCommand,
+		OrderedRenderCommandQueue queue, CallbackInfo ci)
 	{
 		RenderBlockEntityEvent event = new RenderBlockEntityEvent(blockEntity);
 		EventManager.fire(event);

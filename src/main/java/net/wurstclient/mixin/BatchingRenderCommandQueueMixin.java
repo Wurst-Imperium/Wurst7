@@ -18,32 +18,34 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+
+import net.minecraft.client.render.command.BatchingRenderCommandQueue;
 import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.command.RenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NameTagsHack;
 
-@Mixin(net.minecraft.client.render.command.BatchingRenderCommandQueue.class)
-public abstract class EntityRenderCommandQueueImplMixin
-	implements OrderedRenderCommandQueue
+@Mixin(BatchingRenderCommandQueue.class)
+public abstract class BatchingRenderCommandQueueMixin
+	implements RenderCommandQueue
 {
 	@Shadow
-	private List<OrderedRenderCommandQueueImpl.LabelCommand> field_62226;
+	private List<OrderedRenderCommandQueueImpl.LabelCommand> labelCommands;
 	
 	@Shadow
-	private List<OrderedRenderCommandQueueImpl.LabelCommand> field_62227;
+	private List<OrderedRenderCommandQueueImpl.LabelCommand> seeThroughLabelCommands;
 	
 	/**
-	 * Intercepts the matrices.scale() call in method_73482 to apply NameTags
+	 * Intercepts the matrices.scale() call in submitLabel() to apply NameTags
 	 * scale adjustments.
 	 */
 	@WrapOperation(
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/util/math/MatrixStack;scale(FFF)V"),
-		method = "method_73482(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
+		method = "submitLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
 	private void wrapLabelScale(MatrixStack matrices, float x, float y, float z,
 		Operation<Void> original, MatrixStack matrices2, @Nullable Vec3d pos,
 		Text label, boolean notSneaking, int light,
@@ -69,7 +71,7 @@ public abstract class EntityRenderCommandQueueImplMixin
 	 * is enabled.
 	 */
 	@ModifyVariable(at = @At("HEAD"),
-		method = "method_73482(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V",
+		method = "submitLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V",
 		argsOnly = true)
 	private boolean forceNotSneaking(boolean notSneaking)
 	{
@@ -79,13 +81,14 @@ public abstract class EntityRenderCommandQueueImplMixin
 	
 	/**
 	 * Swaps the target list for the first add() call
-	 * (field_62227 -> field_62226) if NameTags is enabled in see-through mode.
+	 * (seeThroughLabelCommands -> labelCommands) if NameTags is enabled in
+	 * see-through mode.
 	 */
 	@ModifyReceiver(
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
 			ordinal = 0),
-		method = "method_73482(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
+		method = "submitLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
 	private List<OrderedRenderCommandQueueImpl.LabelCommand> swapFirstList(
 		List<OrderedRenderCommandQueueImpl.LabelCommand> originalList,
 		Object labelCommand)
@@ -93,22 +96,22 @@ public abstract class EntityRenderCommandQueueImplMixin
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		
 		if(nameTags.isEnabled() && nameTags.isSeeThrough())
-			// field_62227 = see-through labels, field_62226 = regular labels
-			if(originalList == field_62227) // see-through labels
-				return field_62226; // return regular labels
-				
+			if(originalList == seeThroughLabelCommands)
+				return labelCommands;
+			
 		return originalList;
 	}
 	
 	/**
 	 * Swaps the target list for the second add() call
-	 * (field_62226 -> field_62227) if NameTags is enabled in see-through mode.
+	 * (labelCommands -> seeThroughLabelCommands) if NameTags is enabled in
+	 * see-through mode.
 	 */
 	@ModifyReceiver(
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
 			ordinal = 1),
-		method = "method_73482(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
+		method = "submitLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
 	private List<OrderedRenderCommandQueueImpl.LabelCommand> swapSecondList(
 		List<OrderedRenderCommandQueueImpl.LabelCommand> originalList,
 		Object labelCommand)
@@ -116,10 +119,9 @@ public abstract class EntityRenderCommandQueueImplMixin
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		
 		if(nameTags.isEnabled() && nameTags.isSeeThrough())
-			// field_62226 = regular labels, field_62227 = see-through labels
-			if(originalList == field_62226) // regular labels
-				return field_62227; // return see-through labels
-				
+			if(originalList == labelCommands)
+				return seeThroughLabelCommands;
+			
 		return originalList;
 	}
 }

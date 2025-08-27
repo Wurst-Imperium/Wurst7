@@ -30,7 +30,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.session.ProfileKeys;
 import net.minecraft.client.session.Session;
-import net.minecraft.util.ApiServices;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
@@ -56,9 +55,6 @@ public abstract class MinecraftClientMixin
 	public ClientPlayerInteractionManager interactionManager;
 	@Shadow
 	public ClientPlayerEntity player;
-	@Shadow
-	@Final
-	private ApiServices field_62106;
 	
 	@Unique
 	private YggdrasilAuthenticationService wurstAuthenticationService;
@@ -173,7 +169,7 @@ public abstract class MinecraftClientMixin
 		GameProfile oldProfile = cir.getReturnValue();
 		GameProfile newProfile = new GameProfile(wurstSession.getUuidOrNull(),
 			wurstSession.getUsername());
-		newProfile.getProperties().putAll(oldProfile.getProperties());
+		newProfile.properties().putAll(oldProfile.properties());
 		cir.setReturnValue(newProfile);
 	}
 	

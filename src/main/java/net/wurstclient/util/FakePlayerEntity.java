@@ -46,7 +46,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	{
 		if(playerListEntry == null)
 			playerListEntry = MinecraftClient.getInstance().getNetworkHandler()
-				.getPlayerListEntry(getGameProfile().getId());
+				.getPlayerListEntry(getGameProfile().id());
 		
 		return playerListEntry;
 	}
