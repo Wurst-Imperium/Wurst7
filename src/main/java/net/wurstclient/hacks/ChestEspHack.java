@@ -33,6 +33,7 @@ import net.wurstclient.hacks.chestesp.ChestEspGroup;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
+import net.wurstclient.util.LootrModCompat;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.chunk.ChunkUtils;
 
@@ -171,9 +172,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				basicChests.add(blockEntity);
 			else if(blockEntity instanceof EnderChestBlockEntity)
 				enderChests.add(blockEntity);
-			else if(blockEntity instanceof ShulkerBoxBlockEntity)
+			else if(blockEntity instanceof ShulkerBoxBlockEntity
+				|| LootrModCompat.isLootrShulkerBox(blockEntity))
 				shulkerBoxes.add(blockEntity);
-			else if(blockEntity instanceof BarrelBlockEntity)
+			else if(blockEntity instanceof BarrelBlockEntity
+				|| LootrModCompat.isLootrBarrel(blockEntity))
 				barrels.add(blockEntity);
 			else if(blockEntity instanceof DecoratedPotBlockEntity)
 				pots.add(blockEntity);
