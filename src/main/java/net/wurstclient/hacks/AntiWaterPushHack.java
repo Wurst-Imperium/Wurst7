@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.GetPlayerDepthStriderListener;
-import net.wurstclient.events.IsPlayerInWaterListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.events.VelocityFromFluidListener;
 import net.wurstclient.hack.Hack;
@@ -67,18 +66,19 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onVelocityFromFluid(VelocityFromFluidListener.VelocityFromFluidEvent event)
+	public void onVelocityFromFluid(
+		VelocityFromFluidListener.VelocityFromFluidEvent event)
 	{
 		if(event.getEntity() == MC.player)
 			event.cancel();
 	}
-
+	
 	@Override
 	public void onGetPlayerDepthStrider(GetPlayerDepthStriderEvent event)
 	{
-		if (isPreventingSlowdown() && event.getEntity() == MC.player)
+		if(isPreventingSlowdown() && event.getEntity() == MC.player)
 			event.cancel();
-
+		
 	}
 	
 	public boolean isPreventingSlowdown()
