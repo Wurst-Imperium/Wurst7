@@ -9,7 +9,7 @@ package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.IsPlayerInWaterListener;
+import net.wurstclient.events.GetPlayerDepthStriderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.events.VelocityFromFluidListener;
 import net.wurstclient.hack.Hack;
@@ -17,7 +17,7 @@ import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"anti water push", "NoWaterPush", "no water push"})
 public final class AntiWaterPushHack extends Hack implements UpdateListener,
-	VelocityFromFluidListener, IsPlayerInWaterListener
+	VelocityFromFluidListener, GetPlayerDepthStriderListener
 {
 	private final CheckboxSetting preventSlowdown = new CheckboxSetting(
 		"Prevent slowdown", "Allows you to walk underwater at full speed.\n"
@@ -36,7 +36,7 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(VelocityFromFluidListener.class, this);
-		EVENTS.add(IsPlayerInWaterListener.class, this);
+		EVENTS.add(GetPlayerDepthStriderListener.class, this);
 	}
 	
 	@Override
@@ -44,7 +44,7 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(VelocityFromFluidListener.class, this);
-		EVENTS.remove(IsPlayerInWaterListener.class, this);
+		EVENTS.remove(GetPlayerDepthStriderListener.class, this);
 	}
 	
 	@Override
@@ -66,21 +66,24 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onVelocityFromFluid(VelocityFromFluidEvent event)
+	public void onVelocityFromFluid(
+		VelocityFromFluidListener.VelocityFromFluidEvent event)
 	{
 		if(event.getEntity() == MC.player)
 			event.cancel();
 	}
 	
 	@Override
-	public void onIsPlayerInWater(IsPlayerInWaterEvent event)
+	public void onGetPlayerDepthStrider(GetPlayerDepthStriderEvent event)
 	{
-		if(preventSlowdown.isChecked())
-			event.setInWater(false);
+		if(isPreventingSlowdown() && event.getEntity() == MC.player)
+			event.cancel();
+		
 	}
 	
 	public boolean isPreventingSlowdown()
 	{
 		return preventSlowdown.isChecked();
 	}
+	
 }

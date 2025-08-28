@@ -44,6 +44,7 @@
     "LanguageManagerMixin",
     "LightmapTextureManagerMixin",
     "LivingEntityRendererMixin",
+    "LivingEntityMixin",
     "MinecraftClientMixin",
     "MobEntityRendererMixin",
     "MouseMixin",
