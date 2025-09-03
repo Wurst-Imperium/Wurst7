@@ -9,6 +9,7 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.clickgui.ClickGui;
@@ -32,7 +33,8 @@ public final class FileComponent extends Component
 	}
 	
 	@Override
-	public void handleMouseClick(double mouseX, double mouseY, int mouseButton)
+	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
+		class_11909 context)
 	{
 		if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
 			return;

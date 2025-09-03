@@ -12,6 +12,7 @@ import java.nio.file.Path;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -119,20 +120,20 @@ public final class ChooseNameState extends TemplateToolState
 		}
 		
 		@Override
-		public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+		public boolean keyPressed(class_11908 context)
 		{
-			switch(keyCode)
+			switch(context.key())
 			{
 				case GLFW.GLFW_KEY_ESCAPE:
-				cancelButton.onPress();
+				cancelButton.onPress(context);
 				break;
 				
 				case GLFW.GLFW_KEY_ENTER:
-				doneButton.onPress();
+				doneButton.onPress(context);
 				break;
 			}
 			
-			return super.keyPressed(keyCode, scanCode, modifiers);
+			return super.keyPressed(context);
 		}
 		
 		@Override

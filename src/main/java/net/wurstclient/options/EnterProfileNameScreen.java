@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
@@ -67,9 +68,9 @@ public final class EnterProfileNameScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(class_11908 context)
 	{
-		switch(keyCode)
+		switch(context.key())
 		{
 			case GLFW.GLFW_KEY_ENTER:
 			done();
@@ -80,7 +81,7 @@ public final class EnterProfileNameScreen extends Screen
 			break;
 		}
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override

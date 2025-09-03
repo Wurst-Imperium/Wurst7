@@ -9,9 +9,9 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.screens.EditSliderScreen;
@@ -35,15 +35,17 @@ public final class SliderComponent extends Component
 	}
 	
 	@Override
-	public void handleMouseClick(double mouseX, double mouseY, int mouseButton)
+	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
+		class_11909 context)
 	{
+		boolean hasControlDown = context.method_74240();
 		if(mouseY < getY() + 11)
 			return;
 		
 		switch(mouseButton)
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
-			if(Screen.hasControlDown())
+			if(hasControlDown)
 				MC.setScreen(new EditSliderScreen(MC.currentScreen, setting));
 			else
 				dragging = true;

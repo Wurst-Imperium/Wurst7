@@ -188,7 +188,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	@Override
 	public void onRenderBlockEntity(RenderBlockEntityEvent event)
 	{
-		BlockPos pos = event.getBlockEntity().getPos();
+		BlockPos pos = event.getState().position;
 		if(!isVisible(BlockUtils.getBlock(pos), pos))
 			event.cancel();
 	}

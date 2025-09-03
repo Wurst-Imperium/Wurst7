@@ -9,6 +9,7 @@ package net.wurstclient.keybinds;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.InputUtil;
 import net.wurstclient.WurstClient;
@@ -39,8 +40,7 @@ public final class KeybindProcessor implements KeyPressListener
 		if(event.getAction() != GLFW.GLFW_PRESS)
 			return;
 		
-		if(InputUtil.isKeyPressed(WurstClient.MC.getWindow().getHandle(),
-			GLFW.GLFW_KEY_F3))
+		if(InputUtil.isKeyPressed(WurstClient.MC.getWindow(), GLFW.GLFW_KEY_F3))
 			return;
 		
 		Screen screen = WurstClient.MC.currentScreen;
@@ -60,7 +60,10 @@ public final class KeybindProcessor implements KeyPressListener
 	{
 		int keyCode = event.getKeyCode();
 		int scanCode = event.getScanCode();
-		return InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
+		return InputUtil
+			.fromKeyCode(
+				new class_11908(keyCode, scanCode, event.getModifiers()))
+			.getTranslationKey();
 	}
 	
 	private void processCmds(String cmds)

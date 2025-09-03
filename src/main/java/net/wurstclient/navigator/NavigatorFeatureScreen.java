@@ -19,6 +19,9 @@ import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.class_11908;
+import net.minecraft.class_11909;
+import net.minecraft.class_11910;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -227,16 +230,22 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onKeyPress(int keyCode, int scanCode, int int_3)
+	protected void onKeyPress(class_11908 context)
 	{
+		int keyCode = context.key();
+		
 		if(keyCode == GLFW.GLFW_KEY_ESCAPE
 			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
 			goBack();
 	}
 	
 	@Override
-	protected void onMouseClick(double x, double y, int button)
+	protected void onMouseClick(class_11909 context)
 	{
+		double x = context.x();
+		double y = context.y();
+		int button = context.method_74245();
+		
 		// popups
 		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(x, y,
 			button))
@@ -269,7 +278,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// component settings
 		WurstClient.INSTANCE.getGui().handleNavigatorMouseClick(
 			x - middleX + 154, y - 60 - scroll - windowComponentY, button,
-			window);
+			window, context);
 	}
 	
 	private void goBack()
@@ -481,8 +490,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	public void close()
 	{
 		window.close();
-		WurstClient.INSTANCE.getGui().handleMouseClick(Integer.MIN_VALUE,
-			Integer.MIN_VALUE, 0);
+		WurstClient.INSTANCE.getGui().handleMouseClick(new class_11909(
+			Double.MIN_VALUE, Double.MIN_VALUE, new class_11910(0, 0)));
 	}
 	
 	public Feature getFeature()

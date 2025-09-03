@@ -14,6 +14,7 @@ import java.util.Objects;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -110,14 +111,14 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+	public boolean keyPressed(class_11908 context)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
+		if(context.key() == GLFW.GLFW_KEY_ENTER)
 			done();
-		else if(keyCode == GLFW.GLFW_KEY_ESCAPE)
+		else if(context.key() == GLFW.GLFW_KEY_ESCAPE)
 			openPrevScreen();
 		
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(context);
 	}
 	
 	@Override

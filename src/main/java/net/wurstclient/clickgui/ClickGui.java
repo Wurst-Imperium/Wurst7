@@ -25,6 +25,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import net.minecraft.class_11909;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -191,8 +192,11 @@ public final class ClickGui
 		}
 	}
 	
-	public void handleMouseClick(int mouseX, int mouseY, int mouseButton)
+	public void handleMouseClick(class_11909 context)
 	{
+		int mouseX = (int)context.x();
+		int mouseY = (int)context.y();
+		int mouseButton = context.method_74245();
 		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
 			leftMouseButtonPressed = true;
 		
@@ -200,7 +204,7 @@ public final class ClickGui
 			handlePopupMouseClick(mouseX, mouseY, mouseButton);
 		
 		if(!popupClicked)
-			handleWindowMouseClick(mouseX, mouseY, mouseButton);
+			handleWindowMouseClick(mouseX, mouseY, mouseButton, context);
 		
 		for(Popup popup : popups)
 			if(popup.getOwner().getParent().isClosing())
@@ -265,12 +269,13 @@ public final class ClickGui
 	}
 	
 	public void handleNavigatorMouseClick(double cMouseX, double cMouseY,
-		int mouseButton, Window window)
+		int mouseButton, Window window, class_11909 context)
 	{
 		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
 			leftMouseButtonPressed = true;
 		
-		handleComponentMouseClick(window, cMouseX, cMouseY, mouseButton);
+		handleComponentMouseClick(window, cMouseX, cMouseY, mouseButton,
+			context);
 		
 		for(Popup popup : popups)
 			if(popup.getOwner().getParent().isClosing())
@@ -314,7 +319,8 @@ public final class ClickGui
 		return false;
 	}
 	
-	private void handleWindowMouseClick(int mouseX, int mouseY, int mouseButton)
+	private void handleWindowMouseClick(int mouseX, int mouseY, int mouseButton,
+		class_11909 context)
 	{
 		for(int i = windows.size() - 1; i >= 0; i--)
 		{
@@ -351,7 +357,7 @@ public final class ClickGui
 						cMouseY -= window.getScrollOffset();
 					
 					handleComponentMouseClick(window, cMouseX, cMouseY,
-						mouseButton);
+						mouseButton, context);
 				}
 				
 			}else
@@ -436,7 +442,7 @@ public final class ClickGui
 	}
 	
 	private void handleComponentMouseClick(Window window, double mouseX,
-		double mouseY, int mouseButton)
+		double mouseY, int mouseButton, class_11909 context)
 	{
 		for(int i2 = window.countChildren() - 1; i2 >= 0; i2--)
 		{
@@ -448,7 +454,7 @@ public final class ClickGui
 				|| mouseY >= c.getY() + c.getHeight())
 				continue;
 			
-			c.handleMouseClick(mouseX, mouseY, mouseButton);
+			c.handleMouseClick(mouseX, mouseY, mouseButton, context);
 			break;
 		}
 	}

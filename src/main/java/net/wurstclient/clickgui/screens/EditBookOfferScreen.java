@@ -10,6 +10,8 @@ package net.wurstclient.clickgui.screens;
 import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
+import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
@@ -205,40 +207,38 @@ public final class EditBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton,
-		boolean doubleClick)
+	public boolean mouseClicked(class_11909 context, boolean doubleClick)
 	{
-		boolean childClicked =
-			super.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
+		boolean childClicked = super.mouseClicked(context, doubleClick);
 		
-		levelField.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
-		priceField.mouseClicked(mouseX, mouseY, mouseButton, doubleClick);
+		levelField.mouseClicked(context, doubleClick);
+		priceField.mouseClicked(context, doubleClick);
 		
-		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_4)
-			cancelButton.onPress();
+		if(context.method_74245() == GLFW.GLFW_MOUSE_BUTTON_4)
+			cancelButton.onPress(context);
 		
 		return childClicked;
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(class_11908 context)
 	{
-		switch(keyCode)
+		switch(context.key())
 		{
 			case GLFW.GLFW_KEY_ENTER:
 			if(saveButton.active)
-				saveButton.onPress();
+				saveButton.onPress(context);
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			cancelButton.onPress();
+			cancelButton.onPress(context);
 			break;
 			
 			default:
 			break;
 		}
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override

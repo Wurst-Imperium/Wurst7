@@ -16,6 +16,8 @@ import java.nio.file.StandardCopyOption;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
+import net.minecraft.class_11909;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -200,31 +202,30 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(class_11908 context)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			doneButton.onPress();
+		if(context.key() == GLFW.GLFW_KEY_ENTER)
+			doneButton.onPress(context);
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override
-	public boolean mouseClicked(double x, double y, int button,
-		boolean doubleClick)
+	public boolean mouseClicked(class_11909 context, boolean doubleClick)
 	{
-		nameOrEmailBox.mouseClicked(x, y, button, doubleClick);
-		passwordBox.mouseClicked(x, y, button, doubleClick);
+		nameOrEmailBox.mouseClicked(context, doubleClick);
+		passwordBox.mouseClicked(context, doubleClick);
 		
 		if(nameOrEmailBox.isFocused() || passwordBox.isFocused())
 			message = "";
 		
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.method_74245() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
 			close();
 			return true;
 		}
 		
-		return super.mouseClicked(x, y, button, doubleClick);
+		return super.mouseClicked(context, doubleClick);
 	}
 	
 	@Override

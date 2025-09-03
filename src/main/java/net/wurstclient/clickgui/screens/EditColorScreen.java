@@ -16,6 +16,8 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
+import net.minecraft.class_11909;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
@@ -233,9 +235,9 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(class_11908 context)
 	{
-		switch(keyCode)
+		switch(context.key())
 		{
 			case GLFW.GLFW_KEY_ENTER:
 			done();
@@ -246,18 +248,20 @@ public final class EditColorScreen extends Screen
 			break;
 		}
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button,
-		boolean doubleClick)
+	public boolean mouseClicked(class_11909 context, boolean doubleClick)
 	{
+		double mouseX = context.x();
+		double mouseY = context.y();
+		
 		if(mouseX >= paletteX && mouseX <= paletteX + paletteWidth
 			&& mouseY >= paletteY && mouseY <= paletteY + paletteHeight)
 		{
 			if(paletteAsBufferedImage == null)
-				return super.mouseClicked(mouseX, mouseY, button, doubleClick);
+				return super.mouseClicked(context, doubleClick);
 			
 			int x = (int)Math.round((mouseX - paletteX) / paletteWidth
 				* paletteAsBufferedImage.getWidth());
@@ -276,7 +280,7 @@ public final class EditColorScreen extends Screen
 			}
 		}
 		
-		return super.mouseClicked(mouseX, mouseY, button, doubleClick);
+		return super.mouseClicked(context, doubleClick);
 	}
 	
 	private void setColor(Color color)

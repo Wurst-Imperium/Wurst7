@@ -168,8 +168,7 @@ public abstract class MinecraftClientMixin
 		
 		GameProfile oldProfile = cir.getReturnValue();
 		GameProfile newProfile = new GameProfile(wurstSession.getUuidOrNull(),
-			wurstSession.getUsername());
-		newProfile.properties().putAll(oldProfile.properties());
+			wurstSession.getUsername(), oldProfile.properties());
 		cir.setReturnValue(newProfile);
 	}
 	

@@ -29,6 +29,8 @@ import com.google.gson.JsonObject;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.class_11908;
+import net.minecraft.class_11909;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -179,25 +181,24 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+	public boolean keyPressed(class_11908 context)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			useButton.onPress();
+		if(context.key() == GLFW.GLFW_KEY_ENTER)
+			useButton.onPress(context);
 		
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(context);
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button,
-		boolean doubleClick)
+	public boolean mouseClicked(class_11909 context, boolean doubleClick)
 	{
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.method_74245() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
 			close();
 			return true;
 		}
 		
-		return super.mouseClicked(mouseX, mouseY, button, doubleClick);
+		return super.mouseClicked(context, doubleClick);
 	}
 	
 	private void pressLogin()
@@ -557,10 +558,9 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public boolean mouseClicked(double mouseX, double mouseY,
-			int mouseButton, boolean doubleClick)
+		public boolean mouseClicked(class_11909 context, boolean doubleClick)
 		{
-			if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+			if(context.method_74245() != GLFW.GLFW_MOUSE_BUTTON_LEFT)
 				return false;
 			
 			long timeSinceLastClick = Util.getMeasuringTimeMs() - lastClickTime;

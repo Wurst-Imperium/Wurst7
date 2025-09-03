@@ -9,6 +9,7 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11909;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.font.TextRenderer;
@@ -37,7 +38,8 @@ public final class BlockComponent extends Component
 	}
 	
 	@Override
-	public void handleMouseClick(double mouseX, double mouseY, int mouseButton)
+	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
+		class_11909 context)
 	{
 		if(mouseX < getX() + getWidth() - BLOCK_WITDH)
 			return;

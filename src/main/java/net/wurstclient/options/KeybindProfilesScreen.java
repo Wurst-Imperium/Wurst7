@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -112,14 +113,14 @@ public final class KeybindProfilesScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(class_11908 context)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
+		if(context.key() == GLFW.GLFW_KEY_ENTER)
 			loadSelected();
-		else if(keyCode == GLFW.GLFW_KEY_ESCAPE)
+		else if(context.key() == GLFW.GLFW_KEY_ESCAPE)
 			client.setScreen(prevScreen);
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override

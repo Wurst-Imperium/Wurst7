@@ -23,6 +23,7 @@ import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.DefaultSkinHelper;
+import net.minecraft.client.util.Model;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Uuids;
@@ -134,7 +135,7 @@ public final class AltRenderer
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
-				.model() == SkinTextures.Model.SLIM;
+				.model() == Model.SLIM;
 			
 			// Face
 			x = x + width / 4;
@@ -273,7 +274,7 @@ public final class AltRenderer
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
-				.model() == SkinTextures.Model.SLIM;
+				.model() == Model.SLIM;
 			
 			// Face
 			x = x + width / 4;

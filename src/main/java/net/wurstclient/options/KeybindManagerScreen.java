@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -102,30 +103,30 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+	public boolean keyPressed(class_11908 context)
 	{
-		switch(keyCode)
+		switch(context.key())
 		{
 			case GLFW.GLFW_KEY_ENTER:
 			if(editButton.active)
-				editButton.onPress();
+				editButton.onPress(context);
 			else
-				addButton.onPress();
+				addButton.onPress(context);
 			break;
 			
 			case GLFW.GLFW_KEY_DELETE:
-			removeButton.onPress();
+			removeButton.onPress(context);
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			backButton.onPress();
+			backButton.onPress(context);
 			break;
 			
 			default:
 			break;
 		}
 		
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(context);
 	}
 	
 	@Override

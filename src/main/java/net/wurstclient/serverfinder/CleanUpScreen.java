@@ -15,6 +15,9 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.SharedConstants;
+import net.minecraft.class_11907;
+import net.minecraft.class_11908;
+import net.minecraft.class_11909;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -192,25 +195,24 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(class_11908 context)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			cleanUpButton.onPress();
+		if(context.key() == GLFW.GLFW_KEY_ENTER)
+			cleanUpButton.onPress(context);
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button,
-		boolean doubleClick)
+	public boolean mouseClicked(class_11909 context, boolean doubleClick)
 	{
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.method_74245() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
 			close();
 			return true;
 		}
 		
-		return super.mouseClicked(mouseX, mouseY, button, doubleClick);
+		return super.mouseClicked(context, doubleClick);
 	}
 	
 	@Override
@@ -280,9 +282,9 @@ public class CleanUpScreen extends Screen
 		}
 		
 		@Override
-		public void onPress()
+		public void onPress(class_11907 context)
 		{
-			super.onPress();
+			super.onPress(context);
 			setMessage(Text.literal(messageSupplier.get()));
 		}
 	}

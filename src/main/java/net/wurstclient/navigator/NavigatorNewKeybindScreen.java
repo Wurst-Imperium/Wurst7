@@ -13,6 +13,8 @@ import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.class_11908;
+import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -70,7 +72,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			}, Supplier::get)
 		{
 			@Override
-			public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+			public boolean keyPressed(class_11908 context)
 			{
 				// empty method so that pressing Enter won't trigger this button
 				return false;
@@ -87,22 +89,23 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onKeyPress(int keyCode, int scanCode, int int_3)
+	protected void onKeyPress(class_11908 context)
 	{
 		if(choosingKey)
 		{
-			selectedKey =
-				InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
+			selectedKey = InputUtil.fromKeyCode(context).getTranslationKey();
 			okButton.active = !selectedKey.equals("key.keyboard.unknown");
 			
-		}else if(keyCode == GLFW.GLFW_KEY_ESCAPE
-			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
+		}else if(context.key() == GLFW.GLFW_KEY_ESCAPE
+			|| context.key() == GLFW.GLFW_KEY_BACKSPACE)
 			client.setScreen(parent);
 	}
 	
 	@Override
-	protected void onMouseClick(double x, double y, int button)
+	protected void onMouseClick(class_11909 context)
 	{
+		int button = context.method_74245();
+		
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{

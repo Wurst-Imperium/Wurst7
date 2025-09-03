@@ -12,6 +12,8 @@ import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
+import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -70,8 +72,11 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onKeyPress(int keyCode, int scanCode, int int_3)
+	protected void onKeyPress(class_11908 context)
 	{
+		int keyCode = context.key();
+		boolean hasShiftDown = context.method_74239();
+		
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
 			leftClick(selectedFeature);
 		
@@ -79,13 +84,13 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			expand(selectedFeature);
 		
 		if(keyCode == GLFW.GLFW_KEY_RIGHT
-			|| keyCode == GLFW.GLFW_KEY_TAB && !hasShiftDown())
+			|| keyCode == GLFW.GLFW_KEY_TAB && !hasShiftDown)
 		{
 			if(selectedFeature + 1 < navigatorDisplayList.size())
 				selectedFeature++;
 			
 		}else if(keyCode == GLFW.GLFW_KEY_LEFT
-			|| keyCode == GLFW.GLFW_KEY_TAB && hasShiftDown())
+			|| keyCode == GLFW.GLFW_KEY_TAB && hasShiftDown)
 		{
 			if(selectedFeature - 1 > -1)
 				selectedFeature--;
@@ -101,8 +106,11 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onMouseClick(double x, double y, int button)
+	protected void onMouseClick(class_11909 context)
 	{
+		int button = context.method_74245();
+		boolean hasShiftDown = context.method_74239();
+		
 		if(clickTimer != -1)
 			return;
 		
@@ -118,7 +126,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		// arrow click, shift click, wheel click
 		if(button == GLFW.GLFW_MOUSE_BUTTON_LEFT
-			&& (hasShiftDown() || hoveringArrow)
+			&& (hasShiftDown || hoveringArrow)
 			|| button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE)
 		{
 			expand(hoveredFeature);

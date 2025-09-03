@@ -9,6 +9,7 @@ package net.wurstclient.options;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11908;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -31,18 +32,18 @@ public class PressAKeyScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(class_11908 context)
 	{
-		if(keyCode != GLFW.GLFW_KEY_ESCAPE)
-			prevScreen.setKey(getKeyName(keyCode, scanCode));
+		if(context.key() != GLFW.GLFW_KEY_ESCAPE)
+			prevScreen.setKey(getKeyName(context));
 		
 		client.setScreen((Screen)prevScreen);
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
-	private String getKeyName(int keyCode, int scanCode)
+	private String getKeyName(class_11908 context)
 	{
-		return InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
+		return InputUtil.fromKeyCode(context).getTranslationKey();
 	}
 	
 	@Override

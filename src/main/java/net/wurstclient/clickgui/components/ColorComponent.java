@@ -9,6 +9,7 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.clickgui.ClickGui;
@@ -34,7 +35,8 @@ public final class ColorComponent extends Component
 	}
 	
 	@Override
-	public void handleMouseClick(double mouseX, double mouseY, int mouseButton)
+	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
+		class_11909 context)
 	{
 		if(mouseY < getY() + TEXT_HEIGHT)
 			return;

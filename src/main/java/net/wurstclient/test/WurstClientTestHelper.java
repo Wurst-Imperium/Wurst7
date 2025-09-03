@@ -15,10 +15,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.class_11910;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
@@ -258,6 +261,7 @@ public enum WurstClientTestHelper
 	public static void clickButton(String translationKey)
 	{
 		String buttonText = I18n.translate(translationKey);
+		class_11910 pressContext = new class_11910(GLFW.GLFW_KEY_UNKNOWN, 0);
 		
 		waitUntil("button saying " + buttonText + " is visible", mc -> {
 			Screen screen = mc.currentScreen;
@@ -272,14 +276,14 @@ public enum WurstClientTestHelper
 				if(widget instanceof ButtonWidget button
 					&& buttonText.equals(button.getMessage().getString()))
 				{
-					button.onPress();
+					button.onPress(pressContext);
 					return true;
 				}
 				
 				if(widget instanceof CyclingButtonWidget<?> button
 					&& buttonText.equals(button.optionText.getString()))
 				{
-					button.onPress();
+					button.onPress(pressContext);
 					return true;
 				}
 			}
