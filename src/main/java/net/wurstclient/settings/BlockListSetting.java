@@ -21,8 +21,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.minecraft.block.Block;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.BlockListEditButton;
@@ -41,8 +39,7 @@ public class BlockListSetting extends Setting
 	{
 		super(name, description);
 		
-		Arrays.stream(blocks).parallel()
-			.map(s -> Registries.BLOCK.get(Identifier.of(s)))
+		Arrays.stream(blocks).parallel().map(BlockUtils::getBlockFromNameOrID)
 			.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 			.sorted().forEachOrdered(s -> blockNames.add(s));
 		defaultNames = blockNames.toArray(new String[0]);
@@ -136,9 +133,9 @@ public class BlockListSetting extends Setting
 			
 			// otherwise, load the blocks in the JSON array
 			JsonUtils.getAsArray(json).getAllStrings().parallelStream()
-				.map(s -> Registries.BLOCK.get(Identifier.of(s)))
-				.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
-				.sorted().forEachOrdered(s -> blockNames.add(s));
+				.map(BlockUtils::getBlockFromNameOrID).filter(Objects::nonNull)
+				.map(BlockUtils::getName).distinct().sorted()
+				.forEachOrdered(s -> blockNames.add(s));
 			
 		}catch(JsonException e)
 		{
