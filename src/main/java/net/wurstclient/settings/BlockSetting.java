@@ -17,6 +17,7 @@ import com.google.gson.JsonPrimitive;
 
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
+import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.BlockComponent;
@@ -116,16 +117,19 @@ public final class BlockSetting extends Setting
 	{
 		try
 		{
-			String newName = JsonUtils.getAsString(json);
+			String rawName = JsonUtils.getAsString(json);
 			
-			Block newBlock = BlockUtils.getBlockFromNameOrID(newName);
-			if(newBlock == null)
-				throw new JsonException();
+			Identifier id = Identifier.tryParse(rawName);
+			if(id == null)
+				throw new JsonException("Discarding Block \"" + rawName
+					+ "\" as it is not a valid identifier");
 			
-			if(!allowAir && newBlock instanceof AirBlock)
-				throw new JsonException();
+			String name = id.toString();
+			if(!allowAir && "minecraft:air".equals(name))
+				throw new JsonException("Discarding Block \"" + rawName
+					+ "\" as this setting does not allow air blocks");
 			
-			blockName = BlockUtils.getName(newBlock);
+			blockName = name;
 			
 		}catch(JsonException e)
 		{
