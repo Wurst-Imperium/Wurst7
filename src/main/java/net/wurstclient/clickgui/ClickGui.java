@@ -25,9 +25,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import net.minecraft.class_11909;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.wurstclient.Category;
@@ -192,11 +192,11 @@ public final class ClickGui
 		}
 	}
 	
-	public void handleMouseClick(class_11909 context)
+	public void handleMouseClick(Click context)
 	{
 		int mouseX = (int)context.x();
 		int mouseY = (int)context.y();
-		int mouseButton = context.method_74245();
+		int mouseButton = context.button();
 		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
 			leftMouseButtonPressed = true;
 		
@@ -269,7 +269,7 @@ public final class ClickGui
 	}
 	
 	public void handleNavigatorMouseClick(double cMouseX, double cMouseY,
-		int mouseButton, Window window, class_11909 context)
+		int mouseButton, Window window, Click context)
 	{
 		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
 			leftMouseButtonPressed = true;
@@ -320,7 +320,7 @@ public final class ClickGui
 	}
 	
 	private void handleWindowMouseClick(int mouseX, int mouseY, int mouseButton,
-		class_11909 context)
+		Click context)
 	{
 		for(int i = windows.size() - 1; i >= 0; i--)
 		{
@@ -442,7 +442,7 @@ public final class ClickGui
 	}
 	
 	private void handleComponentMouseClick(Window window, double mouseX,
-		double mouseY, int mouseButton, class_11909 context)
+		double mouseY, int mouseButton, Click context)
 	{
 		for(int i2 = window.countChildren() - 1; i2 >= 0; i2--)
 		{

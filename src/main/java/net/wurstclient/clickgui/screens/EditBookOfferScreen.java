@@ -10,14 +10,14 @@ package net.wurstclient.clickgui.screens;
 import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.class_11908;
-import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -207,21 +207,21 @@ public final class EditBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(class_11909 context, boolean doubleClick)
+	public boolean mouseClicked(Click context, boolean doubleClick)
 	{
 		boolean childClicked = super.mouseClicked(context, doubleClick);
 		
 		levelField.mouseClicked(context, doubleClick);
 		priceField.mouseClicked(context, doubleClick);
 		
-		if(context.method_74245() == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
 			cancelButton.onPress(context);
 		
 		return childClicked;
 	}
 	
 	@Override
-	public boolean keyPressed(class_11908 context)
+	public boolean keyPressed(KeyInput context)
 	{
 		switch(context.key())
 		{

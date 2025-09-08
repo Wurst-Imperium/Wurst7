@@ -13,8 +13,7 @@ import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.class_11908;
-import net.minecraft.class_11909;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,6 +21,7 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.network.ServerInfo.ServerType;
 import net.minecraft.client.option.ServerList;
@@ -213,7 +213,7 @@ public class ServerFinderScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(class_11908 context)
+	public boolean keyPressed(KeyInput context)
 	{
 		if(context.key() == GLFW.GLFW_KEY_ENTER)
 			searchButton.onPress(context);
@@ -222,9 +222,9 @@ public class ServerFinderScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(class_11909 context, boolean doubleClick)
+	public boolean mouseClicked(Click context, boolean doubleClick)
 	{
-		if(context.method_74245() == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
 			close();
 			return true;

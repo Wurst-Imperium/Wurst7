@@ -23,8 +23,8 @@ import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.DefaultSkinHelper;
-import net.minecraft.client.util.Model;
 import net.minecraft.client.util.SkinTextures;
+import net.minecraft.entity.player.PlayerSkinType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Uuids;
 import net.wurstclient.WurstClient;
@@ -135,7 +135,7 @@ public final class AltRenderer
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
-				.model() == Model.SLIM;
+				.model() == PlayerSkinType.SLIM;
 			
 			// Face
 			x = x + width / 4;
@@ -274,7 +274,7 @@ public final class AltRenderer
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
-				.model() == Model.SLIM;
+				.model() == PlayerSkinType.SLIM;
 			
 			// Face
 			x = x + width / 4;

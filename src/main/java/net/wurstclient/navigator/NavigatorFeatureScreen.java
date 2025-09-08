@@ -19,12 +19,12 @@ import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.class_11908;
-import net.minecraft.class_11909;
-import net.minecraft.class_11910;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -230,7 +230,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onKeyPress(class_11908 context)
+	protected void onKeyPress(KeyInput context)
 	{
 		int keyCode = context.key();
 		
@@ -240,11 +240,11 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onMouseClick(class_11909 context)
+	protected void onMouseClick(Click context)
 	{
 		double x = context.x();
 		double y = context.y();
-		int button = context.method_74245();
+		int button = context.button();
 		
 		// popups
 		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(x, y,
@@ -490,8 +490,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	public void close()
 	{
 		window.close();
-		WurstClient.INSTANCE.getGui().handleMouseClick(new class_11909(
-			Double.MIN_VALUE, Double.MIN_VALUE, new class_11910(0, 0)));
+		WurstClient.INSTANCE.getGui().handleMouseClick(new Click(
+			Double.MIN_VALUE, Double.MIN_VALUE, new MouseInput(0, 0)));
 	}
 	
 	public Feature getFeature()

@@ -29,10 +29,9 @@ import com.google.gson.JsonObject;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.class_11908;
-import net.minecraft.class_11909;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -42,6 +41,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -181,7 +181,7 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(class_11908 context)
+	public boolean keyPressed(KeyInput context)
 	{
 		if(context.key() == GLFW.GLFW_KEY_ENTER)
 			useButton.onPress(context);
@@ -190,9 +190,9 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(class_11909 context, boolean doubleClick)
+	public boolean mouseClicked(Click context, boolean doubleClick)
 	{
-		if(context.method_74245() == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
 			close();
 			return true;
@@ -558,9 +558,9 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public boolean mouseClicked(class_11909 context, boolean doubleClick)
+		public boolean mouseClicked(Click context, boolean doubleClick)
 		{
-			if(context.method_74245() != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+			if(context.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT)
 				return false;
 			
 			long timeSinceLastClick = Util.getMeasuringTimeMs() - lastClickTime;

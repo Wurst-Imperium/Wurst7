@@ -13,12 +13,12 @@ import java.util.function.Supplier;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.class_11908;
-import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
@@ -72,7 +72,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			}, Supplier::get)
 		{
 			@Override
-			public boolean keyPressed(class_11908 context)
+			public boolean keyPressed(KeyInput context)
 			{
 				// empty method so that pressing Enter won't trigger this button
 				return false;
@@ -89,7 +89,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onKeyPress(class_11908 context)
+	protected void onKeyPress(KeyInput context)
 	{
 		if(choosingKey)
 		{
@@ -102,9 +102,9 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onMouseClick(class_11909 context)
+	protected void onMouseClick(Click context)
 	{
-		int button = context.method_74245();
+		int button = context.button();
 		
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)

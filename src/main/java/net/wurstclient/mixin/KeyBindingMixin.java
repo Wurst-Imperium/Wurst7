@@ -12,9 +12,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-import net.minecraft.class_11908;
-import net.minecraft.class_11910;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
@@ -54,17 +54,17 @@ public abstract class KeyBindingMixin implements IKeyBinding
 		{
 			case KEYSYM:
 			mc.keyboard.onKey(window.getHandle(), action,
-				new class_11908(boundKey.getCode(), 0, 0));
+				new KeyInput(boundKey.getCode(), 0, 0));
 			break;
 			
 			case SCANCODE:
 			mc.keyboard.onKey(window.getHandle(), action,
-				new class_11908(GLFW.GLFW_KEY_UNKNOWN, boundKey.getCode(), 0));
+				new KeyInput(GLFW.GLFW_KEY_UNKNOWN, boundKey.getCode(), 0));
 			break;
 			
 			case MOUSE:
 			mc.mouse.onMouseButton(window.getHandle(),
-				new class_11910(boundKey.getCode(), 0), action);
+				new MouseInput(boundKey.getCode(), 0), action);
 			break;
 			
 			default:

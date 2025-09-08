@@ -12,12 +12,12 @@ import java.util.ArrayList;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.class_11908;
-import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
@@ -72,10 +72,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onKeyPress(class_11908 context)
+	protected void onKeyPress(KeyInput context)
 	{
 		int keyCode = context.key();
-		boolean hasShiftDown = context.method_74239();
+		boolean hasShiftDown = context.hasShift();
 		
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
 			leftClick(selectedFeature);
@@ -106,10 +106,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onMouseClick(class_11909 context)
+	protected void onMouseClick(Click context)
 	{
-		int button = context.method_74245();
-		boolean hasShiftDown = context.method_74239();
+		int button = context.button();
+		boolean hasShiftDown = context.hasShift();
 		
 		if(clickTimer != -1)
 			return;

@@ -7,7 +7,7 @@
  */
 package net.wurstclient.options;
 
-import net.minecraft.class_11909;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -85,7 +85,7 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(class_11909 context, boolean doubleClick)
+	public boolean mouseClicked(Click context, boolean doubleClick)
 	{
 		commandField.mouseClicked(context, doubleClick);
 		return super.mouseClicked(context, doubleClick);

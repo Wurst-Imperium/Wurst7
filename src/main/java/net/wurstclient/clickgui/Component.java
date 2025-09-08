@@ -7,8 +7,8 @@
  */
 package net.wurstclient.clickgui;
 
-import net.minecraft.class_11909;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.WurstClient;
 
@@ -25,7 +25,7 @@ public abstract class Component
 	private Window parent;
 	
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
-		class_11909 context)
+		Click context)
 	{
 		
 	}

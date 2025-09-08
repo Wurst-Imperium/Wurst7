@@ -21,7 +21,6 @@ import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.class_11910;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
@@ -34,6 +33,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.resource.language.I18n;
@@ -261,7 +261,7 @@ public enum WurstClientTestHelper
 	public static void clickButton(String translationKey)
 	{
 		String buttonText = I18n.translate(translationKey);
-		class_11910 pressContext = new class_11910(GLFW.GLFW_KEY_UNKNOWN, 0);
+		MouseInput pressContext = new MouseInput(GLFW.GLFW_KEY_UNKNOWN, 0);
 		
 		waitUntil("button saying " + buttonText + " is visible", mc -> {
 			Screen screen = mc.currentScreen;

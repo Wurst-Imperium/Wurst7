@@ -16,13 +16,13 @@ import java.nio.file.StandardCopyOption;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.class_11908;
-import net.minecraft.class_11909;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -202,7 +202,7 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(class_11908 context)
+	public boolean keyPressed(KeyInput context)
 	{
 		if(context.key() == GLFW.GLFW_KEY_ENTER)
 			doneButton.onPress(context);
@@ -211,7 +211,7 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(class_11909 context, boolean doubleClick)
+	public boolean mouseClicked(Click context, boolean doubleClick)
 	{
 		nameOrEmailBox.mouseClicked(context, doubleClick);
 		passwordBox.mouseClicked(context, doubleClick);
@@ -219,7 +219,7 @@ public abstract class AltEditorScreen extends Screen
 		if(nameOrEmailBox.isFocused() || passwordBox.isFocused())
 			message = "";
 		
-		if(context.method_74245() == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
 			close();
 			return true;

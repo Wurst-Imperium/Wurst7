@@ -9,8 +9,8 @@ package net.wurstclient.keybinds;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.class_11908;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.util.InputUtil;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
@@ -61,8 +61,7 @@ public final class KeybindProcessor implements KeyPressListener
 		int keyCode = event.getKeyCode();
 		int scanCode = event.getScanCode();
 		return InputUtil
-			.fromKeyCode(
-				new class_11908(keyCode, scanCode, event.getModifiers()))
+			.fromKeyCode(new KeyInput(keyCode, scanCode, event.getModifiers()))
 			.getTranslationKey();
 	}
 	

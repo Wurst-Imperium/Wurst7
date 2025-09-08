@@ -9,8 +9,8 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.class_11909;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -36,9 +36,9 @@ public final class SliderComponent extends Component
 	
 	@Override
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
-		class_11909 context)
+		Click context)
 	{
-		boolean hasControlDown = context.method_74240();
+		boolean hasControlDown = context.hasCtrl();
 		if(mouseY < getY() + 11)
 			return;
 		

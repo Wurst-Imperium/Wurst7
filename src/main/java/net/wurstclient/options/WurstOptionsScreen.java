@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.class_11907;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.AbstractInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
@@ -229,7 +229,7 @@ public class WurstOptionsScreen extends Screen
 		}
 		
 		@Override
-		public void onPress(class_11907 context)
+		public void onPress(AbstractInput context)
 		{
 			super.onPress(context);
 			setMessage(Text.literal(messageSupplier.get()));

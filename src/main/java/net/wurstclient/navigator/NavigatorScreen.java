@@ -9,10 +9,10 @@ package net.wurstclient.navigator;
 
 import java.awt.Rectangle;
 
-import net.minecraft.class_11908;
-import net.minecraft.class_11909;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -43,14 +43,14 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final boolean keyPressed(class_11908 context)
+	public final boolean keyPressed(KeyInput context)
 	{
 		onKeyPress(context);
 		return super.keyPressed(context);
 	}
 	
 	@Override
-	public final boolean mouseClicked(class_11909 context, boolean doubleClick)
+	public final boolean mouseClicked(Click context, boolean doubleClick)
 	{
 		// scrollbar
 		if(new Rectangle(width / 2 + 170, 60, 12, height - 103)
@@ -64,11 +64,11 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final boolean mouseDragged(class_11909 context, double double_3,
+	public final boolean mouseDragged(Click context, double double_3,
 		double double_4)
 	{
 		// scrollbar
-		if(scrolling && !scrollbarLocked && context.method_74245() == 0)
+		if(scrolling && !scrollbarLocked && context.button() == 0)
 		{
 			if(maxScroll == 0)
 				scroll = 0;
@@ -88,19 +88,19 @@ public abstract class NavigatorScreen extends Screen
 			scrollKnobPosition += 2;
 		}
 		
-		onMouseDrag(context.x(), context.y(), context.method_74245(), double_3,
+		onMouseDrag(context.x(), context.y(), context.button(), double_3,
 			double_4);
 		
 		return super.mouseDragged(context, double_3, double_4);
 	}
 	
 	@Override
-	public final boolean mouseReleased(class_11909 context)
+	public final boolean mouseReleased(Click context)
 	{
 		// scrollbar
 		scrolling = false;
 		
-		onMouseRelease(context.x(), context.y(), context.method_74245());
+		onMouseRelease(context.x(), context.y(), context.button());
 		
 		// vanilla buttons
 		return super.mouseReleased(context);
@@ -192,9 +192,9 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected abstract void onResize();
 	
-	protected abstract void onKeyPress(class_11908 context);
+	protected abstract void onKeyPress(KeyInput context);
 	
-	protected abstract void onMouseClick(class_11909 context);
+	protected abstract void onMouseClick(Click context);
 	
 	protected abstract void onMouseDrag(double mouseX, double mouseY,
 		int button, double double_3, double double_4);

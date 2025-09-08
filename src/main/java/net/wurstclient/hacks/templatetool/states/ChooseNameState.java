@@ -12,13 +12,13 @@ import java.nio.file.Path;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.class_11908;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -120,7 +120,7 @@ public final class ChooseNameState extends TemplateToolState
 		}
 		
 		@Override
-		public boolean keyPressed(class_11908 context)
+		public boolean keyPressed(KeyInput context)
 		{
 			switch(context.key())
 			{
