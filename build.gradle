@@ -1,6 +1,6 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.329"
+		classpath "org.kohsuke:github-api:1.330"
 	}
 }
 
@@ -37,6 +37,8 @@ configurations.all {
 		force "org.apache.commons:commons-lang3:3.18.0"
 		// v9.40, used by Minecraft 1.21.4 - 1.21.8, is vulnerable to CVE-2025-53864
 		force "com.nimbusds:nimbus-jose-jwt:10.0.2"
+		// v4.1.118.Final, used by Minecraft 1.21.5 - 1.21.8, is vulnerable to CVE-2025-58057
+		force "io.netty:netty-codec:4.1.125.Final"
 	}
 }
 
