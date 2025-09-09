@@ -21,7 +21,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.minecraft.block.Block;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
@@ -41,8 +40,7 @@ public class BlockListSetting extends Setting
 	{
 		super(name, description);
 		
-		Arrays.stream(blocks).parallel()
-			.map(s -> Registries.BLOCK.get(Identifier.of(s)))
+		Arrays.stream(blocks).parallel().map(BlockUtils::getBlockFromNameOrID)
 			.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
 			.sorted().forEachOrdered(s -> blockNames.add(s));
 		defaultNames = blockNames.toArray(new String[0]);
@@ -135,10 +133,27 @@ public class BlockListSetting extends Setting
 			}
 			
 			// otherwise, load the blocks in the JSON array
-			JsonUtils.getAsArray(json).getAllStrings().parallelStream()
-				.map(s -> Registries.BLOCK.get(Identifier.of(s)))
-				.filter(Objects::nonNull).map(BlockUtils::getName).distinct()
-				.sorted().forEachOrdered(s -> blockNames.add(s));
+			for(String rawName : JsonUtils.getAsArray(json).getAllStrings())
+			{
+				Identifier id = Identifier.tryParse(rawName);
+				if(id == null)
+				{
+					System.out.println("Discarding BlockList entry \"" + rawName
+						+ "\" as it is not a valid identifier");
+					continue;
+				}
+				
+				String name = id.toString();
+				if(blockNames.contains(name))
+				{
+					System.out.println("Discarding BlockList entry \"" + rawName
+						+ "\" as \"" + name + "\" is already in the list");
+					continue;
+				}
+				
+				blockNames.add(name);
+			}
+			blockNames.sort(null);
 			
 		}catch(JsonException e)
 		{
