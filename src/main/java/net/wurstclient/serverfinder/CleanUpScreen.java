@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import net.minecraft.util.Colors;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -25,6 +24,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 
 public class CleanUpScreen extends Screen

@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import net.minecraft.util.Colors;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.DrawContext;
@@ -25,6 +24,7 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.network.ServerInfo.ServerType;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
 import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.util.MathUtils;
