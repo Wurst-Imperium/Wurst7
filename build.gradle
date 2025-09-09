@@ -1,6 +1,6 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.329"
+		classpath "org.kohsuke:github-api:1.330"
 	}
 }
 
@@ -29,9 +29,14 @@ repositories {
 // Override vulnerable dependencies until Minecraft updates to newer versions
 configurations.all {
 	resolutionStrategy {
+		// v3.14.0, used by Minecraft 1.20.5 - 1.21.3, is vulnerable to CVE-2025-48924
+		force "org.apache.commons:commons-lang3:3.18.0"
 		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2024-47535 and CVE-2025-25193
 		force "io.netty:netty-common:4.1.118.Final"
+		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2025-24970
 		force "io.netty:netty-handler:4.1.118.Final"
+		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2025-58057
+		force "io.netty:netty-codec:4.1.125.Final"
 	}
 }
 
