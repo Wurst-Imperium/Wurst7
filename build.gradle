@@ -1,6 +1,6 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.329"
+		classpath "org.kohsuke:github-api:1.330"
 	}
 }
 
@@ -24,6 +24,18 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+}
+
+// Override vulnerable dependencies until Minecraft updates to newer versions
+configurations.all {
+	resolutionStrategy {
+		// 3.12.0, used by Minecraft 1.18 - 1.20.1, is vulnerable to CVE-2025-48924
+		force "org.apache.commons:commons-lang3:3.18.0"
+		// v4.1.82.Final, used by Minecraft 1.19.3 - 1.20.1, is vulnerable to CVE-2024-47535 and CVE-2025-25193
+		force "io.netty:netty-common:4.1.118.Final"
+		// v4.1.82.Final, used by Minecraft 1.19.3 - 1.20.1, is vulnerable to CVE-2025-58057
+		force "io.netty:netty-codec:4.1.125.Final"
+	}
 }
 
 dependencies {

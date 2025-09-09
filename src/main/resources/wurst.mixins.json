@@ -25,7 +25,6 @@
     "ClientWorldMixin",
     "ControlsListWidgetMixin",
     "CreativeInventoryScreenMixin",
-    "CustomPayloadC2SPacketAccessor",
     "DeathScreenMixin",
     "DirectConnectScreenMixin",
     "DisconnectedRealmsScreenMixin",

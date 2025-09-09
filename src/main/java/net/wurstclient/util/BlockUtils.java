@@ -98,8 +98,11 @@ public enum BlockUtils
 		
 		try
 		{
-			return Registries.BLOCK.getOrEmpty(new Identifier(nameOrId))
-				.orElse(null);
+			Identifier id = new Identifier(nameOrId);
+			if(!Registries.BLOCK.containsId(id))
+				return null;
+			
+			return Registries.BLOCK.get(id);
 			
 		}catch(InvalidIdentifierException e)
 		{
