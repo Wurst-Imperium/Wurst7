@@ -1,6 +1,6 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.329"
+		classpath "org.kohsuke:github-api:1.330"
 	}
 }
 
@@ -33,10 +33,16 @@ configurations.all {
 		force "net.minidev:json-smart:2.5.2"
 		// v2.13.4, used by Minecraft 1.21.4 - 1.21.8, is vulnerable to CVE-2025-52999
 		force "com.fasterxml.jackson.core:jackson-core:2.15.0"
-		// v1.115.Final, used by Minecraft 1.21.4 - 1.21.5, is vulnerable to CVE-2025-25193
+		// v3.17.0, used by Minecraft 1.21.4 - 1.21.8, is vulnerable to CVE-2025-48924
+		force "org.apache.commons:commons-lang3:3.18.0"
+		// v9.40, used by Minecraft 1.21.4 - 1.21.8, is vulnerable to CVE-2025-53864
+		force "com.nimbusds:nimbus-jose-jwt:10.0.2"
+		// v1.115.Final, used by Minecraft 1.21.4, is vulnerable to CVE-2025-25193
 		force "io.netty:netty-common:4.1.118.Final"
-		// v1.115.Final, used by Minecraft 1.21.4 - 1.21.5, is vulnerable to CVE-2025-24970
+		// v1.115.Final, used by Minecraft 1.21.4, is vulnerable to CVE-2025-24970
 		force "io.netty:netty-handler:4.1.118.Final"
+		// v1.115.Final, used by Minecraft 1.21.4, is vulnerable to CVE-2025-58057
+		force "io.netty:netty-codec:4.1.125.Final"
 	}
 }
 
