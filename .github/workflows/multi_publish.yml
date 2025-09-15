@@ -1,5 +1,5 @@
 name: Publish Multiple Releases
-run-name: Publish v${{ github.event.inputs.wurst_version }} build(s) from ${{ github.event.inputs.branches }}
+run-name: Publish v${{ inputs.wurst_version }} build(s) from ${{ inputs.branches }}
 
 on:
   workflow_dispatch:
@@ -95,7 +95,7 @@ jobs:
         owner: Wurst-Imperium
         repo: Wurst7
         run_id: ${{ steps.publish_dispatch.outputs.run_id }}
-        run_timeout_seconds: 600  # 10 minutes
+        run_timeout_seconds: 1800  # 30 minutes
 
   announce_update:
     runs-on: ubuntu-latest
