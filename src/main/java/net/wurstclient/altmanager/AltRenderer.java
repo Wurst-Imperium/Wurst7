@@ -61,7 +61,7 @@ public final class AltRenderer
 		UUID uuid = Uuids.getOfflinePlayerUuid(name);
 		GameProfile profile = new GameProfile(uuid, name);
 		PlayerListEntry entry = new PlayerListEntry(profile, false);
-		Identifier texture = entry.getSkinTextures().texture();
+		Identifier texture = entry.getSkinTextures().body();
 		offlineSkins.put(name, texture);
 		return texture;
 	}
@@ -91,7 +91,7 @@ public final class AltRenderer
 		}, BACKGROUND_THREAD).thenAcceptAsync(skinTextures -> {
 			
 			if(skinTextures != null)
-				onlineSkins.put(name, skinTextures.texture());
+				onlineSkins.put(name, skinTextures.body());
 			
 		}, BACKGROUND_THREAD);
 	}
