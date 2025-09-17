@@ -64,7 +64,7 @@ public enum RenderUtils
 	
 	public static Vec3d getCameraPos()
 	{
-		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		Camera camera = WurstClient.MC.gameRenderer.getCamera();
 		if(camera == null)
 			return Vec3d.ZERO;
 		
@@ -73,7 +73,7 @@ public enum RenderUtils
 	
 	public static BlockPos getCameraBlockPos()
 	{
-		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		Camera camera = WurstClient.MC.gameRenderer.getCamera();
 		if(camera == null)
 			return BlockPos.ORIGIN;
 		

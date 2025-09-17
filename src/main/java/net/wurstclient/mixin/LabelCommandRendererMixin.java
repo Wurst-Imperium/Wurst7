@@ -10,6 +10,7 @@ package net.wurstclient.mixin;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,6 +20,7 @@ import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import net.minecraft.class_12075;
 import net.minecraft.client.render.command.LabelCommandRenderer;
 import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
 import net.minecraft.client.util.math.MatrixStack;
@@ -32,18 +34,20 @@ public class LabelCommandRendererMixin
 {
 	// Note: These fields are backwards compared to 25w36b, might be a bug.
 	@Shadow // labelCommands
-	private List<OrderedRenderCommandQueueImpl.LabelCommand> field_62987;
+	@Final
+	List<OrderedRenderCommandQueueImpl.LabelCommand> field_62987;
 	
 	@Shadow // seeThroughLabelCommands
-	private List<OrderedRenderCommandQueueImpl.LabelCommand> field_62988;
+	@Final
+	List<OrderedRenderCommandQueueImpl.LabelCommand> field_62988;
 	
 	@WrapOperation(
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/util/math/MatrixStack;scale(FFF)V"),
-		method = "method_74829(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
+		method = "method_74829(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZIDLnet/minecraft/class_12075;)V")
 	private void wrapLabelScale(MatrixStack matrices, float x, float y, float z,
 		Operation<Void> original, MatrixStack matrices2, @Nullable Vec3d vec3d,
-		Text text, boolean bl, int i, double d)
+		Text text, boolean bl, int i, double d, class_12075 state)
 	{
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		if(!nameTags.isEnabled())
@@ -65,7 +69,7 @@ public class LabelCommandRendererMixin
 	 * is enabled.
 	 */
 	@ModifyVariable(at = @At("HEAD"),
-		method = "method_74829(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V",
+		method = "method_74829(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZIDLnet/minecraft/class_12075;)V",
 		argsOnly = true)
 	private boolean forceNotSneaking(boolean notSneaking)
 	{
@@ -82,7 +86,7 @@ public class LabelCommandRendererMixin
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
 			ordinal = 0),
-		method = "method_74829(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
+		method = "method_74829(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZIDLnet/minecraft/class_12075;)V")
 	private List<OrderedRenderCommandQueueImpl.LabelCommand> swapFirstList(
 		List<OrderedRenderCommandQueueImpl.LabelCommand> originalList,
 		Object labelCommand)
@@ -109,7 +113,7 @@ public class LabelCommandRendererMixin
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
 			ordinal = 1),
-		method = "method_74829(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZID)V")
+		method = "method_74829(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZIDLnet/minecraft/class_12075;)V")
 	private List<OrderedRenderCommandQueueImpl.LabelCommand> swapSecondList(
 		List<OrderedRenderCommandQueueImpl.LabelCommand> originalList,
 		Object labelCommand)
