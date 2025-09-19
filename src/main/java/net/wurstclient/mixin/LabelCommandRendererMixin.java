@@ -19,17 +19,16 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-
-import net.minecraft.class_12075;
 import net.minecraft.client.render.command.LabelCommandRenderer;
 import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NameTagsHack;
 
-@Mixin(LabelCommandRenderer.class_12050.class)
+@Mixin(LabelCommandRenderer.Commands.class)
 public class LabelCommandRendererMixin
 {
 	// Note: These fields are backwards compared to 25w36b, might be a bug.
@@ -47,7 +46,7 @@ public class LabelCommandRendererMixin
 		method = "method_74829(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/text/Text;ZIDLnet/minecraft/class_12075;)V")
 	private void wrapLabelScale(MatrixStack matrices, float x, float y, float z,
 		Operation<Void> original, MatrixStack matrices2, @Nullable Vec3d vec3d,
-		Text text, boolean bl, int i, double d, class_12075 state)
+		Text text, boolean bl, int i, double d, CameraRenderState state)
 	{
 		NameTagsHack nameTags = WurstClient.INSTANCE.getHax().nameTagsHack;
 		if(!nameTags.isEnabled())

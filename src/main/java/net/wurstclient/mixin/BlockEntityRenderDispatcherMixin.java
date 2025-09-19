@@ -11,11 +11,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.class_12075;
 import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
 import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
@@ -28,7 +27,7 @@ public class BlockEntityRenderDispatcherMixin
 		cancellable = true)
 	private <S extends BlockEntityRenderState> void onRenderRenderState(
 		S renderState, MatrixStack matrices, OrderedRenderCommandQueue queue,
-		class_12075 otherRenderState, CallbackInfo ci)
+		CameraRenderState otherRenderState, CallbackInfo ci)
 	{
 		RenderBlockEntityEvent event = new RenderBlockEntityEvent(renderState);
 		EventManager.fire(event);
