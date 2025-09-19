@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
 import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
@@ -23,11 +24,11 @@ import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
 public class BlockEntityRenderDispatcherMixin
 {
 	@Inject(at = @At("HEAD"),
-		method = "render(Lnet/minecraft/client/render/block/entity/state/BlockEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/class_12075;)V",
+		method = "render(Lnet/minecraft/client/render/block/entity/state/BlockEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/render/state/CameraRenderState;)V",
 		cancellable = true)
 	private <S extends BlockEntityRenderState> void onRenderRenderState(
 		S renderState, MatrixStack matrices, OrderedRenderCommandQueue queue,
-		CameraRenderState otherRenderState, CallbackInfo ci)
+		CameraRenderState cameraRenderState, CallbackInfo ci)
 	{
 		RenderBlockEntityEvent event = new RenderBlockEntityEvent(renderState);
 		EventManager.fire(event);
