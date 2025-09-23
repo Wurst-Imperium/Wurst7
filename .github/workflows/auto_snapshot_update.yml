@@ -17,7 +17,6 @@ on:
         description: "Fabric API version"
         required: true
       distinct_id:
-        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
         required: false
 
 permissions:
@@ -91,20 +90,11 @@ jobs:
         git push
 
     - name: Trigger CI
-      id: ci_dispatch
-      uses: codex-/return-dispatch@v2
+      uses: Wurst-Imperium/dispatch-and-wait@v1
       with:
         token: ${{ github.token }}
-        owner: Wurst-Imperium
+        owner: ${{ github.repository_owner }}
         repo: ${{ github.event.repository.name }}
         ref: ${{ github.ref }}
         workflow: gradle.yml
-
-    - name: Wait for CI to finish (run ${{ steps.ci_dispatch.outputs.run_id }})
-      uses: codex-/await-remote-run@v1
-      with:
-        token: ${{ github.token }}
-        owner: Wurst-Imperium
-        repo: ${{ github.event.repository.name }}
-        run_id: ${{ steps.ci_dispatch.outputs.run_id }}
         run_timeout_seconds: 600  # 10 minutes

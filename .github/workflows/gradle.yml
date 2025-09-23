@@ -24,7 +24,6 @@ on:
   workflow_dispatch:
     inputs:
       distinct_id:
-        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
         required: false
 
 jobs:
