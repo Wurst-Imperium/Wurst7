@@ -25,7 +25,6 @@ on:
         type: boolean
         default: false
       distinct_id:
-        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
         required: false
 
 permissions:
@@ -92,39 +91,23 @@ jobs:
       id: website_inputs
       if: ${{ inputs.update_website }}
       run: |
-        MOD_VERSION=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
-        WURST_VERSION=$(echo "$MOD_VERSION" | sed 's/^v//' | sed 's/-MC.*$//')
-        MC_VERSION=$(grep "^minecraft_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
-        FAPI_VERSION=$(grep "^fabric_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
-        JSON_STRING=$(cat << EOF
-        {
-          "wurst_version": "$WURST_VERSION",
-          "mc_version": "$MC_VERSION",
-          "fapi_version": "$FAPI_VERSION"
-        }
-        EOF
-        )
-        # Convert to single line and escape quotes
-        echo "json=${JSON_STRING//$'\n'/}" >> "$GITHUB_OUTPUT"
+        echo "wurst_version=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/^v//' | sed 's/-MC.*$//')" >> "$GITHUB_OUTPUT"
+        echo "mc_version=$(grep "^minecraft_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
+        echo "fapi_version=$(grep "^fabric_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
 
     - name: Trigger website update
-      id: website_dispatch
       if: ${{ inputs.update_website }}
-      uses: codex-/return-dispatch@v2
+      uses: Wurst-Imperium/dispatch-and-wait@v1
       with:
         token: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
         owner: Wurst-Imperium
         repo: WurstClient.net
         ref: gh-pages
         workflow: add_wurst_port.yml
-        workflow_inputs: ${{ steps.website_inputs.outputs.json }}
-
-    - name: Wait for website update to finish (run ${{ steps.website_dispatch.outputs.run_id }})
-      if: ${{ inputs.update_website }}
-      uses: codex-/await-remote-run@v1
-      with:
-        token: ${{ secrets.WURSTCLIENT_NET_PUBLISH_TOKEN }}
-        owner: Wurst-Imperium
-        repo: WurstClient.net
-        run_id: ${{ steps.website_dispatch.outputs.run_id }}
+        workflow_inputs: |
+          {
+            "wurst_version": "${{ steps.website_inputs.outputs.wurst_version }}",
+            "mc_version": "${{ steps.website_inputs.outputs.mc_version }}",
+            "fapi_version": "${{ steps.website_inputs.outputs.fapi_version }}"
+          }
         run_timeout_seconds: 600  # 10 minutes
