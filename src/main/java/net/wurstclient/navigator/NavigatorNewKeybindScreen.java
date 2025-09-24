@@ -14,9 +14,11 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
@@ -70,7 +72,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			}, Supplier::get)
 		{
 			@Override
-			public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+			public boolean keyPressed(KeyInput context)
 			{
 				// empty method so that pressing Enter won't trigger this button
 				return false;
@@ -87,22 +89,23 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onKeyPress(int keyCode, int scanCode, int int_3)
+	protected void onKeyPress(KeyInput context)
 	{
 		if(choosingKey)
 		{
-			selectedKey =
-				InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
+			selectedKey = InputUtil.fromKeyCode(context).getTranslationKey();
 			okButton.active = !selectedKey.equals("key.keyboard.unknown");
 			
-		}else if(keyCode == GLFW.GLFW_KEY_ESCAPE
-			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
+		}else if(context.key() == GLFW.GLFW_KEY_ESCAPE
+			|| context.key() == GLFW.GLFW_KEY_BACKSPACE)
 			client.setScreen(parent);
 	}
 	
 	@Override
-	protected void onMouseClick(double x, double y, int button)
+	protected void onMouseClick(Click context)
 	{
+		int button = context.button();
+		
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
@@ -212,7 +215,6 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					y1 + 1, txtColor);
 				context.drawTextWithShadow(tr, pkb.getCommand(), x1 + 1,
 					y1 + 1 + tr.fontHeight, txtColor);
-				context.state.goDownLayer();
 			}
 		}
 		
@@ -224,7 +226,6 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			context.drawTextWithShadow(tr, line, bgx1 + 2, textY, txtColor);
 			textY += tr.fontHeight;
 		}
-		context.state.goDownLayer();
 		
 		context.disableScissor();
 		
@@ -255,7 +256,6 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			context.drawCenteredTextWithShadow(tr,
 				button.getMessage().getString(), (x1 + x2) / 2, y1 + 5,
 				txtColor);
-			context.state.goDownLayer();
 		}
 	}
 	

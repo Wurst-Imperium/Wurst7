@@ -89,7 +89,7 @@ public final class MassTpaHack extends Hack
 		String playerName = MC.getSession().getUsername();
 		for(PlayerListEntry info : MC.player.networkHandler.getPlayerList())
 		{
-			String name = info.getProfile().getName();
+			String name = info.getProfile().name();
 			name = StringHelper.stripTextFormat(name);
 			
 			if(name.equalsIgnoreCase(playerName))

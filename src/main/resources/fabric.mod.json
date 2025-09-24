@@ -26,9 +26,9 @@
   ],
   "accessWidener": "wurst.accesswidener",
   "depends": {
-    "fabricloader": ">=0.16.13",
-    "fabric-api": ">=0.126.1",
-    "minecraft": "~1.21.6-beta.3",
+    "fabricloader": ">=0.17.0",
+    "fabric-api": ">=0.133.7",
+    "minecraft": "~1.21.9-beta.2",
     "java": ">=21"
   },
   "suggests": {

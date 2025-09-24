@@ -10,6 +10,7 @@ package net.wurstclient.clickgui.components;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -34,7 +35,8 @@ public final class ColorComponent extends Component
 	}
 	
 	@Override
-	public void handleMouseClick(double mouseX, double mouseY, int mouseButton)
+	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
+		Click context)
 	{
 		if(mouseY < getY() + TEXT_HEIGHT)
 			return;
@@ -89,7 +91,6 @@ public final class ColorComponent extends Component
 		context.state.goUpLayer();
 		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
 		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
-		context.state.goDownLayer();
 	}
 	
 	private String getColorTooltip()

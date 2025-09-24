@@ -12,6 +12,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -31,18 +32,18 @@ public class PressAKeyScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(KeyInput context)
 	{
-		if(keyCode != GLFW.GLFW_KEY_ESCAPE)
-			prevScreen.setKey(getKeyName(keyCode, scanCode));
+		if(context.key() != GLFW.GLFW_KEY_ESCAPE)
+			prevScreen.setKey(getKeyName(context));
 		
 		client.setScreen((Screen)prevScreen);
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
-	private String getKeyName(int keyCode, int scanCode)
+	private String getKeyName(KeyInput context)
 	{
-		return InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
+		return InputUtil.fromKeyCode(context).getTranslationKey();
 	}
 	
 	@Override

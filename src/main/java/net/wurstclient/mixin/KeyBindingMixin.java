@@ -13,8 +13,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.Window;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IKeyBinding;
 
@@ -29,13 +32,13 @@ public abstract class KeyBindingMixin implements IKeyBinding
 	@Deprecated // use IKeyBinding.resetPressedState() instead
 	public void wurst_resetPressedState()
 	{
-		long handle = WurstClient.MC.getWindow().getHandle();
+		Window window = WurstClient.MC.getWindow();
 		int code = boundKey.getCode();
 		
 		if(boundKey.getCategory() == InputUtil.Type.MOUSE)
-			setPressed(GLFW.glfwGetMouseButton(handle, code) == 1);
+			setPressed(GLFW.glfwGetMouseButton(window.getHandle(), code) == 1);
 		else
-			setPressed(InputUtil.isKeyPressed(handle, code));
+			setPressed(InputUtil.isKeyPressed(window, code));
 	}
 	
 	@Override
@@ -44,22 +47,24 @@ public abstract class KeyBindingMixin implements IKeyBinding
 	public void wurst_simulatePress(boolean pressed)
 	{
 		MinecraftClient mc = WurstClient.MC;
-		long window = mc.getWindow().getHandle();
+		Window window = mc.getWindow();
 		int action = pressed ? 1 : 0;
 		
 		switch(boundKey.getCategory())
 		{
 			case KEYSYM:
-			mc.keyboard.onKey(window, boundKey.getCode(), 0, action, 0);
+			mc.keyboard.onKey(window.getHandle(), action,
+				new KeyInput(boundKey.getCode(), 0, 0));
 			break;
 			
 			case SCANCODE:
-			mc.keyboard.onKey(window, GLFW.GLFW_KEY_UNKNOWN, boundKey.getCode(),
-				action, 0);
+			mc.keyboard.onKey(window.getHandle(), action,
+				new KeyInput(GLFW.GLFW_KEY_UNKNOWN, boundKey.getCode(), 0));
 			break;
 			
 			case MOUSE:
-			mc.mouse.onMouseButton(window, boundKey.getCode(), action, 0);
+			mc.mouse.onMouseButton(window.getHandle(),
+				new MouseInput(boundKey.getCode(), 0), action);
 			break;
 			
 			default:

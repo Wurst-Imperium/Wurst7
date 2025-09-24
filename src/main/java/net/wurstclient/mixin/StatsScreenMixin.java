@@ -17,6 +17,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.screen.StatsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
@@ -25,10 +26,10 @@ import net.wurstclient.WurstClient;
 public class StatsScreenMixin
 {
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/gui/widget/DirectionalLayoutWidget;add(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;",
-		ordinal = 4), method = "createButtons()V")
-	private <T extends Widget> T onCreateDoneButton(
-		DirectionalLayoutWidget layout, T doneWidget, Operation<T> original)
+		target = "Lnet/minecraft/client/gui/widget/ThreePartsLayoutWidget;addFooter(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;",
+		ordinal = 0), method = "init()V")
+	private <T extends Widget> T onAddFooter(ThreePartsLayoutWidget layout,
+		T doneWidget, Operation<T> original)
 	{
 		if(!(doneWidget instanceof ButtonWidget doneButton))
 			throw new IllegalStateException(
@@ -40,10 +41,11 @@ public class StatsScreenMixin
 		doneButton.setWidth(150);
 		
 		DirectionalLayoutWidget subLayout =
-			layout.add(DirectionalLayoutWidget.horizontal()).spacing(5);
+			DirectionalLayoutWidget.horizontal().spacing(5);
 		subLayout.add(ButtonWidget.builder(getButtonText(), this::toggleWurst)
 			.width(150).build());
-		return original.call(subLayout, doneButton);
+		subLayout.add(doneButton);
+		return original.call(layout, subLayout);
 	}
 	
 	@Unique

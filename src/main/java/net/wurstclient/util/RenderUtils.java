@@ -64,7 +64,7 @@ public enum RenderUtils
 	
 	public static Vec3d getCameraPos()
 	{
-		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		Camera camera = WurstClient.MC.gameRenderer.getCamera();
 		if(camera == null)
 			return Vec3d.ZERO;
 		
@@ -73,7 +73,7 @@ public enum RenderUtils
 	
 	public static BlockPos getCameraBlockPos()
 	{
-		Camera camera = WurstClient.MC.getBlockEntityRenderDispatcher().camera;
+		Camera camera = WurstClient.MC.gameRenderer.getCamera();
 		if(camera == null)
 			return BlockPos.ORIGIN;
 		
@@ -662,7 +662,6 @@ public enum RenderUtils
 			context.drawText(tr, "?", 3, 2, WurstColors.VERY_LIGHT_GRAY, true);
 			
 			matrixStack.popMatrix();
-			context.state.goDownLayer();
 		}
 	}
 	
@@ -785,7 +784,10 @@ public enum RenderUtils
 		
 		context.getMatrices().pushMatrix();
 		context.getMatrices().scale(1F / scale);
-		context.drawBorder(x, y, w, h, color);
+		context.drawHorizontalLine(x, x + w - 1, y, color);
+		context.drawHorizontalLine(x, x + w - 1, y + h - 1, color);
+		context.drawVerticalLine(x, y + 1, y + h - 1, color);
+		context.drawVerticalLine(x + w - 1, y + 1, y + h - 1, color);
 		context.getMatrices().popMatrix();
 	}
 	

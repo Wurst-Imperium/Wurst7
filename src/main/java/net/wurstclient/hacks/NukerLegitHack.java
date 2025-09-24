@@ -187,7 +187,7 @@ public final class NukerLegitHack extends Hack
 		
 		if(im.updateBlockBreakingProgress(pos, side))
 		{
-			MC.particleManager.addBlockBreakingParticles(pos, side);
+			MC.world.spawnBlockBreakingParticle(pos, side);
 			swingHand.swing(Hand.MAIN_HAND);
 			MC.options.attackKey.setPressed(true);
 		}

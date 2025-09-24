@@ -24,7 +24,7 @@ public abstract class MobEntityRendererMixin
 	 * NameTags.
 	 */
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;targetedEntity:Lnet/minecraft/entity/Entity;",
+		target = "Lnet/minecraft/client/render/entity/EntityRenderManager;targetedEntity:Lnet/minecraft/entity/Entity;",
 		opcode = Opcodes.GETFIELD,
 		ordinal = 0),
 		method = "hasLabel(Lnet/minecraft/entity/mob/MobEntity;D)Z",
