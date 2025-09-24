@@ -28,15 +28,21 @@ public class StatsScreenMixin
 		target = "Lnet/minecraft/client/gui/widget/DirectionalLayoutWidget;add(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;",
 		ordinal = 4), method = "createButtons()V")
 	private <T extends Widget> T onCreateDoneButton(
-		DirectionalLayoutWidget layout, T doneButton, Operation<T> original)
+		DirectionalLayoutWidget layout, T doneWidget, Operation<T> original)
 	{
+		if(!(doneWidget instanceof ButtonWidget doneButton))
+			throw new IllegalStateException(
+				"The done button in the statistics screen somehow isn't a button");
+		
 		if(WurstClient.INSTANCE.getOtfs().disableOtf.shouldHideEnableButton())
 			return original.call(layout, doneButton);
+		
+		doneButton.setWidth(150);
 		
 		DirectionalLayoutWidget subLayout =
 			layout.add(DirectionalLayoutWidget.horizontal()).spacing(5);
 		subLayout.add(ButtonWidget.builder(getButtonText(), this::toggleWurst)
-			.width(165).build());
+			.width(150).build());
 		return original.call(subLayout, doneButton);
 	}
 	
