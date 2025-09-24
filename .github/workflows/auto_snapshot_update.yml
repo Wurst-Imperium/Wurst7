@@ -1,26 +1,4 @@
 # Experimental workflow to automate updating to a new Minecraft snapshot.
-
-# Currently this is very similar to the semi-automatic scripts I already use,
-# but moving them to GitHub Actions means I don't have to be around to start
-# them. This should allow for further automation in the future.
-
-# TODO:
-# - Add more thorough automated testing where it runs the game, creates a test
-#   world and takes screenshots, similar to what Fabric API does in their
-#   GitHub Actions workflow.
-# - Set up a server to trigger this workflow when a new snapshot is out and
-#   Fabric has updated to it. This might end up running twice per snapshot,
-#   because there is no way to know ahead of time if the previous Fabric API
-#   build still works or if we have to wait for a new build made specifically
-#   for the new snapshot.
-# - Add a step to automatically release the new snapshot build if all tests
-#   have passed. This will only ever run on small snapshots that don't break
-#   anything, but should save a ton of time at the end of each snapshot cycle
-#   when Mojang is spamming tiny pre-releases every day.
-
-# In case it isn't obvious, these todos are very ambitious and might not end
-# up working as planned.
-
 name: Auto Snapshot Update
 
 on:
@@ -39,7 +17,6 @@ on:
         description: "Fabric API version"
         required: true
       distinct_id:
-        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
         required: false
 
 permissions:
@@ -53,8 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Echo distinct ID ${{ github.event.inputs.distinct_id }}
-      run: echo ${{ github.event.inputs.distinct_id }}
+    - name: Echo distinct ID ${{ inputs.distinct_id }}
+      run: echo ${{ inputs.distinct_id }}
 
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -80,22 +57,25 @@ jobs:
         build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
         build-scan-terms-of-use-agree: "yes"
 
-    - name: Run migrateMappings task
+    - name: Migrate mappings for main source set
       run: |
-        ./gradlew migrateMappings --mappings ${{ github.event.inputs.yarn_mappings }}
-
-    - name: Replace src/main/java with remapped files
-      run: |
+        ./gradlew migrateMappings --mappings ${{ inputs.yarn_mappings }} --input "src/main/java" --output "src/main/java_"
         rm -rf ./src/main/java
-        mv ./remappedSrc ./src/main/java
+        mv ./src/main/java_ ./src/main/java
+
+    - name: Migrate mappings for test source set
+      run: |
+        ./gradlew migrateMappings --mappings ${{ inputs.yarn_mappings }} --input "src/test/java" --output "src/test/java_"
+        rm -rf ./src/test/java
+        mv ./src/test/java_ ./src/test/java
 
     - name: Update version constants
       run: |
         python scripts/update_version_constants.py \
-          "${{ github.event.inputs.mc_version }}" \
-          "${{ github.event.inputs.yarn_mappings }}" \
-          "${{ github.event.inputs.fabric_loader }}" \
-          "${{ github.event.inputs.fapi_version }}"
+          "${{ inputs.mc_version }}" \
+          "${{ inputs.yarn_mappings }}" \
+          "${{ inputs.fabric_loader }}" \
+          "${{ inputs.fapi_version }}"
 
     # To fix any style issues that the migration scripts might cause
     - name: Run spotlessApply task
@@ -106,24 +86,15 @@ jobs:
         git config --global user.name "Wurst-Bot"
         git config --global user.email "contact.wurstimperium@gmail.com"
         git add .
-        git commit -m "[Wurst-Bot] Update to ${{ github.event.inputs.mc_version }}"
+        git commit -m "[Wurst-Bot] Update to ${{ inputs.mc_version }}"
         git push
 
     - name: Trigger CI
-      id: ci_dispatch
-      uses: codex-/return-dispatch@v2
+      uses: Wurst-Imperium/dispatch-and-wait@v1
       with:
         token: ${{ github.token }}
-        owner: Wurst-Imperium
-        repo: Wurst7
+        owner: ${{ github.repository_owner }}
+        repo: ${{ github.event.repository.name }}
         ref: ${{ github.ref }}
         workflow: gradle.yml
-
-    - name: Wait for CI to finish (run ${{ steps.ci_dispatch.outputs.run_id }})
-      uses: codex-/await-remote-run@v1
-      with:
-        token: ${{ github.token }}
-        owner: Wurst-Imperium
-        repo: Wurst7
-        run_id: ${{ steps.ci_dispatch.outputs.run_id }}
         run_timeout_seconds: 600  # 10 minutes

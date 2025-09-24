@@ -3,28 +3,27 @@ name: Java CI with Gradle
 on:
   push:
     branches-ignore:
-      - "dependabot/**"
+    - "dependabot/**"
     tags-ignore:
-      - "**"
+    - "**"
     paths:
-      - "**.java"
-      - "**.json"
-      - "**.yml"
-      - "gradle**"
-      - "*.gradle"
-      - "*.accesswidener"
+    - "**.java"
+    - "**.json"
+    - "**.yml"
+    - "gradle**"
+    - "*.gradle"
+    - "*.accesswidener"
   pull_request:
     paths:
-      - "**.java"
-      - "**.json"
-      - "**.yml"
-      - "gradle**"
-      - "*.gradle"
-      - "*.accesswidener"
+    - "**.java"
+    - "**.json"
+    - "**.yml"
+    - "gradle**"
+    - "*.gradle"
+    - "*.accesswidener"
   workflow_dispatch:
     inputs:
       distinct_id:
-        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
         required: false
 
 jobs:
@@ -35,8 +34,8 @@ jobs:
       IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
     steps:
 
-    - name: Echo distinct ID ${{ github.event.inputs.distinct_id }}
-      run: echo ${{ github.event.inputs.distinct_id }}
+    - name: Echo distinct ID ${{ inputs.distinct_id }}
+      run: echo ${{ inputs.distinct_id }}
 
     - name: Checkout repository
       uses: actions/checkout@v5
