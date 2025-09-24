@@ -10,61 +10,40 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.client.gui.screen.Screen;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+
 import net.minecraft.client.gui.screen.StatsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 
 @Mixin(StatsScreen.class)
-public abstract class StatsScreenMixin extends Screen
+public class StatsScreenMixin
 {
-	@Unique
-	private ButtonWidget toggleWurstButton;
-	
-	private StatsScreenMixin(WurstClient wurst, Text title)
+	@WrapOperation(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/widget/DirectionalLayoutWidget;add(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;",
+		ordinal = 4), method = "createButtons()V")
+	private <T extends Widget> T onCreateDoneButton(
+		DirectionalLayoutWidget layout, T doneWidget, Operation<T> original)
 	{
-		super(title);
-	}
-	
-	/**
-	 * Adds the hidden "Enable/Disable Wurst" button on the Statistics screen.
-	 */
-	@Inject(at = @At("TAIL"), method = "createButtons()V")
-	private void onCreateButtons(CallbackInfo ci)
-	{
+		if(!(doneWidget instanceof ButtonWidget doneButton))
+			throw new IllegalStateException(
+				"The done button in the statistics screen somehow isn't a button");
+		
 		if(WurstClient.INSTANCE.getOtfs().disableOtf.shouldHideEnableButton())
-			return;
+			return original.call(layout, doneButton);
 		
-		toggleWurstButton = ButtonWidget
-			.builder(Text.literal(""), this::toggleWurst).width(150).build();
-		
-		ClickableWidget doneButton = getDoneButton();
-		doneButton.setX(width / 2 + 2);
 		doneButton.setWidth(150);
 		
-		toggleWurstButton.setPosition(width / 2 - 152, doneButton.getY());
-		
-		updateWurstButtonText(toggleWurstButton);
-		addDrawableChild(toggleWurstButton);
-	}
-	
-	@Unique
-	private ClickableWidget getDoneButton()
-	{
-		for(ClickableWidget button : Screens.getButtons(this))
-			if(button.getMessage().getString()
-				.equals(I18n.translate("gui.done")))
-				return button;
-			
-		throw new IllegalStateException(
-			"Can't find the done button on the statistics screen.");
+		DirectionalLayoutWidget subLayout =
+			layout.add(DirectionalLayoutWidget.horizontal()).spacing(5);
+		subLayout.add(ButtonWidget.builder(getButtonText(), this::toggleWurst)
+			.width(150).build());
+		return original.call(subLayout, doneButton);
 	}
 	
 	@Unique
@@ -72,15 +51,14 @@ public abstract class StatsScreenMixin extends Screen
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
 		wurst.setEnabled(!wurst.isEnabled());
-		
-		updateWurstButtonText(button);
+		button.setMessage(getButtonText());
 	}
 	
 	@Unique
-	private void updateWurstButtonText(ButtonWidget button)
+	private Text getButtonText()
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
 		String text = (wurst.isEnabled() ? "Disable" : "Enable") + " Wurst";
-		button.setMessage(Text.literal(text));
+		return Text.literal(text);
 	}
 }
