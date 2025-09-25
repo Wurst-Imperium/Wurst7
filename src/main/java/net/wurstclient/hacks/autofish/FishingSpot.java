@@ -15,6 +15,6 @@ public record FishingSpot(PositionAndRotation input, Vec3d bobberPos,
 {
 	public FishingSpot(PositionAndRotation input, FishingBobberEntity bobber)
 	{
-		this(input, bobber.getPos(), bobber.isInOpenWater());
+		this(input, bobber.getEntityPos(), bobber.isInOpenWater());
 	}
 }

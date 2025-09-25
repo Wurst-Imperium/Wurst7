@@ -15,7 +15,7 @@ public record PositionAndRotation(Vec3d pos, Rotation rotation)
 {
 	public PositionAndRotation(Entity entity)
 	{
-		this(entity.getPos(),
+		this(entity.getEntityPos(),
 			Rotation.wrapped(entity.getYaw(), entity.getPitch()));
 	}
 	
