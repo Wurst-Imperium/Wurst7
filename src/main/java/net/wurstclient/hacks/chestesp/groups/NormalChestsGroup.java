@@ -15,6 +15,7 @@ import net.minecraft.block.entity.TrappedChestBlockEntity;
 import net.wurstclient.hacks.chestesp.ChestEspBlockGroup;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
+import net.wurstclient.util.LootrModCompat;
 
 public final class NormalChestsGroup extends ChestEspBlockGroup
 {
@@ -35,6 +36,7 @@ public final class NormalChestsGroup extends ChestEspBlockGroup
 	protected boolean matches(BlockEntity be)
 	{
 		return be instanceof ChestBlockEntity
-			&& !(be instanceof TrappedChestBlockEntity);
+			&& !(be instanceof TrappedChestBlockEntity)
+			&& !LootrModCompat.isLootrTrappedChest(be);
 	}
 }
