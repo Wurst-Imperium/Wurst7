@@ -14,6 +14,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Block;
@@ -175,6 +176,9 @@ public final class SearchHack extends Hack
 	{
 		if(vertexBuffer == null || bufferRegion == null)
 			return;
+		
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
 		
 		float[] rainbow = RenderUtils.getRainbowColor();
 		RenderUtils.setShaderColor(rainbow, 0.5F);
