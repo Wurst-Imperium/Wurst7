@@ -208,6 +208,10 @@ task github(dependsOn: build) {
 	def repoIdProvider = providers.gradleProperty("mcx_repo_id")
 	def ghVersion = getGhVersion()
 	
+	def changelogImageProvider = repoIdProvider.map { repoId ->
+		getChangelogImage("github.com/${repoId}/releases/tag/${ghVersion}")
+	}
+	
 	onlyIf {
 		ENV.GITHUB_TOKEN
 	}
@@ -220,7 +224,7 @@ task github(dependsOn: build) {
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
-			releaseBuilder.body(getChangelogImage("github.com/${repoId}/releases/tag/${ghVersion}"))
+			releaseBuilder.body(changelogImageProvider.get())
 			releaseBuilder.prerelease(ghVersion.contains("pre"))
 			ghRelease = releaseBuilder.create()
 		}
@@ -241,6 +245,10 @@ task closeMilestone {
 	def archivesBaseNameProvider = providers.gradleProperty("archives_base_name")
 	def ghVersion = getGhVersion()
 	
+	def changelogProvider = repoIdProvider.zip(minecraftVersionProvider, modLoaderProvider, archivesBaseNameProvider) { repoId, mcVersion, modLoader, archivesName ->
+		getChangelog("GitHub", "github.com/${repoId}/milestone/${ghVersion}", mcVersion, modLoader, archivesName)
+	}
+	
 	onlyIf {
 		ENV.GITHUB_TOKEN
 	}
@@ -258,8 +266,7 @@ task closeMilestone {
 		
 		if (milestone.getState() != GHMilestoneState.CLOSED) {
 			milestone.setDueOn(Date.from(Instant.now()))
-			milestone.setDescription(getChangelog("GitHub", "github.com/${repoId}/milestone/${ghVersion}", 
-				minecraftVersionProvider.get(), modLoaderProvider.get(), archivesBaseNameProvider.get()))
+			milestone.setDescription(changelogProvider.get())
 			milestone.close()
 		}
 	}
