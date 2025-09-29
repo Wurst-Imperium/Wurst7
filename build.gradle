@@ -200,6 +200,7 @@ import org.kohsuke.github.GitHub
 
 task github(dependsOn: build) {
 	def repoIdProvider = providers.gradleProperty("mcx_repo_id")
+	def ghVersion = getGhVersion()
 	
 	onlyIf {
 		ENV.GITHUB_TOKEN
@@ -209,7 +210,6 @@ task github(dependsOn: build) {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repoId = repoIdProvider.get()
 		def repository = github.getRepository(repoId)
-		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
@@ -233,6 +233,7 @@ task closeMilestone {
 	def minecraftVersionProvider = providers.gradleProperty("minecraft_version")
 	def modLoaderProvider = providers.gradleProperty("mod_loader")
 	def archivesBaseNameProvider = providers.gradleProperty("archives_base_name")
+	def ghVersion = getGhVersion()
 	
 	onlyIf {
 		ENV.GITHUB_TOKEN
@@ -242,7 +243,6 @@ task closeMilestone {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repoId = repoIdProvider.get()
 		def repository = github.getRepository(repoId)
-		def ghVersion = getGhVersion()
 		
 		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
 		def milestone = repository.listMilestones(GHIssueState.ALL).find { it.title == ghVersion }
@@ -261,13 +261,13 @@ task closeMilestone {
 
 task uploadBackups {
 	dependsOn build
+	def shortVersion = getGhVersion().substring(1)
 	
 	onlyIf {
 		ENV.WI_BACKUPS_API_KEY
 	}
 	
 	doLast {
-		def shortVersion = getGhVersion().substring(1)
 		def backupUrl = "https://api.wurstclient.net/artifact-backups/Wurst/${shortVersion}"
 		
 		def maxRetries = 3
