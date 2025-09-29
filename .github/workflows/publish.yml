@@ -80,19 +80,19 @@ jobs:
       if: ${{ inputs.close_milestone }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
-      run: ./gradlew closeMilestone --stacktrace
+      run: ./gradlew closeMilestone --stacktrace --no-configuration-cache
 
     - name: Upload backups
       if: ${{ inputs.upload_backups }}
       env:
         WI_BACKUPS_API_KEY: ${{ secrets.WI_BACKUPS_API_KEY }}
-      run: ./gradlew uploadBackups --stacktrace
+      run: ./gradlew uploadBackups --stacktrace --no-configuration-cache
 
     - name: Publish to GitHub
       if: ${{ inputs.publish_github }}
       env:
         GITHUB_TOKEN: ${{ secrets.OLD_MCX_PUBLISH_TOKEN }}
-      run: ./gradlew github --stacktrace
+      run: ./gradlew github --stacktrace --no-configuration-cache
 
     - name: Build website update inputs
       id: website_inputs
