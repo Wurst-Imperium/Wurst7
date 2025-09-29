@@ -172,14 +172,14 @@ def getGhVersion() {
 	return version.substring(0, version.indexOf("-MC"))
 }
 
-def getChangelogLink(String platform, String from, String minecraftVersion, String archivesBaseName) {
+def getChangelogLink(String platform, String from) {
 	def versionSlug = getGhVersion().substring(1).replace(".", "-")
 	def shortURL = "https://www.wurstclient.net/updates/wurst-${versionSlug}/"
 	def query = []
 	if (platform != "GitHub")
-		query.add("mc=${minecraftVersion}")
+		query.add("mc=${project.minecraft_version}")
 	query.add("utm_source=${platform}")
-	query.add("utm_medium=" + archivesBaseName.replace("-", "+"))
+	query.add("utm_medium=" + project.archives_base_name.replace("-", "+"))
 	def fullURL = shortURL + (query.isEmpty() ? "" : "?" + query.join("&"))
 	def encodedURL = java.net.URLEncoder.encode(fullURL, "UTF-8")
 	return "[${shortURL}](https://go.wimods.net/from/${from}?to=${encodedURL})"
@@ -189,36 +189,30 @@ def getChangelogImage(String from) {
 	return "![](https://img.wimods.net/${from})"
 }
 
-def getChangelog(String platform, String from, String minecraftVersion, String modLoader, String archivesBaseName) {
+def getChangelog(String platform, String from) {
 	def prefix = platform == "GitHub" ? "" : "A changelog can be found at: "
-	def imgQuery = platform == "GitHub" ? "" : "?mc_version=${minecraftVersion}&mod_loader=${modLoader}"
-	return prefix + getChangelogLink(platform, from, minecraftVersion, archivesBaseName) + getChangelogImage(from + imgQuery)
+	def imgQuery = platform == "GitHub" ? "" : "?mc_version=${project.minecraft_version}&mod_loader=${project.mod_loader}"
+	return prefix + getChangelogLink(platform, from) + getChangelogImage(from + imgQuery)
 }
 
 import org.kohsuke.github.GHReleaseBuilder
 import org.kohsuke.github.GitHub
 
 task github(dependsOn: build) {
-	def repoIdProvider = providers.gradleProperty("mcx_repo_id")
-	def ghVersion = getGhVersion()
-	
-	def changelogImageProvider = repoIdProvider.map { repoId ->
-		getChangelogImage("github.com/${repoId}/releases/tag/${ghVersion}")
-	}
-	
 	onlyIf {
 		ENV.GITHUB_TOKEN
 	}
 	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repoId = repoIdProvider.get()
+		def repoId = project.mcx_repo_id
 		def repository = github.getRepository(repoId)
+		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
-			releaseBuilder.body(changelogImageProvider.get())
+			releaseBuilder.body(getChangelogImage("github.com/${repoId}/releases/tag/${ghVersion}"))
 			releaseBuilder.prerelease(ghVersion.contains("pre"))
 			ghRelease = releaseBuilder.create()
 		}
@@ -233,24 +227,15 @@ import org.kohsuke.github.GHMilestoneState
 import java.time.Instant
 
 task closeMilestone {
-	def repoIdProvider = providers.gradleProperty("gh_repo_id")
-	def minecraftVersionProvider = providers.gradleProperty("minecraft_version")
-	def modLoaderProvider = providers.gradleProperty("mod_loader")
-	def archivesBaseNameProvider = providers.gradleProperty("archives_base_name")
-	def ghVersion = getGhVersion()
-	
-	def changelogProvider = repoIdProvider.zip(minecraftVersionProvider, modLoaderProvider, archivesBaseNameProvider) { repoId, mcVersion, modLoader, archivesName ->
-		getChangelog("GitHub", "github.com/${repoId}/milestone/${ghVersion}", mcVersion, modLoader, archivesName)
-	}
-	
 	onlyIf {
 		ENV.GITHUB_TOKEN
 	}
 	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repoId = repoIdProvider.get()
+		def repoId = project.gh_repo_id
 		def repository = github.getRepository(repoId)
+		def ghVersion = getGhVersion()
 		
 		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
 		def milestone = repository.listMilestones(GHIssueState.ALL).find { it.title == ghVersion }
@@ -260,7 +245,7 @@ task closeMilestone {
 		
 		if (milestone.getState() != GHMilestoneState.CLOSED) {
 			milestone.setDueOn(Date.from(Instant.now()))
-			milestone.setDescription(changelogProvider.get())
+			milestone.setDescription(getChangelog("GitHub", "github.com/${repoId}/milestone/${ghVersion}"))
 			milestone.close()
 		}
 	}
@@ -268,13 +253,13 @@ task closeMilestone {
 
 task uploadBackups {
 	dependsOn build
-	def shortVersion = getGhVersion().substring(1)
 	
 	onlyIf {
 		ENV.WI_BACKUPS_API_KEY
 	}
 	
 	doLast {
+		def shortVersion = getGhVersion().substring(1)
 		def backupUrl = "https://api.wurstclient.net/artifact-backups/Wurst/${shortVersion}"
 		
 		def maxRetries = 3
