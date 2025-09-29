@@ -29,9 +29,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
-      IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
     steps:
 
     - name: Echo distinct ID ${{ inputs.distinct_id }}
@@ -55,30 +52,16 @@ jobs:
         build-scan-publish: true
         build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
         build-scan-terms-of-use-agree: "yes"
-
-    - name: Compile Java code
-      run: ./gradlew remapJar --stacktrace --warning-mode=fail
-
-    - name: Validate JSON files
-      run: ./gradlew spotlessJsonCheck || (echo "::error::JSON validation failed! Run './gradlew spotlessApply' to fix style issues, or check the full error message for syntax errors." && exit 1)
-
-    - name: Validate Java code style
-      run: ./gradlew spotlessJavaCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
-
-    - name: Validate license headers
-      run: ./gradlew spotlessLicenseHeaderCheck || (echo "::error::License headers are missing or malformed in some files! Run './gradlew spotlessApply' to fix this, or check the full error message for details." && exit 1)
-
-    - name: Run unit tests
-      run: ./gradlew test --stacktrace --warning-mode=fail
-
-    - name: Validate access widener
-      run: ./gradlew validateAccessWidener --stacktrace --warning-mode=fail
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+        cache-read-only: ${{ github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/heads/1.') }}
 
     - name: Build
       run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: Upload to VirusTotal for analysis
       id: virustotal
+      env:
+        VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
       if: ${{ env.VIRUSTOTAL_API_KEY }}
       uses: crazy-max/ghaction-virustotal@v4
       with:
@@ -90,7 +73,7 @@ jobs:
       continue-on-error: true
 
     - name: Add VirusTotal links to build summary
-      if: ${{ env.VIRUSTOTAL_API_KEY && steps.virustotal.outputs.analysis }}
+      if: ${{ steps.virustotal.outputs.analysis }}
       run: |
         echo "<details open>" >> $GITHUB_STEP_SUMMARY
         echo "<summary>🛡️ VirusTotal Scans</summary>" >> $GITHUB_STEP_SUMMARY
@@ -105,20 +88,27 @@ jobs:
         echo "</details>" >> $GITHUB_STEP_SUMMARY
 
     - name: Run the mod and take screenshots
-      uses: GabrielBB/xvfb-action@v1.7
-      with:
-        run: ./gradlew runEndToEndTest --stacktrace --warning-mode=fail
+      # TODO: Migrate to Fabric Client Gametest API so this can run with configuration cache enabled
+      run: xvfb-run --auto-servernum ./gradlew runEndToEndTest --stacktrace --warning-mode=fail --no-configuration-cache
 
-    # Needed because the screenshot gallery won't be created on pull requests.
-    # Also useful if Imgur uploads fail.
-    - name: Upload Test Screenshots.zip artifact
+    - name: Upload screenshots.zip artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      if: ${{ success() || failure() }}
       with:
-        name: Test Screenshots
+        name: screenshots
         path: run/screenshots
+        compression-level: 0
+
+    - name: Upload crash-reports.zip artifact
+      uses: actions/upload-artifact@v4
+      if: ${{ failure() }}
+      with:
+        name: crash-reports
+        path: run/crash-reports
 
     - name: Create test screenshot gallery
+      env:
+        IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
       if: ${{ env.IMGUR_CLIENT_ID && (success() || failure()) }}
       # Imgur uploads randomly fail sometimes, probably because of the low rate limit.
       # TODO: Find a better place to upload the screenshots.
