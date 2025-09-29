@@ -135,10 +135,11 @@ java {
 }
 
 jar {
-	inputs.property "archivesName", project.base.archivesName
+	def archivesName = project.base.archivesName
+	inputs.property("archivesName", archivesName)
 	
 	from("LICENSE.txt") {
-		rename { "LICENSE-${inputs.properties.archivesName}.txt" }
+		rename { "LICENSE-${archivesName}.txt" }
 	}
 	
 	exclude("intentionally_untranslated.json")
