@@ -98,7 +98,7 @@ jobs:
       if: ${{ success() || failure() }}
       with:
         name: screenshots
-        path: build/run/clientGameTest/screenshots
+        path: run/screenshots
         compression-level: 0
 
     - name: Upload crash-reports.zip artifact
@@ -106,7 +106,7 @@ jobs:
       if: ${{ failure() }}
       with:
         name: crash-reports
-        path: build/run/clientGameTest/crash-reports
+        path: run/crash-reports
 
     - name: Create test screenshot gallery
       if: ${{ env.IMGUR_CLIENT_ID && (success() || failure()) }}
