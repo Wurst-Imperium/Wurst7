@@ -90,7 +90,8 @@ jobs:
     - name: Run the mod and take screenshots
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      run: xvfb-run --auto-servernum ./gradlew runEndToEndTest --stacktrace --warning-mode=fail
+      # TODO: Migrate to Fabric Client Gametest API so this can run with configuration cache enabled
+      run: xvfb-run --auto-servernum ./gradlew runEndToEndTest --stacktrace --warning-mode=fail --no-configuration-cache
 
     - name: Upload screenshots.zip artifact
       uses: actions/upload-artifact@v4
