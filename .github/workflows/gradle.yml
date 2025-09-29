@@ -88,8 +88,6 @@ jobs:
         echo "</details>" >> $GITHUB_STEP_SUMMARY
 
     - name: Run the mod and take screenshots
-      env:
-        IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
       # TODO: Migrate to Fabric Client Gametest API so this can run with configuration cache enabled
       run: xvfb-run --auto-servernum ./gradlew runEndToEndTest --stacktrace --warning-mode=fail --no-configuration-cache
 
@@ -109,6 +107,8 @@ jobs:
         path: run/crash-reports
 
     - name: Create test screenshot gallery
+      env:
+        IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
       if: ${{ env.IMGUR_CLIENT_ID && (success() || failure()) }}
       # Imgur uploads randomly fail sometimes, probably because of the low rate limit.
       # TODO: Find a better place to upload the screenshots.
