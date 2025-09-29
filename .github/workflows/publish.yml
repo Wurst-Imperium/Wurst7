@@ -36,9 +36,6 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    env:
-      WI_BACKUPS_API_KEY: ${{ secrets.WI_BACKUPS_API_KEY }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
 
     - name: Echo distinct ID ${{ inputs.distinct_id }}
@@ -61,6 +58,12 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
+      with:
+        build-scan-publish: true
+        build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
+        build-scan-terms-of-use-agree: "yes"
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+        cache-read-only: ${{ github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/heads/1.') }}
 
     - name: Build
       run: ./gradlew build --stacktrace --warning-mode=fail
@@ -75,10 +78,14 @@ jobs:
 
     - name: Close milestone
       if: ${{ inputs.close_milestone }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       run: ./gradlew closeMilestone --stacktrace
 
     - name: Upload backups
       if: ${{ inputs.upload_backups }}
+      env:
+        WI_BACKUPS_API_KEY: ${{ secrets.WI_BACKUPS_API_KEY }}
       run: ./gradlew uploadBackups --stacktrace
 
     - name: Publish to GitHub
@@ -91,9 +98,9 @@ jobs:
       id: website_inputs
       if: ${{ inputs.update_website }}
       run: |
-        echo "wurst_version=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/^v//' | sed 's/-MC.*$//')" >> "$GITHUB_OUTPUT"
-        echo "mc_version=$(grep "^minecraft_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
-        echo "fapi_version=$(grep "^fabric_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
+        echo "wurst_version=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/^v//' | sed 's/-MC.*$//')" >> "$GITHUB_OUTPUT"
+        echo "mc_version=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
+        echo "fapi_version=$(grep '^fabric_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
 
     - name: Trigger website update
       if: ${{ inputs.update_website }}
