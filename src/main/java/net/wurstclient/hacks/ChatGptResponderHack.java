@@ -9,10 +9,12 @@ package net.wurstclient.hacks;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minecraft.text.Text;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.events.ChatInputListener;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
@@ -26,6 +28,9 @@ public final class ChatGptResponderHack extends Hack
 	implements ChatInputListener
 {
 	
+	// =========================
+	// Settings (existing)
+	// =========================
 	private final TextFieldSetting apiKey =
 		new TextFieldSetting("OpenAI API Key", "");
 	
@@ -57,7 +62,7 @@ public final class ChatGptResponderHack extends Hack
 	private final CheckboxSetting debugLog = new CheckboxSetting(
 		"Debug log to console", "Log decisions and outcomes.", false);
 	
-	// New: rate control
+	// Rate control
 	private final SliderSetting cooldownMs = new SliderSetting("Cooldown (ms)",
 		"Minimum time between replies to the same sender.", 3000, 0, 60000, 250,
 		SliderSetting.ValueDisplay.DECIMAL);
@@ -67,8 +72,33 @@ public final class ChatGptResponderHack extends Hack
 			"Delay before sending a reply (adds human-like latency).", 750, 0,
 			4000, 50, SliderSetting.ValueDisplay.DECIMAL);
 	
+	// =========================
+	// NEW: Mod disabling settings
+	// =========================
+	private final CheckboxSetting disableMods = new CheckboxSetting(
+		"Disable mods when messaging",
+		"Temporarily disable selected hacks while composing/sending a reply.",
+		true);
+	
+	private final CheckboxSetting disableSneak = new CheckboxSetting(
+		"  – Sneak", "Disable Sneak while messaging.", true);
+	
+	private final CheckboxSetting disableTriggerBot = new CheckboxSetting(
+		"  – TriggerBot", "Disable TriggerBot while messaging.", true);
+	
+	private final CheckboxSetting disableKillauraLegit = new CheckboxSetting(
+		"  – Killaura Legit", "Disable KillauraLegit while messaging.", true);
+	
+	private final SliderSetting reenableDelayMs =
+		new SliderSetting("Re-enable delay (ms)",
+			"How long after sending to re-enable disabled hacks.", 500, 0, 5000,
+			50, SliderSetting.ValueDisplay.DECIMAL);
+	
 	// last reply timestamps per sender (lowercased)
 	private final Map<String, Long> lastReplyAt = new HashMap<>();
+	
+	// NEW: a ref-counted disabler so overlaps are safe
+	private final ModDisabler modDisabler = new ModDisabler();
 	
 	public ChatGptResponderHack()
 	{
@@ -83,6 +113,13 @@ public final class ChatGptResponderHack extends Hack
 		addSetting(debugLog);
 		addSetting(cooldownMs);
 		addSetting(sendDelayMs);
+		
+		// New section in GUI
+		addSetting(disableMods);
+		addSetting(disableSneak);
+		addSetting(disableTriggerBot);
+		addSetting(disableKillauraLegit);
+		addSetting(reenableDelayMs);
 	}
 	
 	@Override
@@ -117,23 +154,14 @@ public final class ChatGptResponderHack extends Hack
 	}
 	
 	// Try to detect DMs & extract (sender, message).
-	// Handles:
-	// 1) "<Name> message" -> public
-	// 2) "From <Name>: message" -> DM
-	// 3) "From Name: message" -> DM
-	// 4) "[Sender -> me] message" -> DM (your server format)
-	// 5) "[me -> Target] message" -> outgoing DM (we ignore)
 	private Parsed parse(String raw, String myName)
 	{
-		// (4) Arrow pattern inside brackets
+		// [Sender -> me] message
 		int b1 = raw.indexOf('[');
 		int b2 = raw.indexOf(']');
 		if(b1 >= 0 && b2 > b1)
 		{
-			String bracket = raw.substring(b1 + 1, b2).trim(); // e.g.
-																// "Vijay765846
-																// -> me" or "me
-																// -> Vijay"
+			String bracket = raw.substring(b1 + 1, b2).trim();
 			String lower = bracket.toLowerCase();
 			if(lower.contains("->"))
 			{
@@ -143,8 +171,6 @@ public final class ChatGptResponderHack extends Hack
 					String left = parts[0].trim();
 					String right = parts[1].trim();
 					String remainder = raw.substring(b2 + 1).trim();
-					
-					// inbound DM: [Sender -> me]
 					if(right.equalsIgnoreCase("me")
 						|| right.equalsIgnoreCase(myName))
 					{
@@ -152,19 +178,15 @@ public final class ChatGptResponderHack extends Hack
 							left.replace("<", "").replace(">", "").trim();
 						return new Parsed(sender, remainder, true);
 					}
-					// outgoing DM: [me -> Target] ; ignore as "own message"
-					// even if server wraps it oddly
 					if(left.equalsIgnoreCase("me")
 						|| left.equalsIgnoreCase(myName))
 					{
-						return null; // treat as our own outgoing DM echo -> do
-										// nothing
+						return null; // our own outgoing DM echo
 					}
 				}
 			}
 		}
-		
-		// (2) From <Name>: message
+		// From <Name>: message
 		if(raw.startsWith("From ") && raw.contains(":"))
 		{
 			int open = raw.indexOf('<');
@@ -176,7 +198,7 @@ public final class ChatGptResponderHack extends Hack
 					raw.substring(close + 1).replaceFirst("^:\\s*", "").trim();
 				return new Parsed(sender, msg, true);
 			}
-			// (3) From Name: message
+			// From Name: message
 			String rest = raw.substring("From ".length());
 			int colon = rest.indexOf(':');
 			if(colon > 0)
@@ -186,8 +208,7 @@ public final class ChatGptResponderHack extends Hack
 				return new Parsed(sender, msg, true);
 			}
 		}
-		
-		// (1) Vanilla public: "<Name> message"
+		// <Name> message
 		if(raw.startsWith("<") && raw.indexOf('>') > 1)
 		{
 			int end = raw.indexOf('>');
@@ -195,9 +216,7 @@ public final class ChatGptResponderHack extends Hack
 			String msg = raw.substring(end + 1).trim();
 			return new Parsed(sender, msg, false);
 		}
-		
-		// Unknown format; treat entire line as the message (public), with
-		// unknown sender
+		// fallback: public/unknown
 		return new Parsed(null, raw, false);
 	}
 	
@@ -210,37 +229,30 @@ public final class ChatGptResponderHack extends Hack
 		
 		if(debugLog.isChecked())
 			System.out.println("[ChatGptResponder] Saw: " + raw);
-			
-		// Parse first (important: some servers echo DMs as "<me> [Sender -> me]
-		// msg")
+		
 		Parsed parsed = parse(raw, me);
 		if(parsed == null)
 		{
-			// our own outgoing DM echo or unhandled we choose to ignore
 			if(debugLog.isChecked())
 				System.out.println(
 					"[ChatGptResponder] Ignored (own/outgoing DM echo or unknown).");
 			return;
 		}
 		
-		// Ignore own public lines (unless it's an inbound DM disguised in our
-		// line)
 		if(ignoreOwnMessages.isChecked() && !parsed.isDm)
 		{
 			if(raw.contains("<" + me + ">") || raw.startsWith(me + ":"))
 				return;
 		}
 		
-		// mention gating for PUBLIC chat only
 		boolean mentioned = raw.toLowerCase().contains(me.toLowerCase());
 		if(!parsed.isDm && onlyWhenMentioned.isChecked() && !mentioned)
 			return;
 		
-		// DMs allowed?
 		if(parsed.isDm && !respondToDMs.isChecked())
 			return;
 		
-		// Rate-limit per sender (unknown sender uses key "unknown")
+		// per-sender cooldown
 		String keyForCooldown =
 			(parsed.sender == null ? "unknown" : parsed.sender.toLowerCase());
 		long now = System.currentTimeMillis();
@@ -254,6 +266,7 @@ public final class ChatGptResponderHack extends Hack
 		final String textForModel = parsed.msg;
 		final String publicPrefix =
 			(parsed.sender != null ? "@" + parsed.sender + " " : "");
+		final long delay = (long)sendDelayMs.getValue();
 		
 		// ---- TEST MODE ----
 		if(testModeEcho.isChecked())
@@ -262,32 +275,38 @@ public final class ChatGptResponderHack extends Hack
 			if(reply.isEmpty())
 				return;
 			
-			long delay = (long)sendDelayMs.getValue();
 			Thread.ofVirtual().start(() -> {
 				try
 				{
+					if(disableMods.isChecked())
+						modDisabler.acquireAndApply();
 					if(delay > 0)
 						Thread.sleep(delay + jitter());
-				}catch(InterruptedException ignored)
-				{}
-				if(MC.getNetworkHandler() != null)
-				{
-					if(replyPrivately)
+					if(MC.getNetworkHandler() != null)
 					{
-						MC.getNetworkHandler()
-							.sendChatCommand("msg " + targetName + " " + reply);
-						if(debugLog.isChecked())
-							System.out
-								.println("[ChatGptResponder] Echo via /msg to "
-									+ targetName);
-					}else
-					{
-						MC.getNetworkHandler()
-							.sendChatMessage(publicPrefix + reply);
-						if(debugLog.isChecked())
-							System.out
-								.println("[ChatGptResponder] Echo (public).");
+						if(replyPrivately)
+						{
+							MC.getNetworkHandler().sendChatCommand(
+								"msg " + targetName + " " + reply);
+							if(debugLog.isChecked())
+								System.out.println(
+									"[ChatGptResponder] Echo via /msg to "
+										+ targetName);
+						}else
+						{
+							MC.getNetworkHandler()
+								.sendChatMessage(publicPrefix + reply);
+							if(debugLog.isChecked())
+								System.out.println(
+									"[ChatGptResponder] Echo (public).");
+						}
 					}
+				}catch(InterruptedException ignored)
+				{}finally
+				{
+					if(disableMods.isChecked())
+						modDisabler
+							.releaseLater((long)reenableDelayMs.getValue());
 				}
 			});
 			return;
@@ -313,13 +332,14 @@ public final class ChatGptResponderHack extends Hack
 			.replace("{me}", me)
 			.replace("{is_dm}", Boolean.toString(parsed.isDm));
 		
-		long delay = (long)sendDelayMs.getValue();
-		
 		Thread.ofVirtual().name("ChatGptResponder")
 			.uncaughtExceptionHandler((t, e) -> e.printStackTrace())
 			.start(() -> {
 				try
 				{
+					if(disableMods.isChecked())
+						modDisabler.acquireAndApply();
+					
 					String reply = OpenAIClient.completeChat(key, prompt);
 					reply = sanitizeForChat(reply);
 					if(reply == null || reply.isBlank())
@@ -359,29 +379,117 @@ public final class ChatGptResponderHack extends Hack
 				}catch(Exception e)
 				{
 					e.printStackTrace();
+				}finally
+				{
+					if(disableMods.isChecked())
+						modDisabler
+							.releaseLater((long)reenableDelayMs.getValue());
 				}
 			});
 	}
 	
+	// ============ Helpers ============
+	
 	private static long jitter()
 	{
-		// ±150ms jitter
-		return (long)((Math.random() - 0.5) * 300.0);
+		return (long)((Math.random() - 0.5) * 300.0); // ±150ms
 	}
 	
 	private static String sanitizeForChat(String s)
 	{
 		if(s == null)
 			return "";
-		// strip color codes
-		s = s.replaceAll("§.", "");
-		// normalize whitespace
+		s = s.replaceAll("§.", ""); // strip color codes
 		s = s.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ');
-		// strip other control chars
-		s = s.replaceAll("\\p{C}", "");
+		s = s.replaceAll("\\p{C}", ""); // control chars
 		s = s.trim();
 		if(s.length() > 256)
 			s = s.substring(0, 256);
 		return s;
+	}
+	
+	/**
+	 * Temporarily disables selected hacks while messaging, with reference
+	 * counting
+	 * so overlapping replies don't re-enable too early.
+	 */
+	private final class ModDisabler
+	{
+		private final AtomicInteger holds = new AtomicInteger(0);
+		private Boolean priorSneak, priorTriggerBot, priorKillauraLegit;
+		
+		void acquireAndApply()
+		{
+			if(holds.getAndIncrement() == 0)
+			{
+				apply();
+			}
+		}
+		
+		void releaseLater(long ms)
+		{
+			Thread.ofVirtual().start(() -> {
+				try
+				{
+					if(ms > 0)
+						Thread.sleep(ms);
+				}catch(InterruptedException ignored)
+				{}
+				release();
+			});
+		}
+		
+		private synchronized void apply()
+		{
+			// snapshot & disable only once (first acquire)
+			var hax = WurstClient.INSTANCE.getHax();
+			
+			if(disableSneak.isChecked() && priorSneak == null)
+			{
+				priorSneak = hax.sneakHack.isEnabled();
+				if(priorSneak)
+					hax.sneakHack.setEnabled(false);
+			}
+			if(disableTriggerBot.isChecked() && priorTriggerBot == null)
+			{
+				priorTriggerBot = hax.triggerBotHack.isEnabled();
+				if(priorTriggerBot)
+					hax.triggerBotHack.setEnabled(false);
+			}
+			if(disableKillauraLegit.isChecked() && priorKillauraLegit == null)
+			{
+				priorKillauraLegit = hax.killauraLegitHack.isEnabled();
+				if(priorKillauraLegit)
+					hax.killauraLegitHack.setEnabled(false);
+			}
+		}
+		
+		private synchronized void release()
+		{
+			if(holds.decrementAndGet() > 0)
+				return; // still in use by another reply
+				
+			// restore exactly to previous states
+			var hax = WurstClient.INSTANCE.getHax();
+			
+			if(priorSneak != null)
+			{
+				if(priorSneak)
+					hax.sneakHack.setEnabled(true);
+				priorSneak = null;
+			}
+			if(priorTriggerBot != null)
+			{
+				if(priorTriggerBot)
+					hax.triggerBotHack.setEnabled(true);
+				priorTriggerBot = null;
+			}
+			if(priorKillauraLegit != null)
+			{
+				if(priorKillauraLegit)
+					hax.killauraLegitHack.setEnabled(true);
+				priorKillauraLegit = null;
+			}
+		}
 	}
 }
