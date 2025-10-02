@@ -15,6 +15,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,6 +23,8 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.AbstractInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -192,24 +195,24 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(KeyInput context)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			cleanUpButton.onPress();
+		if(context.key() == GLFW.GLFW_KEY_ENTER)
+			cleanUpButton.onPress(context);
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	public boolean mouseClicked(Click context, boolean doubleClick)
 	{
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
 			close();
 			return true;
 		}
 		
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(context, doubleClick);
 	}
 	
 	@Override
@@ -279,9 +282,9 @@ public class CleanUpScreen extends Screen
 		}
 		
 		@Override
-		public void onPress()
+		public void onPress(AbstractInput context)
 		{
-			super.onPress();
+			super.onPress(context);
 			setMessage(Text.literal(messageSupplier.get()));
 		}
 	}

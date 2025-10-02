@@ -15,6 +15,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -31,6 +33,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.resource.language.I18n;
@@ -258,6 +261,7 @@ public enum WurstClientTestHelper
 	public static void clickButton(String translationKey)
 	{
 		String buttonText = I18n.translate(translationKey);
+		MouseInput pressContext = new MouseInput(GLFW.GLFW_KEY_UNKNOWN, 0);
 		
 		waitUntil("button saying " + buttonText + " is visible", mc -> {
 			Screen screen = mc.currentScreen;
@@ -272,14 +276,14 @@ public enum WurstClientTestHelper
 				if(widget instanceof ButtonWidget button
 					&& buttonText.equals(button.getMessage().getString()))
 				{
-					button.onPress();
+					button.onPress(pressContext);
 					return true;
 				}
 				
 				if(widget instanceof CyclingButtonWidget<?> button
 					&& buttonText.equals(button.optionText.getString()))
 				{
-					button.onPress();
+					button.onPress(pressContext);
 					return true;
 				}
 			}
@@ -335,7 +339,7 @@ public enum WurstClientTestHelper
 	
 	public static void toggleDebugHud()
 	{
-		submitAndWait(mc -> mc.inGameHud.getDebugHud().toggleDebugHud());
+		submitAndWait(mc -> mc.debugHudEntryList.toggleF3Enabled());
 	}
 	
 	public static void setPerspective(Perspective perspective)

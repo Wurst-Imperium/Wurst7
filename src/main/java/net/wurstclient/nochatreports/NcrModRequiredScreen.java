@@ -78,7 +78,7 @@ public final class NcrModRequiredScreen extends Screen
 	{
 		reasonFormatted =
 			MultilineText.create(textRenderer, reason, width - 50);
-		reasonHeight = reasonFormatted.count() * textRenderer.fontHeight;
+		reasonHeight = reasonFormatted.getLineCount() * textRenderer.fontHeight;
 		
 		int buttonX = width / 2 - 100;
 		int belowReasonY =
@@ -128,7 +128,8 @@ public final class NcrModRequiredScreen extends Screen
 		
 		context.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
 			Colors.LIGHT_GRAY);
-		reasonFormatted.drawCenterWithShadow(context, centerX, reasonY);
+		reasonFormatted.draw(context, MultilineText.Alignment.CENTER, centerX,
+			reasonY, 9, true, -1);
 		
 		for(Drawable drawable : drawables)
 			drawable.render(context, mouseX, mouseY, partialTicks);

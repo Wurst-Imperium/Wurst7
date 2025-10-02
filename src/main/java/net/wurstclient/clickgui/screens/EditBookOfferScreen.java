@@ -11,11 +11,13 @@ import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -205,38 +207,38 @@ public final class EditBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(Click context, boolean doubleClick)
 	{
-		boolean childClicked = super.mouseClicked(mouseX, mouseY, mouseButton);
+		boolean childClicked = super.mouseClicked(context, doubleClick);
 		
-		levelField.mouseClicked(mouseX, mouseY, mouseButton);
-		priceField.mouseClicked(mouseX, mouseY, mouseButton);
+		levelField.mouseClicked(context, doubleClick);
+		priceField.mouseClicked(context, doubleClick);
 		
-		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_4)
-			cancelButton.onPress();
+		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
+			cancelButton.onPress(context);
 		
 		return childClicked;
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(KeyInput context)
 	{
-		switch(keyCode)
+		switch(context.key())
 		{
 			case GLFW.GLFW_KEY_ENTER:
 			if(saveButton.active)
-				saveButton.onPress();
+				saveButton.onPress(context);
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			cancelButton.onPress();
+			cancelButton.onPress(context);
 			break;
 			
 			default:
 			break;
 		}
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override

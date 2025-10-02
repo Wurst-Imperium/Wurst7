@@ -24,7 +24,7 @@ import net.wurstclient.WurstClient;
 public class InGameOverlayRendererMixin
 {
 	@ModifyConstant(
-		method = "renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V",
+		method = "renderFireOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/texture/Sprite;)V",
 		constant = @Constant(floatValue = -0.3F))
 	private static float getFireOffset(float original)
 	{

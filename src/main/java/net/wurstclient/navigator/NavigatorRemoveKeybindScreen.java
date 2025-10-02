@@ -16,9 +16,11 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -89,16 +91,18 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onKeyPress(int keyCode, int scanCode, int int_3)
+	protected void onKeyPress(KeyInput context)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ESCAPE
-			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
+		if(context.key() == GLFW.GLFW_KEY_ESCAPE
+			|| context.key() == GLFW.GLFW_KEY_BACKSPACE)
 			client.setScreen(parent);
 	}
 	
 	@Override
-	protected void onMouseClick(double x, double y, int button)
+	protected void onMouseClick(Click context)
 	{
+		int button = context.button();
+		
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
@@ -180,7 +184,6 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 				+ ": " + keybind.getDescription(), x1 + 1, y1 + 1, txtColor);
 			context.drawTextWithShadow(tr, keybind.getCommand(), x1 + 1,
 				y1 + 1 + tr.fontHeight, txtColor);
-			context.state.goDownLayer();
 		}
 		
 		// text
@@ -191,7 +194,6 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			context.drawTextWithShadow(tr, line, bgx1 + 2, textY, txtColor);
 			textY += tr.fontHeight;
 		}
-		context.state.goDownLayer();
 		
 		context.disableScissor();
 		
@@ -222,7 +224,6 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			context.state.goUpLayer();
 			context.drawCenteredTextWithShadow(tr, buttonText, (x1 + x2) / 2,
 				y1 + 5, txtColor);
-			context.state.goDownLayer();
 		}
 	}
 	

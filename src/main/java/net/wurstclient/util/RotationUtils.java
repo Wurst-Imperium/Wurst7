@@ -25,7 +25,7 @@ public enum RotationUtils
 	{
 		ClientPlayerEntity player = MC.player;
 		float eyeHeight = player.getEyeHeight(player.getPose());
-		return player.getPos().add(0, eyeHeight, 0);
+		return player.getEntityPos().add(0, eyeHeight, 0);
 	}
 	
 	public static Vec3d getClientLookVec(float partialTicks)

@@ -250,8 +250,8 @@ public final class ExcavatorHack extends Hack
 	private void handlePositionSelection()
 	{
 		// continue with next step
-		if(step.pos != null && InputUtil
-			.isKeyPressed(MC.getWindow().getHandle(), GLFW.GLFW_KEY_ENTER))
+		if(step.pos != null
+			&& InputUtil.isKeyPressed(MC.getWindow(), GLFW.GLFW_KEY_ENTER))
 		{
 			step = Step.values()[step.ordinal() + 1];
 			

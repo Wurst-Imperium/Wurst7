@@ -40,12 +40,12 @@ public class WorldRendererMixin
 	}
 	
 	@Inject(at = @At("RETURN"),
-		method = "render(Lnet/minecraft/client/util/ObjectAllocator;Lnet/minecraft/client/render/RenderTickCounter;ZLnet/minecraft/client/render/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V")
+		method = "render(Lnet/minecraft/client/util/ObjectAllocator;Lnet/minecraft/client/render/RenderTickCounter;ZLnet/minecraft/client/render/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V")
 	private void onRender(ObjectAllocator allocator,
 		RenderTickCounter tickCounter, boolean renderBlockOutline,
 		Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix,
-		GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl,
-		CallbackInfo ci)
+		Matrix4f matrix4f2, GpuBufferSlice gpuBufferSlice, Vector4f vector4f,
+		boolean bl, CallbackInfo ci)
 	{
 		MatrixStack matrixStack = new MatrixStack();
 		matrixStack.multiplyPositionMatrix(positionMatrix);

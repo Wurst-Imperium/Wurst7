@@ -19,9 +19,12 @@ import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -227,16 +230,22 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onKeyPress(int keyCode, int scanCode, int int_3)
+	protected void onKeyPress(KeyInput context)
 	{
+		int keyCode = context.key();
+		
 		if(keyCode == GLFW.GLFW_KEY_ESCAPE
 			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
 			goBack();
 	}
 	
 	@Override
-	protected void onMouseClick(double x, double y, int button)
+	protected void onMouseClick(Click context)
 	{
+		double x = context.x();
+		double y = context.y();
+		int button = context.button();
+		
 		// popups
 		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(x, y,
 			button))
@@ -269,7 +278,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// component settings
 		WurstClient.INSTANCE.getGui().handleNavigatorMouseClick(
 			x - middleX + 154, y - 60 - scroll - windowComponentY, button,
-			window);
+			window, context);
 	}
 	
 	private void goBack()
@@ -429,7 +438,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				buttonData.buttonText, (x1 + x2) / 2,
 				y1 + (buttonData.height - 10) / 2 + 1, buttonData.isLocked()
 					? WurstColors.VERY_LIGHT_GRAY : buttonData.textColor);
-			context.state.goDownLayer();
 		}
 		
 		// text
@@ -441,7 +449,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				txtColor, false);
 			textY += client.textRenderer.fontHeight;
 		}
-		context.state.goDownLayer();
 		
 		context.disableScissor();
 		
@@ -472,7 +479,6 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			context.drawText(client.textRenderer, buttonText,
 				(x1 + x2 - client.textRenderer.getWidth(buttonText)) / 2,
 				y1 + 5, txtColor, false);
-			context.state.goDownLayer();
 		}
 		
 		// popups & tooltip
@@ -484,8 +490,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	public void close()
 	{
 		window.close();
-		WurstClient.INSTANCE.getGui().handleMouseClick(Integer.MIN_VALUE,
-			Integer.MIN_VALUE, 0);
+		WurstClient.INSTANCE.getGui().handleMouseClick(new Click(
+			Double.MIN_VALUE, Double.MIN_VALUE, new MouseInput(0, 0)));
 	}
 	
 	public Feature getFeature()

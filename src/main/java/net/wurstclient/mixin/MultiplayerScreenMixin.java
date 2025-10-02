@@ -88,16 +88,4 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 	{
 		return serverListWidget;
 	}
-	
-	@Override
-	public void connectToServer(ServerInfo server)
-	{
-		connect(server);
-	}
-	
-	@Shadow
-	private void connect(ServerInfo entry)
-	{
-		
-	}
 }

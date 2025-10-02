@@ -36,7 +36,7 @@ public final class NameProtectHack extends Hack
 		{
 			i++;
 			String name =
-				info.getProfile().getName().replaceAll("\u00a7(?:\\w|\\d)", "");
+				info.getProfile().name().replaceAll("\u00a7(?:\\w|\\d)", "");
 			
 			if(string.contains(name))
 				return string.replace(name, "\u00a7oPlayer" + i + "\u00a7r");

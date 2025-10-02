@@ -31,6 +31,7 @@ import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -40,6 +41,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -179,24 +181,24 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+	public boolean keyPressed(KeyInput context)
 	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			useButton.onPress();
+		if(context.key() == GLFW.GLFW_KEY_ENTER)
+			useButton.onPress(context);
 		
-		return super.keyPressed(keyCode, scanCode, modifiers);
+		return super.keyPressed(context);
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	public boolean mouseClicked(Click context, boolean doubleClick)
 	{
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
 			close();
 			return true;
 		}
 		
-		return super.mouseClicked(mouseX, mouseY, button);
+		return super.mouseClicked(context, doubleClick);
 	}
 	
 	private void pressLogin()
@@ -556,10 +558,9 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public boolean mouseClicked(double mouseX, double mouseY,
-			int mouseButton)
+		public boolean mouseClicked(Click context, boolean doubleClick)
 		{
-			if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+			if(context.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT)
 				return false;
 			
 			long timeSinceLastClick = Util.getMeasuringTimeMs() - lastClickTime;
@@ -572,10 +573,12 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public void render(DrawContext context, int index, int y, int x,
-			int entryWidth, int entryHeight, int mouseX, int mouseY,
+		public void render(DrawContext context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
+			int x = getContentX();
+			int y = getContentY();
+			
 			// green glow when logged in
 			if(client.getSession().getUsername().equals(alt.getName()))
 			{
@@ -624,7 +627,7 @@ public final class AltManagerScreen extends Screen
 		public ListGui(MinecraftClient minecraft, AltManagerScreen screen,
 			List<Alt> list)
 		{
-			super(minecraft, screen.width, screen.height - 96, 36, 30, 0);
+			super(minecraft, screen.width, screen.height - 96, 36, 30);
 			
 			list.stream().map(AltManagerScreen.Entry::new)
 				.forEach(this::addEntry);

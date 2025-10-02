@@ -12,6 +12,7 @@ import java.util.Arrays;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
@@ -42,7 +43,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	}
 	
 	@Override
-	public void handleMouseClick(double mouseX, double mouseY, int mouseButton)
+	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
+		Click context)
 	{
 		if(mouseX < getX() + getWidth() - popupWidth - ARROW_SIZE - 4)
 			return;
@@ -127,8 +129,6 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		int txtColor = GUI.getTxtColor();
 		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
 		context.drawText(TR, value, x4 + 2, y1 + 2, txtColor, false);
-		
-		context.state.goDownLayer();
 	}
 	
 	private int getFillColor(boolean hovering)

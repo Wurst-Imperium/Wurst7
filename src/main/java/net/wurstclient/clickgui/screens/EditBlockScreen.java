@@ -18,6 +18,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -77,9 +78,9 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(KeyInput context)
 	{
-		switch(keyCode)
+		switch(context.key())
 		{
 			case GLFW.GLFW_KEY_ENTER:
 			done();
@@ -90,7 +91,7 @@ public final class EditBlockScreen extends Screen
 			break;
 		}
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override
@@ -139,7 +140,6 @@ public final class EditBlockScreen extends Screen
 		
 		RenderUtils.drawItem(context, new ItemStack(blockToAdd),
 			-64 + width / 2 - 100 + 52, 115 - 52, false);
-		context.state.goDownLayer();
 	}
 	
 	@Override

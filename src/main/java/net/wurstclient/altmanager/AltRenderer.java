@@ -23,7 +23,8 @@ import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.DefaultSkinHelper;
-import net.minecraft.client.util.SkinTextures;
+import net.minecraft.entity.player.PlayerSkinType;
+import net.minecraft.entity.player.SkinTextures;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Uuids;
 import net.wurstclient.WurstClient;
@@ -60,7 +61,7 @@ public final class AltRenderer
 		UUID uuid = Uuids.getOfflinePlayerUuid(name);
 		GameProfile profile = new GameProfile(uuid, name);
 		PlayerListEntry entry = new PlayerListEntry(profile, false);
-		Identifier texture = entry.getSkinTextures().texture();
+		Identifier texture = entry.getSkinTextures().body().texturePath();
 		offlineSkins.put(name, texture);
 		return texture;
 	}
@@ -73,7 +74,7 @@ public final class AltRenderer
 			
 			UUID uuid = SkinStealer.getUUIDOrNull(name);
 			ProfileResult result =
-				mc.getSessionService().fetchProfile(uuid, false);
+				mc.getApiServices().sessionService().fetchProfile(uuid, false);
 			
 			return result == null ? null : result.profile();
 			
@@ -90,7 +91,7 @@ public final class AltRenderer
 		}, BACKGROUND_THREAD).thenAcceptAsync(skinTextures -> {
 			
 			if(skinTextures != null)
-				onlineSkins.put(name, skinTextures.texture());
+				onlineSkins.put(name, skinTextures.body().texturePath());
 			
 		}, BACKGROUND_THREAD);
 	}
@@ -134,7 +135,7 @@ public final class AltRenderer
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
-				.model() == SkinTextures.Model.SLIM;
+				.model() == PlayerSkinType.SLIM;
 			
 			// Face
 			x = x + width / 4;
@@ -273,7 +274,7 @@ public final class AltRenderer
 			
 			boolean slim = DefaultSkinHelper
 				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
-				.model() == SkinTextures.Model.SLIM;
+				.model() == PlayerSkinType.SLIM;
 			
 			// Face
 			x = x + width / 4;

@@ -24,7 +24,7 @@ public final class GetPosCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		BlockPos pos = BlockPos.ofFloored(MC.player.getPos());
+		BlockPos pos = BlockPos.ofFloored(MC.player.getEntityPos());
 		String posString = pos.getX() + " " + pos.getY() + " " + pos.getZ();
 		
 		switch(String.join(" ", args).toLowerCase())

@@ -16,6 +16,7 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -23,6 +24,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -90,36 +92,36 @@ public final class EditBlockListScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+	public boolean mouseClicked(Click context, boolean doubleClick)
 	{
-		blockNameField.mouseClicked(mouseX, mouseY, mouseButton);
-		return super.mouseClicked(mouseX, mouseY, mouseButton);
+		blockNameField.mouseClicked(context, doubleClick);
+		return super.mouseClicked(context, doubleClick);
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
+	public boolean keyPressed(KeyInput context)
 	{
-		switch(keyCode)
+		switch(context.key())
 		{
 			case GLFW.GLFW_KEY_ENTER:
 			if(addButton.active)
-				addButton.onPress();
+				addButton.onPress(context);
 			break;
 			
 			case GLFW.GLFW_KEY_DELETE:
 			if(!blockNameField.isFocused())
-				removeButton.onPress();
+				removeButton.onPress(context);
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			doneButton.onPress();
+			doneButton.onPress(context);
 			break;
 			
 			default:
 			break;
 		}
 		
-		return super.keyPressed(keyCode, scanCode, int_3);
+		return super.keyPressed(context);
 	}
 	
 	@Override
@@ -179,7 +181,6 @@ public final class EditBlockListScreen extends Screen
 			blockToAdd == null ? ItemStack.EMPTY : new ItemStack(blockToAdd),
 			width / 2 - 164, height - 52, false);
 		
-		context.state.goDownLayer();
 		matrixStack.popMatrix();
 	}
 	
@@ -217,10 +218,12 @@ public final class EditBlockListScreen extends Screen
 		}
 		
 		@Override
-		public void render(DrawContext context, int index, int y, int x,
-			int entryWidth, int entryHeight, int mouseX, int mouseY,
+		public void render(DrawContext context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
+			int x = getContentX();
+			int y = getContentY();
+			
 			Block block = BlockUtils.getBlockFromName(blockName);
 			ItemStack stack = new ItemStack(block);
 			TextRenderer tr = client.textRenderer;
@@ -252,7 +255,7 @@ public final class EditBlockListScreen extends Screen
 		public ListGui(MinecraftClient minecraft, EditBlockListScreen screen,
 			List<String> list)
 		{
-			super(minecraft, screen.width, screen.height - 96, 36, 30, 0);
+			super(minecraft, screen.width, screen.height - 96, 36, 30);
 			
 			list.stream().map(EditBlockListScreen.Entry::new)
 				.forEach(this::addEntry);
