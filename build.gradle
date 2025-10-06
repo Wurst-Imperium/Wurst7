@@ -141,7 +141,7 @@ jar {
 	inputs.property("archivesName", archivesName)
 	
 	from("LICENSE.txt") {
-		rename { "LICENSE-${archivesName}.txt" }
+		rename { "LICENSE-${archivesName.get()}.txt" }
 	}
 	
 	exclude("intentionally_untranslated.json")
