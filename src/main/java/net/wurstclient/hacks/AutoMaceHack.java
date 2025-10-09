@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
 package net.wurstclient.hacks;
 
 import java.util.Arrays;
@@ -45,16 +52,41 @@ public final class AutoMaceHack extends Hack
 	private static final MinecraftClient MC = WurstClient.MC;
 	private static final IMinecraftClient IMC = WurstClient.IMC;
 	
+	private long lastHitNs = 0L;
+	
 	/* Settings */
 	private final TextFieldSetting windBurstName = new TextFieldSetting(
 		"Wind burst item",
 		"Substring to locate wind burst item (case-insensitive). Example: \"wind\"",
 		"wind");
 	
-	private final CheckboxSetting elytraInAir = new CheckboxSetting(
-		"Equip Elytra while airborne",
-		"If enabled: when you’re in the air, equip Elytra.\nIf disabled: keep/restore armor.",
-		true);
+	private final CheckboxSetting preferChestAir = new CheckboxSetting(
+		"Prefer Netherite chestplate in air",
+		"When airborne, equip Netherite chestplate (and hold mace).", false);
+	
+	private final CheckboxSetting autoEquipEnabled =
+		new CheckboxSetting("Auto-equip (enable/disable)",
+			"Turn on/off automatic chest item switching.", true);
+	
+	// Replace the old TextFieldSetting airEquipMode with TWO checkboxes
+	// (radio-like)
+	private final CheckboxSetting preferElytraAir = new CheckboxSetting(
+		"Prefer Elytra in air",
+		"When airborne, equip Elytra (and hold fireworks/wind burst).", true);
+	
+	// Make hits slower / configurable
+	private final SliderSetting hitDelayMs = new SliderSetting("Hit delay (ms)",
+		"Minimum delay between auto-hits while falling.", 220, 0, 1000, 10,
+		ValueDisplay.INTEGER);
+	
+	private final CheckboxSetting hitPlayersOnly = new CheckboxSetting(
+		"Hit players only",
+		"If ON, only attacks players while dropping. If OFF, attacks any living entity.",
+		false);
+	
+	private final SliderSetting hitRange =
+		new SliderSetting("Hit range", "Range for auto-hit while dropping.",
+			4.5, 1.0, 6.0, 0.1, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting autoHitOnDrop = new CheckboxSetting(
 		"Auto-hit while falling",
@@ -72,7 +104,9 @@ public final class AutoMaceHack extends Hack
 		new SliderSetting("Action delay (ms)", "Delay between internal steps.",
 			120, 0, 1000, 10, ValueDisplay.INTEGER);
 	
-	/* Runtime state */
+	// === Runtime state for transition-based equip ===
+	private boolean didEquipForThisAir = false;
+	private boolean didEquipForThisGround = false;
 	private int lastHeldSlot = -1;
 	private long lastActionNs = 0L;
 	private boolean didBurstThisJump = false;
@@ -83,11 +117,18 @@ public final class AutoMaceHack extends Hack
 		super("AutoMace");
 		setCategory(Category.COMBAT);
 		addSetting(windBurstName);
-		addSetting(elytraInAir);
 		addSetting(autoHitOnDrop);
 		addSetting(suppressMovementDuringBurst);
 		addSetting(ignorePlayers);
 		addSetting(actionDelayMs);
+		
+		addSetting(autoEquipEnabled);
+		addSetting(preferElytraAir);
+		addSetting(preferChestAir);
+		
+		addSetting(hitPlayersOnly);
+		addSetting(hitRange);
+		addSetting(hitDelayMs);
 	}
 	
 	@Override
@@ -96,6 +137,7 @@ public final class AutoMaceHack extends Hack
 		lastActionNs = 0;
 		didBurstThisJump = false;
 		wasOnGround = true;
+		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(HandleInputListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -120,31 +162,78 @@ public final class AutoMaceHack extends Hack
 		if(MC.player == null || MC.world == null || MC.isPaused())
 			return;
 		
-		boolean onGround = MC.player.isOnGround();
+		final boolean onGround = MC.player.isOnGround();
+		
+		// Reset “one burst per jump”
 		if(onGround)
 		{
-			// Reset “one burst per jump”
 			didBurstThisJump = false;
+			didEquipForThisAir = false; // allow action next time we go air
+		}else
+		{
+			didEquipForThisGround = false; // allow action next time we land
 		}
 		
-		// Elytra/Armor policy: maintain based on "elytraInAir" and airborne
-		// state
-		maintainChestItem(onGround);
+		// === Transition-based auto-equip ===
+		// === Enforce desired chest item every tick (no transition gating) ===
+		if(autoEquipEnabled.isChecked())
+		{
+			if(!onGround)
+			{
+				// Airborne: Elytra if pref ON, otherwise armor
+				if(preferElytraAir.isChecked())
+				{
+					// want Elytra in air
+					if(MC.player.getEquippedStack(EquipmentSlot.CHEST)
+						.getItem() != Items.ELYTRA)
+					{
+						equipElytraByUse();
+					}
+				}else
+				{
+					// want armor in air
+					if(MC.player.getEquippedStack(EquipmentSlot.CHEST)
+						.getItem() == Items.ELYTRA
+						|| MC.player.getEquippedStack(EquipmentSlot.CHEST)
+							.isEmpty())
+					{
+						ensureArmorEquippedByUse();
+					}
+				}
+			}else
+			{
+				// Grounded: always armor (if Elytra on, swap to armor)
+				if(MC.player.getEquippedStack(EquipmentSlot.CHEST)
+					.getItem() == Items.ELYTRA
+					|| MC.player.getEquippedStack(EquipmentSlot.CHEST)
+						.isEmpty())
+				{
+					ensureArmorEquippedByUse();
+				}
+			}
+		}
 		
-		// Throttle
+		// Choose what to HOLD in hand (fireworks/wind burst vs mace) based on
+		// mode/equipment
+		chooseHandItem(onGround);
+		
+		// Throttle general actions
 		long now = System.nanoTime();
 		if(now - lastActionNs < TimeUnit.MILLISECONDS
 			.toNanos(actionDelayMs.getValueI()))
 			return;
 		
-		// Pause if someone to ignore is nearby
-		if(isIgnoredPlayerNearby())
-			return;
+		// Build ignore set (used only for targeting – DOES NOT pause the hack)
+		final Set<String> ignoreSet =
+			Arrays.stream(ignorePlayers.getValue().split(",")).map(String::trim)
+				.filter(s -> !s.isEmpty()).map(String::toLowerCase)
+				.collect(Collectors.toSet());
 		
-		// Optional single tap while falling
+		// Optional single tap while falling (KillAura-style targeting with
+		// delay)
 		if(!onGround && autoHitOnDrop.isChecked()
 			&& MC.player.getVelocity().y < -0.15)
-			tryAutoHitCrosshair();
+			tryAutoHitNearby(ignoreSet);
 		
 		// Fire wind burst ONLY when on ground, only once per jump
 		if(onGround && !didBurstThisJump)
@@ -165,6 +254,26 @@ public final class AutoMaceHack extends Hack
 		wasOnGround = onGround;
 	}
 	
+	private void equipElytraByUse()
+	{
+		if(InventoryUtils.selectItem(
+			s -> s != null && !s.isEmpty() && s.isOf(Items.ELYTRA), 36, true))
+		{
+			try
+			{
+				IMC.getInteractionManager().rightClickItem();
+			}catch(Throwable t)
+			{
+				try
+				{
+					MC.interactionManager.interactItem(MC.player,
+						Hand.MAIN_HAND);
+				}catch(Throwable ignored)
+				{}
+			}
+		}
+	}
+	
 	@Override
 	public void onHandleInput()
 	{ /* use commands to toggle/dequip */ }
@@ -179,6 +288,145 @@ public final class AutoMaceHack extends Hack
 		setEnabled(!isEnabled());
 	}
 	
+	/** Called once when we become airborne (if auto-equip enabled). */
+	private void equipForAir()
+	{
+		if(!preferElytraAir.isChecked())
+		{
+			// user prefers ARMOR in air (implicit)
+			ensureArmorEquippedByUse(); // right-click to equip
+			return;
+		}
+		// Elytra in air
+		if(MC.player.getEquippedStack(EquipmentSlot.CHEST)
+			.getItem() == Items.ELYTRA)
+			return;
+			
+		// Select Elytra into hand and right-click to wear (always replaces
+		// chest item server-side)
+		if(InventoryUtils.selectItem(
+			s -> s != null && !s.isEmpty() && s.isOf(Items.ELYTRA), 36, true))
+		{
+			try
+			{
+				IMC.getInteractionManager().rightClickItem();
+			}catch(Throwable t)
+			{
+				try
+				{
+					MC.interactionManager.interactItem(MC.player,
+						Hand.MAIN_HAND);
+				}catch(Throwable ignored)
+				{}
+			}
+		}
+	}
+	
+	/**
+	 * Decide what to hold: fireworks (or wind burst) for Elytra mode; mace for
+	 * chestplate mode/ground.
+	 */
+	/**
+	 * Decide what to hold: fireworks (or wind burst) for Elytra pref; mace
+	 * otherwise.
+	 */
+	private void chooseHandItem(boolean onGround)
+	{
+		if(!onGround && preferElytraAir.isChecked())
+		{
+			// Elytra mode in air => Fireworks first, else Wind Burst
+			boolean haveFireworks = InventoryUtils.selectItem(
+				s -> s != null && !s.isEmpty() && s.isOf(Items.FIREWORK_ROCKET),
+				36, false);
+			if(haveFireworks)
+				return;
+			
+			InventoryUtils.selectItem(
+				s -> s != null && !s.isEmpty() && (s.isOf(Items.WIND_CHARGE)
+					|| s.getName().getString().toLowerCase().contains("wind")),
+				36, false);
+			return;
+		}
+		
+		// Otherwise (ground or chestplate-in-air) => hold Mace
+		InventoryUtils
+			.selectItem(
+				s -> s != null && !s.isEmpty()
+					&& ((s.getItem() instanceof MaceItem) || s.getName()
+						.getString().toLowerCase().contains("mace")),
+				36, false);
+	}
+	
+	/** Called once when we land (if auto-equip enabled). */
+	private void equipForGround()
+	{
+		// Always armor on ground
+		if(!MC.player.getEquippedStack(EquipmentSlot.CHEST).isEmpty()
+			&& MC.player.getEquippedStack(EquipmentSlot.CHEST)
+				.getItem() != Items.ELYTRA)
+			return; // already armor
+		ensureArmorEquippedByUse(); // right-click to wear
+	}
+	
+	/**
+	 * Equip Netherite->Diamond->Iron by selecting it into hand and
+	 * right-clicking (server swaps chest).
+	 */
+	private void ensureArmorEquippedByUse()
+	{
+		int slot = InventoryUtils.indexOf(Items.NETHERITE_CHESTPLATE);
+		if(slot == -1)
+			slot = InventoryUtils.indexOf(Items.DIAMOND_CHESTPLATE);
+		if(slot == -1)
+			slot = InventoryUtils.indexOf(Items.IRON_CHESTPLATE);
+		if(slot == -1)
+			return;
+		
+		// Select into hand
+		boolean ok = InventoryUtils.selectItem(s -> s != null && !s.isEmpty()
+			&& (s.isOf(Items.NETHERITE_CHESTPLATE)
+				|| s.isOf(Items.DIAMOND_CHESTPLATE)
+				|| s.isOf(Items.IRON_CHESTPLATE)),
+			36, true);
+		if(!ok)
+			return;
+		
+		// Right-click to equip (swaps whatever is on chest back to inventory)
+		try
+		{
+			IMC.getInteractionManager().rightClickItem();
+		}catch(Throwable t)
+		{
+			try
+			{
+				MC.interactionManager.interactItem(MC.player, Hand.MAIN_HAND);
+			}catch(Throwable ignored)
+			{}
+		}
+	}
+	
+	/**
+	 * Prefer best available: Netherite -> Diamond -> Iron (simple + robust).
+	 */
+	private void ensureArmorEquipped()
+	{
+		int slot = InventoryUtils.indexOf(Items.NETHERITE_CHESTPLATE);
+		if(slot == -1)
+			slot = InventoryUtils.indexOf(Items.DIAMOND_CHESTPLATE);
+		if(slot == -1)
+			slot = InventoryUtils.indexOf(Items.IRON_CHESTPLATE);
+		
+		if(slot != -1)
+		{
+			try
+			{
+				int net = InventoryUtils.toNetworkSlot(slot);
+				IMC.getInteractionManager().windowClick_QUICK_MOVE(net);
+			}catch(Throwable ignored)
+			{}
+		}
+	}
+	
 	public void dequipAndRestore()
 	{
 		if(MC.player == null || MC.world == null)
@@ -187,6 +435,56 @@ public final class AutoMaceHack extends Hack
 		ensureArmorEquipped();
 		if(lastHeldSlot >= 0)
 			MC.player.getInventory().setSelectedSlot(lastHeldSlot);
+	}
+	
+	private void tryAutoHitNearby(Set<String> ignoreSet)
+	{
+		if(MC.interactionManager == null || MC.player == null
+			|| MC.world == null)
+			return;
+		
+		long now = System.nanoTime();
+		if(now - lastHitNs < TimeUnit.MILLISECONDS
+			.toNanos(hitDelayMs.getValueI()))
+			return; // respect user-set hit delay
+			
+		final double range = hitRange.getValue();
+		
+		var box = MC.player.getBoundingBox().expand(range, range, range);
+		var candidates = MC.world.getOtherEntities(MC.player, box, e -> {
+			if(!e.isAlive())
+				return false;
+			if(e.squaredDistanceTo(MC.player) > range * range)
+				return false;
+			if(e instanceof PlayerEntity p)
+			{
+				String name = getPlayerNameLower(p);
+				if(name != null && ignoreSet.contains(name))
+					return false;
+				if(hitPlayersOnly.isChecked())
+					return true;
+			}else if(hitPlayersOnly.isChecked())
+			{
+				return false;
+			}
+			return e.isAttackable();
+		});
+		
+		var target = candidates.stream()
+			.min((a, b) -> Double.compare(a.squaredDistanceTo(MC.player),
+				b.squaredDistanceTo(MC.player)))
+			.orElse(null);
+		
+		if(target == null)
+			return;
+		
+		try
+		{
+			MC.interactionManager.attackEntity(MC.player, target);
+			MC.player.swingHand(Hand.MAIN_HAND);
+			lastHitNs = System.nanoTime();
+		}catch(Throwable ignored)
+		{}
 	}
 	
 	/* ===== Core behavior ===== */
@@ -235,82 +533,6 @@ public final class AutoMaceHack extends Hack
 		
 		// successful burst
 		return true;
-	}
-	
-	/** Maintain Elytra vs Armor based on settings and airborne state. */
-	private void maintainChestItem(boolean onGround)
-	{
-		ItemStack chest = MC.player.getEquippedStack(EquipmentSlot.CHEST);
-		
-		if(!onGround && elytraInAir.isChecked())
-		{
-			// Airborne + Elytra policy: ensure Elytra equipped
-			if(chest.getItem() != Items.ELYTRA)
-			{
-				int elytraSlot = InventoryUtils.indexOf(Items.ELYTRA);
-				if(elytraSlot != -1)
-				{
-					try
-					{
-						int net = InventoryUtils.toNetworkSlot(elytraSlot);
-						IMC.getInteractionManager().windowClick_QUICK_MOVE(net);
-					}catch(Throwable ignored)
-					{}
-				}
-			}
-		}else
-		{
-			// Grounded or Elytra policy disabled: ensure any chestplate is
-			// equipped (not Elytra)
-			// if wearing Elytra or empty, force switch to Netherite chestplate
-			// if available
-			if(chest.isEmpty() || chest.getItem() == Items.ELYTRA)
-			{
-				int chestSlot =
-					InventoryUtils.indexOf(Items.NETHERITE_CHESTPLATE);
-				if(chestSlot == -1)
-					chestSlot =
-						InventoryUtils.indexOf(Items.DIAMOND_CHESTPLATE);
-				if(chestSlot == -1)
-					chestSlot = InventoryUtils.indexOf(Items.IRON_CHESTPLATE);
-				if(chestSlot != -1)
-				{
-					try
-					{
-						int net = InventoryUtils.toNetworkSlot(chestSlot);
-						IMC.getInteractionManager().windowClick_QUICK_MOVE(net);
-					}catch(Throwable ignored)
-					{}
-				}
-			}
-			
-		}
-	}
-	
-	private void ensureArmorEquipped()
-	{
-		// Prefer best available: Netherite -> Diamond -> Chain -> Iron -> Gold
-		// -> Leather
-		int slot = InventoryUtils.indexOf(Items.NETHERITE_CHESTPLATE);
-		if(slot == -1)
-			slot = InventoryUtils.indexOf(Items.DIAMOND_CHESTPLATE);
-		if(slot == -1)
-			slot = InventoryUtils.indexOf(Items.CHAINMAIL_CHESTPLATE);
-		if(slot == -1)
-			slot = InventoryUtils.indexOf(Items.IRON_CHESTPLATE);
-		if(slot == -1)
-			slot = InventoryUtils.indexOf(Items.GOLDEN_CHESTPLATE);
-		if(slot == -1)
-			slot = InventoryUtils.indexOf(Items.LEATHER_CHESTPLATE);
-		if(slot != -1)
-		{
-			try
-			{
-				int net = InventoryUtils.toNetworkSlot(slot);
-				IMC.getInteractionManager().windowClick_QUICK_MOVE(net);
-			}catch(Throwable ignored)
-			{}
-		}
 	}
 	
 	/* ===== Helpers ===== */
