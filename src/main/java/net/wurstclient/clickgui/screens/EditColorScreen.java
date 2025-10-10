@@ -16,7 +16,6 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.Click;
@@ -219,14 +218,14 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public void resize(MinecraftClient client, int width, int height)
+	public void resize(int width, int height)
 	{
 		String hex = hexValueField.getText();
 		String r = redValueField.getText();
 		String g = greenValueField.getText();
 		String b = blueValueField.getText();
 		
-		init(client, width, height);
+		init(width, height);
 		
 		hexValueField.setText(hex);
 		redValueField.setText(r);

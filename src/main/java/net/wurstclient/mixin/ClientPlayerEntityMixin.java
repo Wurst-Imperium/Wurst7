@@ -86,11 +86,11 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	/**
-	 * Allows NoSlowdown to intercept the isUsingItem() call in
+	 * Allows NoSlowdown to intercept the method_75409() call in
 	 * tickMovement().
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z",
+		target = "Lnet/minecraft/client/network/ClientPlayerEntity;method_75409()Z",
 		ordinal = 0), method = "tickMovement()V")
 	private boolean wrapTickMovementItemUse(ClientPlayerEntity instance,
 		Operation<Boolean> original)

@@ -105,6 +105,9 @@ public final class EasyVertexBuffer implements AutoCloseable
 		draw(matrixStack, layer, rgb[0], rgb[1], rgb[2], alpha);
 	}
 	
+	/*
+	 * Similar to {@link RenderLayer.MultiPhase#draw(BuiltBuffer)}.
+	 */
 	public void draw(MatrixStack matrixStack, RenderLayer.MultiPhase layer,
 		float red, float green, float blue, float alpha)
 	{
@@ -119,7 +122,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 		GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms().write(
 			RenderSystem.getModelViewMatrix(),
 			new Vector4f(red, green, blue, alpha), new Vector3f(),
-			RenderSystem.getTextureMatrix(), RenderSystem.getShaderLineWidth());
+			RenderSystem.getTextureMatrix());
 		
 		Framebuffer framebuffer = layer.phases.target.get();
 		RenderPipeline pipeline = layer.pipeline;

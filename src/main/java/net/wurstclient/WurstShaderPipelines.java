@@ -30,7 +30,7 @@ public enum WurstShaderPipelines
 		.withVertexShader(Identifier.of("wurst:core/fogless_lines"))
 		.withFragmentShader(Identifier.of("wurst:core/fogless_lines"))
 		.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
-		.withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL, DrawMode.LINES)
+		.withVertexFormat(VertexFormats.field_63455, DrawMode.LINES)
 		.buildSnippet();
 	
 	/**
@@ -48,27 +48,6 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline ESP_LINES =
 		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
 			.withLocation(Identifier.of("wurst:pipeline/wurst_esp_lines"))
-			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
-	
-	/**
-	 * Similar to the LINE_STRIP ShaderPipeline, but with no fog.
-	 */
-	public static final RenderPipeline DEPTH_TEST_LINE_STRIP =
-		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
-			.withLocation(
-				Identifier.of("wurst:pipeline/wurst_depth_test_line_strip"))
-			.withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL,
-				DrawMode.LINE_STRIP)
-			.build());
-	
-	/**
-	 * Similar to the LINE_STRIP ShaderPipeline, but with no depth test or fog.
-	 */
-	public static final RenderPipeline ESP_LINE_STRIP =
-		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
-			.withLocation(Identifier.of("wurst:pipeline/wurst_esp_line_strip"))
-			.withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL,
-				DrawMode.LINE_STRIP)
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**

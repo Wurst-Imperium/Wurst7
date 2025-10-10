@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.class_12131;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.wurstclient.WurstClient;
@@ -42,13 +43,13 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 	}
 	
 	@Override
-	public int getMoonPhase()
+	public class_12131 getMoonPhase()
 	{
 		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
 		
 		if(noWeather.isMoonPhaseChanged())
 			return noWeather.getChangedMoonPhase();
 		
-		return getDimension().getMoonPhase(getLunarTime());
+		return WorldAccess.super.getMoonPhase();
 	}
 }

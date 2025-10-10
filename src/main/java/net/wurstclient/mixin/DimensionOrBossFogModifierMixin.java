@@ -12,12 +12,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.fog.DimensionOrBossFogModifier;
 import net.minecraft.client.render.fog.FogData;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import net.wurstclient.WurstClient;
 
 @Mixin(DimensionOrBossFogModifier.class)
@@ -30,9 +29,9 @@ public class DimensionOrBossFogModifierMixin
 	@Inject(method = "applyStartEndModifier",
 		at = @At("TAIL"),
 		cancellable = true)
-	private void onApplyStartEndModifier(FogData data, Entity cameraEntity,
-		BlockPos cameraPos, ClientWorld world, float viewDistance,
-		RenderTickCounter tickCounter, CallbackInfo ci)
+	private void onApplyStartEndModifier(FogData data, Camera camera,
+		ClientWorld world, float viewDistance, RenderTickCounter tickCounter,
+		CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
 			return;
