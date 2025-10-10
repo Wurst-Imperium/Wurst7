@@ -60,10 +60,6 @@ public final class AutoMaceHack extends Hack
 		"Substring to locate wind burst item (case-insensitive). Example: \"wind\"",
 		"wind");
 	
-	private final CheckboxSetting preferChestAir = new CheckboxSetting(
-		"Prefer Netherite chestplate in air",
-		"When airborne, equip Netherite chestplate (and hold mace).", false);
-	
 	private final CheckboxSetting autoEquipEnabled =
 		new CheckboxSetting("Auto-equip (enable/disable)",
 			"Turn on/off automatic chest item switching.", true);
@@ -124,7 +120,6 @@ public final class AutoMaceHack extends Hack
 		
 		addSetting(autoEquipEnabled);
 		addSetting(preferElytraAir);
-		addSetting(preferChestAir);
 		
 		addSetting(hitPlayersOnly);
 		addSetting(hitRange);
@@ -567,6 +562,11 @@ public final class AutoMaceHack extends Hack
 			MC.player.swingHand(Hand.MAIN_HAND);
 		}catch(Throwable ignored)
 		{}
+	}
+	
+	public boolean isPreferElytraAir()
+	{
+		return preferElytraAir.isChecked();
 	}
 	
 	private static String getPlayerNameLower(PlayerEntity p)

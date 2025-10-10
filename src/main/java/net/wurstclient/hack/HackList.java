@@ -174,6 +174,7 @@ public final class HackList implements UpdateListener
 	public final SpeedHackHack speedHackHack = new SpeedHackHack();
 	public final SpeedNukerHack speedNukerHack = new SpeedNukerHack();
 	public final SpiderHack spiderHack = new SpiderHack();
+	public final StatusHudHack statusHudHack = new StatusHudHack();
 	public final StepHack stepHack = new StepHack();
 	public final TemplateToolHack templateToolHack = new TemplateToolHack();
 	public final ThrowHack throwHack = new ThrowHack();
@@ -188,6 +189,7 @@ public final class HackList implements UpdateListener
 	public final TrollPotionHack trollPotionHack = new TrollPotionHack();
 	public final TrueSightHack trueSightHack = new TrueSightHack();
 	public final TunnellerHack tunnellerHack = new TunnellerHack();
+	public final WindPearlHack windPearlHack = new WindPearlHack();
 	public final VeinMinerHack veinMinerHack = new VeinMinerHack();
 	public final XRayHack xRayHack = new XRayHack();
 	
