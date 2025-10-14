@@ -30,7 +30,8 @@ public enum WurstShaderPipelines
 		.withVertexShader(Identifier.of("wurst:core/fogless_lines"))
 		.withFragmentShader(Identifier.of("wurst:core/fogless_lines"))
 		.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
-		.withVertexFormat(VertexFormats.field_63455, DrawMode.LINES)
+		.withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH,
+			DrawMode.LINES)
 		.buildSnippet();
 	
 	/**
