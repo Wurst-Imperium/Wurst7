@@ -234,5 +234,14 @@ public class WurstOptionsScreen extends Screen
 			super.onPress(context);
 			setMessage(Text.literal(messageSupplier.get()));
 		}
+		
+		@Override
+		protected void method_75752(DrawContext drawContext, int i, int j,
+			float f)
+		{
+			this.method_75794(drawContext);
+			this.method_75793(
+				drawContext.method_75787(this, DrawContext.class_12228.NONE));
+		}
 	}
 }

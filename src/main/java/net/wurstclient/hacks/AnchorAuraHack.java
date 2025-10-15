@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import net.minecraft.class_12206;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.entity.Entity;
@@ -105,7 +106,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(MC.world.getDimension().respawnAnchorWorks())
+		if(MC.world.getDimension().attributes()
+			.method_75663(class_12206.RESPAWN_ANCHOR_WORKS_GAMEPLAY, false))
 		{
 			ChatUtils.error("Respawn anchors don't explode in this dimension.");
 			setEnabled(false);

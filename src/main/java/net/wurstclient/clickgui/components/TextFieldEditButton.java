@@ -93,8 +93,8 @@ public final class TextFieldEditButton extends Component
 		context.drawText(TR, setting.getName(), x1, y1 + 2, txtColor, false);
 		String value = setting.getValue();
 		int maxWidth = getWidth() - TR.getWidth("...") - 2;
-		int maxLength = TR.getTextHandler().getLimitedStringLength(value,
-			maxWidth, Style.EMPTY);
+		int maxLength =
+			TR.getTextHandler().getTrimmedLength(value, maxWidth, Style.EMPTY);
 		if(maxLength < value.length())
 			value = value.substring(0, maxLength) + "...";
 		context.drawText(TR, value, x1 + 2, y3 + 2, txtColor, false);

@@ -50,9 +50,9 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		if(chatLines.isEmpty())
 			return;
 		
-		ChatHud chat = MC.inGameHud.getChatHud();
-		int maxTextLength =
-			MathHelper.floor(chat.getWidth() / chat.getChatScale());
+		int maxTextLength = MathHelper
+			.floor(ChatHud.getWidth(MC.options.getChatWidth().getValue())
+				/ MC.options.getChatScale().getValue());
 		List<OrderedText> newLines = ChatMessages.breakRenderedChatMessageLines(
 			event.getComponent(), maxTextLength, MC.textRenderer);
 		
