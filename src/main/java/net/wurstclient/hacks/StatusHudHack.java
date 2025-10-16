@@ -26,7 +26,6 @@ public final class StatusHudHack extends Hack implements GUIRenderListener
 	
 	private final SliderSetting x = new SliderSetting("X",
 		"Horizontal HUD position.", 6, 0, 500, 1, ValueDisplay.INTEGER);
-	
 	private final SliderSetting y = new SliderSetting("Y",
 		"Vertical HUD position.", 6, 0, 500, 1, ValueDisplay.INTEGER);
 	
@@ -60,45 +59,23 @@ public final class StatusHudHack extends Hack implements GUIRenderListener
 		int baseY = y.getValueI();
 		int offX = 0;
 		
-		// === AutoMace status ===
 		boolean maceOn = false;
 		boolean preferElytra = false;
+		boolean preferFireworks = false;
+		boolean eatOn = false;
+		
 		try
 		{
 			AutoMaceHack am = WURST.getHax().autoMaceHack;
 			if(am != null)
 			{
 				maceOn = am.isEnabled();
-				// Make sure AutoMaceHack has a public getter:
-				// public boolean isPreferElytraAir() { return
-				// preferElytraAir.isChecked(); }
 				preferElytra = am.isPreferElytraAir();
+				preferFireworks = am.isPreferFireworks(); // NEW
 			}
 		}catch(Throwable ignored)
 		{}
 		
-		// background tile
-		drawIconTile(context, baseX + offX, baseY, maceOn);
-		// icon
-		context.drawItem(new ItemStack(Items.MACE), baseX + offX + 2,
-			baseY + 2);
-		// label
-		context.drawTextWithShadow(MC.textRenderer,
-			maceOn ? "Mace:ON" : "Mace:OFF", baseX + offX + 22, baseY + 6,
-			0xFFFFFF);
-		offX += 90;
-		
-		// === Prefer Elytra vs Chestplate flag ===
-		drawIconTile(context, baseX + offX, baseY, preferElytra);
-		context.drawItem(new ItemStack(Items.ELYTRA), baseX + offX + 2,
-			baseY + 2);
-		context.drawTextWithShadow(MC.textRenderer,
-			preferElytra ? "Elytra" : "Chest", baseX + offX + 22, baseY + 6,
-			0xFFFFFF);
-		offX += 90;
-		
-		// === AutoEat status (if present) ===
-		boolean eatOn = false;
 		try
 		{
 			var ae = WURST.getHax().autoEatHack;
@@ -107,6 +84,34 @@ public final class StatusHudHack extends Hack implements GUIRenderListener
 		}catch(Throwable ignored)
 		{}
 		
+		// AutoMace tile
+		drawIconTile(context, baseX + offX, baseY, maceOn);
+		context.drawItem(new ItemStack(Items.MACE), baseX + offX + 2,
+			baseY + 2);
+		context.drawTextWithShadow(MC.textRenderer,
+			maceOn ? "Mace:ON" : "Mace:OFF", baseX + offX + 22, baseY + 6,
+			0xFFFFFF);
+		offX += 90;
+		
+		// Prefer Elytra/Chest tile
+		drawIconTile(context, baseX + offX, baseY, preferElytra);
+		context.drawItem(new ItemStack(Items.ELYTRA), baseX + offX + 2,
+			baseY + 2);
+		context.drawTextWithShadow(MC.textRenderer,
+			preferElytra ? "Elytra" : "Chest", baseX + offX + 22, baseY + 6,
+			0xFFFFFF);
+		offX += 90;
+		
+		// Prefer Fireworks tile (NEW)
+		drawIconTile(context, baseX + offX, baseY, preferFireworks);
+		context.drawItem(new ItemStack(Items.FIREWORK_ROCKET), baseX + offX + 2,
+			baseY + 2);
+		context.drawTextWithShadow(MC.textRenderer,
+			preferFireworks ? "Rockets" : "NoRkt", baseX + offX + 22, baseY + 6,
+			0xFFFFFF);
+		offX += 90;
+		
+		// AutoEat tile
 		drawIconTile(context, baseX + offX, baseY, eatOn);
 		context.drawItem(new ItemStack(Items.COOKED_BEEF), baseX + offX + 2,
 			baseY + 2);
@@ -118,10 +123,7 @@ public final class StatusHudHack extends Hack implements GUIRenderListener
 	private void drawIconTile(DrawContext ctx, int x, int y,
 		boolean highlighted)
 	{
-		// simple rounded-ish rectangle made of a solid fill (use two fills to
-		// give a subtle border)
-		int bg = highlighted ? 0xA0008020 : 0xA0000000; // translucent green-ish
-														// when highlighted
+		int bg = highlighted ? 0xA0008020 : 0xA0000000;
 		int border = 0x40000000;
 		ctx.fill(x, y, x + 84, y + 20, border);
 		ctx.fill(x + 1, y + 1, x + 83, y + 19, bg);
