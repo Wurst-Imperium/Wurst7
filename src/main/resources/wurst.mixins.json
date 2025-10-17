@@ -32,6 +32,7 @@
     "DirectConnectScreenMixin",
     "DisconnectedRealmsScreenMixin",
     "DisconnectedScreenMixin",
+    "DownloaderMixin",
     "EntityMixin",
     "EntityRendererMixin",
     "FluidRendererMixin",

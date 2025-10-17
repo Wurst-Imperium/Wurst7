@@ -37,6 +37,8 @@ configurations.all {
 		force "io.netty:netty-handler:4.1.118.Final"
 		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2025-58057
 		force "io.netty:netty-codec:4.1.125.Final"
+		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2025-58056
+		force "io.netty:netty-codec-http:4.1.125.Final"
 	}
 }
 
@@ -137,7 +139,7 @@ jar {
 	inputs.property("archivesName", archivesName)
 	
 	from("LICENSE.txt") {
-		rename { "LICENSE-${archivesName}.txt" }
+		rename { "LICENSE-${archivesName.get()}.txt" }
 	}
 	
 	exclude("intentionally_untranslated.json")
