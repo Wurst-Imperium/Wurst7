@@ -15,10 +15,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
@@ -84,14 +84,12 @@ public abstract class GameRendererMixin implements AutoCloseable
 		cancelNextBobView = false;
 	}
 	
-	@Inject(at = @At(value = "RETURN", ordinal = 1),
-		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)F",
-		cancellable = true)
-	private void onGetFov(Camera camera, float tickDelta, boolean changingFov,
-		CallbackInfoReturnable<Float> cir)
+	@ModifyReturnValue(at = @At("RETURN"),
+		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)F")
+	private float onGetFov(float original)
 	{
-		cir.setReturnValue(WurstClient.INSTANCE.getOtfs().zoomOtf
-			.changeFovBasedOnZoom(cir.getReturnValueF()));
+		return WurstClient.INSTANCE.getOtfs().zoomOtf
+			.changeFovBasedOnZoom(original);
 	}
 	
 	/**
