@@ -62,6 +62,7 @@ public abstract class DownloaderMixin implements AutoCloseable
 		if(uuid == null)
 			uuid = Uuids.getOfflinePlayerUuid(session.getUsername());
 		
-		return original.call(instance.resolve(uuid.toString()), filename);
+		return result.getParent().resolve(uuid.toString())
+			.resolve(result.getFileName());
 	}
 }
