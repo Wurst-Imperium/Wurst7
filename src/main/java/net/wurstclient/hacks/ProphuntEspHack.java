@@ -65,7 +65,7 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 			if(MC.player.squaredDistanceTo(entity) < 0.25)
 				continue;
 			
-			boxes.add(FAKE_BLOCK_BOX.offset(entity.getPos()));
+			boxes.add(FAKE_BLOCK_BOX.offset(entity.getEntityPos()));
 		}
 		
 		RenderUtils.drawSolidBoxes(matrixStack, boxes, color, false);

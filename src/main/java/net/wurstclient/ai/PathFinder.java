@@ -61,7 +61,7 @@ public class PathFinder
 			start = new PathPos(BlockPos.ofFloored(MC.player.getX(),
 				MC.player.getY() + 0.5, MC.player.getZ()));
 		else
-			start = new PathPos(BlockPos.ofFloored(MC.player.getPos()));
+			start = new PathPos(BlockPos.ofFloored(MC.player.getEntityPos()));
 		this.goal = goal;
 		
 		costMap.put(start, 0F);

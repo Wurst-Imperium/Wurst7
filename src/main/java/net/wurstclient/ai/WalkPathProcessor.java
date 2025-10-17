@@ -36,7 +36,7 @@ public class WalkPathProcessor extends PathProcessor
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ());
 		else
-			pos = BlockPos.ofFloored(WurstClient.MC.player.getPos());
+			pos = BlockPos.ofFloored(WurstClient.MC.player.getEntityPos());
 		PathPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
 		

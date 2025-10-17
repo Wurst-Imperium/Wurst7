@@ -68,7 +68,7 @@ public enum EntityUtils
 		// When an entity is removed, it stops moving and its lastRenderX/Y/Z
 		// values are no longer updated.
 		if(e.isRemoved())
-			return e.getPos();
+			return e.getEntityPos();
 		
 		double x = MathHelper.lerp(partialTicks, e.lastRenderX, e.getX());
 		double y = MathHelper.lerp(partialTicks, e.lastRenderY, e.getY());
@@ -94,7 +94,7 @@ public enum EntityUtils
 		if(e.isRemoved())
 			return e.getBoundingBox();
 		
-		Vec3d offset = getLerpedPos(e, partialTicks).subtract(e.getPos());
+		Vec3d offset = getLerpedPos(e, partialTicks).subtract(e.getEntityPos());
 		return e.getBoundingBox().offset(offset);
 	}
 }

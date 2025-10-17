@@ -75,15 +75,15 @@ public enum MicrosoftLoginManager
 		createURL("https://api.minecraftservices.com/minecraft/profile");
 	
 	/**
-	 * Expected data: <code>sFTTag: '&lt;input type="hidden" name="PPFT"
-	 * id="12345" value="random stuff"/&gt;'</code>
+	 * Expected data: <code>"sFTTag": "&lt;input type=\"hidden\" name=\"PPFT\"
+	 * id=\"12345\" value=\"random stuff\"/&gt;"</code>
 	 *
 	 * <p>
 	 * This is all inside a long &lt;script&gt; tag on the {@link #LOGIN_URL}
 	 * webpage.
 	 */
 	private static final Pattern PPFT_REGEX =
-		Pattern.compile("sFTTag:[ ]?'.*value=\"(.*)\"/>");
+		Pattern.compile("\"sFTTag\":\".*value=\\\\\"([^\\\\]+)\\\\\"/>");
 	
 	/**
 	 * Expected data: <code>urlPost: 'https://login.live.com/...'</code>
@@ -92,10 +92,10 @@ public enum MicrosoftLoginManager
 	 * This appears earlier in the same &lt;script&gt; tag.
 	 */
 	private static final Pattern URLPOST_REGEX =
-		Pattern.compile("urlPost:[ ]?'(.+?(?='))");
+		Pattern.compile("\"urlPost\":\"([^\"]+)");
 	
 	private static final Pattern AUTHCODE_REGEX =
-		Pattern.compile("[?|&]code=([\\w.-]+)");
+		Pattern.compile("[?&]code=([\\w\\.-]+)");
 	
 	public static void login(String email, String password)
 		throws LoginException

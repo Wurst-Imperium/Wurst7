@@ -208,7 +208,7 @@ public final class AutoFishHack extends Hack
 		debugDraw.updateSoundPos(sound);
 		
 		// check sound position (Chebyshev distance)
-		Vec3d bobber = MC.player.fishHook.getPos();
+		Vec3d bobber = MC.player.fishHook.getEntityPos();
 		double dx = Math.abs(sound.getX() - bobber.getX());
 		double dz = Math.abs(sound.getZ() - bobber.getZ());
 		if(Math.max(dx, dz) > validRange.getValue())
