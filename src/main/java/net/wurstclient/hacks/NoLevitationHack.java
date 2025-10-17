@@ -20,5 +20,6 @@ public final class NoLevitationHack extends Hack
 		setCategory(Category.MOVEMENT);
 	}
 	
-	// See ClientPlayerEntityMixin.hasStatusEffect()
+	// See ClientPlayerEntityMixin.hasStatusEffect() and
+	// ClientPlayerEntityMixin.getStatusEffect()
 }
