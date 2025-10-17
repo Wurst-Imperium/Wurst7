@@ -28,6 +28,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.Vec3d;
@@ -283,6 +284,19 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 			return false;
 		
 		return super.hasStatusEffect(effect);
+	}
+	
+	@Override
+	public StatusEffectInstance getStatusEffect(
+		RegistryEntry<StatusEffect> effect)
+	{
+		HackList hax = WurstClient.INSTANCE.getHax();
+		
+		if(effect == StatusEffects.LEVITATION
+			&& hax.noLevitationHack.isEnabled())
+			return null;
+		
+		return super.getStatusEffect(effect);
 	}
 	
 	@Override
