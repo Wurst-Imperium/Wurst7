@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import net.minecraft.class_12225;
 import net.minecraft.client.font.Alignment;
 import net.minecraft.client.font.MultilineText;
+import net.minecraft.client.font.TextConsumer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
@@ -130,7 +130,7 @@ public final class NcrModRequiredScreen extends Screen
 		
 		context.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
 			Colors.LIGHT_GRAY);
-		class_12225 otherContext = context.method_75788();
+		TextConsumer otherContext = context.getTextConsumer();
 		reasonFormatted.method_75816(Alignment.CENTER, centerX, reasonY, 9,
 			otherContext);
 		
