@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -96,14 +97,12 @@ public abstract class GameRendererMixin implements AutoCloseable
 		EventManager.fire(event);
 	}
 	
-	@Inject(at = @At(value = "RETURN", ordinal = 1),
-		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D",
-		cancellable = true)
-	private void onGetFov(Camera camera, float tickDelta, boolean changingFov,
-		CallbackInfoReturnable<Double> cir)
+	@ModifyReturnValue(at = @At("RETURN"),
+		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D")
+	private double onGetFov(double original)
 	{
-		cir.setReturnValue(WurstClient.INSTANCE.getOtfs().zoomOtf
-			.changeFovBasedOnZoom(cir.getReturnValueD()));
+		return WurstClient.INSTANCE.getOtfs().zoomOtf
+			.changeFovBasedOnZoom(original);
 	}
 	
 	@Inject(at = @At(value = "INVOKE",

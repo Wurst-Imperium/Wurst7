@@ -54,6 +54,7 @@
     "RenderLayersMixin",
     "RenderTickCounterMixin",
     "ScreenMixin",
+    "ServerResourcePackProviderMixin",
     "ShulkerBoxScreenMixin",
     "SimpleOptionMixin",
     "SodiumBlockOcclusionCacheMixin",
