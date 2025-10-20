@@ -221,6 +221,8 @@ public final class AutoFarmHack extends Hack
 			
 			if(InventoryUtils.selectItem(plantType.getSeedItem()))
 				return true;
+			else if(InventoryUtils.giveCreativeItem(plantType.getSeedItem()))
+				return true;
 		}
 		
 		return false;
