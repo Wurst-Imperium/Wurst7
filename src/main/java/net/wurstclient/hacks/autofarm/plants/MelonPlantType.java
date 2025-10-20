@@ -13,6 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 
 public final class MelonPlantType extends AutoFarmPlantType
@@ -40,5 +41,17 @@ public final class MelonPlantType extends AutoFarmPlantType
 	public Item getSeedItem()
 	{
 		return Items.MELON_SEEDS;
+	}
+	
+	@Override
+	protected CheckboxSetting createHarvestSetting()
+	{
+		return new CheckboxSetting("Harvest melons", true);
+	}
+	
+	@Override
+	protected CheckboxSetting createReplantSetting()
+	{
+		return new CheckboxSetting("Replant melons", true);
 	}
 }

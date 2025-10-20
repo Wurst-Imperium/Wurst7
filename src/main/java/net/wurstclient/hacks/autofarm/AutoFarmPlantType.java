@@ -7,12 +7,41 @@
  */
 package net.wurstclient.hacks.autofarm;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.Setting;
 
 public abstract class AutoFarmPlantType
 {
+	private final CheckboxSetting harvest;
+	private final CheckboxSetting replant;
+	
+	public AutoFarmPlantType()
+	{
+		harvest = Objects.requireNonNull(createHarvestSetting());
+		replant = Objects.requireNonNull(createReplantSetting());
+	}
+	
+	public final boolean isHarvestingEnabled()
+	{
+		return harvest.isChecked();
+	}
+	
+	public final boolean isReplantingEnabled()
+	{
+		return replant.isChecked();
+	}
+	
+	public final Stream<Setting> getSettings()
+	{
+		return Stream.of(harvest, replant);
+	}
+	
 	/**
 	 * Returns <code>true</code> if the given block contains a plant of this
 	 * type and would be the right spot to replant that plant if it wasn't
@@ -38,4 +67,8 @@ public abstract class AutoFarmPlantType
 	 */
 	public abstract boolean shouldHarvestByMining(BlockPos pos,
 		BlockState state);
+	
+	protected abstract CheckboxSetting createHarvestSetting();
+	
+	protected abstract CheckboxSetting createReplantSetting();
 }

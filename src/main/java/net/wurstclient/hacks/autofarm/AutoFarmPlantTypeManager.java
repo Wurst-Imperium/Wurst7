@@ -8,10 +8,12 @@
 package net.wurstclient.hacks.autofarm;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.plants.*;
+import net.wurstclient.settings.Setting;
 import net.wurstclient.util.BlockUtils;
 
 public final class AutoFarmPlantTypeManager
@@ -46,6 +48,12 @@ public final class AutoFarmPlantTypeManager
 	{
 		BlockState state = BlockUtils.getState(pos);
 		return plantTypes.stream()
+			.filter(AutoFarmPlantType::isHarvestingEnabled)
 			.anyMatch(type -> type.shouldHarvestByMining(pos, state));
+	}
+	
+	public Stream<Setting> getSettings()
+	{
+		return plantTypes.stream().flatMap(AutoFarmPlantType::getSettings);
 	}
 }

@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.BlockUtils;
 
 public final class KelpPlantType extends AutoFarmPlantType
@@ -61,5 +62,17 @@ public final class KelpPlantType extends AutoFarmPlantType
 	public Item getSeedItem()
 	{
 		return Items.KELP;
+	}
+	
+	@Override
+	protected CheckboxSetting createHarvestSetting()
+	{
+		return new CheckboxSetting("Harvest kelp", true);
+	}
+	
+	@Override
+	protected CheckboxSetting createReplantSetting()
+	{
+		return new CheckboxSetting("Replant kelp", true);
 	}
 }

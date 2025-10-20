@@ -27,7 +27,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantTypeManager;
 import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
@@ -41,9 +40,6 @@ public final class AutoFarmHack extends Hack
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
-	
-	private final CheckboxSetting replant =
-		new CheckboxSetting("Replant", true);
 	
 	private final AutoFarmPlantTypeManager plantTypes =
 		new AutoFarmPlantTypeManager();
@@ -63,7 +59,7 @@ public final class AutoFarmHack extends Hack
 		super("AutoFarm");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
-		addSetting(replant);
+		plantTypes.getSettings().forEach(this::addSetting);
 	}
 	
 	@Override
@@ -124,14 +120,14 @@ public final class AutoFarmHack extends Hack
 					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
 				.toList();
 			
-			if(replant.isChecked())
-				blocksToReplant = BlockUtils
-					.getAllInBoxStream(eyesBlock, blockRange)
+			blocksToReplant =
+				BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 					.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
 					.filter(pos -> BlockUtils.getState(pos).isReplaceable())
 					.filter(pos -> {
 						AutoFarmPlantType plantType = replantingSpots.get(pos);
 						return plantType != null
+							&& plantType.isReplantingEnabled()
 							&& plantType.hasPlantingSurface(pos);
 					}).sorted(Comparator.comparingDouble(
 						pos -> pos.getSquaredDistance(eyesVec)))
