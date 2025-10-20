@@ -90,8 +90,6 @@ public final class AutoFarmHack extends Hack
 		cache.reset();
 		overlay.resetProgress();
 		busy = false;
-		
-		renderer.reset();
 	}
 	
 	@Override
@@ -146,7 +144,7 @@ public final class AutoFarmHack extends Hack
 		
 		busy = replanting || currentlyMining != null;
 		
-		renderer.updateVertexBuffers(blocksToMine, replantingSpots.keySet(),
+		renderer.update(blocksToMine, replantingSpots.keySet(),
 			blocksToReplant);
 	}
 	
