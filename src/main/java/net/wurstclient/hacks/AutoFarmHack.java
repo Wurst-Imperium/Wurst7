@@ -7,20 +7,15 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.minecraft.block.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -29,19 +24,16 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
+import net.wurstclient.hacks.autofarm.AutoFarmPlantTypeManager;
 import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
-import net.wurstclient.util.BlockBreaker;
-import net.wurstclient.util.BlockBreakingCache;
-import net.wurstclient.util.BlockPlacer;
+import net.wurstclient.util.*;
+import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
-import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.InventoryUtils;
-import net.wurstclient.util.OverlayRenderer;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"auto farm", "AutoHarvest", "auto harvest"})
 public final class AutoFarmHack extends Hack
@@ -53,21 +45,13 @@ public final class AutoFarmHack extends Hack
 	private final CheckboxSetting replant =
 		new CheckboxSetting("Replant", true);
 	
-	private final HashMap<Block, Item> seeds = new HashMap<>();
-	{
-		seeds.put(Blocks.WHEAT, Items.WHEAT_SEEDS);
-		seeds.put(Blocks.CARROTS, Items.CARROT);
-		seeds.put(Blocks.POTATOES, Items.POTATO);
-		seeds.put(Blocks.BEETROOTS, Items.BEETROOT_SEEDS);
-		seeds.put(Blocks.PUMPKIN_STEM, Items.PUMPKIN_SEEDS);
-		seeds.put(Blocks.MELON_STEM, Items.MELON_SEEDS);
-		seeds.put(Blocks.NETHER_WART, Items.NETHER_WART);
-		seeds.put(Blocks.COCOA, Items.COCOA_BEANS);
-	}
+	private final AutoFarmPlantTypeManager plantTypes =
+		new AutoFarmPlantTypeManager();
 	
-	private final HashMap<BlockPos, Item> plants = new HashMap<>();
+	private final HashMap<BlockPos, AutoFarmPlantType> replantingSpots =
+		new HashMap<>();
 	private final BlockBreakingCache cache = new BlockBreakingCache();
-	private BlockPos currentlyHarvesting;
+	private BlockPos currentlyMining;
 	
 	private final AutoFarmRenderer renderer = new AutoFarmRenderer();
 	private final OverlayRenderer overlay = new OverlayRenderer();
@@ -77,7 +61,6 @@ public final class AutoFarmHack extends Hack
 	public AutoFarmHack()
 	{
 		super("AutoFarm");
-		
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(replant);
@@ -86,8 +69,7 @@ public final class AutoFarmHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		plants.clear();
-		
+		replantingSpots.clear();
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -98,11 +80,11 @@ public final class AutoFarmHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
-		if(currentlyHarvesting != null)
+		if(currentlyMining != null)
 		{
 			MC.interactionManager.breakingBlock = true;
 			MC.interactionManager.cancelBlockBreaking();
-			currentlyHarvesting = null;
+			currentlyMining = null;
 		}
 		
 		cache.reset();
@@ -115,49 +97,56 @@ public final class AutoFarmHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		currentlyHarvesting = null;
+		currentlyMining = null;
 		Vec3d eyesVec = RotationUtils.getEyesPos();
 		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
-		// get nearby, non-empty blocks
-		ArrayList<BlockPos> blocks =
+		List<BlockPos> nonEmptyBlocks =
 			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
-				.filter(BlockUtils::canBeClicked)
-				.collect(Collectors.toCollection(ArrayList::new));
+				.filter(BlockUtils::canBeClicked).toList();
 		
-		// check for any new plants and add them to the map
-		updatePlants(blocks);
-		
-		ArrayList<BlockPos> blocksToHarvest = new ArrayList<>();
-		ArrayList<BlockPos> blocksToReplant = new ArrayList<>();
-		
-		// don't place or break any blocks while Freecam is enabled
-		if(!WURST.getHax().freecamHack.isEnabled())
+		for(BlockPos pos : nonEmptyBlocks)
 		{
-			// check which of the nearby blocks can be harvested
-			blocksToHarvest = getBlocksToHarvest(eyesVec, blocks);
-			
-			// do a new search to find empty blocks that can be replanted
-			if(replant.isChecked())
-				blocksToReplant =
-					getBlocksToReplant(eyesVec, eyesBlock, rangeSq, blockRange);
+			AutoFarmPlantType plantType = plantTypes.getReplantingSpotType(pos);
+			if(plantType != null)
+				replantingSpots.put(pos, plantType);
 		}
 		
-		// first, try to replant
+		List<BlockPos> blocksToMine = List.of();
+		List<BlockPos> blocksToReplant = List.of();
+		
+		if(!WURST.getHax().freecamHack.isEnabled())
+		{
+			blocksToMine = nonEmptyBlocks.stream()
+				.filter(plantTypes::shouldHarvestByMining)
+				.sorted(Comparator
+					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
+				.toList();
+			
+			if(replant.isChecked())
+				blocksToReplant = BlockUtils
+					.getAllInBoxStream(eyesBlock, blockRange)
+					.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+					.filter(pos -> BlockUtils.getState(pos).isReplaceable())
+					.filter(pos -> {
+						AutoFarmPlantType plantType = replantingSpots.get(pos);
+						return plantType != null
+							&& plantType.hasPlantingSurface(pos);
+					}).sorted(Comparator.comparingDouble(
+						pos -> pos.getSquaredDistance(eyesVec)))
+					.toList();
+		}
+		
 		boolean replanting = replant(blocksToReplant);
-		
-		// if we can't replant, harvest instead
 		if(!replanting)
-			harvest(blocksToHarvest.stream());
+			harvestByMining(blocksToMine);
 		
-		// update busy state
-		busy = replanting || currentlyHarvesting != null;
+		busy = replanting || currentlyMining != null;
 		
-		// update renderer
-		renderer.updateVertexBuffers(blocksToHarvest, plants.keySet(),
+		renderer.updateVertexBuffers(blocksToMine, replantingSpots.keySet(),
 			blocksToReplant);
 	}
 	
@@ -165,7 +154,7 @@ public final class AutoFarmHack extends Hack
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		renderer.render(matrixStack);
-		overlay.render(matrixStack, partialTicks, currentlyHarvesting);
+		overlay.render(matrixStack, partialTicks, currentlyMining);
 	}
 	
 	/**
@@ -176,188 +165,91 @@ public final class AutoFarmHack extends Hack
 		return busy;
 	}
 	
-	private void updatePlants(List<BlockPos> blocks)
-	{
-		for(BlockPos pos : blocks)
-		{
-			Item seed = seeds.get(BlockUtils.getBlock(pos));
-			if(seed == null)
-				continue;
-			
-			plants.put(pos, seed);
-		}
-	}
-	
-	private ArrayList<BlockPos> getBlocksToHarvest(Vec3d eyesVec,
-		ArrayList<BlockPos> blocks)
-	{
-		return blocks.parallelStream().filter(this::shouldBeHarvested)
-			.sorted(Comparator
-				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
-			.collect(Collectors.toCollection(ArrayList::new));
-	}
-	
-	private boolean shouldBeHarvested(BlockPos pos)
-	{
-		Block block = BlockUtils.getBlock(pos);
-		BlockState state = BlockUtils.getState(pos);
-		
-		if(block instanceof CropBlock)
-			return ((CropBlock)block).isMature(state);
-		
-		if(block instanceof NetherWartBlock)
-			return state.get(NetherWartBlock.AGE) >= 3;
-		
-		if(block instanceof CocoaBlock)
-			return state.get(CocoaBlock.AGE) >= 2;
-		
-		if(block == Blocks.PUMPKIN || block == Blocks.MELON)
-			return true;
-		
-		if(block instanceof SugarCaneBlock)
-			return BlockUtils.getBlock(pos.down()) instanceof SugarCaneBlock
-				&& !(BlockUtils
-					.getBlock(pos.down(2)) instanceof SugarCaneBlock);
-		
-		if(block instanceof CactusBlock)
-			return BlockUtils.getBlock(pos.down()) instanceof CactusBlock
-				&& !(BlockUtils.getBlock(pos.down(2)) instanceof CactusBlock);
-		
-		if(block instanceof KelpPlantBlock)
-			return BlockUtils.getBlock(pos.down()) instanceof KelpPlantBlock
-				&& !(BlockUtils
-					.getBlock(pos.down(2)) instanceof KelpPlantBlock);
-		
-		if(block instanceof BambooBlock)
-			return BlockUtils.getBlock(pos.down()) instanceof BambooBlock
-				&& !(BlockUtils.getBlock(pos.down(2)) instanceof BambooBlock);
-		
-		return false;
-	}
-	
-	private ArrayList<BlockPos> getBlocksToReplant(Vec3d eyesVec,
-		BlockPos eyesBlock, double rangeSq, int blockRange)
-	{
-		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
-			.filter(pos -> BlockUtils.getState(pos).isReplaceable())
-			.filter(pos -> plants.containsKey(pos)).filter(this::canBeReplanted)
-			.sorted(Comparator
-				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
-			.collect(Collectors.toCollection(ArrayList::new));
-	}
-	
-	private boolean canBeReplanted(BlockPos pos)
-	{
-		Item item = plants.get(pos);
-		
-		if(item == Items.WHEAT_SEEDS || item == Items.CARROT
-			|| item == Items.POTATO || item == Items.BEETROOT_SEEDS
-			|| item == Items.PUMPKIN_SEEDS || item == Items.MELON_SEEDS)
-			return BlockUtils.getBlock(pos.down()) instanceof FarmlandBlock;
-		
-		if(item == Items.NETHER_WART)
-			return BlockUtils.getBlock(pos.down()) instanceof SoulSandBlock;
-		
-		if(item == Items.COCOA_BEANS)
-			return BlockUtils.getState(pos.north()).isIn(BlockTags.JUNGLE_LOGS)
-				|| BlockUtils.getState(pos.east()).isIn(BlockTags.JUNGLE_LOGS)
-				|| BlockUtils.getState(pos.south()).isIn(BlockTags.JUNGLE_LOGS)
-				|| BlockUtils.getState(pos.west()).isIn(BlockTags.JUNGLE_LOGS);
-		
-		return false;
-	}
-	
 	private boolean replant(List<BlockPos> blocksToReplant)
 	{
-		// check cooldown
 		if(MC.itemUseCooldown > 0)
 			return false;
 		
-		// check if already holding one of the seeds needed for blocksToReplant
-		Optional<Item> heldSeed = blocksToReplant.stream().map(plants::get)
-			.distinct().filter(item -> MC.player.isHolding(item)).findFirst();
+		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
+			return false;
 		
-		// if so, try to replant the blocks that need that seed
+		Optional<Item> heldSeed =
+			blocksToReplant.stream().map(replantingSpots::get)
+				.filter(Objects::nonNull).map(AutoFarmPlantType::getSeedItem)
+				.distinct().filter(MC.player::isHolding).findFirst();
+		
 		if(heldSeed.isPresent())
 		{
-			// get the seed and the hand that is holding it
 			Item item = heldSeed.get();
 			Hand hand = MC.player.getMainHandStack().isOf(item) ? Hand.MAIN_HAND
 				: Hand.OFF_HAND;
 			
-			// filter out blocks that need a different seed
-			ArrayList<BlockPos> blocksToReplantWithHeldSeed =
-				blocksToReplant.stream().filter(pos -> plants.get(pos) == item)
-					.collect(Collectors.toCollection(ArrayList::new));
-			
-			for(BlockPos pos : blocksToReplantWithHeldSeed)
+			for(BlockPos pos : blocksToReplant)
 			{
-				// skip over blocks that we can't reach
+				AutoFarmPlantType plantType = replantingSpots.get(pos);
+				if(plantType == null || plantType.getSeedItem() != item)
+					continue;
+				
 				BlockPlacingParams params =
 					BlockPlacer.getBlockPlacingParams(pos);
 				if(params == null || params.distanceSq() > range.getValueSq())
 					continue;
 				
-				// face block
-				WURST.getRotationFaker().faceVectorPacket(params.hitVec());
-				
-				// place seed
-				ActionResult result = MC.interactionManager
-					.interactBlock(MC.player, hand, params.toHitResult());
-				
-				// swing arm
-				// Note: All SwingHand types correspond to SwingSource.CLIENT
-				if(result instanceof ActionResult.Success success
-					&& success.swingSource() == ActionResult.SwingSource.CLIENT)
-					SwingHand.SERVER.swing(hand); // intentional use of SERVER
-					
-				// reset cooldown
 				MC.itemUseCooldown = 4;
+				WURST.getRotationFaker().faceVectorPacket(params.hitVec());
+				InteractionSimulator.rightClickBlock(params.toHitResult(), hand,
+					SwingHand.SERVER);
 				return true;
 			}
 		}
 		
-		// otherwise, find a block that we can reach and have seeds for
 		for(BlockPos pos : blocksToReplant)
 		{
-			// skip over blocks that we can't reach
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
 			if(params == null || params.distanceSq() > range.getValueSq())
 				continue;
 			
-			// try to select the seed (returns false if we don't have it)
-			Item item = plants.get(pos);
-			if(InventoryUtils.selectItem(item))
+			AutoFarmPlantType plantType = replantingSpots.get(pos);
+			if(plantType == null)
+				continue;
+			
+			if(InventoryUtils.selectItem(plantType.getSeedItem()))
 				return true;
 		}
 		
-		// if we couldn't replant anything, return false
 		return false;
 	}
 	
-	private void harvest(Stream<BlockPos> stream)
+	private void harvestByMining(List<BlockPos> blocksToMine)
 	{
+		double rangeSq = range.getValueSq();
+		Stream<BlockBreakingParams> stream = blocksToMine.stream()
+			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
+			.filter(params -> params.distanceSq() <= rangeSq)
+			.sorted(BlockBreaker.comparingParams());
+		
 		// Break all blocks in creative mode
 		if(MC.player.getAbilities().creativeMode)
 		{
 			MC.interactionManager.cancelBlockBreaking();
 			overlay.resetProgress();
 			
-			ArrayList<BlockPos> blocks = cache.filterOutRecentBlocks(stream);
+			List<BlockPos> blocks = cache
+				.filterOutRecentBlocks(stream.map(BlockBreakingParams::pos));
 			if(blocks.isEmpty())
 				return;
 			
-			currentlyHarvesting = blocks.get(0);
+			currentlyMining = blocks.get(0);
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
+			SwingHand.SERVER.swing(Hand.MAIN_HAND);
 			return;
 		}
 		
 		// Break the first valid block in survival mode
-		currentlyHarvesting =
-			stream.filter(BlockBreaker::breakOneBlock).findFirst().orElse(null);
+		currentlyMining = stream.filter(this::breakOneBlock)
+			.map(BlockBreakingParams::pos).findFirst().orElse(null);
 		
-		if(currentlyHarvesting == null)
+		if(currentlyMining == null)
 		{
 			MC.interactionManager.cancelBlockBreaking();
 			overlay.resetProgress();
@@ -365,5 +257,17 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		overlay.updateProgress();
+	}
+	
+	private boolean breakOneBlock(BlockBreakingParams params)
+	{
+		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
+		
+		if(!MC.interactionManager.updateBlockBreakingProgress(params.pos(),
+			params.side()))
+			return false;
+		
+		SwingHand.SERVER.swing(Hand.MAIN_HAND);
+		return true;
 	}
 }

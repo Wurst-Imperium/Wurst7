@@ -55,21 +55,21 @@ public final class AutoFarmRenderer
 	}
 	
 	public void updateVertexBuffers(List<BlockPos> blocksToHarvest,
-		Set<BlockPos> plants, List<BlockPos> blocksToReplant)
+		Set<BlockPos> replantingSpots, List<BlockPos> blocksToReplant)
 	{
 		reset();
 		
-		if(blocksToHarvest.isEmpty() && plants.isEmpty()
+		if(blocksToHarvest.isEmpty() && replantingSpots.isEmpty()
 			&& blocksToReplant.isEmpty())
 			return;
 		
 		vertexBuffer = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
 			VertexFormats.POSITION_COLOR_NORMAL, buffer -> buildBuffer(buffer,
-				blocksToHarvest, plants, blocksToReplant));
+				blocksToHarvest, replantingSpots, blocksToReplant));
 	}
 	
 	private void buildBuffer(VertexConsumer buffer,
-		List<BlockPos> blocksToHarvest, Set<BlockPos> plants,
+		List<BlockPos> blocksToHarvest, Set<BlockPos> replantingSpots,
 		List<BlockPos> blocksToReplant)
 	{
 		region = RenderUtils.getCameraRegion();
@@ -81,7 +81,7 @@ public final class AutoFarmRenderer
 			RenderUtils.drawOutlinedBox(buffer, box, 0x8000FF00);
 		}
 		
-		for(BlockPos pos : plants)
+		for(BlockPos pos : replantingSpots)
 		{
 			Box renderNode = NODE_BOX.offset(pos).offset(regionOffset);
 			RenderUtils.drawNode(buffer, renderNode, 0x8000FFFF);
