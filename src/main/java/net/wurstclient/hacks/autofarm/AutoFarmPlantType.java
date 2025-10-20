@@ -68,6 +68,16 @@ public abstract class AutoFarmPlantType
 	public abstract boolean shouldHarvestByMining(BlockPos pos,
 		BlockState state);
 	
+	/**
+	 * Returns <code>true</code> if the given block contains a plant of this
+	 * type that is ready to be harvested by interacting with (right clicking)
+	 * it.
+	 */
+	public boolean shouldHarvestByInteracting(BlockPos pos, BlockState state)
+	{
+		return false;
+	}
+	
 	protected abstract CheckboxSetting createHarvestSetting();
 	
 	protected abstract CheckboxSetting createReplantSetting();

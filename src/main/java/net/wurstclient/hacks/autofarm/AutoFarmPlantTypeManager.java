@@ -29,12 +29,14 @@ public final class AutoFarmPlantTypeManager
 	public final PotatoesPlantType potatoesType = new PotatoesPlantType();
 	public final PumpkinPlantType pumpkinType = new PumpkinPlantType();
 	public final SugarCanePlantType sugarCaneType = new SugarCanePlantType();
+	public final SweetBerryPlantType sweetBerryPlantType =
+		new SweetBerryPlantType();
 	public final WheatPlantType wheatType = new WheatPlantType();
 	
 	public final List<AutoFarmPlantType> plantTypes =
 		List.of(bambooType, beetrootsType, cactusType, carrotsType,
 			cocoaBeanType, kelpType, melonType, netherWartType, potatoesType,
-			pumpkinType, sugarCaneType, wheatType);
+			pumpkinType, sugarCaneType, sweetBerryPlantType, wheatType);
 	
 	public AutoFarmPlantType getReplantingSpotType(BlockPos pos)
 	{
@@ -50,6 +52,14 @@ public final class AutoFarmPlantTypeManager
 		return plantTypes.stream()
 			.filter(AutoFarmPlantType::isHarvestingEnabled)
 			.anyMatch(type -> type.shouldHarvestByMining(pos, state));
+	}
+	
+	public boolean shouldHarvestByInteracting(BlockPos pos)
+	{
+		BlockState state = BlockUtils.getState(pos);
+		return plantTypes.stream()
+			.filter(AutoFarmPlantType::isHarvestingEnabled)
+			.anyMatch(type -> type.shouldHarvestByInteracting(pos, state));
 	}
 	
 	public Stream<Setting> getSettings()

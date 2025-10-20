@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -110,12 +111,19 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		List<BlockPos> blocksToMine = List.of();
+		List<BlockPos> blocksToInteract = List.of();
 		List<BlockPos> blocksToReplant = List.of();
 		
 		if(!WURST.getHax().freecamHack.isEnabled())
 		{
 			blocksToMine = nonEmptyBlocks.stream()
 				.filter(plantTypes::shouldHarvestByMining)
+				.sorted(Comparator
+					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
+				.toList();
+			
+			blocksToInteract = nonEmptyBlocks.stream()
+				.filter(plantTypes::shouldHarvestByInteracting)
 				.sorted(Comparator
 					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
 				.toList();
@@ -135,12 +143,16 @@ public final class AutoFarmHack extends Hack
 		}
 		
 		boolean replanting = replant(blocksToReplant);
-		if(!replanting)
+		boolean interacting =
+			replanting ? false : harvestByInteracting(blocksToInteract);
+		if(!interacting && !replanting)
 			harvestByMining(blocksToMine);
 		
-		busy = replanting || currentlyMining != null;
+		busy = replanting || interacting || currentlyMining != null;
 		
-		renderer.update(blocksToMine, replantingSpots.keySet(),
+		List<BlockPos> blocksToHarvest = Stream
+			.of(blocksToMine, blocksToInteract).flatMap(List::stream).toList();
+		renderer.update(blocksToHarvest, replantingSpots.keySet(),
 			blocksToReplant);
 	}
 	
@@ -209,6 +221,34 @@ public final class AutoFarmHack extends Hack
 			
 			if(InventoryUtils.selectItem(plantType.getSeedItem()))
 				return true;
+		}
+		
+		return false;
+	}
+	
+	private boolean harvestByInteracting(List<BlockPos> blocksToInteract)
+	{
+		if(MC.itemUseCooldown > 0)
+			return false;
+		
+		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
+			return false;
+		
+		for(BlockPos pos : blocksToInteract)
+		{
+			BlockBreakingParams params =
+				BlockBreaker.getBlockBreakingParams(pos);
+			if(params == null || params.distanceSq() > range.getValueSq())
+				continue;
+			
+			if(MC.player.getMainHandStack().isOf(Items.BONE_MEAL))
+				return InventoryUtils.selectItem(s -> !s.isOf(Items.BONE_MEAL));
+			
+			MC.itemUseCooldown = 4;
+			WURST.getRotationFaker().faceVectorPacket(params.hitVec());
+			InteractionSimulator.rightClickBlock(params.toHitResult(),
+				SwingHand.SERVER);
+			return true;
 		}
 		
 		return false;
