@@ -196,7 +196,7 @@ public enum RenderUtils
 	{
 		Vector3f normal = new Vector3f(x2, y2, z2).sub(x1, y1, z1).normalize();
 		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, normal)
-			.method_75298(2);
+			.lineWidth(2);
 		
 		// If the line goes through the screen, add another vertex there. This
 		// works around a bug in Minecraft's line shader.
@@ -206,13 +206,13 @@ public enum RenderUtils
 		{
 			Vector3f closeToCam = new Vector3f(normal).mul(t).add(x1, y1, z1);
 			buffer.vertex(entry, closeToCam).color(color).normal(entry, normal)
-				.method_75298(2);
+				.lineWidth(2);
 			buffer.vertex(entry, closeToCam).color(color).normal(entry, normal)
-				.method_75298(2);
+				.lineWidth(2);
 		}
 		
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, normal)
-			.method_75298(2);
+			.lineWidth(2);
 	}
 	
 	public static void drawLine(VertexConsumer buffer, float x1, float y1,
@@ -220,9 +220,9 @@ public enum RenderUtils
 	{
 		Vector3f n = new Vector3f(x2, y2, z2).sub(x1, y1, z1).normalize();
 		buffer.vertex(x1, y1, z1).color(color).normal(n.x, n.y, n.z)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(x2, y2, z2).color(color).normal(n.x, n.y, n.z)
-			.method_75298(2);
+			.lineWidth(2);
 	}
 	
 	public static void drawCurvedLine(MatrixStack matrices, List<Vec3d> points,
@@ -253,9 +253,9 @@ public enum RenderUtils
 			Vector3f current = points.get(i).toVector3f();
 			Vector3f normal = new Vector3f(current).sub(prev).normalize();
 			buffer.vertex(entry, prev).color(color).normal(entry, normal)
-				.method_75298(2);
+				.lineWidth(2);
 			buffer.vertex(entry, current).color(color).normal(entry, normal)
-				.method_75298(2);
+				.lineWidth(2);
 		}
 	}
 	
@@ -409,57 +409,57 @@ public enum RenderUtils
 		
 		// bottom lines
 		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 1, 0, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 1, 0, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 0, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 0, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 0, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 0, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 1, 0, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 1, 0, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		
 		// top lines
 		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 1, 0, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 1, 0, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 0, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 0, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 0, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 1, 0, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 1, 0, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		
 		// side lines
 		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 0, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 0, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 0, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 0, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 0, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 0, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 0, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 	}
 	
 	public static void drawCrossBox(MatrixStack matrices, Box box, int color,
@@ -522,63 +522,63 @@ public enum RenderUtils
 		
 		// back
 		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 1, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 1, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, -1, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, -1, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		
 		// left
 		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 0, 1, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 1, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 0, 1, -1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 0, 1, -1)
-			.method_75298(2);
+			.lineWidth(2);
 		
 		// front
 		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, -1, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, -1, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 1, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 1, 1, 0)
-			.method_75298(2);
+			.lineWidth(2);
 		
 		// right
 		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 0, 1, -1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 0, 1, -1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 0, 1, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 0, 1, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		
 		// top
 		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 1, 0, -1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 1, 0, -1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 1, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 1, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		
 		// bottom
 		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, -1, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, -1, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 1, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 1, 0, 1)
-			.method_75298(2);
+			.lineWidth(2);
 	}
 	
 	public static void drawNode(MatrixStack matrices, Box box, int color,

@@ -107,7 +107,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		if(MC.world.getDimension().attributes()
-			.get(EnvironmentAttributes.RESPAWN_ANCHOR_WORKS_GAMEPLAY, false))
+			.apply(EnvironmentAttributes.RESPAWN_ANCHOR_WORKS_GAMEPLAY, false))
 		{
 			ChatUtils.error("Respawn anchors don't explode in this dimension.");
 			setEnabled(false);
