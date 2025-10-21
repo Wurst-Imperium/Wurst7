@@ -49,7 +49,7 @@
   "description.wurst.setting.autoeat.allow_hunger": "Çürük et, zararsız bir \"açlık\" etkisi uygular.\nYemek güvenlidir ve acil durum yemeği olarak kullanışlıdır.",
   "description.wurst.setting.autoeat.allow_poison": "Zehirli yiyecekler zamanla hasar uygular.\nÖnerilmez.",
   "description.wurst.setting.autoeat.allow_chorus": "Chorus meyvesi yemek sizi rastgele bir yere ışınlar.\nÖnerilmez.",
-  "description.wurst.hack.autofarm": "Mahsulleri otomatik olarak hasat eder ve yeniden diker.\nBuğday, havuç, patates, pancar, balkabağı, kavun, kaktüs, şeker kamışı, yosun, bambu, nether mantarı ve kakao çekirdekleri ile çalışır.",
+  "description.wurst.hack.autofarm": "Mahsulleri otomatik olarak hasat eder ve yeniden diker.",
   "description.wurst.hack.autofish": "En iyi olta takımınızı kullanarak otomatik olarak balık tutar. Balık tutarken daha iyi bir olta bulursa, otomatik olarak ona geçer.",
   "description.wurst.hack.automine": "Baktığınız herhangi bir bloğu otomatik olarak kırar.",
   "description.wurst.hack.autopotion": "Sağlığınız düşük olduğunda otomatik olarak anlık iyileşme iksiri fırlatır.",

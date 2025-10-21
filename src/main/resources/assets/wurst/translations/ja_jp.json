@@ -29,7 +29,7 @@
   "description.wurst.setting.autoeat.allow_hunger": "腐った肉には無害な \"空腹\"の効果がある。\n食べても安全で、非常食としても有用です。",
   "description.wurst.setting.autoeat.allow_poison": "毒のある食べ物は、時間経過とともにダメージが加わります。\n推奨しません。",
   "description.wurst.setting.autoeat.allow_chorus": "コーラスフルーツを食べると、ランダムな場所にテレポートします。\n推奨しません。",
-  "description.wurst.hack.autofarm": "収穫と植え直しを自動で行う。\n小麦、ニンジン、ジャガイモ、ビートルート、カボチャ、スイカ、サボテン、サトウキビ、コンブ、竹、ネザーウォート、カカオ豆に対応している。",
+  "description.wurst.hack.autofarm": "収穫と植え直しを自動で行う。",
   "description.wurst.hack.autofish": "インベントリ内で一番良い釣り竿を使用し、自動で魚を釣る。釣りの際中により良い釣り竿が見つかった際は持ち替える。",
   "description.wurst.hack.automine": "視点の先にあるブロックを自動で採掘する。",
   "description.wurst.hack.autopotion": "体力が少なくなると自動で即時回復のスプラッシュポーションを投げる。",

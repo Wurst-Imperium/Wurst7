@@ -23,7 +23,7 @@
   "description.wurst.setting.autoeat.allow_hunger": "Efectul de hunger al rotten flesh-ului nu se aplica.\nEste bun de mancat si poate servi drept mancare de urgenta.",
   "description.wurst.setting.autoeat.allow_poison": "Mancarurile cu otrava isi fac efectul cu timpul.\nNu este recomandat.",
   "description.wurst.setting.autoeat.allow_chorus": "Consumarea unui Chorus Fruit de teleporteaza la intamplare.\nNu este recomandat.",
-  "description.wurst.hack.autofarm": "Recolteaza si planteaza automat.\nFunctioneaza cu grau, morcovi, cartofi, sfecla, dovleci, pepeni, cactusi, trestie de zahar, varec, bambus, nether wart, si boabe de cacao.",
+  "description.wurst.hack.autofarm": "Recolteaza si planteaza automat.",
   "description.wurst.hack.autofish": "Pescuieste automat folosindu-se de cea mai buna undita a ta. Daca pescuind gaseste o undita mai buna, o va folosi pe aceea.",
   "description.wurst.hack.automine": "Strica automat block-ul la care te uiti.",
   "description.wurst.hack.autopotion": "Arunca splash potions of instant health atunci cand esti pe putine inimi.",

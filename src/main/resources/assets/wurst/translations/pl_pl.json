@@ -49,7 +49,7 @@
   "description.wurst.setting.autoeat.allow_hunger": "Zgniłe mięso nakłada nieszkodliwy efekt \"głód\".\nJest bezpieczne do jedzenia i przydatne jako zapasowe jedzenie.",
   "description.wurst.setting.autoeat.allow_poison": "Trujące jedzenie zadaje z czasem obrażenia.\nNiepolecane.",
   "description.wurst.setting.autoeat.allow_chorus": "Zjedzenie owoców refrenusu teleportuje cię w losowe miejsce.\nNiepolecane.",
-  "description.wurst.hack.autofarm": "Automatycznie zbiera i przesadza plony.\nDziała z pszenicą, marchewką, ziemniakami, burakami, dyniami, arbuzami, kaktusami, trzciną cukrową, wodorostami, bambusem, netherowymi brodawkami i ziarnami kakao.",
+  "description.wurst.hack.autofarm": "Automatycznie zbiera i przesadza plony.",
   "description.wurst.hack.autofish": "Automatycznie łowi ryby, korzystając z twojej najlepszej wędki. Jeśli podczas łowienia znajdzie lepszą wędkę, automatycznie się na nią przełączy.",
   "description.wurst.hack.automine": "Automatycznie wykopuje każdy blok, na który patrzysz.",
   "description.wurst.hack.autopotion": "Automatycznie rzuca miotane mikstury leczenia, gdy masz mało życia.",

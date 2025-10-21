@@ -23,7 +23,7 @@
   "description.wurst.setting.autoeat.allow_hunger": "La chair putréfiée applique un effet de \"faim\" inoffensif.\nElle est sûre à manger et utile comme nourriture d'urgence.",
   "description.wurst.setting.autoeat.allow_poison": "La nourriture empoisonnée applique des dégâts au fil du temps.\nNon recommandé.",
   "description.wurst.setting.autoeat.allow_chorus": "Manger des fruits de chorus vous téléporte à un endroit aléatoire.\nNon recommandé.",
-  "description.wurst.hack.autofarm": "Récolte et replante les cultures automatiquement.\nFonctionne avec le blé, les carottes, les pommes de terre, les betteraves, les citrouilles, les melons, les cactus, les cannes à sucre, les algues, le bambou, les verrues du nether et les fèves de cacao.",
+  "description.wurst.hack.autofarm": "Récolte et replante les cultures automatiquement.",
   "description.wurst.hack.autofish": "Attrape automatiquement les poissons en utilisant votre meilleure canne à pêche. S'il trouve une meilleure canne pendant la pêche, il passera automatiquement à celle-ci.",
   "description.wurst.hack.automine": "Mine automatiquement n'importe quel bloc que vous regardez.",
   "description.wurst.hack.autopotion": "Lance automatiquement des potions jetables de soin instantanée lorsque votre santé est faible.",

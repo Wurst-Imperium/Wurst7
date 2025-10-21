@@ -49,7 +49,7 @@
   "description.wurst.setting.autoeat.allow_hunger": "Rotten flesh applies a harmless \"hunger\" effect.\nIt is safe to eat and useful as emergency food.",
   "description.wurst.setting.autoeat.allow_poison": "Poisonous food applies damage over time.\nNot recommended.",
   "description.wurst.setting.autoeat.allow_chorus": "Eating chorus fruit teleports you to a random location.\nNot recommended.",
-  "description.wurst.hack.autofarm": "Harvests and replants crops automatically.\nWorks with wheat, carrots, potatoes, beetroots, pumpkins, melons, cacti, sugar canes, kelp, bamboo, nether warts, and cocoa beans.",
+  "description.wurst.hack.autofarm": "Harvests and replants crops automatically.",
   "description.wurst.hack.autofish": "Automatically catches fish using your best fishing rod. If it finds a better rod while fishing, it will automatically switch to it.",
   "description.wurst.hack.automine": "Automatically mines any block that you look at.",
   "description.wurst.hack.autopotion": "Automatically throws splash potions of instant health when your health is low.",
