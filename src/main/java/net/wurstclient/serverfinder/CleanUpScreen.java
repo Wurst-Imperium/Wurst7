@@ -258,12 +258,13 @@ public class CleanUpScreen extends Screen
 	private final class CleanUpButton extends ButtonWidget
 	{
 		private final Supplier<String> messageSupplier;
-		private final List<Text> tooltip;
+		private final List<net.minecraft.text.Text> tooltip;
 		
 		public CleanUpButton(int x, int y, Supplier<String> messageSupplier,
 			String tooltip, PressAction pressAction)
 		{
-			super(x, y, 200, 20, Text.literal(messageSupplier.get()),
+			super(x, y, 200, 20,
+				net.minecraft.text.Text.literal(messageSupplier.get()),
 				pressAction, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
 			this.messageSupplier = messageSupplier;
 			
@@ -273,9 +274,10 @@ public class CleanUpScreen extends Screen
 			{
 				String[] lines = tooltip.split("\n");
 				
-				Text[] lines2 = new Text[lines.length];
+				net.minecraft.text.Text[] lines2 =
+					new net.minecraft.text.Text[lines.length];
 				for(int i = 0; i < lines.length; i++)
-					lines2[i] = Text.literal(lines[i]);
+					lines2[i] = net.minecraft.text.Text.literal(lines[i]);
 				
 				this.tooltip = Arrays.asList(lines2);
 			}
@@ -285,7 +287,7 @@ public class CleanUpScreen extends Screen
 		public void onPress(AbstractInput context)
 		{
 			super.onPress(context);
-			setMessage(Text.literal(messageSupplier.get()));
+			setMessage(net.minecraft.text.Text.literal(messageSupplier.get()));
 		}
 		
 		@Override

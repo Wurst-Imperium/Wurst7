@@ -67,7 +67,7 @@ public final class MobSpawnEspHack extends Hack
 	
 	private final ChunkVertexBufferCoordinator coordinator =
 		new ChunkVertexBufferCoordinator(this::isSpawnable, DrawMode.LINES,
-			VertexFormats.POSITION_COLOR_NORMAL, this::buildBuffer,
+			VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH, this::buildBuffer,
 			drawDistance);
 	
 	private int cachedDayColor;
@@ -123,8 +123,7 @@ public final class MobSpawnEspHack extends Hack
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		RenderLayer.MultiPhase layer =
-			WurstRenderLayers.getLines(depthTest.isChecked());
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest.isChecked());
 		
 		for(Entry<ChunkPos, EasyVertexBuffer> entry : coordinator.getBuffers())
 		{
@@ -182,9 +181,7 @@ public final class MobSpawnEspHack extends Hack
 		int color = MC.world.getLightLevel(LightType.SKY, pos) < 8
 			? cachedDayColor : cachedNightColor;
 		
-		buffer.vertex(x1, y, z1).color(color).normal(1, 0, 1);
-		buffer.vertex(x2, y, z2).color(color).normal(1, 0, 1);
-		buffer.vertex(x2, y, z1).color(color).normal(-1, 0, 1);
-		buffer.vertex(x1, y, z2).color(color).normal(-1, 0, 1);
+		RenderUtils.drawLine(buffer, x1, y, z1, x2, y, z2, color);
+		RenderUtils.drawLine(buffer, x2, y, z1, x1, y, z2, color);
 	}
 }

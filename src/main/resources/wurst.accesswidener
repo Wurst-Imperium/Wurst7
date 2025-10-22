@@ -6,9 +6,7 @@ accessible	method	net/minecraft/client/Keyboard	onKey	(JILnet/minecraft/client/i
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/Mouse	onMouseButton	(JLnet/minecraft/client/input/MouseInput;I)V
 accessible	method	net/minecraft/client/render/GameRenderer	setPostProcessor	(Lnet/minecraft/util/Identifier;)V
-accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	build	(Z)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
-accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	layering	(Lnet/minecraft/client/render/RenderPhase$Layering;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
-accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	target	(Lnet/minecraft/client/render/RenderPhase$Target;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
+accessible	method	net/minecraft/client/render/RenderLayer	method_75940	(Ljava/lang/String;Lnet/minecraft/class_12247;)Lnet/minecraft/client/render/RenderLayer;
 accessible	method	net/minecraft/component/ComponentMap$Builder	put	(Lnet/minecraft/component/ComponentType;Ljava/lang/Object;)V
 accessible	method	net/minecraft/entity/player/PlayerEntity	canGlide	()Z
 accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z
@@ -28,9 +26,6 @@ accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastYawClient	F
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	blockBreakingCooldown	I
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	breakingBlock	Z
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	currentBreakingProgress	F
-accessible	field	net/minecraft/client/render/RenderLayer$MultiPhase	phases	Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
-accessible	field	net/minecraft/client/render/RenderLayer$MultiPhase	pipeline	Lcom/mojang/blaze3d/pipeline/RenderPipeline;
-accessible	field	net/minecraft/client/render/RenderLayer$MultiPhaseParameters	target	Lnet/minecraft/client/render/RenderPhase$Target;
 accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/Deque;
 accessible	field	net/minecraft/entity/Entity	movementMultiplier	Lnet/minecraft/util/math/Vec3d;
 accessible	field	net/minecraft/entity/LivingEntity	equipment	Lnet/minecraft/entity/EntityEquipment;

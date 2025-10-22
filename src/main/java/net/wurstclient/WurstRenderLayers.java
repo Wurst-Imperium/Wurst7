@@ -7,6 +7,9 @@
  */
 package net.wurstclient;
 
+import net.minecraft.class_12245;
+import net.minecraft.class_12246;
+import net.minecraft.class_12247;
 import net.minecraft.client.render.RenderLayer;
 
 public enum WurstRenderLayers
@@ -16,50 +19,51 @@ public enum WurstRenderLayers
 	/**
 	 * Similar to {@link RenderLayer#getLines()}, but with line width 2.
 	 */
-	public static final RenderLayer.MultiPhase LINES = RenderLayer.of(
-		"wurst:lines", 1536, WurstShaderPipelines.DEPTH_TEST_LINES,
-		RenderLayer.MultiPhaseParameters.builder()
-			.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-			.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+	public static final RenderLayer LINES =
+		RenderLayer.method_75940("wurst:lines",
+			class_12247.method_75927(WurstShaderPipelines.DEPTH_TEST_LINES)
+				.method_75930(class_12245.VIEW_OFFSET_Z_LAYERING)
+				.method_75931(class_12246.ITEM_ENTITY_TARGET).method_75938());
 	
 	/**
 	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
 	 * depth test.
 	 */
-	public static final RenderLayer.MultiPhase ESP_LINES =
-		RenderLayer.of("wurst:esp_lines", 1536, WurstShaderPipelines.ESP_LINES,
-			RenderLayer.MultiPhaseParameters.builder()
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+	public static final RenderLayer ESP_LINES =
+		RenderLayer.method_75940("wurst:esp_lines",
+			class_12247.method_75927(WurstShaderPipelines.ESP_LINES)
+				.method_75930(class_12245.VIEW_OFFSET_Z_LAYERING)
+				.method_75931(class_12246.ITEM_ENTITY_TARGET).method_75938());
 	
 	/**
 	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled.
 	 */
-	public static final RenderLayer.MultiPhase QUADS = RenderLayer.of(
-		"wurst:quads", 1536, false, true, WurstShaderPipelines.QUADS,
-		RenderLayer.MultiPhaseParameters.builder().build(false));
+	public static final RenderLayer QUADS = RenderLayer.method_75940(
+		"wurst:quads", class_12247.method_75927(WurstShaderPipelines.QUADS)
+			.method_75937().method_75938());
 	
 	/**
 	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled
 	 * and no depth test.
 	 */
-	public static final RenderLayer.MultiPhase ESP_QUADS = RenderLayer.of(
-		"wurst:esp_quads", 1536, false, true, WurstShaderPipelines.ESP_QUADS,
-		RenderLayer.MultiPhaseParameters.builder().build(false));
+	public static final RenderLayer ESP_QUADS =
+		RenderLayer.method_75940("wurst:esp_quads",
+			class_12247.method_75927(WurstShaderPipelines.ESP_QUADS)
+				.method_75937().method_75938());
 	
 	/**
 	 * Similar to {@link RenderLayer#getDebugQuads()}, but with no depth test.
 	 */
-	public static final RenderLayer.MultiPhase ESP_QUADS_NO_CULLING =
-		RenderLayer.of("wurst:esp_quads_no_culling", 1536, false, true,
-			WurstShaderPipelines.ESP_QUADS_NO_CULLING,
-			RenderLayer.MultiPhaseParameters.builder().build(false));
+	public static final RenderLayer ESP_QUADS_NO_CULLING =
+		RenderLayer.method_75940("wurst:esp_quads_no_culling",
+			class_12247.method_75927(WurstShaderPipelines.ESP_QUADS_NO_CULLING)
+				.method_75937().method_75928().method_75938());
 	
 	/**
 	 * Returns either {@link #QUADS} or {@link #ESP_QUADS} depending on the
 	 * value of {@code depthTest}.
 	 */
-	public static RenderLayer.MultiPhase getQuads(boolean depthTest)
+	public static RenderLayer getQuads(boolean depthTest)
 	{
 		return depthTest ? QUADS : ESP_QUADS;
 	}
@@ -68,7 +72,7 @@ public enum WurstRenderLayers
 	 * Returns either {@link #LINES} or {@link #ESP_LINES} depending on the
 	 * value of {@code depthTest}.
 	 */
-	public static RenderLayer.MultiPhase getLines(boolean depthTest)
+	public static RenderLayer getLines(boolean depthTest)
 	{
 		return depthTest ? LINES : ESP_LINES;
 	}

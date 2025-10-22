@@ -64,8 +64,9 @@ public final class AutoFarmRenderer
 			return;
 		
 		vertexBuffer = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
-			VertexFormats.POSITION_COLOR_NORMAL, buffer -> buildBuffer(buffer,
-				blocksToHarvest, plants, blocksToReplant));
+			VertexFormats.POSITION_COLOR_NORMAL_LINE_WIDTH,
+			buffer -> buildBuffer(buffer, blocksToHarvest, plants,
+				blocksToReplant));
 	}
 	
 	private void buildBuffer(VertexConsumer buffer,
