@@ -8,7 +8,6 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,23 +17,18 @@ import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.Text;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.serverfinder.CleanUpScreen;
 import net.wurstclient.serverfinder.ServerFinderScreen;
 import net.wurstclient.util.LastServerRememberer;
 
 @Mixin(MultiplayerScreen.class)
-public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
+public class MultiplayerScreenMixin extends Screen
 {
-	@Shadow
-	protected MultiplayerServerListWidget serverListWidget;
-	
 	private ButtonWidget lastServerButton;
 	
 	private MultiplayerScreenMixin(WurstClient wurst, Text title)
@@ -108,11 +102,5 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 		lastServerButton.active = LastServerRememberer.getLastServer() != null;
 		lastServerButton.setX(width / 2 - 154);
 		lastServerButton.setY(6);
-	}
-	
-	@Override
-	public MultiplayerServerListWidget getServerListSelector()
-	{
-		return serverListWidget;
 	}
 }
