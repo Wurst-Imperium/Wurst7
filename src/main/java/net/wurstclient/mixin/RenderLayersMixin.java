@@ -14,11 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.BlockRenderLayers;
 import net.minecraft.fluid.FluidState;
 import net.wurstclient.WurstClient;
 
-@Mixin(RenderLayers.class)
+@Mixin(BlockRenderLayers.class)
 public abstract class RenderLayersMixin
 {
 	/**

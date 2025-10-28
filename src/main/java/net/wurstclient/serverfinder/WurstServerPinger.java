@@ -9,11 +9,10 @@ package net.wurstclient.serverfinder;
 
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import net.minecraft.class_12239;
 import net.minecraft.client.network.MultiplayerServerListPinger;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.network.ServerInfo.ServerType;
+import net.minecraft.network.NetworkingBackend;
 import net.wurstclient.WurstClient;
 
 public class WurstServerPinger
@@ -43,8 +42,8 @@ public class WurstServerPinger
 		
 		try
 		{
-			pinger.add(server, () -> {}, () -> {}, class_12239.method_75867(
-				WurstClient.MC.options.shouldUseNativeTransport()));
+			pinger.add(server, () -> {}, () -> {}, NetworkingBackend
+				.remote(WurstClient.MC.options.shouldUseNativeTransport()));
 			System.out.println("Ping successful: " + ip + ":" + port);
 			
 		}catch(UnknownHostException e)

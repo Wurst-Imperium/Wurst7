@@ -22,15 +22,14 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
-
-import net.minecraft.class_12246;
-import net.minecraft.class_12250;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.BuiltBuffer.DrawParameters;
+import net.minecraft.client.render.OutputTarget;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.TextureTransform;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -122,9 +121,10 @@ public final class EasyVertexBuffer implements AutoCloseable
 		GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms().write(
 			RenderSystem.getModelViewMatrix(),
 			new Vector4f(red, green, blue, alpha), new Vector3f(),
-			class_12250.DEFAULT_TEXTURING.method_76030());
+			TextureTransform.DEFAULT_TEXTURING.getTransformSupplier());
 		
-		Framebuffer framebuffer = class_12246.ITEM_ENTITY_TARGET.method_75921();
+		Framebuffer framebuffer =
+			OutputTarget.ITEM_ENTITY_TARGET.getFramebuffer();
 		RenderPipeline pipeline = layer.getRenderPipeline();
 		GpuBuffer indexBuffer = shapeIndexBuffer.getIndexBuffer(indexCount);
 		
