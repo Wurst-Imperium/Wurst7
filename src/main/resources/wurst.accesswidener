@@ -6,7 +6,7 @@ accessible	method	net/minecraft/client/Keyboard	onKey	(JILnet/minecraft/client/i
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/Mouse	onMouseButton	(JLnet/minecraft/client/input/MouseInput;I)V
 accessible	method	net/minecraft/client/render/GameRenderer	setPostProcessor	(Lnet/minecraft/util/Identifier;)V
-accessible	method	net/minecraft/client/render/RenderLayer	method_75940	(Ljava/lang/String;Lnet/minecraft/class_12247;)Lnet/minecraft/client/render/RenderLayer;
+accessible	method	net/minecraft/client/render/RenderLayer	of	(Ljava/lang/String;Lnet/minecraft/client/render/RenderSetup;)Lnet/minecraft/client/render/RenderLayer;
 accessible	method	net/minecraft/component/ComponentMap$Builder	put	(Lnet/minecraft/component/ComponentType;Ljava/lang/Object;)V
 accessible	method	net/minecraft/entity/player/PlayerEntity	canGlide	()Z
 accessible	method	net/minecraft/entity/projectile/FishingBobberEntity	isOpenOrWaterAround	(Lnet/minecraft/util/math/BlockPos;)Z

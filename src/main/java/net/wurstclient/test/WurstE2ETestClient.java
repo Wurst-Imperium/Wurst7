@@ -40,6 +40,12 @@ public final class WurstE2ETestClient implements ModInitializer
 		System.out.println("Starting Wurst End-to-End Tests");
 		waitForResourceLoading();
 		
+		// Disable chunk fade
+		submitAndWait(mc -> mc.options.method_76253().setValue(0.0));
+		
+		// Disable anisotropic filtering
+		submitAndWait(mc -> mc.options.method_76247().setValue(0));
+		
 		if(submitAndGet(mc -> mc.options.onboardAccessibility))
 		{
 			System.out.println("Onboarding is enabled. Waiting for it");

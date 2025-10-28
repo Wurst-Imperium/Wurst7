@@ -28,7 +28,6 @@
     "ControlsListWidgetMixin",
     "CreativeInventoryScreenMixin",
     "DeathScreenMixin",
-    "DimensionOrBossFogModifierMixin",
     "DirectConnectScreenMixin",
     "DisconnectedScreenMixin",
     "DownloaderMixin",
