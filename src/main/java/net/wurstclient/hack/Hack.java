@@ -40,7 +40,7 @@ public abstract class Hack extends Feature
 	
 	/**
 	 * Returns the name of the hack to be displayed in HackList.
-	 * 
+	 *
 	 * <p>
 	 * WARNING: This method can be called while <code>MC.player</code> is null.
 	 */

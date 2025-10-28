@@ -31,8 +31,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
-import net.wurstclient.settings.FacingSetting;
-import net.wurstclient.settings.FacingSetting.Facing;
+import net.wurstclient.settings.FaceTargetSetting;
+import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
@@ -57,12 +57,12 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			+ "When disabled, CrystalAura will only detonate manually placed crystals.",
 		true);
 	
-	private final FacingSetting faceBlocks =
-		FacingSetting.withPacketSpam("Face crystals",
+	private final FaceTargetSetting faceBlocks =
+		FaceTargetSetting.withPacketSpam("Face crystals",
 			"Whether or not CrystalAura should face the correct direction when"
 				+ " placing and left-clicking end crystals.\n\n"
 				+ "Slower but can help with anti-cheat plugins.",
-			Facing.OFF);
+			FaceTarget.OFF);
 	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight",

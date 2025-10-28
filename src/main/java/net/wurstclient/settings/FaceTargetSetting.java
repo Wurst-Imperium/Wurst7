@@ -13,35 +13,38 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.RotationUtils;
 
-public final class FacingSetting extends EnumSetting<FacingSetting.Facing>
+public final class FaceTargetSetting
+	extends EnumSetting<FaceTargetSetting.FaceTarget>
 {
 	private static final WurstClient WURST = WurstClient.INSTANCE;
 	
-	private FacingSetting(String name, String description, Facing[] values,
-		Facing selected)
+	private FaceTargetSetting(String name, String description,
+		FaceTarget[] values, FaceTarget selected)
 	{
 		super(name, description, values, selected);
 	}
 	
-	public static FacingSetting withoutPacketSpam(String description)
+	public static FaceTargetSetting withoutPacketSpam(String description)
 	{
-		return withoutPacketSpam("Facing", description, Facing.SERVER);
+		return withoutPacketSpam("Face target", description, FaceTarget.SERVER);
 	}
 	
-	public static FacingSetting withoutPacketSpam(String name,
-		String description, Facing selected)
+	public static FaceTargetSetting withoutPacketSpam(String name,
+		String description, FaceTarget selected)
 	{
-		Facing[] values = {Facing.OFF, Facing.SERVER, Facing.CLIENT};
-		return new FacingSetting(name, description, values, selected);
+		FaceTarget[] values =
+			{FaceTarget.OFF, FaceTarget.SERVER, FaceTarget.CLIENT};
+		return new FaceTargetSetting(name, description, values, selected);
 	}
 	
-	public static FacingSetting withPacketSpam(String name, String description,
-		Facing selected)
+	public static FaceTargetSetting withPacketSpam(String name,
+		String description, FaceTarget selected)
 	{
-		return new FacingSetting(name, description, Facing.values(), selected);
+		return new FaceTargetSetting(name, description, FaceTarget.values(),
+			selected);
 	}
 	
-	public enum Facing
+	public enum FaceTarget
 	{
 		OFF("Off", v -> {}),
 		
@@ -57,7 +60,7 @@ public final class FacingSetting extends EnumSetting<FacingSetting.Facing>
 		private String name;
 		private Consumer<Vec3d> face;
 		
-		private Facing(String name, Consumer<Vec3d> face)
+		private FaceTarget(String name, Consumer<Vec3d> face)
 		{
 			this.name = name;
 			this.face = face;
