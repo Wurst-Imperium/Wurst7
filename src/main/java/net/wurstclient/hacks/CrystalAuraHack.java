@@ -57,18 +57,14 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			+ "When disabled, CrystalAura will only detonate manually placed crystals.",
 		true);
 	
-	private final FaceTargetSetting faceBlocks =
-		FaceTargetSetting.withPacketSpam("Face crystals",
-			"Whether or not CrystalAura should face the correct direction when"
-				+ " placing and left-clicking end crystals.\n\n"
-				+ "Slower but can help with anti-cheat plugins.",
-			FaceTarget.OFF);
-	
 	private final CheckboxSetting checkLOS = new CheckboxSetting(
 		"Check line of sight",
 		"Ensures that you don't reach through blocks when placing or left-clicking end crystals.\n\n"
 			+ "Slower but can help with anti-cheat plugins.",
 		false);
+	
+	private final FaceTargetSetting faceTarget =
+		FaceTargetSetting.withPacketSpam(this, FaceTarget.OFF);
 	
 	private final SwingHandSetting swingHand =
 		new SwingHandSetting(this, SwingHand.CLIENT);
@@ -87,8 +83,8 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(autoPlace);
-		addSetting(faceBlocks);
 		addSetting(checkLOS);
+		addSetting(faceTarget);
 		addSetting(swingHand);
 		addSetting(takeItemsFrom);
 		
@@ -170,7 +166,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	{
 		for(Entity e : crystals)
 		{
-			faceBlocks.getSelected().face(e.getBoundingBox().getCenter());
+			faceTarget.getSelected().face(e.getBoundingBox().getCenter());
 			MC.interactionManager.attackEntity(MC.player, e);
 		}
 		
@@ -213,7 +209,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			if(!MC.player.isHolding(Items.END_CRYSTAL))
 				return false;
 			
-			faceBlocks.getSelected().face(hitVec);
+			faceTarget.getSelected().face(hitVec);
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(neighbor,

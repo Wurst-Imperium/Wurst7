@@ -56,14 +56,12 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		new CheckboxSetting("Auto-place anchors",
 			"description.wurst.setting.anchoraura.auto-place_anchors", true);
 	
-	private final FaceTargetSetting faceBlocks =
-		FaceTargetSetting.withPacketSpam("Face anchors",
-			"description.wurst.setting.anchoraura.face_anchors",
-			FaceTarget.OFF);
-	
 	private final CheckboxSetting checkLOS =
 		new CheckboxSetting("Check line of sight",
 			"description.wurst.setting.anchoraura.check_line_of_sight", false);
+	
+	private final FaceTargetSetting faceTarget =
+		FaceTargetSetting.withPacketSpam(this, FaceTarget.OFF);
 	
 	private final SwingHandSetting swingHand =
 		new SwingHandSetting(this, SwingHand.CLIENT);
@@ -83,8 +81,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(autoPlace);
-		addSetting(faceBlocks);
 		addSetting(checkLOS);
+		addSetting(faceTarget);
 		addSetting(swingHand);
 		addSetting(takeItemsFrom);
 		
@@ -243,7 +241,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
-			faceBlocks.getSelected().face(hitVec);
+			faceTarget.getSelected().face(hitVec);
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
@@ -289,7 +287,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			if(!MC.player.isHolding(Items.RESPAWN_ANCHOR))
 				return false;
 			
-			faceBlocks.getSelected().face(hitVec);
+			faceTarget.getSelected().face(hitVec);
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(neighbor,

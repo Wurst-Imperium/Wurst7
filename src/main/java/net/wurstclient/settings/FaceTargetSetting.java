@@ -11,37 +11,72 @@ import java.util.function.Consumer;
 
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hack.Hack;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.text.WText;
 
 public final class FaceTargetSetting
 	extends EnumSetting<FaceTargetSetting.FaceTarget>
 {
 	private static final WurstClient WURST = WurstClient.INSTANCE;
+	private static final WText FULL_DESCRIPTION_SUFFIX =
+		buildDescriptionSuffix(true);
+	private static final WText REDUCED_DESCRIPTION_SUFFIX =
+		buildDescriptionSuffix(false);
 	
-	private FaceTargetSetting(String name, String description,
-		FaceTarget[] values, FaceTarget selected)
+	private FaceTargetSetting(WText description, FaceTarget[] values,
+		FaceTarget selected)
 	{
-		super(name, description, values, selected);
+		super("Face target", description, values, selected);
 	}
 	
-	public static FaceTargetSetting withoutPacketSpam(String description)
+	public static FaceTargetSetting withPacketSpam(Hack hack,
+		FaceTarget selected)
 	{
-		return withoutPacketSpam("Face target", description, FaceTarget.SERVER);
+		return withPacketSpam(hackDescription(hack), selected);
 	}
 	
-	public static FaceTargetSetting withoutPacketSpam(String name,
-		String description, FaceTarget selected)
+	public static FaceTargetSetting withPacketSpam(WText description,
+		FaceTarget selected)
+	{
+		return new FaceTargetSetting(
+			description.append(FULL_DESCRIPTION_SUFFIX), FaceTarget.values(),
+			selected);
+	}
+	
+	public static FaceTargetSetting withoutPacketSpam(Hack hack,
+		FaceTarget selected)
+	{
+		return withoutPacketSpam(hackDescription(hack), selected);
+	}
+	
+	public static FaceTargetSetting withoutPacketSpam(WText description,
+		FaceTarget selected)
 	{
 		FaceTarget[] values =
 			{FaceTarget.OFF, FaceTarget.SERVER, FaceTarget.CLIENT};
-		return new FaceTargetSetting(name, description, values, selected);
+		return new FaceTargetSetting(
+			description.append(REDUCED_DESCRIPTION_SUFFIX), values, selected);
 	}
 	
-	public static FaceTargetSetting withPacketSpam(String name,
-		String description, FaceTarget selected)
+	private static WText hackDescription(Hack hack)
 	{
-		return new FaceTargetSetting(name, description, FaceTarget.values(),
-			selected);
+		return WText.translated("description.wurst.setting."
+			+ hack.getName().toLowerCase() + ".face_target");
+	}
+	
+	private static WText buildDescriptionSuffix(boolean includePacketSpam)
+	{
+		WText text = WText.literal("\n\n");
+		FaceTarget[] values =
+			includePacketSpam ? FaceTarget.values() : new FaceTarget[]{
+				FaceTarget.OFF, FaceTarget.SERVER, FaceTarget.CLIENT};
+		
+		for(FaceTarget value : values)
+			text.append("\u00a7l" + value.name + "\u00a7r - ")
+				.append(value.description).append("\n\n");
+		
+		return text;
 	}
 	
 	public enum FaceTarget
@@ -57,12 +92,18 @@ public final class FaceTargetSetting
 		SPAM("Packet spam",
 			v -> RotationUtils.getNeededRotations(v).sendPlayerLookPacket());
 		
-		private String name;
-		private Consumer<Vec3d> face;
+		private static final String TRANSLATION_KEY_PREFIX =
+			"description.wurst.setting.generic.face_target.";
+		
+		private final String name;
+		private final WText description;
+		private final Consumer<Vec3d> face;
 		
 		private FaceTarget(String name, Consumer<Vec3d> face)
 		{
 			this.name = name;
+			description =
+				WText.translated(TRANSLATION_KEY_PREFIX + name().toLowerCase());
 			this.face = face;
 		}
 		

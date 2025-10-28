@@ -10,7 +10,6 @@
   "description.wurst.hack.anchoraura": "Yanlış boyutta yerleştirip şarj ettiğinizde patlayan yeniden doğma ankrajlarını otomatik olarak yerleştirir (isteğe bağlı), şarj eder ve etrafınızdaki varlıkları öldürmek için patlatır.",
   "description.wurst.setting.anchoraura.range": "AnchorAura'nın ankrajları yerleştirme, şarj etme ve patlatma işlemlerinde ne kadar uzağa ulaşacağını belirler.",
   "description.wurst.setting.anchoraura.auto-place_anchors": "Hack etkinleştirildiğinde, AnchorAura geçerli varlıkların yakınına otomatik olarak ankraj yerleştirir.\nDevre dışı bırakıldığında, AnchorAura yalnızca manuel olarak yerleştirilen ankrajları yükler ve patlatır.",
-  "description.wurst.setting.anchoraura.face_anchors": "AnchorAura'nın respawn ankrajları yerleştirirken ve sağ tıklarken doğru yöne bakması gerekip gerekmediği.\n\nDaha küçük ama hile karşıtı eklentilere yardımcı olabilir.",
   "description.wurst.setting.anchoraura.check_line_of_sight": "Yeniden doğma ankrajlarını yerleştirirken veya sağ tıklarken bloklara ulaşmamanızı sağlar.\n\nDaha küçük ama hile karşıtı eklentilere yardımcı olabilir.",
   "description.wurst.setting.anchoraura.swing_hand": "AnchorAura'nın yeniden doğma ankrajlarını yerleştirirken, şarj ederken ve patlatırken elinizi nasıl sallaması gerektiğini belirler.",
   "description.wurst.setting.anchoraura.take_items_from": "Yeniden doğma ankrajlarını ve parıltı taşını arayacağı yerleri belirler.",
