@@ -26,6 +26,7 @@
   "description.wurst.setting.autoeat.allow_poison": "Jedovatá potrava časem působí poškození.\n Nedoporučuje se.",
   "description.wurst.setting.autoeat.allow_chorus": "Ovoce chorusovníku vás teleportuje na náhodné místo.\nNedoporučuje se.",
   "description.wurst.hack.autofarm": "Automaticky sklízí a přesazuje plodiny.",
+  "description.wurst.setting.autofarm.swing_hand": "Jak má AutoFarm mávat vaší rukou při sázení a sklízení.",
   "description.wurst.hack.autofish": "Automaticky chytá ryby pomocí vašeho nejlepšího rybářského prutu. Pokud najde lepší prut při rybaření, automaticky na něj přepne.",
   "description.wurst.hack.automine": "Automaticky vytěží jakýkoli blok, na který se podíváte.",
   "description.wurst.hack.autopotion": "Automaticky hází lektvary okamžitého zdraví, když je vaše zdraví nízké.",

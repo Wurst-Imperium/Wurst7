@@ -23,6 +23,7 @@
   "description.wurst.setting.autoeat.eat_while_walking": "걷는 동안 음식을 먹는 것은 속도를 늦춥니다. 권장하지 않습니다.",
   "description.wurst.setting.autoeat.allow_poison": "독성 음식은 시간 경과에 따라 피해를 입힙니다.\n권장하지 않습니다.",
   "description.wurst.hack.autofarm": "자동으로 작물을 수확하고 다시 심습니다.",
+  "description.wurst.setting.autofarm.swing_hand": "심기 및 수확 시 AutoFarm이 손을 흔드는 방법을 설정합니다.",
   "description.wurst.hack.autofish": "최고의 낚싯대를 사용하여 자동으로 물고기를 잡습니다. 물고기를 잡는 동안 더 좋은 낚싯대를 발견하면 자동으로 전환됩니다.",
   "description.wurst.hack.automine": "시선을 정한 블록을 자동으로 채굴합니다.",
   "description.wurst.hack.autopotion": "체력이 낮을 때 즉시 회복 물약을 자동으로 던집니다.",

@@ -26,6 +26,7 @@
   "description.wurst.setting.autoeat.allow_poison": "Il cibo velenoso provoca danni nel tempo.\nNon consigliato.",
   "description.wurst.setting.autoeat.allow_chorus": "Mangiare il frutto di chorus ti teletrasporta in una posizione casuale.\nNon consigliato.",
   "description.wurst.hack.autofarm": "Raccoglie e ripianta i raccolti automaticamente.",
+  "description.wurst.setting.autofarm.swing_hand": "Come AutoFarm deve muovere la tua mano durante la semina e il raccolto.",
   "description.wurst.hack.autofish": "Pesca automaticamente utilizzando la canna da pesca migliore. Se trova una migliore canna da pesca pescando, cambia automaticamente quella in uso con quella trovata.",
   "description.wurst.hack.automine": "Distrugge ogni blocco che guardi automaticamente.",
   "description.wurst.hack.autopotion": "Lancia una pozione di cura istantanea automaticamente quando la tua salute è bassa.",

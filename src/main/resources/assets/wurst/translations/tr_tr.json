@@ -50,6 +50,7 @@
   "description.wurst.setting.autoeat.allow_poison": "Zehirli yiyecekler zamanla hasar uygular.\nÖnerilmez.",
   "description.wurst.setting.autoeat.allow_chorus": "Chorus meyvesi yemek sizi rastgele bir yere ışınlar.\nÖnerilmez.",
   "description.wurst.hack.autofarm": "Mahsulleri otomatik olarak hasat eder ve yeniden diker.",
+  "description.wurst.setting.autofarm.swing_hand": "AutoFarm'ın ekim ve hasat sırasında elinizi nasıl sallaması gerektiğini belirler.",
   "description.wurst.hack.autofish": "En iyi olta takımınızı kullanarak otomatik olarak balık tutar. Balık tutarken daha iyi bir olta bulursa, otomatik olarak ona geçer.",
   "description.wurst.hack.automine": "Baktığınız herhangi bir bloğu otomatik olarak kırar.",
   "description.wurst.hack.autopotion": "Sağlığınız düşük olduğunda otomatik olarak anlık iyileşme iksiri fırlatır.",

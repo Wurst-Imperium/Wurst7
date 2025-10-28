@@ -50,6 +50,7 @@
   "description.wurst.setting.autoeat.allow_poison": "Trujące jedzenie zadaje z czasem obrażenia.\nNiepolecane.",
   "description.wurst.setting.autoeat.allow_chorus": "Zjedzenie owoców refrenusu teleportuje cię w losowe miejsce.\nNiepolecane.",
   "description.wurst.hack.autofarm": "Automatycznie zbiera i przesadza plony.",
+  "description.wurst.setting.autofarm.swing_hand": "Jak AutoFarm powinien machać twoją ręką podczas sadzenia i zbierania plonów.",
   "description.wurst.hack.autofish": "Automatycznie łowi ryby, korzystając z twojej najlepszej wędki. Jeśli podczas łowienia znajdzie lepszą wędkę, automatycznie się na nią przełączy.",
   "description.wurst.hack.automine": "Automatycznie wykopuje każdy blok, na który patrzysz.",
   "description.wurst.hack.autopotion": "Automatycznie rzuca miotane mikstury leczenia, gdy masz mało życia.",

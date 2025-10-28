@@ -30,6 +30,7 @@ import net.wurstclient.hacks.autofarm.AutoFarmPlantTypeManager;
 import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.*;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
@@ -41,6 +42,9 @@ public final class AutoFarmHack extends Hack
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
+	private final SwingHandSetting swingHand =
+		new SwingHandSetting(this, SwingHand.SERVER);
 	
 	private final AutoFarmPlantTypeManager plantTypes =
 		new AutoFarmPlantTypeManager();
@@ -60,6 +64,7 @@ public final class AutoFarmHack extends Hack
 		super("AutoFarm");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
+		addSetting(swingHand);
 		plantTypes.getSettings().forEach(this::addSetting);
 	}
 	
@@ -205,7 +210,7 @@ public final class AutoFarmHack extends Hack
 				MC.itemUseCooldown = 4;
 				WURST.getRotationFaker().faceVectorPacket(params.hitVec());
 				InteractionSimulator.rightClickBlock(params.toHitResult(), hand,
-					SwingHand.SERVER);
+					swingHand.getSelected());
 				return true;
 			}
 		}
@@ -250,7 +255,7 @@ public final class AutoFarmHack extends Hack
 			MC.itemUseCooldown = 4;
 			WURST.getRotationFaker().faceVectorPacket(params.hitVec());
 			InteractionSimulator.rightClickBlock(params.toHitResult(),
-				SwingHand.SERVER);
+				swingHand.getSelected());
 			return true;
 		}
 		
@@ -278,7 +283,7 @@ public final class AutoFarmHack extends Hack
 			
 			currentlyMining = blocks.get(0);
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
-			SwingHand.SERVER.swing(Hand.MAIN_HAND);
+			swingHand.swing(Hand.MAIN_HAND);
 			return;
 		}
 		
@@ -304,7 +309,7 @@ public final class AutoFarmHack extends Hack
 			params.side()))
 			return false;
 		
-		SwingHand.SERVER.swing(Hand.MAIN_HAND);
+		swingHand.swing(Hand.MAIN_HAND);
 		return true;
 	}
 }

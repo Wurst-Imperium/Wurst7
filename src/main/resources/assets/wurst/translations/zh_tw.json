@@ -26,6 +26,7 @@
   "description.wurst.setting.autoeat.allow_poison": "有毒食物會隨著時間的推移造成傷害。\n不推薦。",
   "description.wurst.setting.autoeat.allow_chorus": "吃紫頌果會將你傳送到一個隨機位置。\n不推薦。",
   "description.wurst.hack.autofarm": "自動收穫與種植農作物。",
+  "description.wurst.setting.autofarm.swing_hand": "設定 AutoFarm 在種植和收穫時如何揮動你的手。",
   "description.wurst.hack.autofish": "自動使用最好的魚竿釣魚，如果在此期間獲得了更好的魚竿，就會自動切換到它。",
   "description.wurst.hack.automine": "自動挖掘你眼前所指的方塊。",
   "description.wurst.hack.autopotion": "當你的生命值低於設定值時，自動扔一瓶噴濺型瞬間恢復藥水。",

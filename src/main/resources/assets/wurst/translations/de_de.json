@@ -29,6 +29,7 @@
   "description.wurst.setting.autoeat.allow_poison": "Giftiges Essen fügt dir über einen Zeitraum hinweg Schaden zu.\nNicht empfohlen.",
   "description.wurst.setting.autoeat.allow_chorus": "Die Chorusfrucht zu essen teleportiert dich an einen zufälligen Ort.\nNicht empfohlen.",
   "description.wurst.hack.autofarm": "Erntet und re-plantet Pflanzen automatisch.",
+  "description.wurst.setting.autofarm.swing_hand": "Wie AutoFarm beim Pflanzen und Ernten deine Hand schwingen soll.",
   "description.wurst.hack.autofish": "Angelt automatisch mit deiner besten Angel. Wenn es beim Angeln eine noch bessere Angel findet, wechselt es automatisch.",
   "description.wurst.hack.automine": "Baut automatisch den Block ab, den du gerade anguckst.",
   "description.wurst.hack.autopotion": "Benutzt automatisch Wurftränke der Heilung, wenn deine Gesundheit niedrig ist.",

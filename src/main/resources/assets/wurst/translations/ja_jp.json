@@ -30,6 +30,7 @@
   "description.wurst.setting.autoeat.allow_poison": "毒のある食べ物は、時間経過とともにダメージが加わります。\n推奨しません。",
   "description.wurst.setting.autoeat.allow_chorus": "コーラスフルーツを食べると、ランダムな場所にテレポートします。\n推奨しません。",
   "description.wurst.hack.autofarm": "収穫と植え直しを自動で行う。",
+  "description.wurst.setting.autofarm.swing_hand": "植え付けと収穫時にAutoFarmがどのように手を振るかを設定する。",
   "description.wurst.hack.autofish": "インベントリ内で一番良い釣り竿を使用し、自動で魚を釣る。釣りの際中により良い釣り竿が見つかった際は持ち替える。",
   "description.wurst.hack.automine": "視点の先にあるブロックを自動で採掘する。",
   "description.wurst.hack.autopotion": "体力が少なくなると自動で即時回復のスプラッシュポーションを投げる。",

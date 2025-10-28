@@ -24,6 +24,7 @@
   "description.wurst.setting.autoeat.allow_poison": "Mancarurile cu otrava isi fac efectul cu timpul.\nNu este recomandat.",
   "description.wurst.setting.autoeat.allow_chorus": "Consumarea unui Chorus Fruit de teleporteaza la intamplare.\nNu este recomandat.",
   "description.wurst.hack.autofarm": "Recolteaza si planteaza automat.",
+  "description.wurst.setting.autofarm.swing_hand": "Cum ar trebui AutoFarm să-ți fluture mâna când plantează și recoltează.",
   "description.wurst.hack.autofish": "Pescuieste automat folosindu-se de cea mai buna undita a ta. Daca pescuind gaseste o undita mai buna, o va folosi pe aceea.",
   "description.wurst.hack.automine": "Strica automat block-ul la care te uiti.",
   "description.wurst.hack.autopotion": "Arunca splash potions of instant health atunci cand esti pe putine inimi.",

@@ -23,6 +23,7 @@
   "description.wurst.setting.autoeat.allow_poison": "有毒嘅食物將會隨時間嘅推移造成傷害。\n唔推薦。",
   "description.wurst.setting.autoeat.allow_chorus": "（如果允許）食歌萊果將會傳送你到一個隨機嘅地點。\n唔推薦。",
   "description.wurst.hack.autofarm": "自動收獲並種植農作物。",
+  "description.wurst.setting.autofarm.swing_hand": "設定 AutoFarm 喺種植同收獲時點樣揮動你隻手。",
   "description.wurst.hack.autofish": "自動釣魚同時使用你最好嘅魚竿，如果有更好嘅魚竿將會自動使用。",
   "description.wurst.hack.automine": "自動挖掘你眼前所指嘅方塊。",
   "description.wurst.hack.autopotion": "當你嘅生命值過低時，自動掟一樽噴濺型瞬間恢復。",

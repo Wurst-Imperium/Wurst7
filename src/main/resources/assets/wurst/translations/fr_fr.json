@@ -24,6 +24,7 @@
   "description.wurst.setting.autoeat.allow_poison": "La nourriture empoisonnée applique des dégâts au fil du temps.\nNon recommandé.",
   "description.wurst.setting.autoeat.allow_chorus": "Manger des fruits de chorus vous téléporte à un endroit aléatoire.\nNon recommandé.",
   "description.wurst.hack.autofarm": "Récolte et replante les cultures automatiquement.",
+  "description.wurst.setting.autofarm.swing_hand": "Comment AutoFarm doit balancer votre main lors de la plantation et de la récolte.",
   "description.wurst.hack.autofish": "Attrape automatiquement les poissons en utilisant votre meilleure canne à pêche. S'il trouve une meilleure canne pendant la pêche, il passera automatiquement à celle-ci.",
   "description.wurst.hack.automine": "Mine automatiquement n'importe quel bloc que vous regardez.",
   "description.wurst.hack.autopotion": "Lance automatiquement des potions jetables de soin instantanée lorsque votre santé est faible.",

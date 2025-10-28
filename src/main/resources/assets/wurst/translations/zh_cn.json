@@ -30,6 +30,7 @@
   "description.wurst.setting.autoeat.allow_poison": "食用有毒的食物会带来持续伤害。\n不推荐。",
   "description.wurst.setting.autoeat.allow_chorus": "食用紫颂果会将你随机传送。\n不推荐。",
   "description.wurst.hack.autofarm": "自动种植与收获农作物。",
+  "description.wurst.setting.autofarm.swing_hand": "设置 AutoFarm 在种植和收获时如何挥动你的手。",
   "description.wurst.hack.autofish": "当你在钓鱼的时切换到最好的鱼竿并自动钓鱼。",
   "description.wurst.hack.automine": "自动挖掘你准星所指的方块。",
   "description.wurst.hack.autopotion": "当你的生命值过低时，自动扔出一瓶喷溅型瞬间恢复药水。",
