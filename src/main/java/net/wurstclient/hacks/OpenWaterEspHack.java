@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.Optional;
+
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.util.math.Box;
@@ -28,10 +30,8 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	@Override
 	public String getRenderName()
 	{
-		if(MC.player == null)
-			return getName();
-		
-		FishingBobberEntity bobber = MC.player.fishHook;
+		FishingBobberEntity bobber = Optional.ofNullable(MC.player)
+			.map(player -> player.fishHook).orElse(null);
 		if(bobber == null)
 			return getName();
 		
