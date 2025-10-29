@@ -231,9 +231,8 @@ public final class AutoFarmHack extends Hack
 			if(plantType == null)
 				continue;
 			
-			if(InventoryUtils.selectItem(plantType.getSeedItem()))
-				return true;
-			else if(InventoryUtils.giveCreativeItem(plantType.getSeedItem()))
+			if(InventoryUtils.selectItem(plantType.getSeedItem())
+				|| InventoryUtils.giveCreativeItem(plantType.getSeedItem()))
 				return true;
 		}
 		
