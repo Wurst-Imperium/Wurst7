@@ -65,6 +65,11 @@ public final class FaceTargetSetting
 			+ hack.getName().toLowerCase() + ".face_target");
 	}
 	
+	public void face(Vec3d v)
+	{
+		getSelected().face(v);
+	}
+	
 	private static WText buildDescriptionSuffix(boolean includePacketSpam)
 	{
 		WText text = WText.literal("\n\n");

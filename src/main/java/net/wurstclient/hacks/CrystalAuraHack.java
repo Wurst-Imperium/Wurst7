@@ -166,7 +166,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	{
 		for(Entity e : crystals)
 		{
-			faceTarget.getSelected().face(e.getBoundingBox().getCenter());
+			faceTarget.face(e.getBoundingBox().getCenter());
 			MC.interactionManager.attackEntity(MC.player, e);
 		}
 		
@@ -209,7 +209,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			if(!MC.player.isHolding(Items.END_CRYSTAL))
 				return false;
 			
-			faceTarget.getSelected().face(hitVec);
+			faceTarget.face(hitVec);
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(neighbor,

@@ -171,7 +171,7 @@ public final class BuildRandomHack extends Hack
 			return false;
 		
 		MC.itemUseCooldown = 4;
-		faceTarget.getSelected().face(params.hitVec());
+		faceTarget.face(params.hitVec());
 		lastPos = pos;
 		
 		InteractionSimulator.rightClickBlock(params.toHitResult(),

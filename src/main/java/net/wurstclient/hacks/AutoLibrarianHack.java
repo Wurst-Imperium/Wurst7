@@ -281,7 +281,7 @@ public final class AutoLibrarianHack extends Hack
 			repairMode.getValueI());
 		
 		// face block
-		faceTarget.getSelected().face(params.hitVec());
+		faceTarget.face(params.hitVec());
 		
 		// damage block and swing hand
 		if(MC.interactionManager.updateBlockBreakingProgress(jobSite,
@@ -341,7 +341,7 @@ public final class AutoLibrarianHack extends Hack
 		}
 		
 		// face block
-		faceTarget.getSelected().face(params.hitVec());
+		faceTarget.face(params.hitVec());
 		
 		// place block
 		ActionResult result = MC.interactionManager.interactBlock(MC.player,
@@ -380,7 +380,7 @@ public final class AutoLibrarianHack extends Hack
 		EntityHitResult hitResult = new EntityHitResult(villager, hitVec);
 		
 		// face end vector
-		faceTarget.getSelected().face(end);
+		faceTarget.face(end);
 		
 		// click on villager
 		Hand hand = Hand.MAIN_HAND;

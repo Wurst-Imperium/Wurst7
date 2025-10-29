@@ -223,7 +223,7 @@ public final class TreeBotHack extends Hack
 		WURST.getHax().autoToolHack.equipBestTool(pos, false, true, 0);
 		
 		// face block
-		faceTarget.getSelected().face(params.hitVec());
+		faceTarget.face(params.hitVec());
 		
 		// damage block and swing hand
 		if(MC.interactionManager.updateBlockBreakingProgress(pos,

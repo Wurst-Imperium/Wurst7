@@ -241,7 +241,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
-			faceTarget.getSelected().face(hitVec);
+			faceTarget.face(hitVec);
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
@@ -287,7 +287,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			if(!MC.player.isHolding(Items.RESPAWN_ANCHOR))
 				return false;
 			
-			faceTarget.getSelected().face(hitVec);
+			faceTarget.face(hitVec);
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(neighbor,
