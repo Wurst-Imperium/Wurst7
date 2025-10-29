@@ -28,6 +28,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantTypeManager;
 import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
+import net.wurstclient.settings.FaceTargetSetting;
+import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
@@ -42,6 +44,9 @@ public final class AutoFarmHack extends Hack
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
+	private final FaceTargetSetting faceTarget =
+		FaceTargetSetting.withoutPacketSpam(this, FaceTarget.SERVER);
 	
 	private final SwingHandSetting swingHand =
 		new SwingHandSetting(this, SwingHand.SERVER);
@@ -64,6 +69,7 @@ public final class AutoFarmHack extends Hack
 		super("AutoFarm");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
+		addSetting(faceTarget);
 		addSetting(swingHand);
 		plantTypes.getSettings().forEach(this::addSetting);
 	}
@@ -208,7 +214,7 @@ public final class AutoFarmHack extends Hack
 					continue;
 				
 				MC.itemUseCooldown = 4;
-				WURST.getRotationFaker().faceVectorPacket(params.hitVec());
+				faceTarget.face(params.hitVec());
 				InteractionSimulator.rightClickBlock(params.toHitResult(), hand,
 					swingHand.getSelected());
 				return true;
@@ -253,7 +259,7 @@ public final class AutoFarmHack extends Hack
 				return InventoryUtils.selectItem(s -> !s.isOf(Items.BONE_MEAL));
 			
 			MC.itemUseCooldown = 4;
-			WURST.getRotationFaker().faceVectorPacket(params.hitVec());
+			faceTarget.face(params.hitVec());
 			InteractionSimulator.rightClickBlock(params.toHitResult(),
 				swingHand.getSelected());
 			return true;
@@ -271,7 +277,8 @@ public final class AutoFarmHack extends Hack
 			.sorted(BlockBreaker.comparingParams());
 		
 		// Break all blocks in creative mode
-		if(MC.player.getAbilities().creativeMode)
+		if(MC.player.getAbilities().creativeMode
+			&& faceTarget.getSelected() != FaceTarget.CLIENT)
 		{
 			MC.interactionManager.cancelBlockBreaking();
 			overlay.resetProgress();
@@ -303,7 +310,7 @@ public final class AutoFarmHack extends Hack
 	
 	private boolean breakOneBlock(BlockBreakingParams params)
 	{
-		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
+		faceTarget.face(params.hitVec());
 		
 		if(!MC.interactionManager.updateBlockBreakingProgress(params.pos(),
 			params.side()))
