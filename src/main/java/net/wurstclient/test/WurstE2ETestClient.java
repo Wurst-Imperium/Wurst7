@@ -40,12 +40,6 @@ public final class WurstE2ETestClient implements ModInitializer
 		System.out.println("Starting Wurst End-to-End Tests");
 		waitForResourceLoading();
 		
-		// Disable chunk fade
-		submitAndWait(mc -> mc.options.method_76253().setValue(0.0));
-		
-		// Disable anisotropic filtering
-		submitAndWait(mc -> mc.options.method_76247().setValue(0));
-		
 		if(submitAndGet(mc -> mc.options.onboardAccessibility))
 		{
 			System.out.println("Onboarding is enabled. Waiting for it");
@@ -89,15 +83,22 @@ public final class WurstE2ETestClient implements ModInitializer
 		clickButton("selectWorld.create");
 		
 		waitForWorldLoad();
+		
+		// Disable anisotropic filtering
+		submitAndWait(mc -> mc.options.method_76247().setValue(0));
+		
+		// Disable chunk fade
+		submitAndWait(mc -> mc.options.method_76253().setValue(0.0));
+		
 		dismissTutorialToasts();
 		waitForWorldTicks(200);
 		runChatCommand("seed");
 		System.out.println("Reached singleplayer world");
 		takeScreenshot("in_game", Duration.ZERO);
-		runChatCommand("gamerule doDaylightCycle false");
-		runChatCommand("gamerule doWeatherCycle false");
-		runChatCommand("gamerule doTraderSpawning false");
-		runChatCommand("gamerule doPatrolSpawning false");
+		runChatCommand("gamerule advance_time false");
+		runChatCommand("gamerule advance_weather false");
+		runChatCommand("gamerule spawn_wandering_traders false");
+		runChatCommand("gamerule spawn_patrols false");
 		runChatCommand("time set noon");
 		clearChat();
 		
