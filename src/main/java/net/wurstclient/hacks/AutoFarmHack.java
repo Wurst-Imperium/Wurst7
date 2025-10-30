@@ -28,6 +28,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantTypeManager;
 import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FaceTargetSetting;
 import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
 import net.wurstclient.settings.SliderSetting;
@@ -44,6 +45,10 @@ public final class AutoFarmHack extends Hack
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	
+	private final CheckboxSetting checkLOS =
+		new CheckboxSetting("Check line of sight",
+			"description.wurst.setting.autofarm.check_line_of_sight", false);
 	
 	private final FaceTargetSetting faceTarget =
 		FaceTargetSetting.withoutPacketSpam(this, FaceTarget.SERVER);
@@ -69,6 +74,7 @@ public final class AutoFarmHack extends Hack
 		super("AutoFarm");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
+		addSetting(checkLOS);
 		addSetting(faceTarget);
 		addSetting(swingHand);
 		plantTypes.getSettings().forEach(this::addSetting);
@@ -213,6 +219,9 @@ public final class AutoFarmHack extends Hack
 				if(params == null || params.distanceSq() > range.getValueSq())
 					continue;
 				
+				if(checkLOS.isChecked() && !params.lineOfSight())
+					continue;
+				
 				MC.itemUseCooldown = 4;
 				faceTarget.face(params.hitVec());
 				InteractionSimulator.rightClickBlock(params.toHitResult(), hand,
@@ -254,6 +263,9 @@ public final class AutoFarmHack extends Hack
 			if(params == null || params.distanceSq() > range.getValueSq())
 				continue;
 			
+			if(checkLOS.isChecked() && !params.lineOfSight())
+				continue;
+			
 			if(MC.player.getMainHandStack().isOf(Items.BONE_MEAL))
 				return InventoryUtils.selectItem(s -> !s.isOf(Items.BONE_MEAL));
 			
@@ -272,8 +284,12 @@ public final class AutoFarmHack extends Hack
 		double rangeSq = range.getValueSq();
 		Stream<BlockBreakingParams> stream = blocksToMine.stream()
 			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
-			.filter(params -> params.distanceSq() <= rangeSq)
-			.sorted(BlockBreaker.comparingParams());
+			.filter(params -> params.distanceSq() <= rangeSq);
+		
+		if(checkLOS.isChecked())
+			stream = stream.filter(BlockBreakingParams::lineOfSight);
+		
+		stream = stream.sorted(BlockBreaker.comparingParams());
 		
 		// Break all blocks in creative mode
 		if(MC.player.getAbilities().creativeMode
