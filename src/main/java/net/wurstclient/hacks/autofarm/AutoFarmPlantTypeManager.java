@@ -18,6 +18,7 @@ import net.wurstclient.util.BlockUtils;
 
 public final class AutoFarmPlantTypeManager
 {
+	public final AmethystPlantType amethystType = new AmethystPlantType();
 	public final BambooPlantType bambooType = new BambooPlantType();
 	public final BeetrootsPlantType beetrootsType = new BeetrootsPlantType();
 	public final CactusPlantType cactusType = new CactusPlantType();
@@ -33,10 +34,10 @@ public final class AutoFarmPlantTypeManager
 		new SweetBerryPlantType();
 	public final WheatPlantType wheatType = new WheatPlantType();
 	
-	public final List<AutoFarmPlantType> plantTypes =
-		List.of(bambooType, beetrootsType, cactusType, carrotsType,
-			cocoaBeanType, kelpType, melonType, netherWartType, potatoesType,
-			pumpkinType, sugarCaneType, sweetBerryPlantType, wheatType);
+	public final List<AutoFarmPlantType> plantTypes = List.of(amethystType,
+		bambooType, beetrootsType, cactusType, carrotsType, cocoaBeanType,
+		kelpType, melonType, netherWartType, potatoesType, pumpkinType,
+		sugarCaneType, sweetBerryPlantType, wheatType);
 	
 	public AutoFarmPlantType getReplantingSpotType(BlockPos pos)
 	{
