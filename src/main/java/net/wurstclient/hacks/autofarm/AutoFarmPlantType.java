@@ -14,7 +14,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.Setting;
 
 public abstract class AutoFarmPlantType
 {
@@ -24,7 +23,7 @@ public abstract class AutoFarmPlantType
 	public AutoFarmPlantType()
 	{
 		harvest = Objects.requireNonNull(createHarvestSetting());
-		replant = Objects.requireNonNull(createReplantSetting());
+		replant = createReplantSetting();
 	}
 	
 	public final boolean isHarvestingEnabled()
@@ -34,12 +33,12 @@ public abstract class AutoFarmPlantType
 	
 	public final boolean isReplantingEnabled()
 	{
-		return replant.isChecked();
+		return replant != null && replant.isChecked();
 	}
 	
-	public final Stream<Setting> getSettings()
+	public final Stream<CheckboxSetting> getSettings()
 	{
-		return Stream.of(harvest, replant);
+		return Stream.of(harvest, replant).filter(Objects::nonNull);
 	}
 	
 	/**
