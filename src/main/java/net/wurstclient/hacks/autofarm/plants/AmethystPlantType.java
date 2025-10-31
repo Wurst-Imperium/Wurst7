@@ -10,6 +10,7 @@ package net.wurstclient.hacks.autofarm.plants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.CheckboxSetting;
@@ -19,13 +20,13 @@ public final class AmethystPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean isReplantingSpot(BlockPos pos, BlockState state)
 	{
-		return false;
+		return state.isOf(Blocks.BUDDING_AMETHYST);
 	}
 	
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -37,7 +38,7 @@ public final class AmethystPlantType extends AutoFarmPlantType
 	@Override
 	public Item getSeedItem()
 	{
-		throw new UnsupportedOperationException();
+		return Items.BUDDING_AMETHYST;
 	}
 	
 	@Override
@@ -49,6 +50,6 @@ public final class AmethystPlantType extends AutoFarmPlantType
 	@Override
 	protected CheckboxSetting createReplantSetting()
 	{
-		return null;
+		return new CheckboxSetting("Replant amethyst", true);
 	}
 }
