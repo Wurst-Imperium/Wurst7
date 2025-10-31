@@ -10,12 +10,9 @@ package net.wurstclient.hacks.autofarm.plants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.util.BlockUtils;
 
 public final class AmethystPlantType extends AutoFarmPlantType
 {
@@ -28,12 +25,6 @@ public final class AmethystPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		for(Direction dir : Direction.values())
-		{
-			BlockState state = BlockUtils.getState(pos.offset(dir));
-			if(state.isOf(Blocks.BUDDING_AMETHYST))
-				return true;
-		}
 		return false;
 	}
 	
@@ -46,7 +37,7 @@ public final class AmethystPlantType extends AutoFarmPlantType
 	@Override
 	public Item getSeedItem()
 	{
-		return Items.AMETHYST_SHARD;
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
