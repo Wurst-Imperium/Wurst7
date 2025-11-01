@@ -27,6 +27,8 @@ public final class AutoFarmPlantTypeManager
 	public final KelpPlantType kelpType = new KelpPlantType();
 	public final MelonPlantType melonType = new MelonPlantType();
 	public final NetherWartPlantType netherWartType = new NetherWartPlantType();
+	public final PitcherPlantPlantType pitcherPlantType =
+		new PitcherPlantPlantType();
 	public final PotatoesPlantType potatoesType = new PotatoesPlantType();
 	public final PumpkinPlantType pumpkinType = new PumpkinPlantType();
 	public final SugarCanePlantType sugarCaneType = new SugarCanePlantType();
@@ -36,10 +38,11 @@ public final class AutoFarmPlantTypeManager
 		new TorchflowerPlantType();
 	public final WheatPlantType wheatType = new WheatPlantType();
 	
-	public final List<AutoFarmPlantType> plantTypes = List.of(amethystType,
-		bambooType, beetrootsType, cactusType, carrotsType, cocoaBeanType,
-		kelpType, melonType, netherWartType, potatoesType, pumpkinType,
-		sugarCaneType, sweetBerryPlantType, torchflowerType, wheatType);
+	public final List<AutoFarmPlantType> plantTypes =
+		List.of(amethystType, bambooType, beetrootsType, cactusType,
+			carrotsType, cocoaBeanType, kelpType, melonType, netherWartType,
+			pitcherPlantType, potatoesType, pumpkinType, sugarCaneType,
+			sweetBerryPlantType, torchflowerType, wheatType);
 	
 	public AutoFarmPlantType getReplantingSpotType(BlockPos pos)
 	{
