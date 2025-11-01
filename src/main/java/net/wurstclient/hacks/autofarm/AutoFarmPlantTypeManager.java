@@ -24,6 +24,7 @@ public final class AutoFarmPlantTypeManager
 	public final CactusPlantType cactusType = new CactusPlantType();
 	public final CarrotsPlantType carrotsType = new CarrotsPlantType();
 	public final CocoaBeanPlantType cocoaBeanType = new CocoaBeanPlantType();
+	public final GlowBerryPlantType glowBerryType = new GlowBerryPlantType();
 	public final KelpPlantType kelpType = new KelpPlantType();
 	public final MelonPlantType melonType = new MelonPlantType();
 	public final NetherWartPlantType netherWartType = new NetherWartPlantType();
@@ -40,9 +41,9 @@ public final class AutoFarmPlantTypeManager
 	
 	public final List<AutoFarmPlantType> plantTypes =
 		List.of(amethystType, bambooType, beetrootsType, cactusType,
-			carrotsType, cocoaBeanType, kelpType, melonType, netherWartType,
-			pitcherPlantType, potatoesType, pumpkinType, sugarCaneType,
-			sweetBerryPlantType, torchflowerType, wheatType);
+			carrotsType, cocoaBeanType, glowBerryType, kelpType, melonType,
+			netherWartType, pitcherPlantType, potatoesType, pumpkinType,
+			sugarCaneType, sweetBerryPlantType, torchflowerType, wheatType);
 	
 	public AutoFarmPlantType getReplantingSpotType(BlockPos pos)
 	{
