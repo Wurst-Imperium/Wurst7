@@ -32,12 +32,14 @@ public final class AutoFarmPlantTypeManager
 	public final SugarCanePlantType sugarCaneType = new SugarCanePlantType();
 	public final SweetBerryPlantType sweetBerryPlantType =
 		new SweetBerryPlantType();
+	public final TorchflowerPlantType torchflowerType =
+		new TorchflowerPlantType();
 	public final WheatPlantType wheatType = new WheatPlantType();
 	
 	public final List<AutoFarmPlantType> plantTypes = List.of(amethystType,
 		bambooType, beetrootsType, cactusType, carrotsType, cocoaBeanType,
 		kelpType, melonType, netherWartType, potatoesType, pumpkinType,
-		sugarCaneType, sweetBerryPlantType, wheatType);
+		sugarCaneType, sweetBerryPlantType, torchflowerType, wheatType);
 	
 	public AutoFarmPlantType getReplantingSpotType(BlockPos pos)
 	{
