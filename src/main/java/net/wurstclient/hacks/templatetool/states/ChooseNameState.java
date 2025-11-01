@@ -115,17 +115,20 @@ public final class ChooseNameState extends TemplateToolState
 		@Override
 		public void tick()
 		{
-			try
+			if(nameField.getText().isEmpty())
+				hack.setFile(null);
+			else
 			{
-				if(!nameField.getText().isEmpty())
+				try
 				{
 					Path folder = WURST.getHax().autoBuildHack.getFolder();
 					Path file = folder.resolve(nameField.getText() + ".json");
 					hack.setFile(file.toFile());
+					
+				}catch(InvalidPathException e)
+				{
+					hack.setFile(null);
 				}
-			}catch(InvalidPathException e)
-			{
-				hack.setFile(null);
 			}
 			
 			doneButton.active = hack.getFile() != null;
