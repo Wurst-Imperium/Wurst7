@@ -32,15 +32,15 @@ public final class PumpkinPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
-	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
-	{
-		return state.isOf(Blocks.PUMPKIN);
-	}
-	
-	@Override
 	public Item getSeedItem()
 	{
 		return Items.PUMPKIN_SEEDS;
+	}
+	
+	@Override
+	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
+	{
+		return state.isOf(Blocks.PUMPKIN);
 	}
 	
 	@Override

@@ -47,6 +47,12 @@ public final class CactusPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.CACTUS;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!state.isOf(Blocks.CACTUS) && !state.isOf(Blocks.CACTUS_FLOWER))
@@ -54,12 +60,6 @@ public final class CactusPlantType extends AutoFarmPlantType
 		
 		BlockPos below = pos.down();
 		return isReplantingSpot(below, BlockUtils.getState(below));
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.CACTUS;
 	}
 	
 	@Override

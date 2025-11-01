@@ -35,6 +35,12 @@ public final class SweetBerryPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.SWEET_BERRIES;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		return false;
@@ -47,12 +53,6 @@ public final class SweetBerryPlantType extends AutoFarmPlantType
 			return false;
 		
 		return state.get(SweetBerryBushBlock.AGE) > 1;
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.SWEET_BERRIES;
 	}
 	
 	@Override

@@ -32,18 +32,18 @@ public final class CarrotsPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.CARROT;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!(state.getBlock() instanceof CarrotsBlock carrots))
 			return false;
 		
 		return carrots.isMature(state);
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.CARROT;
 	}
 	
 	@Override

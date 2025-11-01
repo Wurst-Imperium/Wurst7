@@ -32,18 +32,18 @@ public final class WheatPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.WHEAT_SEEDS;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!(state.getBlock() instanceof CropBlock crop))
 			return false;
 		
 		return crop.isMature(state) && state.isOf(Blocks.WHEAT);
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.WHEAT_SEEDS;
 	}
 	
 	@Override

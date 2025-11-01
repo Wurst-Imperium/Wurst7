@@ -30,15 +30,15 @@ public final class AmethystPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
-	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
-	{
-		return state.isOf(Blocks.AMETHYST_CLUSTER);
-	}
-	
-	@Override
 	public Item getSeedItem()
 	{
 		return Items.BUDDING_AMETHYST;
+	}
+	
+	@Override
+	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
+	{
+		return state.isOf(Blocks.AMETHYST_CLUSTER);
 	}
 	
 	@Override

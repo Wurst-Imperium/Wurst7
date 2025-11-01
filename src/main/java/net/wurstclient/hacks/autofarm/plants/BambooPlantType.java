@@ -41,6 +41,12 @@ public final class BambooPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.BAMBOO;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!state.isOf(Blocks.BAMBOO))
@@ -48,12 +54,6 @@ public final class BambooPlantType extends AutoFarmPlantType
 		
 		BlockPos below = pos.down();
 		return isReplantingSpot(below, BlockUtils.getState(below));
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.BAMBOO;
 	}
 	
 	@Override

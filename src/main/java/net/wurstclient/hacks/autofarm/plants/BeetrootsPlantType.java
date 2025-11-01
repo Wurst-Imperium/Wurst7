@@ -32,18 +32,18 @@ public final class BeetrootsPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.BEETROOT_SEEDS;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!(state.getBlock() instanceof BeetrootsBlock beetroots))
 			return false;
 		
 		return beetroots.isMature(state);
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.BEETROOT_SEEDS;
 	}
 	
 	@Override

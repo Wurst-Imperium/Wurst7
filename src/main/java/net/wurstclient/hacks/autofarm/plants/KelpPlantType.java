@@ -49,6 +49,12 @@ public final class KelpPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.KELP;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!state.isOf(Blocks.KELP) && !state.isOf(Blocks.KELP_PLANT))
@@ -56,12 +62,6 @@ public final class KelpPlantType extends AutoFarmPlantType
 		
 		BlockPos below = pos.down();
 		return isReplantingSpot(below, BlockUtils.getState(below));
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.KELP;
 	}
 	
 	@Override

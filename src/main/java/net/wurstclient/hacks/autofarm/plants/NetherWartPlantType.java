@@ -32,18 +32,18 @@ public final class NetherWartPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.NETHER_WART;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!(state.getBlock() instanceof NetherWartBlock))
 			return false;
 		
 		return state.get(NetherWartBlock.AGE) >= NetherWartBlock.MAX_AGE;
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.NETHER_WART;
 	}
 	
 	@Override

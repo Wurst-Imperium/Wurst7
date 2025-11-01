@@ -35,18 +35,18 @@ public final class CocoaBeanPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.COCOA_BEANS;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!(state.getBlock() instanceof CocoaBlock))
 			return false;
 		
 		return state.get(CocoaBlock.AGE) >= CocoaBlock.MAX_AGE;
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.COCOA_BEANS;
 	}
 	
 	@Override

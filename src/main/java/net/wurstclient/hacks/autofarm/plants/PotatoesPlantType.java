@@ -32,18 +32,18 @@ public final class PotatoesPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.POTATO;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!(state.getBlock() instanceof PotatoesBlock potato))
 			return false;
 		
 		return potato.isMature(state);
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.POTATO;
 	}
 	
 	@Override

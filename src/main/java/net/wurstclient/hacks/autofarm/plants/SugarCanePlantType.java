@@ -53,6 +53,12 @@ public final class SugarCanePlantType extends AutoFarmPlantType
 	}
 	
 	@Override
+	public Item getSeedItem()
+	{
+		return Items.SUGAR_CANE;
+	}
+	
+	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		if(!state.isOf(Blocks.SUGAR_CANE))
@@ -60,12 +66,6 @@ public final class SugarCanePlantType extends AutoFarmPlantType
 		
 		BlockPos below = pos.down();
 		return isReplantingSpot(below, BlockUtils.getState(below));
-	}
-	
-	@Override
-	public Item getSeedItem()
-	{
-		return Items.SUGAR_CANE;
 	}
 	
 	@Override
