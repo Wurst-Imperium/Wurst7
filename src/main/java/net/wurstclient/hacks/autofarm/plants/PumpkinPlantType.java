@@ -13,7 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
 
 public final class PumpkinPlantType extends AutoFarmPlantType
@@ -44,14 +44,8 @@ public final class PumpkinPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
-	protected CheckboxSetting createHarvestSetting()
+	protected PlantTypeSetting createSetting()
 	{
-		return new CheckboxSetting("Harvest pumpkins", true);
-	}
-	
-	@Override
-	protected CheckboxSetting createReplantSetting()
-	{
-		return new CheckboxSetting("Replant pumpkins", true);
+		return new PlantTypeSetting("Pumpkins", Items.PUMPKIN, true, true);
 	}
 }

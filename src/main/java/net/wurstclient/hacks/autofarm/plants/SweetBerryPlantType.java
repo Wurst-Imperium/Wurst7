@@ -15,7 +15,7 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
 
 public final class SweetBerryPlantType extends AutoFarmPlantType
@@ -56,14 +56,9 @@ public final class SweetBerryPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
-	protected CheckboxSetting createHarvestSetting()
+	protected PlantTypeSetting createSetting()
 	{
-		return new CheckboxSetting("Harvest sweet berries", true);
-	}
-	
-	@Override
-	protected CheckboxSetting createReplantSetting()
-	{
-		return new CheckboxSetting("Replant sweet berries", true);
+		return new PlantTypeSetting("Sweet Berries", Items.SWEET_BERRIES, true,
+			true);
 	}
 }

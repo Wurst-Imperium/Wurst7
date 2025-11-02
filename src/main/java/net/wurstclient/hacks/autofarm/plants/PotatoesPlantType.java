@@ -14,7 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
 
 public final class PotatoesPlantType extends AutoFarmPlantType
@@ -47,14 +47,8 @@ public final class PotatoesPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
-	protected CheckboxSetting createHarvestSetting()
+	protected PlantTypeSetting createSetting()
 	{
-		return new CheckboxSetting("Harvest potatoes", true);
-	}
-	
-	@Override
-	protected CheckboxSetting createReplantSetting()
-	{
-		return new CheckboxSetting("Replant potatoes", true);
+		return new PlantTypeSetting("Potatoes", Items.POTATO, true, true);
 	}
 }

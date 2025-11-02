@@ -14,7 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
 
 public final class CarrotsPlantType extends AutoFarmPlantType
@@ -47,14 +47,8 @@ public final class CarrotsPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
-	protected CheckboxSetting createHarvestSetting()
+	protected PlantTypeSetting createSetting()
 	{
-		return new CheckboxSetting("Harvest carrots", true);
-	}
-	
-	@Override
-	protected CheckboxSetting createReplantSetting()
-	{
-		return new CheckboxSetting("Replant carrots", true);
+		return new PlantTypeSetting("Carrots", Items.CARROT, true, true);
 	}
 }

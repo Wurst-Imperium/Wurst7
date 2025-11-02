@@ -13,7 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PlantTypeSetting;
 
 public final class AmethystPlantType extends AutoFarmPlantType
 {
@@ -42,14 +42,9 @@ public final class AmethystPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
-	protected CheckboxSetting createHarvestSetting()
+	protected PlantTypeSetting createSetting()
 	{
-		return new CheckboxSetting("Harvest amethyst", true);
-	}
-	
-	@Override
-	protected CheckboxSetting createReplantSetting()
-	{
-		return new CheckboxSetting("Replant amethyst", true);
+		return new PlantTypeSetting("Amethyst", Items.AMETHYST_SHARD, true,
+			true);
 	}
 }

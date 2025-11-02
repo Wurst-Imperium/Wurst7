@@ -14,7 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
 
 public final class BambooPlantType extends AutoFarmPlantType
@@ -57,14 +57,8 @@ public final class BambooPlantType extends AutoFarmPlantType
 	}
 	
 	@Override
-	protected CheckboxSetting createHarvestSetting()
+	protected PlantTypeSetting createSetting()
 	{
-		return new CheckboxSetting("Harvest bamboo", true);
-	}
-	
-	@Override
-	protected CheckboxSetting createReplantSetting()
-	{
-		return new CheckboxSetting("Replant bamboo", true);
+		return new PlantTypeSetting("Bamboo", Items.BAMBOO, true, true);
 	}
 }

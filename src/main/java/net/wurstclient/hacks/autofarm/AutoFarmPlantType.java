@@ -13,32 +13,31 @@ import java.util.stream.Stream;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
-import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.PlantTypeSetting;
+import net.wurstclient.settings.Setting;
 
 public abstract class AutoFarmPlantType
 {
-	private final CheckboxSetting harvest;
-	private final CheckboxSetting replant;
+	private final PlantTypeSetting setting;
 	
 	public AutoFarmPlantType()
 	{
-		harvest = Objects.requireNonNull(createHarvestSetting());
-		replant = createReplantSetting();
+		setting = Objects.requireNonNull(createSetting());
 	}
 	
 	public final boolean isHarvestingEnabled()
 	{
-		return harvest.isChecked();
+		return setting.isHarvestingEnabled();
 	}
 	
 	public final boolean isReplantingEnabled()
 	{
-		return replant != null && replant.isChecked();
+		return setting.isReplantingEnabled();
 	}
 	
-	public final Stream<CheckboxSetting> getSettings()
+	public final Stream<Setting> getSettings()
 	{
-		return Stream.of(harvest, replant).filter(Objects::nonNull);
+		return Stream.of(setting);
 	}
 	
 	/**
@@ -77,7 +76,5 @@ public abstract class AutoFarmPlantType
 		return false;
 	}
 	
-	protected abstract CheckboxSetting createHarvestSetting();
-	
-	protected abstract CheckboxSetting createReplantSetting();
+	protected abstract PlantTypeSetting createSetting();
 }

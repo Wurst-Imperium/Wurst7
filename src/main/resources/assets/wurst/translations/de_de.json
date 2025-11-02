@@ -142,6 +142,8 @@
   "gui.wurst.altmanager.folder_error.message": "Eventuell hast du Wurst aus Versehen den Zugriff auf diesen Ordner verweigert.\nAltManager kann deine Alt-Liste ohne diesen Ordner nicht ver- order entschlüsseln.\nDu kannst AltManager trotzdem noch benutzen, aber alle Alts die du jetzt erstellst werden nicht gespeichert.\n\nDie komplette Fehlermeldung lautet wie folgt:\n%s",
   "gui.wurst.altmanager.empty.title": "Deine Alt-Liste ist noch leer.",
   "gui.wurst.altmanager.empty.message": "Möchtest du mit ein paar zufällig generierten Alts anfangen?",
+  "gui.wurst.autofarm.harvest": "Ernten",
+  "gui.wurst.autofarm.replant": "Wieder anpflanzen",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lWARNUNG:§r Unsicherer Server",
   "gui.wurst.nochatreports.unsafe_server.message": "Dieser Server verlangt dass Chat-Signaturen aktiviert sind, was deinen Account dem Risiko von betrügerischen Chat-Reports aussetzt.\n\nDu kannst auf diesem Server chatten, wenn du Chat-Signaturen erlaubst und dich dann neu verbindest. Wenn du das tust, solltest du in Erwägung ziehen, einen Alt-Account zu benutzen, bei dem es dir egal ist wenn du ihn verlierst.\n\nWenn das dein Server ist, kannst du das Problem beheben, indem du 'enforce-secure-profile' in server.properties auf false setzt. In typischer Mojang-Manier bewirkt diese Einstellung genau das Gegenteil von dem, wonach es klingt.",
   "toast.wurst.nochatreports.unsafe_server.title": "Chatnachrichten können gemeldet werden",

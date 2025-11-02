@@ -302,6 +302,8 @@
   "gui.wurst.altmanager.folder_error.message": "Mogłeś przypadkowo zablokować dostęp Wurst do tego folderu.\nAltManager nie może zaszyfrować, ani odszyfrować twojej listy altów bez niego.\nMożesz nadal korzystać z AltManagera, ale żaden z altów, które teraz stworzysz, nie zostanie zapisany.\n\nPełny błąd wygląda następująco:\n%s",
   "gui.wurst.altmanager.empty.title": "Twoja lista altów jest pusta.",
   "gui.wurst.altmanager.empty.message": "Czy chciałbyś zacząć od dodania kilku losowych altów?",
+  "gui.wurst.autofarm.harvest": "Zbierz",
+  "gui.wurst.autofarm.replant": "Zasadź ponownie",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lOSTRZEŻENIE:§r Niebezpieczny Serwer",
   "gui.wurst.nochatreports.unsafe_server.message": "Ten serwer wymaga włączenia sygnatur czatu, co naraża Twoje konto na fałszywe zgłoszenia.\n\nMożesz dołączyć do tego serwera, jeśli odblokujesz podpisy czatu. Jeśli to zrobisz, lepiej nie korzystaj z czatu. Lub graj na koncie, które nie jest dla ciebie ważne.\n\nJeśli to twój serwer, możesz to naprawić, ustawiająć 'enforce-secure-profile' na false w server.properties. Jak przystało na Mojanga, działanie tego ustawienia jest przeciwne do nazwy.",
   "toast.wurst.nochatreports.unsafe_server.title": "Wiadomości czatu mogą być zgłaszane",

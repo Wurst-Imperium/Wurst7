@@ -166,6 +166,8 @@
   "gui.wurst.altmanager.folder_error.message": "Este posibil ca tu sa fi luat accesul instalatiei Wurst de la acest folder.\nAltManager nu poate cripta sau decripta conturi alternative fara acesta.\nInca poti folosi AltManager, dar orice cont alternativ pe care il creezi acum nu va fi salvat.\n\nIntreaga eroare este aceasta:\n%s",
   "gui.wurst.altmanager.empty.title": "Lista voastră de alt-uri este goala.",
   "gui.wurst.altmanager.empty.message": "Ți-ar plăcea niște alt-uri la întâmplare ca sa începi?",
+  "gui.wurst.autofarm.harvest": "Recoltează",
+  "gui.wurst.autofarm.replant": "Replantează",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lAVERTIZARE:§r Server nesigur",
   "toast.wurst.nochatreports.unsafe_server.title": "Mesajele chat-ului pot fi raportate",
   "toast.wurst.nochatreports.unsafe_server.message": "Mesajele trimise pe acest server pot fi raportate către Fratele Mare Mojang si poți lua ban global pe contul tău",

@@ -246,6 +246,8 @@
   "gui.wurst.altmanager.folder_error.message": "Wurstのフォルダーへのアクセス権限を拒否してしまっている可能性があります。\nアクセス権限がないと、AltManagerはAltリストを暗号化および複合化することができません。\n引き続きAltManagerを使用することはできますが、新たに作成したAltは保存されません。\n\nエラーの全容:\n%s",
   "gui.wurst.altmanager.empty.title": "Altリストは空です。",
   "gui.wurst.altmanager.empty.message": "手始めに、ランダムなAltをいくつか追加しますか？",
+  "gui.wurst.autofarm.harvest": "収穫",
+  "gui.wurst.autofarm.replant": "植え直し",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§l警告:§r 安全でないサーバー",
   "gui.wurst.nochatreports.unsafe_server.message": "このサーバーでは、チャット署名を有効にする必要があります, そのため、アカウントが不正なチャットレポートの危険にさらされます。\n\nチャット署名のブロックを解除してから再接続すると、このサーバーに参加できます。 その場合は、チャットをまったく使用しないことを検討してください。 または、BANされても大丈夫な代替アカウントでプレイします。\n\nこれがあなたのサーバーである場合、server.properties で'enforce-secure-profile'を false に設定することでこれを修正できます。典型的なモジャンのやり方で, この設定は、見た目とは逆です。",
   "toast.wurst.nochatreports.unsafe_server.title": "チャットメッセージを報告できます",
