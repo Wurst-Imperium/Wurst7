@@ -24,8 +24,8 @@ public final class AutoFarmPlantTypeManager
 	public final BeetrootsPlantType beetrootsType = new BeetrootsPlantType();
 	public final CactusPlantType cactusType = new CactusPlantType();
 	public final CarrotsPlantType carrotsType = new CarrotsPlantType();
-	public final ChorusFruitPlantType chorusFruitType =
-		new ChorusFruitPlantType();
+	public final ChorusPlantPlantType chorusFruitType =
+		new ChorusPlantPlantType();
 	public final CocoaBeanPlantType cocoaBeanType = new CocoaBeanPlantType();
 	public final GlowBerryPlantType glowBerryType = new GlowBerryPlantType();
 	public final KelpPlantType kelpType = new KelpPlantType();

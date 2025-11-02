@@ -27,7 +27,7 @@ import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
 
-public final class ChorusFruitPlantType extends AutoFarmPlantType
+public final class ChorusPlantPlantType extends AutoFarmPlantType
 {
 	private static final EnumMap<Direction, BooleanProperty> CHORUS_GROWING_DIRECTIONS =
 		Maps.newEnumMap(Map.of(Direction.NORTH, ConnectingBlock.NORTH,
@@ -100,7 +100,7 @@ public final class ChorusFruitPlantType extends AutoFarmPlantType
 	@Override
 	protected PlantTypeSetting createSetting()
 	{
-		return new PlantTypeSetting("Chorus Fruit", Items.CHORUS_FRUIT, true,
+		return new PlantTypeSetting("Chorus Plants", Items.CHORUS_FLOWER, true,
 			true);
 	}
 }
