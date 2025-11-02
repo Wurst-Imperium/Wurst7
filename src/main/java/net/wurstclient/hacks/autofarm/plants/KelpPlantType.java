@@ -40,7 +40,7 @@ public final class KelpPlantType extends AutoFarmPlantType
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
 		FluidState fluid = BlockUtils.getState(pos).getFluidState();
-		if(!fluid.isIn(FluidTags.WATER) && fluid.getLevel() == 8)
+		if(!fluid.isIn(FluidTags.WATER) || fluid.getLevel() != 8)
 			return false;
 		
 		BlockState floor = BlockUtils.getState(pos.down());
