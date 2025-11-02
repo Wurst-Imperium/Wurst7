@@ -15,11 +15,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
 import net.wurstclient.clickgui.Component;
-import net.wurstclient.settings.PlantTypeSetting;
+import net.wurstclient.settings.ToggleAllPlantTypesSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.text.WText;
 
-public final class PlantTypeComponent extends Component
+public final class ToggleAllPlantTypesComponent extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
 	private static final TextRenderer TR = MC.textRenderer;
@@ -28,9 +28,9 @@ public final class PlantTypeComponent extends Component
 	private static final String HARVEST = "Harvest";
 	private static final String REPLANT = "Replant";
 	
-	private final PlantTypeSetting setting;
+	private final ToggleAllPlantTypesSetting setting;
 	
-	public PlantTypeComponent(PlantTypeSetting setting)
+	public ToggleAllPlantTypesComponent(ToggleAllPlantTypesSetting setting)
 	{
 		this.setting = setting;
 		setWidth(getDefaultWidth());
@@ -91,10 +91,9 @@ public final class PlantTypeComponent extends Component
 			hovering && mouseX >= x3 && mouseX < x5 && mouseY >= y3;
 		boolean hReplant = hovering && mouseX >= x5 && mouseY >= y3;
 		
-		if(hIcon)
-			GUI.setTooltip(setting.getIcon().getName().getString());
-		else if(hName)
-			GUI.setTooltip(setting.getWrappedDescription(200));
+		if(hIcon || hName)
+			GUI.setTooltip(
+				"" + WText.translated("gui.wurst.autofarm.all_plant_types"));
 		else if(hHarvest)
 			GUI.setTooltip("" + WText.translated("gui.wurst.autofarm.harvest"));
 		else if(hReplant)
@@ -107,9 +106,6 @@ public final class PlantTypeComponent extends Component
 		context.fill(x4, y3, x5, y2, bgColor);
 		context.fill(x6, y3, x2, y2, bgColor);
 		
-		// icon
-		RenderUtils.drawItem(context, setting.getIcon(), x1, y1, true);
-		
 		// boxes
 		context.fill(x3, y3, x4, y2, getFillColor(hHarvest));
 		context.fill(x5, y3, x6, y2, getFillColor(hReplant));
@@ -118,10 +114,18 @@ public final class PlantTypeComponent extends Component
 		RenderUtils.drawBorder2D(context, x5, y3, x6, y2, outlineColor);
 		
 		// checks
-		if(setting.isHarvestingEnabled())
+		Boolean harvestingEnabled = setting.isHarvestingEnabled();
+		if(harvestingEnabled == Boolean.TRUE)
 			ClickGuiIcons.drawCheck(context, x3, y3, x4, y2, hHarvest, false);
-		if(setting.isReplantingEnabled())
+		else if(harvestingEnabled == null)
+			ClickGuiIcons.drawIndeterminateCheck(context, x3, y3, x4, y2,
+				hHarvest, false);
+		Boolean replantingEnabled = setting.isReplantingEnabled();
+		if(replantingEnabled == Boolean.TRUE)
 			ClickGuiIcons.drawCheck(context, x5, y3, x6, y2, hReplant, false);
+		else if(replantingEnabled == null)
+			ClickGuiIcons.drawIndeterminateCheck(context, x5, y3, x6, y2,
+				hReplant, false);
 		
 		// text
 		String name = setting.getName();

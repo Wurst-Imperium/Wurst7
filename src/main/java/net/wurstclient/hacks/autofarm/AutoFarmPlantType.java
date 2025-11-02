@@ -14,7 +14,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.settings.PlantTypeSetting;
-import net.wurstclient.settings.Setting;
 
 public abstract class AutoFarmPlantType
 {
@@ -35,7 +34,7 @@ public abstract class AutoFarmPlantType
 		return setting.isReplantingEnabled();
 	}
 	
-	public final Stream<Setting> getSettings()
+	public final Stream<PlantTypeSetting> getSettings()
 	{
 		return Stream.of(setting);
 	}

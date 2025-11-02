@@ -302,6 +302,7 @@
   "gui.wurst.altmanager.folder_error.message": "Mogłeś przypadkowo zablokować dostęp Wurst do tego folderu.\nAltManager nie może zaszyfrować, ani odszyfrować twojej listy altów bez niego.\nMożesz nadal korzystać z AltManagera, ale żaden z altów, które teraz stworzysz, nie zostanie zapisany.\n\nPełny błąd wygląda następująco:\n%s",
   "gui.wurst.altmanager.empty.title": "Twoja lista altów jest pusta.",
   "gui.wurst.altmanager.empty.message": "Czy chciałbyś zacząć od dodania kilku losowych altów?",
+  "gui.wurst.autofarm.all_plant_types": "Wszystkie rodzaje roślin",
   "gui.wurst.autofarm.harvest": "Zbierz",
   "gui.wurst.autofarm.replant": "Zasadź ponownie",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lOSTRZEŻENIE:§r Niebezpieczny Serwer",

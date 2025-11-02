@@ -39,9 +39,9 @@ public final class PlantTypeSetting extends Setting
 		super(name, description);
 		this.icon = new ItemStack(icon);
 		this.harvest = harvest;
-		this.harvestByDefault = harvest;
+		harvestByDefault = harvest;
 		this.replant = replant;
-		this.replantByDefault = replant;
+		replantByDefault = replant;
 	}
 	
 	public PlantTypeSetting(String name, String descriptionKey, Item icon,
@@ -83,16 +83,26 @@ public final class PlantTypeSetting extends Setting
 	
 	public void setHarvestingEnabled(boolean harvest)
 	{
+		setHarvestingEnabledWithoutSaving(harvest);
+		WurstClient.INSTANCE.saveSettings();
+	}
+	
+	void setHarvestingEnabledWithoutSaving(boolean harvest)
+	{
 		this.harvest = harvest;
 		update();
-		WurstClient.INSTANCE.saveSettings();
 	}
 	
 	public void setReplantingEnabled(boolean replant)
 	{
+		setReplantingEnabledWithoutSaving(replant);
+		WurstClient.INSTANCE.saveSettings();
+	}
+	
+	void setReplantingEnabledWithoutSaving(boolean replant)
+	{
 		this.replant = replant;
 		update();
-		WurstClient.INSTANCE.saveSettings();
 	}
 	
 	public void toggleHarvestingEnabled()

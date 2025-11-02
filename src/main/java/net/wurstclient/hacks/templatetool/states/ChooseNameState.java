@@ -118,7 +118,6 @@ public final class ChooseNameState extends TemplateToolState
 			if(nameField.getText().isEmpty())
 				hack.setFile(null);
 			else
-			{
 				try
 				{
 					Path folder = WURST.getHax().autoBuildHack.getFolder();
@@ -129,7 +128,6 @@ public final class ChooseNameState extends TemplateToolState
 				{
 					hack.setFile(null);
 				}
-			}
 			
 			doneButton.active = hack.getFile() != null;
 		}

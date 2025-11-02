@@ -169,6 +169,7 @@
   "gui.wurst.altmanager.folder_error.message": "Можливо, ви випадково заблокували Wurst доступ до цієї папки.\nAltManager не може зашифрувати або розшифрувати ваш альт список без неї.\nВи як і раніше можете використовувати AltManager, але будь-які створені вами альт-профілі не будуть збережені.\n\nПовна помилка має такий вигляд:\n%s",
   "gui.wurst.altmanager.empty.title": "Ваш альт-список порожній.",
   "gui.wurst.altmanager.empty.message": "Бажаєте згенерувати декілька альтів для початку?",
+  "gui.wurst.autofarm.all_plant_types": "Усі типи рослин",
   "gui.wurst.autofarm.harvest": "Зібрати",
   "gui.wurst.autofarm.replant": "Посадити знову",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lУВАГА:§r Небезпечний Сервер",

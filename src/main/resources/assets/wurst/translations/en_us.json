@@ -306,6 +306,7 @@
   "gui.wurst.altmanager.folder_error.message": "You may have accidentally blocked Wurst from accessing this folder.\nAltManager cannot encrypt or decrypt your alt list without it.\nYou can still use AltManager, but any alts you create now won't be saved.\n\nThe full error is as follows:\n%s",
   "gui.wurst.altmanager.empty.title": "Your alt list is empty.",
   "gui.wurst.altmanager.empty.message": "Would you like some random alts to get started?",
+  "gui.wurst.autofarm.all_plant_types": "All plant types",
   "gui.wurst.autofarm.harvest": "Harvest",
   "gui.wurst.autofarm.replant": "Replant",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lWARNING:§r Unsafe Server",

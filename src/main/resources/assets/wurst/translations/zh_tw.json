@@ -173,6 +173,7 @@
   "gui.wurst.altmanager.folder_error.message": "你可能在無意中阻止了 Wurst 訪問這個文件夾。\nAltManager 無法在沒有權限的情況下加密或解密 Alt List。\n你可以繼續使用 AltManager，但是你新建的 Alt 都無法被存儲。\n\n完整的錯誤信息如下：\n%s",
   "gui.wurst.altmanager.empty.title": "你的 Alt List 是空的。",
   "gui.wurst.altmanager.empty.message": "你希望 Wurst 生成一些離綫賬戶嗎？",
+  "gui.wurst.autofarm.all_plant_types": "所有植物種類",
   "gui.wurst.autofarm.harvest": "收穫",
   "gui.wurst.autofarm.replant": "重新種植",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§l警告：§r不安全的伺服器",

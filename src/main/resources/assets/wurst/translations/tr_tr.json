@@ -295,6 +295,7 @@
   "gui.wurst.altmanager.folder_error.message": "Yanlışlıkla Wurst'un bu klasöre erişimini engellemiş olabilirsiniz.\nAltManager, yan hesap listenizi şifreleyip çözemez.\nYine de AltManager'ı kullanabilirsiniz, ancak şimdi oluşturduğunuz yan hesaplar kaydedilmeyecektir.\n\nTam hata mesajı:\n%s",
   "gui.wurst.altmanager.empty.title": "Yan hesap listeniz boş.",
   "gui.wurst.altmanager.empty.message": "Başlamak için bazı rastgele yan hesaplar ister misiniz?",
+  "gui.wurst.autofarm.all_plant_types": "Tüm bitki türleri",
   "gui.wurst.autofarm.harvest": "Hasat Et",
   "gui.wurst.autofarm.replant": "Yeniden Dik",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lUyarı:§r Güvensiz Sunucu",

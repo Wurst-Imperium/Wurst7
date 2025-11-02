@@ -182,6 +182,7 @@
   "gui.wurst.altmanager.folder_error.message": "你也许不小心禁止了 Wurst 访问这个目录，\n因此 AltManager 无法加解密你的备用账户列表。\n你仍然可以使用 AltManager，但你新建的备用账户将不会被保存。\n\n完整错误信息如下：\n%s",
   "gui.wurst.altmanager.empty.title": "你的备用账户列表为空。",
   "gui.wurst.altmanager.empty.message": "你希望 Wurst 生成一些离线账户吗？",
+  "gui.wurst.autofarm.all_plant_types": "所有植物种类",
   "gui.wurst.autofarm.harvest": "收获",
   "gui.wurst.autofarm.replant": "重新种植",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§l警告:§r 不安全的服务器",

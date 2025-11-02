@@ -143,6 +143,7 @@
   "gui.wurst.altmanager.folder_error.message": "Wurst가 이 폴더에 액세스할 수 없게 블록한 것 같습니다.\nAltManager는 이 폴더 없이 가계정 목록을 암호화하거나 복호화할 수 없습니다.\nAltManager를 계속 사용할 수 있지만, 이제 만드는 가계정은 저장되지 않습니다.\n\n전체 오류는 다음과 같습니다:\n%s",
   "gui.wurst.altmanager.empty.title": "가계정 목록이 비어 있습니다.",
   "gui.wurst.altmanager.empty.message": "시작하기 위해 일부 무작위 알트 계정을 원하시나요?",
+  "gui.wurst.autofarm.all_plant_types": "모든 식물 종류",
   "gui.wurst.autofarm.harvest": "수확",
   "gui.wurst.autofarm.replant": "다시 심기",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§l주의:§r 위험한 서버",

@@ -142,6 +142,7 @@
   "gui.wurst.altmanager.folder_error.message": "Eventuell hast du Wurst aus Versehen den Zugriff auf diesen Ordner verweigert.\nAltManager kann deine Alt-Liste ohne diesen Ordner nicht ver- order entschlüsseln.\nDu kannst AltManager trotzdem noch benutzen, aber alle Alts die du jetzt erstellst werden nicht gespeichert.\n\nDie komplette Fehlermeldung lautet wie folgt:\n%s",
   "gui.wurst.altmanager.empty.title": "Deine Alt-Liste ist noch leer.",
   "gui.wurst.altmanager.empty.message": "Möchtest du mit ein paar zufällig generierten Alts anfangen?",
+  "gui.wurst.autofarm.all_plant_types": "Alle Pflanzenarten",
   "gui.wurst.autofarm.harvest": "Ernten",
   "gui.wurst.autofarm.replant": "Wieder anpflanzen",
   "gui.wurst.nochatreports.unsafe_server.title": "§4§lWARNUNG:§r Unsicherer Server",

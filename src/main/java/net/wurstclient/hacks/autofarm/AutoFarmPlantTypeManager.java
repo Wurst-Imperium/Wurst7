@@ -14,6 +14,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.hacks.autofarm.plants.*;
 import net.wurstclient.settings.Setting;
+import net.wurstclient.settings.ToggleAllPlantTypesSetting;
 import net.wurstclient.util.BlockUtils;
 
 public final class AutoFarmPlantTypeManager
@@ -45,6 +46,10 @@ public final class AutoFarmPlantTypeManager
 			netherWartType, pitcherPlantType, potatoesType, pumpkinType,
 			sugarCaneType, sweetBerryPlantType, torchflowerType, wheatType);
 	
+	public final ToggleAllPlantTypesSetting toggleAllSetting =
+		new ToggleAllPlantTypesSetting("All plant types",
+			plantTypes.stream().flatMap(AutoFarmPlantType::getSettings));
+	
 	public AutoFarmPlantType getReplantingSpotType(BlockPos pos)
 	{
 		BlockState state = BlockUtils.getState(pos);
@@ -71,6 +76,7 @@ public final class AutoFarmPlantTypeManager
 	
 	public Stream<Setting> getSettings()
 	{
-		return plantTypes.stream().flatMap(AutoFarmPlantType::getSettings);
+		return Stream.concat(Stream.of(toggleAllSetting),
+			plantTypes.stream().flatMap(AutoFarmPlantType::getSettings));
 	}
 }
