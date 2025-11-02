@@ -38,13 +38,15 @@ public final class AutoFarmPlantTypeManager
 		new SweetBerryPlantType();
 	public final TorchflowerPlantType torchflowerType =
 		new TorchflowerPlantType();
+	public final WeepingVinesPlantType weepingVinesType =
+		new WeepingVinesPlantType();
 	public final WheatPlantType wheatType = new WheatPlantType();
 	
-	public final List<AutoFarmPlantType> plantTypes =
-		List.of(amethystType, bambooType, beetrootsType, cactusType,
-			carrotsType, cocoaBeanType, glowBerryType, kelpType, melonType,
-			netherWartType, pitcherPlantType, potatoesType, pumpkinType,
-			sugarCaneType, sweetBerryPlantType, torchflowerType, wheatType);
+	public final List<AutoFarmPlantType> plantTypes = List.of(amethystType,
+		bambooType, beetrootsType, cactusType, carrotsType, cocoaBeanType,
+		glowBerryType, kelpType, melonType, netherWartType, pitcherPlantType,
+		potatoesType, pumpkinType, sugarCaneType, sweetBerryPlantType,
+		torchflowerType, weepingVinesType, wheatType);
 	
 	public final ToggleAllPlantTypesSetting toggleAllSetting =
 		new ToggleAllPlantTypesSetting("All plant types",
