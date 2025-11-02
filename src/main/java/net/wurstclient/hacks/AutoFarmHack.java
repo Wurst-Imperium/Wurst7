@@ -77,6 +77,7 @@ public final class AutoFarmHack extends Hack
 		addSetting(checkLOS);
 		addSetting(faceTarget);
 		addSetting(swingHand);
+		renderer.getSettings().forEach(this::addSetting);
 		plantTypes.getSettings().forEach(this::addSetting);
 	}
 	
@@ -170,7 +171,7 @@ public final class AutoFarmHack extends Hack
 		
 		List<BlockPos> blocksToHarvest = Stream
 			.of(blocksToMine, blocksToInteract).flatMap(List::stream).toList();
-		renderer.update(blocksToHarvest, replantingSpots.keySet(),
+		renderer.update(replantingSpots.keySet(), blocksToHarvest,
 			blocksToReplant);
 	}
 	
@@ -178,7 +179,9 @@ public final class AutoFarmHack extends Hack
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
 		renderer.render(matrixStack);
-		overlay.render(matrixStack, partialTicks, currentlyMining);
+		
+		if(renderer.drawBlocksToHarvest.isChecked())
+			overlay.render(matrixStack, partialTicks, currentlyMining);
 	}
 	
 	/**
