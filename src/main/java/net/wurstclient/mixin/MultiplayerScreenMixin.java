@@ -32,38 +32,60 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 	@Shadow
 	protected MultiplayerServerListWidget serverListWidget;
 	
+	@Unique
 	private ButtonWidget lastServerButton;
+	
+	@Unique
+	private ButtonWidget serverFinderButton;
+	
+	@Unique
+	private ButtonWidget cleanUpButton;
 	
 	private MultiplayerScreenMixin(WurstClient wurst, Text title)
 	{
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "init()V")
-	private void onInit(CallbackInfo ci)
+	@Inject(at = @At("TAIL"), method = "refreshWidgetPositions")
+	private void onRefreshWidgetPositions(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		lastServerButton = addDrawableChild(ButtonWidget
-			.builder(Text.literal("Last Server"),
-				b -> LastServerRememberer
-					.joinLastServer((MultiplayerScreen)(Object)this))
-			.dimensions(width / 2 - 154, 10, 100, 20).build());
+		if(lastServerButton == null)
+		{
+			lastServerButton =
+				addDrawableChild(
+					ButtonWidget
+						.builder(Text.literal("Last Server"),
+							b -> LastServerRememberer.joinLastServer(
+								(MultiplayerScreen)(Object)this))
+						.size(100, 20).build());
+		}
+		lastServerButton.setPosition(width / 2 - 154, 10);
 		updateLastServerButton();
 		
-		addDrawableChild(
-			ButtonWidget
+		if(serverFinderButton == null)
+		{
+			serverFinderButton = addDrawableChild(ButtonWidget
 				.builder(Text.literal("Server Finder"),
 					b -> client.setScreen(new ServerFinderScreen(
 						(MultiplayerScreen)(Object)this)))
-				.dimensions(width / 2 + 154 + 4, height - 54, 100, 20).build());
+				.size(100, 20).build());
+		}
+		serverFinderButton.setPosition(width / 2 + 154 + 4, height - 54);
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Clean Up"),
-				b -> client.setScreen(
-					new CleanUpScreen((MultiplayerScreen)(Object)this)))
-			.dimensions(width / 2 + 154 + 4, height - 30, 100, 20).build());
+		if(cleanUpButton == null)
+		{
+			cleanUpButton =
+				addDrawableChild(
+					ButtonWidget
+						.builder(Text.literal("Clean Up"),
+							b -> client.setScreen(new CleanUpScreen(
+								(MultiplayerScreen)(Object)this)))
+						.size(100, 20).build());
+		}
+		cleanUpButton.setPosition(width / 2 + 154 + 4, height - 30);
 	}
 	
 	@Inject(at = @At("HEAD"),
