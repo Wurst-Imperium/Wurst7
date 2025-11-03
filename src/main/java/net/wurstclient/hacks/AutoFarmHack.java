@@ -296,7 +296,7 @@ public final class AutoFarmHack extends Hack
 		
 		// Break all blocks in creative mode
 		if(MC.player.getAbilities().creativeMode
-			&& faceTarget.getSelected() != FaceTarget.CLIENT)
+			&& faceTarget.getSelected() == FaceTarget.OFF)
 		{
 			MC.interactionManager.cancelBlockBreaking();
 			overlay.resetProgress();
