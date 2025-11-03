@@ -84,13 +84,23 @@ public final class ChorusPlantPlantType extends AutoFarmPlantType
 			if(!state.get(entry.getValue(), false))
 				continue;
 			
-			BlockPos neighborPos = pos.offset(entry.getKey());
+			Direction direction = entry.getKey();
+			BlockPos neighborPos = pos.offset(direction);
 			BlockState neighborState = BlockUtils.getState(neighborPos);
 			if(neighborState.isOf(Blocks.CHORUS_FLOWER))
 				return true;
 			
-			if(neighborState.isOf(Blocks.CHORUS_PLANT)
-				&& hasAttachedFlowers(neighborPos, neighborState, visited))
+			if(!neighborState.isOf(Blocks.CHORUS_PLANT))
+				continue;
+				
+			// A horizontally adjacent neighbor that connects down is probably
+			// connected to the stem, so we can ignore any flowers that it
+			// supports.
+			if(direction.getAxis().isHorizontal()
+				&& neighborState.get(ConnectingBlock.DOWN, false))
+				continue;
+			
+			if(hasAttachedFlowers(neighborPos, neighborState, visited))
 				return true;
 		}
 		
