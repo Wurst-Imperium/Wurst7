@@ -85,10 +85,10 @@ public final class WurstE2ETestClient implements ModInitializer
 		waitForWorldLoad();
 		
 		// Disable anisotropic filtering
-		submitAndWait(mc -> mc.options.method_76247().setValue(0));
+		submitAndWait(mc -> mc.options.getMaxAnisotropy().setValue(0));
 		
 		// Disable chunk fade
-		submitAndWait(mc -> mc.options.method_76253().setValue(0.0));
+		submitAndWait(mc -> mc.options.getChunkFade().setValue(0.0));
 		
 		dismissTutorialToasts();
 		waitForWorldTicks(200);
