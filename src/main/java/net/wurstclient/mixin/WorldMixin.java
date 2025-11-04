@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.world.MoonPhase;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.wurstclient.WurstClient;
@@ -31,25 +32,11 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 			cir.setReturnValue(0F);
 	}
 	
-	@Override
-	public float getSkyAngle(float tickDelta)
+	@ModifyReturnValue(at = @At("RETURN"), method = "getTimeOfDay()J")
+	public long onGetTimeOfDay(long original)
 	{
 		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
-		
-		long timeOfDay = noWeather.isTimeChanged() ? noWeather.getChangedTime()
-			: getLevelProperties().getTimeOfDay();
-		
-		return getDimension().getSkyAngle(timeOfDay);
-	}
-	
-	@Override
-	public MoonPhase getMoonPhase()
-	{
-		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
-		
-		if(noWeather.isMoonPhaseChanged())
-			return noWeather.getChangedMoonPhase();
-		
-		return WorldAccess.super.getMoonPhase();
+		return noWeather.isTimeChanged() ? noWeather.getChangedTime()
+			: original;
 	}
 }
