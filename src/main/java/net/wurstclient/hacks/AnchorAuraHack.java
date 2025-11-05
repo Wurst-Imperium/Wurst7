@@ -31,8 +31,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
-import net.wurstclient.settings.FacingSetting;
-import net.wurstclient.settings.FacingSetting.Facing;
+import net.wurstclient.settings.FaceTargetSetting;
+import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
@@ -56,13 +56,12 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		new CheckboxSetting("Auto-place anchors",
 			"description.wurst.setting.anchoraura.auto-place_anchors", true);
 	
-	private final FacingSetting faceBlocks =
-		FacingSetting.withPacketSpam("Face anchors",
-			"description.wurst.setting.anchoraura.face_anchors", Facing.OFF);
-	
 	private final CheckboxSetting checkLOS =
 		new CheckboxSetting("Check line of sight",
 			"description.wurst.setting.anchoraura.check_line_of_sight", false);
+	
+	private final FaceTargetSetting faceTarget =
+		FaceTargetSetting.withPacketSpam(this, FaceTarget.OFF);
 	
 	private final SwingHandSetting swingHand =
 		new SwingHandSetting(this, SwingHand.CLIENT);
@@ -82,8 +81,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		setCategory(Category.COMBAT);
 		addSetting(range);
 		addSetting(autoPlace);
-		addSetting(faceBlocks);
 		addSetting(checkLOS);
+		addSetting(faceTarget);
 		addSetting(swingHand);
 		addSetting(takeItemsFrom);
 		
@@ -242,7 +241,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 				&& !BlockUtils.hasLineOfSight(eyesPos, hitVec))
 				continue;
 			
-			faceBlocks.getSelected().face(hitVec);
+			faceTarget.face(hitVec);
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
@@ -288,7 +287,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			if(!MC.player.isHolding(Items.RESPAWN_ANCHOR))
 				return false;
 			
-			faceBlocks.getSelected().face(hitVec);
+			faceTarget.face(hitVec);
 			
 			// place block
 			IMC.getInteractionManager().rightClickBlock(neighbor,

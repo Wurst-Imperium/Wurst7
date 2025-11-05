@@ -21,14 +21,12 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.network.ServerInfo.ServerType;
 import net.minecraft.client.option.ServerList;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
-import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.util.MathUtils;
 
 public class ServerFinderScreen extends Screen
@@ -199,10 +197,9 @@ public class ServerFinderScreen extends Screen
 		serverList.add(new ServerInfo(name, ip, ServerType.OTHER), false);
 		serverList.saveFile();
 		
-		MultiplayerServerListWidget selector =
-			((IMultiplayerScreen)prevScreen).getServerListSelector();
-		selector.setSelected(null);
-		selector.setServers(serverList);
+		MultiplayerServerListWidget listWidget = prevScreen.serverListWidget;
+		listWidget.setSelected(null);
+		listWidget.setServers(serverList);
 	}
 	
 	@Override
@@ -210,15 +207,6 @@ public class ServerFinderScreen extends Screen
 	{
 		searchButton.active = MathUtils.isInteger(maxThreadsBox.getText())
 			&& !ipBox.getText().isEmpty();
-	}
-	
-	@Override
-	public boolean keyPressed(KeyInput context)
-	{
-		if(context.key() == GLFW.GLFW_KEY_ENTER)
-			searchButton.onPress(context);
-		
-		return super.keyPressed(context);
 	}
 	
 	@Override

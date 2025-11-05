@@ -10,32 +10,30 @@ package net.wurstclient.hacks.chestesp;
 import java.util.ArrayList;
 
 import net.minecraft.entity.Entity;
-import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.EntityUtils;
 
-public final class ChestEspEntityGroup extends ChestEspGroup
+public abstract class ChestEspEntityGroup extends ChestEspGroup
 {
 	private final ArrayList<Entity> entities = new ArrayList<>();
 	
-	public ChestEspEntityGroup(ColorSetting color, CheckboxSetting enabled)
-	{
-		super(color, enabled);
-	}
+	protected abstract boolean matches(Entity e);
 	
-	public void add(Entity e)
+	public final void addIfMatches(Entity e)
 	{
+		if(!matches(e))
+			return;
+		
 		entities.add(e);
 	}
 	
 	@Override
-	public void clear()
+	public final void clear()
 	{
 		entities.clear();
 		super.clear();
 	}
 	
-	public void updateBoxes(float partialTicks)
+	public final void updateBoxes(float partialTicks)
 	{
 		boxes.clear();
 		
