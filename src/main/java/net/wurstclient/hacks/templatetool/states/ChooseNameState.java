@@ -8,6 +8,7 @@
 package net.wurstclient.hacks.templatetool.states;
 
 import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 import org.lwjgl.glfw.GLFW;
@@ -98,6 +99,9 @@ public final class ChooseNameState extends TemplateToolState
 		
 		private void done()
 		{
+			if(hack.getFile() == null)
+				return;
+			
 			hack.setBlockTypesEnabled(includeTypesBox.isChecked());
 			hack.setState(new SavingFileState());
 		}
@@ -111,11 +115,20 @@ public final class ChooseNameState extends TemplateToolState
 		public void tick()
 		{
 			if(nameField.getText().isEmpty())
-				return;
+				hack.setFile(null);
+			else
+				try
+				{
+					Path folder = WURST.getHax().autoBuildHack.getFolder();
+					Path file = folder.resolve(nameField.getText() + ".json");
+					hack.setFile(file.toFile());
+					
+				}catch(InvalidPathException e)
+				{
+					hack.setFile(null);
+				}
 			
-			Path folder = WURST.getHax().autoBuildHack.getFolder();
-			Path file = folder.resolve(nameField.getText() + ".json");
-			hack.setFile(file.toFile());
+			doneButton.active = hack.getFile() != null;
 		}
 		
 		@Override

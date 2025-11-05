@@ -33,7 +33,8 @@ import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.treebot.Tree;
 import net.wurstclient.hacks.treebot.TreeBotUtils;
-import net.wurstclient.settings.FacingSetting;
+import net.wurstclient.settings.FaceTargetSetting;
+import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
@@ -52,16 +53,8 @@ public final class TreeBotHack extends Hack
 		"How far TreeBot will reach to break blocks.", 4.5, 1, 6, 0.05,
 		ValueDisplay.DECIMAL);
 	
-	private final FacingSetting facing = FacingSetting.withoutPacketSpam(
-		"How TreeBot should face the logs and leaves when breaking them.\n\n"
-			+ "\u00a7lOff\u00a7r - Don't face the blocks at all. Will be"
-			+ " detected by anti-cheat plugins.\n\n"
-			+ "\u00a7lServer-side\u00a7r - Face the blocks on the"
-			+ " server-side, while still letting you move the camera freely on"
-			+ " the client-side.\n\n"
-			+ "\u00a7lClient-side\u00a7r - Face the blocks by moving your"
-			+ " camera on the client-side. This is the most legit option, but"
-			+ " can be disorienting to look at.");
+	private final FaceTargetSetting faceTarget =
+		FaceTargetSetting.withoutPacketSpam(this, FaceTarget.SERVER);
 	
 	private final SwingHandSetting swingHand =
 		new SwingHandSetting(this, SwingHand.SERVER);
@@ -79,7 +72,7 @@ public final class TreeBotHack extends Hack
 		super("TreeBot");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
-		addSetting(facing);
+		addSetting(faceTarget);
 		addSetting(swingHand);
 	}
 	
@@ -230,7 +223,7 @@ public final class TreeBotHack extends Hack
 		WURST.getHax().autoToolHack.equipBestTool(pos, false, true, 0);
 		
 		// face block
-		facing.getSelected().face(params.hitVec());
+		faceTarget.face(params.hitVec());
 		
 		// damage block and swing hand
 		if(MC.interactionManager.updateBlockBreakingProgress(pos,

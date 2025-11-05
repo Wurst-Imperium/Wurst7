@@ -174,6 +174,24 @@ public enum ClickGuiIcons
 		RenderUtils.drawLineStrip2D(context, outlineVertices, outlineColor);
 	}
 	
+	public static void drawIndeterminateCheck(DrawContext context, float x1,
+		float y1, float x2, float y2, boolean hovering, boolean grayedOut)
+	{
+		float xc1 = x1 + 2.5F;
+		float xc2 = x2 - 2.5F;
+		float yc1 = y1 + 2.5F;
+		float yc2 = y2 - 2.5F;
+		
+		// fill
+		int checkColor =
+			grayedOut ? 0xC0808080 : hovering ? 0xFF00FF00 : 0xFF00D900;
+		RenderUtils.fill2D(context, xc1, yc1, xc2, yc2, checkColor);
+		
+		// outline
+		int outlineColor = 0x80101010;
+		RenderUtils.drawBorder2D(context, xc1, yc1, xc2, yc2, outlineColor);
+	}
+	
 	public static void drawCross(DrawContext context, float x1, float y1,
 		float x2, float y2, boolean hovering)
 	{
