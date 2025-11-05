@@ -49,7 +49,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "Lnet/minecraft/entity/Entity;pushAwayFrom(Lnet/minecraft/entity/Entity;)V",
+		method = "pushAwayFrom(Lnet/minecraft/entity/Entity;)V",
 		cancellable = true)
 	private void onPushAwayFrom(Entity entity, CallbackInfo ci)
 	{
@@ -65,7 +65,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 	 * Makes invisible entities render as ghosts if TrueSight is enabled.
 	 */
 	@Inject(at = @At("RETURN"),
-		method = "Lnet/minecraft/entity/Entity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z",
+		method = "isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z",
 		cancellable = true)
 	private void onIsInvisibleTo(PlayerEntity player,
 		CallbackInfoReturnable<Boolean> cir)
