@@ -30,8 +30,8 @@ public class FlyPathProcessor extends PathProcessor
 	public void process()
 	{
 		// get positions
-		BlockPos pos = BlockPos.ofFloored(MC.player.getPos());
-		Vec3d posVec = MC.player.getPos();
+		BlockPos pos = BlockPos.ofFloored(MC.player.getEntityPos());
+		Vec3d posVec = MC.player.getEntityPos();
 		BlockPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
 		Box nextBox = new Box(nextPos.getX() + 0.3, nextPos.getY(),
@@ -113,7 +113,7 @@ public class FlyPathProcessor extends PathProcessor
 		// horizontal movement
 		if(horizontal)
 		{
-			if(!creativeFlying && MC.player.getPos().distanceTo(
+			if(!creativeFlying && MC.player.getEntityPos().distanceTo(
 				vecInPos) <= WURST.getHax().flightHack.horizontalSpeed
 					.getValue())
 			{
@@ -132,7 +132,7 @@ public class FlyPathProcessor extends PathProcessor
 			// vertical movement
 		}else if(y)
 		{
-			if(!creativeFlying && MC.player.getPos().distanceTo(
+			if(!creativeFlying && MC.player.getEntityPos().distanceTo(
 				vecInPos) <= WURST.getHax().flightHack.verticalSpeed.getValue())
 			{
 				MC.player.setPosition(vecInPos.x, vecInPos.y, vecInPos.z);

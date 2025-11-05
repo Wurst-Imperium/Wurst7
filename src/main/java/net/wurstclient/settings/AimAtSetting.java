@@ -77,7 +77,7 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 	private static Vec3d aimAtHead(Entity e)
 	{
 		float eyeHeight = e.getEyeHeight(e.getPose());
-		return e.getPos().add(0, eyeHeight, 0);
+		return e.getEntityPos().add(0, eyeHeight, 0);
 	}
 	
 	private static Vec3d aimAtCenter(Entity e)
@@ -87,7 +87,7 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 	
 	private static Vec3d aimAtFeet(Entity e)
 	{
-		return e.getPos().add(0, 0.001, 0);
+		return e.getEntityPos().add(0, 0.001, 0);
 	}
 	
 	public enum AimAt

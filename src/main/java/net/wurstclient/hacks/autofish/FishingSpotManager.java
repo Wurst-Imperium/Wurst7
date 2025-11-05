@@ -182,7 +182,7 @@ public final class FishingSpotManager
 		boolean samePlayerInput = lastSpot != null
 			&& lastSpot.input().isNearlyIdenticalTo(castPosRot);
 		boolean sameBobberPos = lastSpot != null
-			&& isInRange(lastSpot.bobberPos(), bobber.getPos());
+			&& isInRange(lastSpot.bobberPos(), bobber.getEntityPos());
 		
 		// update counter based on bobber position
 		if(sameBobberPos)

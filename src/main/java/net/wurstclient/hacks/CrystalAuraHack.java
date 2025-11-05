@@ -279,8 +279,8 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 		BlockPos max = center.add(rangeI, rangeI, rangeI);
 		Box targetBB = target.getBoundingBox();
 		
-		Vec3d targetEyesVec =
-			target.getPos().add(0, target.getEyeHeight(target.getPose()), 0);
+		Vec3d targetEyesVec = target.getEntityPos().add(0,
+			target.getEyeHeight(target.getPose()), 0);
 		
 		Comparator<BlockPos> closestToTarget =
 			Comparator.<BlockPos> comparingDouble(
