@@ -7,20 +7,15 @@
  */
 package net.wurstclient.hacks.autofarm;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Stream;
 
-import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
-
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.wurstclient.WurstRenderLayers;
-import net.wurstclient.util.EasyVertexBuffer;
-import net.wurstclient.util.RegionPos;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.Setting;
 import net.wurstclient.util.RenderUtils;
 
 public final class AutoFarmRenderer
@@ -29,68 +24,47 @@ public final class AutoFarmRenderer
 		new Box(BlockPos.ORIGIN).contract(1 / 16.0);
 	private static final Box NODE_BOX = new Box(BlockPos.ORIGIN).contract(0.25);
 	
-	private EasyVertexBuffer vertexBuffer;
-	private RegionPos region;
+	public final CheckboxSetting drawReplantingSpots =
+		new CheckboxSetting("Draw replanting spots", true);
+	public final CheckboxSetting drawBlocksToHarvest =
+		new CheckboxSetting("Draw blocks to harvest", true);
+	public final CheckboxSetting drawBlocksToReplant =
+		new CheckboxSetting("Draw blocks to replant", true);
 	
-	public void reset()
+	private List<Box> replantingSpots = List.of();
+	private List<Box> blocksToHarvest = List.of();
+	private List<Box> blocksToReplant = List.of();
+	
+	public void update(Collection<BlockPos> replantingSpots,
+		Collection<BlockPos> blocksToHarvest,
+		Collection<BlockPos> blocksToReplant)
 	{
-		if(vertexBuffer != null)
-		{
-			vertexBuffer.close();
-			vertexBuffer = null;
-		}
+		this.replantingSpots =
+			replantingSpots.stream().map(NODE_BOX::offset).toList();
+		this.blocksToHarvest =
+			blocksToHarvest.stream().map(BLOCK_BOX::offset).toList();
+		this.blocksToReplant =
+			blocksToReplant.stream().map(BLOCK_BOX::offset).toList();
 	}
 	
 	public void render(MatrixStack matrixStack)
 	{
-		if(vertexBuffer == null || region == null)
-			return;
+		if(drawReplantingSpots.isChecked())
+			RenderUtils.drawNodes(matrixStack, replantingSpots, 0x8000FFFF,
+				false);
 		
-		matrixStack.push();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
+		if(drawBlocksToHarvest.isChecked())
+			RenderUtils.drawOutlinedBoxes(matrixStack, blocksToHarvest,
+				0x8000FF00, false);
 		
-		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_LINES);
-		
-		matrixStack.pop();
+		if(drawBlocksToReplant.isChecked())
+			RenderUtils.drawOutlinedBoxes(matrixStack, blocksToReplant,
+				0x80FF0000, false);
 	}
 	
-	public void updateVertexBuffers(List<BlockPos> blocksToHarvest,
-		Set<BlockPos> plants, List<BlockPos> blocksToReplant)
+	public Stream<Setting> getSettings()
 	{
-		reset();
-		
-		if(blocksToHarvest.isEmpty() && plants.isEmpty()
-			&& blocksToReplant.isEmpty())
-			return;
-		
-		vertexBuffer = EasyVertexBuffer.createAndUpload(DrawMode.LINES,
-			VertexFormats.POSITION_COLOR_NORMAL, buffer -> buildBuffer(buffer,
-				blocksToHarvest, plants, blocksToReplant));
-	}
-	
-	private void buildBuffer(VertexConsumer buffer,
-		List<BlockPos> blocksToHarvest, Set<BlockPos> plants,
-		List<BlockPos> blocksToReplant)
-	{
-		region = RenderUtils.getCameraRegion();
-		Vec3d regionOffset = region.negate().toVec3d();
-		
-		for(BlockPos pos : blocksToHarvest)
-		{
-			Box box = BLOCK_BOX.offset(pos).offset(regionOffset);
-			RenderUtils.drawOutlinedBox(buffer, box, 0x8000FF00);
-		}
-		
-		for(BlockPos pos : plants)
-		{
-			Box renderNode = NODE_BOX.offset(pos).offset(regionOffset);
-			RenderUtils.drawNode(buffer, renderNode, 0x8000FFFF);
-		}
-		
-		for(BlockPos pos : blocksToReplant)
-		{
-			Box renderBox = BLOCK_BOX.offset(pos).offset(regionOffset);
-			RenderUtils.drawOutlinedBox(buffer, renderBox, 0x80FF0000);
-		}
+		return Stream.of(drawReplantingSpots, drawBlocksToHarvest,
+			drawBlocksToReplant);
 	}
 }

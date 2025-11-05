@@ -14,19 +14,17 @@ import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.enums.ChestType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.BlockUtils;
 
-public final class ChestEspBlockGroup extends ChestEspGroup
+public abstract class ChestEspBlockGroup extends ChestEspGroup
 {
-	public ChestEspBlockGroup(ColorSetting color, CheckboxSetting enabled)
-	{
-		super(color, enabled);
-	}
+	protected abstract boolean matches(BlockEntity be);
 	
-	public void add(BlockEntity be)
+	public final void addIfMatches(BlockEntity be)
 	{
+		if(!matches(be))
+			return;
+		
 		Box box = getBox(be);
 		if(box == null)
 			return;

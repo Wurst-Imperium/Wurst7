@@ -2,6 +2,13 @@ buildscript {
 	dependencies {
 		classpath "org.kohsuke:github-api:1.330"
 	}
+	
+	configurations.classpath {
+		resolutionStrategy {
+			// v28.0-jre, used by fabric-loom 1.13.3, is vulnerable to CVE-2020-8908 and CVE-2023-2976
+			force "com.google.guava:guava:32.0.1-jre"
+		}
+	}
 }
 
 plugins {
@@ -61,8 +68,8 @@ dependencies {
 	// In other words, Wurst won't compile without this library,
 	// even though it's Minecraft that actually uses it.
 	modImplementation "com.google.code.findbugs:jsr305:3.0.2"
-	}
-	
+}
+
 loom {
 	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
 }

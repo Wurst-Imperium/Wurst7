@@ -18,6 +18,7 @@ import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.WaterAnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
@@ -65,9 +66,9 @@ public final class RadarComponent extends Component
 		matrixStack.translate(middleX, middleY);
 		
 		ClientPlayerEntity player = MC.player;
-		// if(!hack.isRotateEnabled()) FIXME
-		// matrixStack.multiply(new Quaternionf().rotationZ(
-		// (180 + player.getYaw()) * MathHelper.RADIANS_PER_DEGREE));
+		if(!hack.isRotateEnabled())
+			matrixStack.rotate(
+				(180 + player.getYaw()) * MathHelper.RADIANS_PER_DEGREE);
 		
 		// arrow
 		ClickGuiIcons.drawRadarArrow(context, -2, -2, 2, 2);

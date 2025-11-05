@@ -25,16 +25,16 @@ public final class SwingHandSetting
 	private static final WText REDUCED_DESCRIPTION_SUFFIX =
 		buildDescriptionSuffix(false);
 	
-	private SwingHandSetting(String name, WText description, SwingHand[] values,
+	private SwingHandSetting(WText description, SwingHand[] values,
 		SwingHand selected)
 	{
-		super(name, description, values, selected);
+		super("Swing hand", description, values, selected);
 	}
 	
 	public SwingHandSetting(WText description, SwingHand selected)
 	{
-		this("Swing hand", description.append(FULL_DESCRIPTION_SUFFIX),
-			SwingHand.values(), selected);
+		this(description.append(FULL_DESCRIPTION_SUFFIX), SwingHand.values(),
+			selected);
 	}
 	
 	public SwingHandSetting(Hack hack, SwingHand selected)
@@ -46,7 +46,7 @@ public final class SwingHandSetting
 		SwingHand selected)
 	{
 		SwingHand[] values = {SwingHand.SERVER, SwingHand.CLIENT};
-		return new SwingHandSetting("Swing hand",
+		return new SwingHandSetting(
 			description.append(REDUCED_DESCRIPTION_SUFFIX), values, selected);
 	}
 	

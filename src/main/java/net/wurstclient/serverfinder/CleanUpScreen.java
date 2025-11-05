@@ -25,7 +25,6 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
-import net.wurstclient.mixinterface.IMultiplayerScreen;
 
 public class CleanUpScreen extends Screen
 {
@@ -184,11 +183,9 @@ public class CleanUpScreen extends Screen
 	{
 		prevScreen.getServerList().saveFile();
 		
-		MultiplayerServerListWidget serverListSelector =
-			((IMultiplayerScreen)prevScreen).getServerListSelector();
-		
-		serverListSelector.setSelected(null);
-		serverListSelector.setServers(prevScreen.getServerList());
+		MultiplayerServerListWidget listWidget = prevScreen.serverListWidget;
+		listWidget.setSelected(null);
+		listWidget.setServers(prevScreen.getServerList());
 	}
 	
 	@Override

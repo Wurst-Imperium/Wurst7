@@ -2,6 +2,7 @@ accessWidener	v1	named
 accessible	class	net/minecraft/client/gui/DrawContext$ScissorStack
 accessible	method	net/minecraft/client/gl/RenderPipelines	register	(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 accessible	method	net/minecraft/client/gui/screen/ingame/HandledScreen onMouseClick	(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V
+accessible	method	net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen	connect	(Lnet/minecraft/client/network/ServerInfo;)V
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/Mouse	onMouseButton	(JIII)V
 accessible	method	net/minecraft/client/render/GameRenderer	setPostProcessor	(Lnet/minecraft/util/Identifier;)V
@@ -19,6 +20,7 @@ accessible	field	net/minecraft/client/gui/hud/ChatHud	visibleMessages	Ljava/util
 accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/TitleScreen	doBackgroundFade	Z
 accessible	field	net/minecraft/client/gui/screen/ingame/CreativeInventoryScreen	selectedTab	Lnet/minecraft/item/ItemGroup;
+accessible	field	net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen	serverListWidget	Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget;
 accessible	field	net/minecraft/client/gui/screen/option/ControlsListWidget$KeyBindingEntry	bindingName	Lnet/minecraft/text/Text;
 accessible	field	net/minecraft/client/gui/widget/CyclingButtonWidget	optionText	Lnet/minecraft/text/Text;
 accessible	field	net/minecraft/client/network/ClientPlayNetworkHandler	messagePacker	Lnet/minecraft/network/message/MessageChain$Packer;
