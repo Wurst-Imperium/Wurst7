@@ -22,7 +22,8 @@
   "description.wurst.setting.autoeat.allow_hunger": "食腐肉時會有一個無害嘅 \"飢餓\" 效果。\n可安全食用，或作應急食品。",
   "description.wurst.setting.autoeat.allow_poison": "有毒嘅食物將會隨時間嘅推移造成傷害。\n唔推薦。",
   "description.wurst.setting.autoeat.allow_chorus": "（如果允許）食歌萊果將會傳送你到一個隨機嘅地點。\n唔推薦。",
-  "description.wurst.hack.autofarm": "自動收獲並種植農作物。\n有效作物為小麥、紅蘿蔔、薯仔、紅菜頭、南瓜、西瓜、仙人掌、蔗、海帶、竹、 地獄孢子同可可豆。",
+  "description.wurst.hack.autofarm": "自動收獲並種植農作物。",
+  "description.wurst.setting.autofarm.swing_hand": "設定 AutoFarm 喺種植同收獲時點樣揮動你隻手。",
   "description.wurst.hack.autofish": "自動釣魚同時使用你最好嘅魚竿，如果有更好嘅魚竿將會自動使用。",
   "description.wurst.hack.automine": "自動挖掘你眼前所指嘅方塊。",
   "description.wurst.hack.autopotion": "當你嘅生命值過低時，自動掟一樽噴濺型瞬間恢復。",
@@ -162,5 +163,8 @@
   "gui.wurst.altmanager.folder_error.message": "你可能唔小心阻止 Wurst 訪問呢個文件夾。\n如果Wurst無法訪問， AltManager 將無法加密或解密你嘅帳號列表。\n你依然可以使用 AltManager，但你依家創建嘅任何帳號將冇辦法被保存。\n\n全部錯誤如下：\n%s",
   "gui.wurst.altmanager.empty.title": "你嘅帳號列表係空嘅。",
   "gui.wurst.altmanager.empty.message": "你想唔想要啲隨機嘅帳號嚟開始？",
+  "gui.wurst.autofarm.all_plant_types": "所有植物種類",
+  "gui.wurst.autofarm.harvest": "收割",
+  "gui.wurst.autofarm.replant": "重新種植",
   "key.wurst.zoom": "縮放"
 }
