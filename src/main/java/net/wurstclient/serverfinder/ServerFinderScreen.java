@@ -26,7 +26,6 @@ import net.minecraft.client.option.ServerList;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
-import net.wurstclient.mixinterface.IMultiplayerScreen;
 import net.wurstclient.util.MathUtils;
 
 public class ServerFinderScreen extends Screen
@@ -197,10 +196,9 @@ public class ServerFinderScreen extends Screen
 		serverList.add(new ServerInfo(name, ip, ServerType.OTHER), false);
 		serverList.saveFile();
 		
-		MultiplayerServerListWidget selector =
-			((IMultiplayerScreen)prevScreen).getServerListSelector();
-		selector.setSelected(null);
-		selector.setServers(serverList);
+		MultiplayerServerListWidget listWidget = prevScreen.serverListWidget;
+		listWidget.setSelected(null);
+		listWidget.setServers(serverList);
 	}
 	
 	@Override
@@ -208,15 +206,6 @@ public class ServerFinderScreen extends Screen
 	{
 		searchButton.active = MathUtils.isInteger(maxThreadsBox.getText())
 			&& !ipBox.getText().isEmpty();
-	}
-	
-	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int int_3)
-	{
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			searchButton.onPress();
-		
-		return super.keyPressed(keyCode, scanCode, int_3);
 	}
 	
 	@Override

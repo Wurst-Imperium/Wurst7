@@ -48,7 +48,8 @@ import net.wurstclient.hacks.autolibrarian.UpdateBooksSetting;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.FacingSetting;
+import net.wurstclient.settings.FaceTargetSetting;
+import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
@@ -92,16 +93,8 @@ public final class AutoLibrarianHack extends Hack
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final FacingSetting facing = FacingSetting.withoutPacketSpam(
-		"How AutoLibrarian should face the villager and job site.\n\n"
-			+ "\u00a7lOff\u00a7r - Don't face the villager at all. Will be"
-			+ " detected by anti-cheat plugins.\n\n"
-			+ "\u00a7lServer-side\u00a7r - Face the villager on the"
-			+ " server-side, while still letting you move the camera freely on"
-			+ " the client-side.\n\n"
-			+ "\u00a7lClient-side\u00a7r - Face the villager by moving your"
-			+ " camera on the client-side. This is the most legit option, but"
-			+ " can be disorienting to look at.");
+	private final FaceTargetSetting faceTarget =
+		FaceTargetSetting.withoutPacketSpam(this, FaceTarget.SERVER);
 	
 	private final SwingHandSetting swingHand =
 		new SwingHandSetting(this, SwingHand.SERVER);
@@ -130,7 +123,7 @@ public final class AutoLibrarianHack extends Hack
 		addSetting(lockInTrade);
 		addSetting(updateBooks);
 		addSetting(range);
-		addSetting(facing);
+		addSetting(faceTarget);
 		addSetting(swingHand);
 		addSetting(repairMode);
 	}
@@ -288,7 +281,7 @@ public final class AutoLibrarianHack extends Hack
 			repairMode.getValueI());
 		
 		// face block
-		facing.getSelected().face(params.hitVec());
+		faceTarget.face(params.hitVec());
 		
 		// damage block and swing hand
 		if(MC.interactionManager.updateBlockBreakingProgress(jobSite,
@@ -348,7 +341,7 @@ public final class AutoLibrarianHack extends Hack
 		}
 		
 		// face block
-		facing.getSelected().face(params.hitVec());
+		faceTarget.face(params.hitVec());
 		
 		// place block
 		ActionResult result = MC.interactionManager.interactBlock(MC.player,
@@ -387,7 +380,7 @@ public final class AutoLibrarianHack extends Hack
 		EntityHitResult hitResult = new EntityHitResult(villager, hitVec);
 		
 		// face end vector
-		facing.getSelected().face(end);
+		faceTarget.face(end);
 		
 		// click on villager
 		Hand hand = Hand.MAIN_HAND;
