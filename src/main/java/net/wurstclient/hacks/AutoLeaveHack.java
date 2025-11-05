@@ -65,7 +65,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 	@Override
 	public String getRenderName()
 	{
-		if(MC.player.getAbilities().creativeMode)
+		if(MC.player != null && MC.player.getAbilities().creativeMode)
 			return getName() + " (paused)";
 		
 		return getName() + " [" + mode.getSelected() + "]";

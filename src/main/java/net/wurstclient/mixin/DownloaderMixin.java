@@ -43,7 +43,7 @@ public abstract class DownloaderMixin implements AutoCloseable
 	@WrapOperation(at = @At(value = "INVOKE",
 		target = "Ljava/nio/file/Path;resolve(Ljava/lang/String;)Ljava/nio/file/Path;",
 		ordinal = 0,
-		remap = false), method = "method_55485")
+		remap = false), method = "method_55485", remap = false)
 	private Path wrapResolve(Path instance, String filename,
 		Operation<Path> original)
 	{
