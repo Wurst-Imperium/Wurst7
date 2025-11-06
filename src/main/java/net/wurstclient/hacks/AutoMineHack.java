@@ -42,6 +42,7 @@ public final class AutoMineHack extends Hack
 	@Override
 	protected void onEnable()
 	{
+		WURST.getHax().autoFarmHack.setEnabled(false);
 		WURST.getHax().excavatorHack.setEnabled(false);
 		WURST.getHax().nukerHack.setEnabled(false);
 		WURST.getHax().nukerLegitHack.setEnabled(false);
