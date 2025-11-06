@@ -6,7 +6,7 @@ buildscript {
 	configurations.classpath {
 		resolutionStrategy {
 			// v28.0-jre, used by fabric-loom 1.13.3, is vulnerable to CVE-2020-8908 and CVE-2023-2976
-			force "com.google.guava:guava:32.0.1-jre"
+			force "com.google.guava:guava:33.5.0-jre"
 		}
 	}
 }
