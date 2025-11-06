@@ -540,6 +540,35 @@ public enum RenderUtils
 		vcp.draw(layer);
 	}
 	
+	public static void drawNodes(MatrixStack matrices, List<Box> boxes,
+		int color, boolean depthTest)
+	{
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		Vec3d camOffset = getCameraPos().negate();
+		for(Box box : boxes)
+			drawNode(matrices, buffer, box.offset(camOffset), color);
+		
+		vcp.draw(layer);
+	}
+	
+	public static void drawNodes(MatrixStack matrices, List<ColoredBox> boxes,
+		boolean depthTest)
+	{
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		Vec3d camOffset = getCameraPos().negate();
+		for(ColoredBox box : boxes)
+			drawNode(matrices, buffer, box.box().offset(camOffset),
+				box.color());
+		
+		vcp.draw(layer);
+	}
+	
 	public static void drawNode(VertexConsumer buffer, Box box, int color)
 	{
 		drawNode(new MatrixStack(), buffer, box, color);

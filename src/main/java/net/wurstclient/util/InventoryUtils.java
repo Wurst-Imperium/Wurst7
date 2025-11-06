@@ -247,17 +247,43 @@ public enum InventoryUtils
 		return slot;
 	}
 	
+	public static boolean giveCreativeItem(Item item)
+	{
+		return giveCreativeItem(new ItemStack(item));
+	}
+	
+	/**
+	 * Spawns the given item stack into the first empty slot of the player's
+	 * inventory in Creative Mode. If the player is not in Creative Mode or the
+	 * inventory is full, this method will return <code>false</code> and do
+	 * nothing.
+	 */
+	public static boolean giveCreativeItem(ItemStack stack)
+	{
+		return setCreativeStack(MC.player.getInventory().getEmptySlot(), stack);
+	}
+	
+	public static boolean setCreativeStack(int slot, Item item)
+	{
+		return setCreativeStack(slot, new ItemStack(item));
+	}
+	
 	/**
 	 * Spawns/modifies/deletes the given item stack in Creative Mode. If the
-	 * given slot is negative, this method will do nothing.
+	 * given slot is negative or the player is not in Creative Mode, this method
+	 * will return <code>false</code> and do nothing.
 	 */
-	public static void setCreativeStack(int slot, ItemStack stack)
+	public static boolean setCreativeStack(int slot, ItemStack stack)
 	{
 		if(slot < 0)
-			return;
+			return false;
+		
+		if(!MC.player.isInCreativeMode())
+			return false;
 		
 		MC.player.getInventory().setStack(slot, stack);
 		MC.player.networkHandler.sendPacket(
 			new CreativeInventoryActionC2SPacket(toNetworkSlot(slot), stack));
+		return true;
 	}
 }

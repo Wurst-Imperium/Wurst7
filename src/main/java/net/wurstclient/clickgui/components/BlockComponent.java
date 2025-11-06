@@ -26,7 +26,7 @@ public final class BlockComponent extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
 	private static final TextRenderer TR = MC.textRenderer;
-	private static final int BLOCK_WITDH = 24;
+	private static final int BLOCK_WIDTH = 24;
 	
 	private final BlockSetting setting;
 	
@@ -41,7 +41,7 @@ public final class BlockComponent extends Component
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
 		Click context)
 	{
-		if(mouseX < getX() + getWidth() - BLOCK_WITDH)
+		if(mouseX < getX() + getWidth() - BLOCK_WIDTH)
 			return;
 		
 		switch(mouseButton)
@@ -62,7 +62,7 @@ public final class BlockComponent extends Component
 	{
 		int x1 = getX();
 		int x2 = x1 + getWidth();
-		int x3 = x2 - BLOCK_WITDH;
+		int x3 = x2 - BLOCK_WIDTH;
 		int y1 = getY();
 		int y2 = y1 + getHeight();
 		
@@ -128,12 +128,12 @@ public final class BlockComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return TR.getWidth(setting.getName() + ":") + BLOCK_WITDH + 4;
+		return TR.getWidth(setting.getName() + ":") + BLOCK_WIDTH + 4;
 	}
 	
 	@Override
 	public int getDefaultHeight()
 	{
-		return BLOCK_WITDH;
+		return BLOCK_WIDTH;
 	}
 }
