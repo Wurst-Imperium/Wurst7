@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "wurst_testmod",
+  "version": "1.0.0",
+  "name": "Wurst Test Mod",
+  "license": "GPL-3.0-or-later",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "net.wurstclient.gametest.WurstTest"
+    ]
+  },
+  "mixins": [
+    "wurst_testmod.mixins.json"
+  ]
+}
