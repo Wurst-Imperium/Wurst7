@@ -87,57 +87,34 @@ jobs:
         done
         echo "</details>" >> $GITHUB_STEP_SUMMARY
 
-    - name: Run the mod and take screenshots
-      # TODO: Migrate to Fabric Client Gametest API so this can run with configuration cache enabled
-      run: xvfb-run --auto-servernum ./gradlew runEndToEndTest --stacktrace --warning-mode=fail --no-configuration-cache
+    - name: Run client gametests
+      env:
+        IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
+      run: xvfb-run --auto-servernum ./gradlew runClientGameTest --stacktrace --warning-mode=fail
 
-    - name: Upload screenshots.zip artifact
+    - name: Run client gametests with mods
+      env:
+        IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
+      run: xvfb-run --auto-servernum ./gradlew runClientGameTestWithMods --stacktrace --warning-mode=fail
+
+    - name: Upload screenshots
       uses: actions/upload-artifact@v5
       if: ${{ success() || failure() }}
       with:
         name: screenshots
-        path: run/screenshots
+        path: build/run/*/screenshots
         compression-level: 0
 
-    - name: Upload crash-reports.zip artifact
+    - name: Upload logs
+      uses: actions/upload-artifact@v5
+      if: ${{ success() || failure() }}
+      with:
+        name: logs
+        path: build/run/*/logs/latest.log
+
+    - name: Upload crash reports
       uses: actions/upload-artifact@v5
       if: ${{ failure() }}
       with:
         name: crash-reports
-        path: run/crash-reports
-
-    - name: Create test screenshot gallery
-      env:
-        IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      if: ${{ env.IMGUR_CLIENT_ID && (success() || failure()) }}
-      # Imgur uploads randomly fail sometimes, probably because of the low rate limit.
-      # TODO: Find a better place to upload the screenshots.
-      continue-on-error: true
-      run: |
-        echo "<details open>" >> $GITHUB_STEP_SUMMARY
-        echo "<summary>📸 Test Screenshots</summary>" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        for img in run/screenshots/*.png; do
-          if [ -f "$img" ]; then
-            filename=$(basename "$img")
-            name_without_ext="${filename%.*}"
-            # Upload to Imgur
-            response=$(curl -s -X POST \
-              -H "Authorization: Client-ID $IMGUR_CLIENT_ID" \
-              -F "image=@$img" \
-              https://api.imgur.com/3/image)
-            # Extract the URL from the response
-            url=$(echo $response | grep -o '"link":"[^"]*"' | cut -d'"' -f4)
-            if [ ! -z "$url" ]; then
-              # Convert underscores to spaces and capitalize first letter of each word
-              title=$(echo "$name_without_ext" | tr '_' ' ' | awk '{for(i=1;i<=NF;i++)sub(/./,toupper(substr($i,1,1)),$i)}1')
-              echo "### $title" >> $GITHUB_STEP_SUMMARY
-              echo "![${name_without_ext}]($url)" >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "Failed to upload $filename" >> $GITHUB_STEP_SUMMARY
-              echo "Imgur upload response for $filename: $response"
-            fi
-          fi
-        done
-        echo "</details>" >> $GITHUB_STEP_SUMMARY
+        path: build/run/*/crash-reports

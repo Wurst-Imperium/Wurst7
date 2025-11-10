@@ -2,13 +2,6 @@ buildscript {
 	dependencies {
 		classpath "org.kohsuke:github-api:1.330"
 	}
-	
-	configurations.classpath {
-		resolutionStrategy {
-			// v28.0-jre, used by fabric-loom 1.13.3, is vulnerable to CVE-2020-8908 and CVE-2023-2976
-			force "com.google.guava:guava:32.0.1-jre"
-		}
-	}
 }
 
 plugins {
@@ -31,23 +24,16 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-}
-
-// Override vulnerable dependencies until Minecraft updates to newer versions
-configurations.all {
-	resolutionStrategy {
-		// v2.5.1, used by Minecraft 1.21.4 - 1.21.10, is vulnerable to CVE-2024-57699
-		force "net.minidev:json-smart:2.5.2"
-		// v2.13.4, used by Minecraft 1.21.4 - 1.21.10, is vulnerable to CVE-2025-52999
-		force "com.fasterxml.jackson.core:jackson-core:2.15.0"
-		// v3.17.0, used by Minecraft 1.21.4 - 1.21.10, is vulnerable to CVE-2025-48924
-		force "org.apache.commons:commons-lang3:3.18.0"
-		// v9.40, used by Minecraft 1.21.4 - 1.21.10, is vulnerable to CVE-2025-53864
-		force "com.nimbusds:nimbus-jose-jwt:10.0.2"
-		// v4.1.118.Final, used by Minecraft 1.21.5 - 1.21.10, is vulnerable to CVE-2025-58057
-		force "io.netty:netty-codec:4.1.125.Final"
-		// v4.1.118.Final, used by Minecraft 1.21.5 - 1.21.10, is vulnerable to CVE-2025-58056
-		force "io.netty:netty-codec-http:4.1.125.Final"
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
+			includeGroup "maven.modrinth"
+		}
 	}
 }
 
@@ -70,53 +56,53 @@ dependencies {
 	modImplementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
+fabricApi.configureTests {
+	createSourceSet = true
+	enableGameTests = false
+	enableClientGameTests = true
+	modId = "wurst_testmod"
+	username = "Wurst-Bot"
+}
+
 loom {
 	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
+	
+	runs {
+		clientGameTestWithMods {
+			inherit client
+			source = sourceSets.gametest
+			runDir = "build/run/clientGameTestWithMods"
+			vmArgs.add("-Dfabric.client.gametest")
+			vmArgs.add("-Dwurst.test.withMods=true")
+			programArgs.add("--username=Wurst-Bot")
+		}
+	}
 }
 
 configurations {
-	productionRuntime {
-		extendsFrom configurations.minecraftLibraries
-		extendsFrom configurations.loaderLibraries
-		extendsFrom configurations.minecraftRuntimeLibraries
+	testMods {
+		transitive = false
 	}
 }
 
 dependencies {
-	productionRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
-	productionRuntime "net.fabricmc:intermediary:${project.minecraft_version}"
+	testMods "maven.modrinth:sodium:${project.sodium_version}"
 }
 
-import net.fabricmc.loom.util.Platform
-tasks.register('runEndToEndTest', JavaExec) {
-	dependsOn remapJar, downloadAssets
-	classpath.from configurations.productionRuntime
-	mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient"
-	workingDir = file("run")
-	
-	doFirst {
-		classpath.from loom.minecraftProvider.minecraftClientJar
-		workingDir.mkdirs()
-		
-		args(
-			"--assetIndex", loom.minecraftProvider.versionInfo.assetIndex().fabricId(loom.minecraftProvider.minecraftVersion()),
-			"--assetsDir", new File(loom.files.userCache, "assets").absolutePath,
-			"--gameDir", workingDir.absolutePath
-		)
-		
-		if (Platform.CURRENT.operatingSystem.isMacOS()) {
-			jvmArgs("-XstartOnFirstThread")
-		}
-		
-		jvmArgs(
-			"-Dfabric.addMods=${configurations.modImplementation.find { it.name.contains('fabric-api') }.absolutePath}${File.pathSeparator}${remapJar.archiveFile.get().asFile.absolutePath}",
-			"-Dwurst.e2eTest",
-			"-Dfabric-tag-conventions-v2.missingTagTranslationWarning=fail",
-			"-Dfabric-tag-conventions-v1.legacyTagWarning=fail",
-			"-Dmixin.debug.verify=true",
-			"-Dmixin.debug.countInjections=true"
-		)
-	}
+def cleanClientGameTestWithMods = tasks.register("cleanClientGameTestWithMods", Delete) {
+	delete layout.buildDirectory.dir("run/clientGameTestWithMods")
+}
+
+def prepareClientGameTestWithMods = tasks.register("prepareClientGameTestWithMods", Sync) {
+	dependsOn cleanClientGameTestWithMods
+	from configurations.testMods
+	into layout.buildDirectory.dir("run/clientGameTestWithMods/mods")
+}
+
+def doModCompatTest = providers.gradleProperty("do_mod_compat_test").map { it.toBoolean() }.orElse(false)
+tasks.named("runClientGameTestWithMods") {
+	onlyIf { doModCompatTest.get() }
+	dependsOn prepareClientGameTestWithMods
 }
 
 processResources {
@@ -164,13 +150,13 @@ spotless {
 		eclipse().configFile(file("codestyle/formatter.xml"))
 	}
 	format("licenseHeader") {
-		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		target("src/*/java/**/*.java")
 		def header_file = file("codestyle/license_header.txt")
 		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
 		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
 	}
 	json {
-		target "src/**/*.json"
+		target("src/**/*.json", "src/**/*.mcmeta")
 		gson().indentWithSpaces(2).version("2.11.0")
 	}
 }
