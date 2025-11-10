@@ -13,6 +13,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
+import net.wurstclient.gametest.WurstTest;
 
 public enum AltManagerTest
 {
@@ -22,9 +23,9 @@ public enum AltManagerTest
 	
 	public static void testAltManagerButton(ClientGameTestContext context)
 	{
+		WurstTest.LOGGER.info("Checking AltManager button position");
+		
 		context.runOnClient(mc -> {
-			System.out.println("Checking AltManager button position");
-			
 			if(!(mc.currentScreen instanceof TitleScreen))
 				throw new RuntimeException("Not on the title screen");
 			
