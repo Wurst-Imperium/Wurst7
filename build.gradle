@@ -24,6 +24,17 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
+			includeGroup "maven.modrinth"
+		}
+	}
 }
 
 dependencies {
@@ -55,6 +66,43 @@ fabricApi.configureTests {
 
 loom {
 	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
+	
+	runs {
+		clientGameTestWithMods {
+			inherit client
+			source = sourceSets.gametest
+			runDir = "build/run/clientGameTestWithMods"
+			vmArgs.add("-Dfabric.client.gametest")
+			vmArgs.add("-Dwurst.test.withMods=true")
+			programArgs.add("--username=Wurst-Bot")
+		}
+	}
+}
+
+configurations {
+	testMods {
+		transitive = false
+	}
+}
+
+dependencies {
+	testMods "maven.modrinth:sodium:${project.sodium_version}"
+}
+
+def cleanClientGameTestWithMods = tasks.register("cleanClientGameTestWithMods", Delete) {
+	delete layout.buildDirectory.dir("run/clientGameTestWithMods")
+}
+
+def prepareClientGameTestWithMods = tasks.register("prepareClientGameTestWithMods", Sync) {
+	dependsOn cleanClientGameTestWithMods
+	from configurations.testMods
+	into layout.buildDirectory.dir("run/clientGameTestWithMods/mods")
+}
+
+def doModCompatTest = providers.gradleProperty("do_mod_compat_test").map { it.toBoolean() }.orElse(false)
+tasks.named("runClientGameTestWithMods") {
+	onlyIf { doModCompatTest.get() }
+	dependsOn prepareClientGameTestWithMods
 }
 
 processResources {

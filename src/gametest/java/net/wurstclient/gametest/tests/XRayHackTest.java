@@ -40,7 +40,8 @@ public enum XRayHackTest
 		context.waitTick();
 		world.waitForChunksRender();
 		assertScreenshotEquals(context, "xray_default",
-			"https://i.imgur.com/Dftamqv.png");
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/02KZHLm.png"
+				: "https://i.imgur.com/Dftamqv.png");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		clearChat(context);
 		
@@ -51,7 +52,8 @@ public enum XRayHackTest
 		context.waitTick();
 		world.waitForChunksRender();
 		assertScreenshotEquals(context, "xray_exposed_only",
-			"https://i.imgur.com/QlEpQTu.png");
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/xplrJwM.png"
+				: "https://i.imgur.com/QlEpQTu.png");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		clearChat(context);
 		
@@ -62,7 +64,8 @@ public enum XRayHackTest
 		context.waitTick();
 		world.waitForChunksRender();
 		assertScreenshotEquals(context, "xray_opacity",
-			"https://i.imgur.com/0nLulJn.png");
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/MFc821z.png"
+				: "https://i.imgur.com/0nLulJn.png");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		clearChat(context);
 		
@@ -73,7 +76,8 @@ public enum XRayHackTest
 		context.waitTick();
 		world.waitForChunksRender();
 		assertScreenshotEquals(context, "xray_exposed_only_opacity",
-			"https://i.imgur.com/noPWDUl.png");
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/GRHgW6P.png"
+				: "https://i.imgur.com/noPWDUl.png");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		clearChat(context);
 		

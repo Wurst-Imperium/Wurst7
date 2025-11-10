@@ -36,6 +36,9 @@ public class WurstTest implements FabricClientGameTest
 {
 	public static final Logger LOGGER = LoggerFactory.getLogger("Wurst Test");
 	
+	public static final boolean IS_MOD_COMPAT_TEST =
+		System.getProperty("wurst.test.withMods") != null;
+	
 	@Override
 	public void runTest(ClientGameTestContext context)
 	{
@@ -86,7 +89,8 @@ public class WurstTest implements FabricClientGameTest
 		world.waitForChunksRender();
 		
 		assertScreenshotEquals(context, "in_game",
-			"https://i.imgur.com/EfzN9Cd.png");
+			IS_MOD_COMPAT_TEST ? "https://i.imgur.com/VxbGFrb.png"
+				: "https://i.imgur.com/EfzN9Cd.png");
 		
 		LOGGER.info("Recording debug menu");
 		input.pressKey(GLFW.GLFW_KEY_F3);

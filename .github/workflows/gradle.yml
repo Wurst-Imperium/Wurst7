@@ -90,7 +90,7 @@ jobs:
     - name: Run client gametests
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      run: xvfb-run --auto-servernum ./gradlew runClientGameTest --stacktrace --warning-mode=fail
+      run: xvfb-run --auto-servernum ./gradlew runClientGameTest runClientGameTestWithMods --stacktrace --warning-mode=fail
 
     - name: Upload screenshots
       uses: actions/upload-artifact@v5
