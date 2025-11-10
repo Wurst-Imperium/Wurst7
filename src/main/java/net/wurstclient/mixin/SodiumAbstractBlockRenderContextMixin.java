@@ -41,8 +41,9 @@ public class SodiumAbstractBlockRenderContextMixin
 	 * Hides and shows blocks when using X-Ray with Sodium installed.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "isFaceCulled(Lnet/minecraft/util/math/Direction;)Z",
+		method = "isFaceCulled(Lnet/minecraft/class_2350;)Z",
 		cancellable = true,
+		remap = false,
 		require = 0)
 	private void onIsFaceCulled(@Nullable Direction face,
 		CallbackInfoReturnable<Boolean> cir)
