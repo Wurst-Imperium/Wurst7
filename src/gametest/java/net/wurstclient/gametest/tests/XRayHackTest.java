@@ -31,7 +31,6 @@ public enum XRayHackTest
 		TestClientWorldContext world = spContext.getClientWorld();
 		TestServerContext server = spContext.getServer();
 		buildTestRig(context, spContext);
-		clearChat(context);
 		
 		// Enable X-Ray with default settings
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
@@ -41,47 +40,43 @@ public enum XRayHackTest
 		assertScreenshotEquals(context, "xray_default",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/02KZHLm.png"
 				: "https://i.imgur.com/Dftamqv.png");
-		input.pressKey(GLFW.GLFW_KEY_X);
-		clearChat(context);
 		
 		// Exposed only
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed on");
 		runWurstCommand(context, "setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
+		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_exposed_only",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/xplrJwM.png"
 				: "https://i.imgur.com/QlEpQTu.png");
-		input.pressKey(GLFW.GLFW_KEY_X);
-		clearChat(context);
 		
 		// Opacity mode
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand(context, "setslider X-Ray opacity 0.5");
 		input.pressKey(GLFW.GLFW_KEY_X);
+		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/MFc821z.png"
 				: "https://i.imgur.com/0nLulJn.png");
-		input.pressKey(GLFW.GLFW_KEY_X);
-		clearChat(context);
 		
 		// Exposed only + opacity
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed on");
 		runWurstCommand(context, "setslider X-Ray opacity 0.5");
 		input.pressKey(GLFW.GLFW_KEY_X);
+		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_exposed_only_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/GRHgW6P.png"
 				: "https://i.imgur.com/noPWDUl.png");
-		input.pressKey(GLFW.GLFW_KEY_X);
-		clearChat(context);
 		
 		// Clean up
 		runCommand(server, "fill ~-5 ~-2 ~5 ~5 ~5 ~7 air");
 		waitForBlock(context, 5, 5, 7, Blocks.AIR);
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand(context, "setslider X-Ray opacity 0");
+		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		clearChat(context);
 	}
@@ -115,6 +110,7 @@ public enum XRayHackTest
 		// Wait for blocks to appear
 		waitForBlock(context, -1, 0, 6, Blocks.LAVA);
 		waitForChunkReloading(context, world);
+		clearChat(context);
 	}
 	
 	private static void waitForChunkReloading(ClientGameTestContext context,
