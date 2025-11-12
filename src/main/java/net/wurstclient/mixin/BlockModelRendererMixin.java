@@ -43,8 +43,9 @@ public abstract class BlockModelRendererMixin implements ItemConvertible
 	private static boolean onRenderSmoothOrFlat(BlockState state,
 		BlockState otherState, Direction side, Operation<Boolean> original,
 		BlockRenderView world, BlockState stateButFromTheOtherMethod,
-		boolean cull, Direction sideButFromTheOtherMethod, BlockPos pos)
+		boolean cull, Direction sideButFromTheOtherMethod, BlockPos neighborPos)
 	{
+		BlockPos pos = neighborPos.offset(side.getOpposite());
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
 		
