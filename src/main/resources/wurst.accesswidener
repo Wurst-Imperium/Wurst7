@@ -1,7 +1,7 @@
 accessWidener	v1	named
 accessible	class	net/minecraft/client/gui/DrawContext$ScissorStack
 accessible	method	net/minecraft/client/gl/RenderPipelines	register	(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
-accessible	method	net/minecraft/client/gui/screen/ingame/HandledScreen onMouseClick	(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V
+accessible	method	net/minecraft/client/gui/screen/ingame/HandledScreen	onMouseClick	(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V
 accessible	method	net/minecraft/client/Keyboard	onKey	(JILnet/minecraft/client/input/KeyInput;)V
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/Mouse	onMouseButton	(JLnet/minecraft/client/input/MouseInput;I)V
