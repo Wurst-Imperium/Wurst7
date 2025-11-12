@@ -37,8 +37,7 @@ public enum XRayHackTest
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand(context, "setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
-		context.waitTick();
-		world.waitForChunksRender();
+		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_default",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/02KZHLm.png"
 				: "https://i.imgur.com/Dftamqv.png");
@@ -49,8 +48,7 @@ public enum XRayHackTest
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed on");
 		runWurstCommand(context, "setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
-		context.waitTick();
-		world.waitForChunksRender();
+		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_exposed_only",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/xplrJwM.png"
 				: "https://i.imgur.com/QlEpQTu.png");
@@ -61,8 +59,7 @@ public enum XRayHackTest
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand(context, "setslider X-Ray opacity 0.5");
 		input.pressKey(GLFW.GLFW_KEY_X);
-		context.waitTick();
-		world.waitForChunksRender();
+		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/MFc821z.png"
 				: "https://i.imgur.com/0nLulJn.png");
@@ -73,8 +70,7 @@ public enum XRayHackTest
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed on");
 		runWurstCommand(context, "setslider X-Ray opacity 0.5");
 		input.pressKey(GLFW.GLFW_KEY_X);
-		context.waitTick();
-		world.waitForChunksRender();
+		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_exposed_only_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/GRHgW6P.png"
 				: "https://i.imgur.com/noPWDUl.png");
@@ -86,8 +82,7 @@ public enum XRayHackTest
 		waitForBlock(context, 5, 5, 7, Blocks.AIR);
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand(context, "setslider X-Ray opacity 0");
-		context.waitTick();
-		world.waitForChunksRender();
+		waitForChunkReloading(context, world);
 		clearChat(context);
 	}
 	
@@ -119,7 +114,15 @@ public enum XRayHackTest
 		
 		// Wait for blocks to appear
 		waitForBlock(context, -1, 0, 6, Blocks.LAVA);
-		context.waitTick();
+		waitForChunkReloading(context, world);
+	}
+	
+	private static void waitForChunkReloading(ClientGameTestContext context,
+		TestClientWorldContext world)
+	{
+		// Wait longer if testing with Sodium, since we can't rely on
+		// waitForChunksRender() to track when Sodium finishes loading chunks
+		context.waitTicks(WurstTest.IS_MOD_COMPAT_TEST ? 5 : 1);
 		world.waitForChunksRender();
 	}
 }
