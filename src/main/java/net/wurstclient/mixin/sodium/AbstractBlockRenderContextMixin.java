@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.sodium;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,7 +29,7 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 @Pseudo
 @Mixin(targets = {
 	"net.caffeinemc.mods.sodium.client.render.frapi.render.AbstractBlockRenderContext"})
-public class SodiumAbstractBlockRenderContextMixin
+public class AbstractBlockRenderContextMixin
 {
 	@Shadow
 	protected BlockState state;

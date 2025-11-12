@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.sodium;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -34,7 +34,7 @@ import net.wurstclient.hacks.XRayHack;
 @Pseudo
 @Mixin(targets = {
 	"net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.DefaultFluidRenderer"})
-public class SodiumDefaultFluidRendererMixin
+public class DefaultFluidRendererMixin
 {
 	/**
 	 * Hides and shows fluids when using X-Ray with Sodium installed.
