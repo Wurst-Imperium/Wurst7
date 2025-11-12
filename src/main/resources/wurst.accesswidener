@@ -4,6 +4,7 @@ accessible	method	net/minecraft/client/gui/screen/ingame/HandledScreen onMouseCl
 accessible	method	net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen	connect	(Lnet/minecraft/client/network/ServerInfo;)V
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/Mouse	onMouseButton	(JIII)V
+accessible	method	net/minecraft/client/particle/ParticleManager	clearParticles	()V
 accessible	method	net/minecraft/client/render/BackgroundRenderer	getFogModifier	(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;
 accessible	method	net/minecraft/client/render/GameRenderer	setPostProcessor	(Lnet/minecraft/util/Identifier;)V
 accessible	method	net/minecraft/component/ComponentMap$Builder	put	(Lnet/minecraft/component/ComponentType;Ljava/lang/Object;)V
@@ -24,6 +25,7 @@ accessible	field	net/minecraft/client/network/ClientPlayerEntity	lastYaw	F
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	blockBreakingCooldown	I
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	breakingBlock	Z
 accessible	field	net/minecraft/client/network/ClientPlayerInteractionManager	currentBreakingProgress	F
+accessible	field	net/minecraft/client/texture/NativeImage	pointer	J
 accessible	field	net/minecraft/client/toast/ToastManager	toastQueue	Ljava/util/Deque;
 accessible	field	net/minecraft/entity/Entity	movementMultiplier	Lnet/minecraft/util/math/Vec3d;
 accessible	field	net/minecraft/entity/LivingEntity	jumping	Z
