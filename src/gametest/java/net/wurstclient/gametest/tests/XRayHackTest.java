@@ -65,7 +65,7 @@ public enum XRayHackTest
 		world.waitForChunksRender();
 		assertScreenshotEquals(context, "xray_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/MFc821z.png"
-				: "https://i.imgur.com/0nLulJn.png");
+				: "https://i.imgur.com/Ee9ZANB.png");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		clearChat(context);
 		
@@ -77,7 +77,7 @@ public enum XRayHackTest
 		world.waitForChunksRender();
 		assertScreenshotEquals(context, "xray_exposed_only_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/GRHgW6P.png"
-				: "https://i.imgur.com/noPWDUl.png");
+				: "https://i.imgur.com/hQOQRVG.png");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		clearChat(context);
 		
