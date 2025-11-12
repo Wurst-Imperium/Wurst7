@@ -17,8 +17,7 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "net.wurstclient.WurstInitializer",
-      "net.wurstclient.test.WurstE2ETestClient"
+      "net.wurstclient.WurstInitializer"
     ]
   },
   "mixins": [

@@ -140,7 +140,7 @@ public final class PlausibleAnalytics
 	private boolean isDebugMode()
 	{
 		return FabricLoader.getInstance().isDevelopmentEnvironment()
-			|| System.getProperty("wurst.e2eTest") != null;
+			|| System.getProperty("fabric.client.gametest") != null;
 	}
 	
 	private void runBackgroundLoop()
