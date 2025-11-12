@@ -40,8 +40,9 @@ public class SodiumDefaultFluidRendererMixin
 	 * Hides and shows fluids when using X-Ray with Sodium installed.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "isFullBlockFluidOccluded(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/block/BlockState;Lnet/minecraft/fluid/FluidState;)Z",
+		method = "isFullBlockFluidOccluded(Lnet/minecraft/class_1920;Lnet/minecraft/class_2338;Lnet/minecraft/class_2350;Lnet/minecraft/class_2680;Lnet/minecraft/class_3610;)Z",
 		cancellable = true,
+		remap = false,
 		require = 0)
 	private void onIsFullBlockFluidOccluded(BlockRenderView world, BlockPos pos,
 		Direction dir, BlockState state, FluidState fluid,

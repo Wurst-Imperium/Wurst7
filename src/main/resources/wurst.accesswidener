@@ -5,6 +5,7 @@ accessible	method	net/minecraft/client/gui/screen/ingame/HandledScreen onMouseCl
 accessible	method	net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen	connect	(Lnet/minecraft/client/network/ServerInfo;)V
 accessible	method	net/minecraft/client/MinecraftClient	doItemUse	()V
 accessible	method	net/minecraft/client/Mouse	onMouseButton	(JIII)V
+accessible	method	net/minecraft/client/particle/ParticleManager	clearParticles	()V
 accessible	method	net/minecraft/client/render/GameRenderer	setPostProcessor	(Lnet/minecraft/util/Identifier;)V
 accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	build	(Z)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
 accessible	method	net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder	layering	(Lnet/minecraft/client/render/RenderPhase$Layering;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
