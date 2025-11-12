@@ -2,13 +2,6 @@ buildscript {
 	dependencies {
 		classpath "org.kohsuke:github-api:1.330"
 	}
-	
-	configurations.classpath {
-		resolutionStrategy {
-			// v28.0-jre, used by fabric-loom 1.13.3, is vulnerable to CVE-2020-8908 and CVE-2023-2976
-			force "com.google.guava:guava:32.0.1-jre"
-		}
-	}
 }
 
 plugins {
@@ -31,22 +24,6 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-}
-
-// Override vulnerable dependencies until Minecraft updates to newer versions
-configurations.all {
-	resolutionStrategy {
-		// v3.14.0, used by Minecraft 1.20.5 - 1.21.3, is vulnerable to CVE-2025-48924
-		force "org.apache.commons:commons-lang3:3.18.0"
-		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2024-47535 and CVE-2025-25193
-		force "io.netty:netty-common:4.1.118.Final"
-		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2025-24970
-		force "io.netty:netty-handler:4.1.118.Final"
-		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2025-58057
-		force "io.netty:netty-codec:4.1.125.Final"
-		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2025-58056
-		force "io.netty:netty-codec-http:4.1.125.Final"
-	}
 }
 
 dependencies {
@@ -162,14 +139,14 @@ spotless {
 		eclipse().configFile(file("codestyle/formatter.xml"))
 	}
 	format("licenseHeader") {
-		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		target("src/*/java/**/*.java")
 		def header_file = file("codestyle/license_header.txt")
 		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
 		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
 	}
 	json {
-		target "src/**/*.json"
-		gson().indentWithSpaces(2).version("2.10.1")
+		target("src/**/*.json", "src/**/*.mcmeta")
+		gson().indentWithSpaces(2).version("2.11.0")
 	}
 }
 

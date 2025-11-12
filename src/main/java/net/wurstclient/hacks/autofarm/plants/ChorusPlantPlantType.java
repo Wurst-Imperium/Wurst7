@@ -57,15 +57,20 @@ public final class ChorusPlantPlantType extends AutoFarmPlantType
 	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
-		if(state.isOf(Blocks.CHORUS_FLOWER)
-			&& state.getOrEmpty(ChorusFlowerBlock.AGE)
-				.orElse(0) == ChorusFlowerBlock.MAX_AGE)
-			return true;
+		if(state.isOf(Blocks.CHORUS_FLOWER))
+			return isFlowerFullyGrown(pos, state);
 		
-		if(!state.isOf(Blocks.CHORUS_PLANT))
-			return false;
+		if(state.isOf(Blocks.CHORUS_PLANT))
+			return !hasAttachedFlowers(pos, state, new HashSet<>());
 		
-		return !hasAttachedFlowers(pos, state, new HashSet<>());
+		return false;
+	}
+	
+	private boolean isFlowerFullyGrown(BlockPos pos, BlockState state)
+	{
+		return state.getOrEmpty(ChorusFlowerBlock.AGE)
+			.orElse(0) == ChorusFlowerBlock.MAX_AGE
+			|| !BlockUtils.getState(pos.up()).isAir();
 	}
 	
 	private boolean hasAttachedFlowers(BlockPos pos, BlockState state,
