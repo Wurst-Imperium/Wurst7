@@ -42,6 +42,7 @@ public enum AutoMineHackTest
 		runCommand(server, "gamemode creative");
 		runCommand(server, "kill @e[type=item]");
 		clearInventory(context);
+		context.waitTick();
 		clearParticles(context);
 		clearChat(context);
 		context.waitTick();

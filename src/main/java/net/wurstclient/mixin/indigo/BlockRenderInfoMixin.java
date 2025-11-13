@@ -5,9 +5,8 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.indigo;
 
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,37 +20,33 @@ import net.minecraft.util.math.Direction;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
-/**
- * Last updated for <a href=
- * "https://github.com/CaffeineMC/sodium/tree/02253db283e4679228ba5fbc30cfc851d17123c8">Sodium
- * 0.6.13+mc1.21.6</a>
- */
 @Pseudo
-@Mixin(targets = {
-	"net.caffeinemc.mods.sodium.client.render.frapi.render.AbstractBlockRenderContext"})
-public class SodiumAbstractBlockRenderContextMixin
+@Mixin(
+	targets = "net.fabricmc.fabric.impl.client.indigo.renderer.render.BlockRenderInfo",
+	remap = false)
+public abstract class BlockRenderInfoMixin
 {
 	@Shadow
-	protected BlockState state;
-	
+	public BlockPos blockPos;
 	@Shadow
-	protected BlockPos pos;
+	public BlockState blockState;
 	
 	/**
-	 * Hides and shows blocks when using X-Ray with Sodium installed.
+	 * This mixin hides and shows regular blocks when using X-Ray, if Indigo
+	 * is running and Sodium is not installed.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "isFaceCulled(Lnet/minecraft/class_2350;)Z",
-		cancellable = true,
-		remap = false,
-		require = 0)
-	private void onIsFaceCulled(@Nullable Direction face,
+		method = "shouldDrawSide",
+		require = 0,
+		cancellable = true)
+	private void onShouldDrawSide(Direction face,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		ShouldDrawSideEvent event =
+			new ShouldDrawSideEvent(blockState, blockPos);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
-			cir.setReturnValue(!event.isRendered());
+			cir.setReturnValue(event.isRendered());
 	}
 }
