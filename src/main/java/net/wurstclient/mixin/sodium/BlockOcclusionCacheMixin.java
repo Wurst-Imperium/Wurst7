@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.sodium;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -24,7 +24,7 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 @Mixin(targets = {
 	"net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.BlockOcclusionCache"},
 	remap = false)
-public class SodiumBlockOcclusionCacheMixin
+public class BlockOcclusionCacheMixin
 {
 	/**
 	 * This mixin hides and shows regular full blocks when using X-Ray with
