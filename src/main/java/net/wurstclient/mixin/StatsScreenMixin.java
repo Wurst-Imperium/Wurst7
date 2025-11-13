@@ -14,24 +14,24 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import net.minecraft.client.gui.screen.StatsScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.screens.achievement.StatsScreen;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 
 @Mixin(StatsScreen.class)
 public class StatsScreenMixin
 {
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/gui/widget/ThreePartsLayoutWidget;addFooter(Lnet/minecraft/client/gui/widget/Widget;)Lnet/minecraft/client/gui/widget/Widget;",
+		target = "Lnet/minecraft/client/gui/layouts/HeaderAndFooterLayout;addToFooter(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;",
 		ordinal = 0), method = "init()V")
-	private <T extends Widget> T onAddFooter(ThreePartsLayoutWidget layout,
-		T doneWidget, Operation<T> original)
+	private <T extends LayoutElement> T onAddFooter(
+		HeaderAndFooterLayout layout, T doneWidget, Operation<T> original)
 	{
-		if(!(doneWidget instanceof ButtonWidget doneButton))
+		if(!(doneWidget instanceof Button doneButton))
 			throw new IllegalStateException(
 				"The done button in the statistics screen somehow isn't a button");
 		
@@ -40,16 +40,15 @@ public class StatsScreenMixin
 		
 		doneButton.setWidth(150);
 		
-		DirectionalLayoutWidget subLayout =
-			DirectionalLayoutWidget.horizontal().spacing(5);
-		subLayout.add(ButtonWidget.builder(getButtonText(), this::toggleWurst)
+		LinearLayout subLayout = LinearLayout.horizontal().spacing(5);
+		subLayout.addChild(Button.builder(getButtonText(), this::toggleWurst)
 			.width(150).build());
-		subLayout.add(doneButton);
+		subLayout.addChild(doneButton);
 		return original.call(layout, subLayout);
 	}
 	
 	@Unique
-	private void toggleWurst(ButtonWidget button)
+	private void toggleWurst(Button button)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
 		wurst.setEnabled(!wurst.isEnabled());
@@ -57,10 +56,10 @@ public class StatsScreenMixin
 	}
 	
 	@Unique
-	private Text getButtonText()
+	private Component getButtonText()
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
 		String text = (wurst.isEnabled() ? "Disable" : "Enable") + " Wurst";
-		return Text.literal(text);
+		return Component.literal(text);
 	}
 }

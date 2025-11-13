@@ -11,18 +11,18 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.component.EnchantmentEffectComponentTypes;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.FishingRodItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry.Reference;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder.Reference;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.FishingRodItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoFishHack;
 import net.wurstclient.settings.CheckboxSetting;
@@ -32,7 +32,7 @@ import net.wurstclient.util.InventoryUtils;
 
 public final class AutoFishRodSelector
 {
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	private final CheckboxSetting stopWhenOutOfRods = new CheckboxSetting(
 		"Stop when out of rods",
@@ -75,9 +75,9 @@ public final class AutoFishRodSelector
 	 */
 	public boolean update()
 	{
-		PlayerInventory inventory = MC.player.getInventory();
+		Inventory inventory = MC.player.getInventory();
 		int selectedSlot = inventory.getSelectedSlot();
-		ItemStack selectedStack = inventory.getStack(selectedSlot);
+		ItemStack selectedStack = inventory.getItem(selectedSlot);
 		
 		// evaluate selected rod (or lack thereof)
 		int bestRodValue = getRodValue(selectedStack);
@@ -90,7 +90,7 @@ public final class AutoFishRodSelector
 		// search inventory for better rod
 		for(int slot : stream.toArray())
 		{
-			ItemStack stack = inventory.getStack(slot);
+			ItemStack stack = inventory.getItem(slot);
 			int rodValue = getRodValue(stack);
 			
 			if(rodValue > bestRodValue)
@@ -113,7 +113,7 @@ public final class AutoFishRodSelector
 		}
 		
 		// stop if inventory is full
-		if(stopWhenInvFull.isChecked() && inventory.getEmptySlot() == -1)
+		if(stopWhenInvFull.isChecked() && inventory.getFreeSlot() == -1)
 		{
 			ChatUtils.message(
 				"AutoFish has stopped because your inventory is full.");
@@ -135,32 +135,35 @@ public final class AutoFishRodSelector
 		if(stack.isEmpty() || !(stack.getItem() instanceof FishingRodItem))
 			return -1;
 		
-		DynamicRegistryManager drm = MC.world.getRegistryManager();
+		RegistryAccess drm = MC.level.registryAccess();
 		Registry<Enchantment> registry =
-			drm.getOrThrow(RegistryKeys.ENCHANTMENT);
+			drm.lookupOrThrow(Registries.ENCHANTMENT);
 		
 		Optional<Reference<Enchantment>> luckOTS =
-			registry.getOptional(Enchantments.LUCK_OF_THE_SEA);
-		int luckOTSLvl = luckOTS
-			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+			registry.get(Enchantments.LUCK_OF_THE_SEA);
+		int luckOTSLvl = luckOTS.map(
+			entry -> EnchantmentHelper.getItemEnchantmentLevel(entry, stack))
+			.orElse(0);
 		
-		Optional<Reference<Enchantment>> lure =
-			registry.getOptional(Enchantments.LURE);
-		int lureLvl = lure
-			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+		Optional<Reference<Enchantment>> lure = registry.get(Enchantments.LURE);
+		int lureLvl = lure.map(
+			entry -> EnchantmentHelper.getItemEnchantmentLevel(entry, stack))
+			.orElse(0);
 		
 		Optional<Reference<Enchantment>> unbreaking =
-			registry.getOptional(Enchantments.UNBREAKING);
-		int unbreakingLvl = unbreaking
-			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+			registry.get(Enchantments.UNBREAKING);
+		int unbreakingLvl = unbreaking.map(
+			entry -> EnchantmentHelper.getItemEnchantmentLevel(entry, stack))
+			.orElse(0);
 		
 		Optional<Reference<Enchantment>> mending =
-			registry.getOptional(Enchantments.MENDING);
-		int mendingBonus = mending
-			.map(entry -> EnchantmentHelper.getLevel(entry, stack)).orElse(0);
+			registry.get(Enchantments.MENDING);
+		int mendingBonus = mending.map(
+			entry -> EnchantmentHelper.getItemEnchantmentLevel(entry, stack))
+			.orElse(0);
 		
-		int noVanishBonus = EnchantmentHelper.hasAnyEnchantmentsWith(stack,
-			EnchantmentEffectComponentTypes.PREVENT_EQUIPMENT_DROP) ? 0 : 1;
+		int noVanishBonus = EnchantmentHelper.has(stack,
+			EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP) ? 0 : 1;
 		
 		return luckOTSLvl * 9 + lureLvl * 9 + unbreakingLvl * 2 + mendingBonus
 			+ noVanishBonus;

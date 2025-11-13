@@ -19,27 +19,27 @@ import java.util.function.BiConsumer;
 
 import com.google.common.collect.Lists;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.resource.language.TranslationStorage;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloader;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Language;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.ClientLanguage;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
-public class WurstTranslator implements SynchronousResourceReloader
+public class WurstTranslator implements ResourceManagerReloadListener
 {
 	private final WurstClient wurst = WurstClient.INSTANCE;
-	private TranslationStorage mcEnglish;
+	private ClientLanguage mcEnglish;
 	
 	private Map<String, String> currentLangStrings = Map.of();
 	private Map<String, String> englishOnlyStrings = Map.of();
 	
 	@Override
-	public void reload(ResourceManager manager)
+	public void onResourceManagerReload(ResourceManager manager)
 	{
-		mcEnglish = TranslationStorage.load(manager,
+		mcEnglish = ClientLanguage.loadFrom(manager,
 			Lists.newArrayList("en_us"), false);
 		
 		HashMap<String, String> currentLangStrings = new HashMap<>();
@@ -89,7 +89,7 @@ public class WurstTranslator implements SynchronousResourceReloader
 	{
 		String string = englishOnlyStrings.get(key);
 		if(string == null)
-			string = mcEnglish.get(key);
+			string = mcEnglish.getOrDefault(key);
 		
 		try
 		{
@@ -107,13 +107,13 @@ public class WurstTranslator implements SynchronousResourceReloader
 	 * Minecraft's own translations.
 	 *
 	 * @apiNote This method differs from
-	 *          {@link I18n#translate(String, Object...)} in that it does not
+	 *          {@link I18n#get(String, Object...)} in that it does not
 	 *          return "Format error" if the key contains a percent sign.
 	 */
 	public String translateMc(String key, Object... args)
 	{
-		if(I18n.hasTranslation(key))
-			return I18n.translate(key, args);
+		if(I18n.exists(key))
+			return I18n.get(key, args);
 		
 		return key;
 	}
@@ -123,14 +123,14 @@ public class WurstTranslator implements SynchronousResourceReloader
 	 * the current language, using only Minecraft's own translations.
 	 *
 	 * @apiNote This method differs from
-	 *          {@link I18n#translate(String, Object...)} in that it does not
+	 *          {@link I18n#get(String, Object...)} in that it does not
 	 *          return "Format error" if the key contains a percent sign.
 	 */
 	public String translateMcEnglish(String key, Object... args)
 	{
 		try
 		{
-			return String.format(mcEnglish.get(key), args);
+			return String.format(mcEnglish.getOrDefault(key), args);
 			
 		}catch(IllegalFormatException e)
 		{
@@ -147,7 +147,7 @@ public class WurstTranslator implements SynchronousResourceReloader
 	 * Returns a translation storage for Minecraft's English strings, regardless
 	 * of the current language. Does not include any of Wurst's translations.
 	 */
-	public TranslationStorage getMcEnglish()
+	public ClientLanguage getMcEnglish()
 	{
 		return mcEnglish;
 	}
@@ -167,8 +167,8 @@ public class WurstTranslator implements SynchronousResourceReloader
 	{
 		// Weird bug: Some users have their language set to "en_US" instead of
 		// "en_us" for some reason. Last seen in 1.21.
-		String mainLangCode = MinecraftClient.getInstance().getLanguageManager()
-			.getLanguage().toLowerCase();
+		String mainLangCode = Minecraft.getInstance().getLanguageManager()
+			.getSelected().toLowerCase();
 		
 		ArrayList<String> langCodes = new ArrayList<>();
 		langCodes.add("en_us");
@@ -184,17 +184,18 @@ public class WurstTranslator implements SynchronousResourceReloader
 		for(String langCode : langCodes)
 		{
 			String langFilePath = "translations/" + langCode + ".json";
-			Identifier langId = Identifier.of("wurst", langFilePath);
+			Identifier langId =
+				Identifier.fromNamespaceAndPath("wurst", langFilePath);
 			
-			for(Resource resource : manager.getAllResources(langId))
-				try(InputStream stream = resource.getInputStream())
+			for(Resource resource : manager.getResourceStack(langId))
+				try(InputStream stream = resource.open())
 				{
-					Language.load(stream, entryConsumer);
+					Language.loadFromJson(stream, entryConsumer);
 					
 				}catch(IOException e)
 				{
 					System.out.println("Failed to load translations for "
-						+ langCode + " from pack " + resource.getPackId());
+						+ langCode + " from pack " + resource.sourcePackId());
 					e.printStackTrace();
 				}
 		}

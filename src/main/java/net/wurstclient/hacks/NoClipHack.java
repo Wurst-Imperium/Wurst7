@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.player.LocalPlayer;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.AirStrafingSpeedListener;
@@ -47,26 +47,26 @@ public final class NoClipHack extends Hack
 		EVENTS.remove(SetOpaqueCubeListener.class, this);
 		EVENTS.remove(AirStrafingSpeedListener.class, this);
 		
-		MC.player.noClip = false;
+		MC.player.noPhysics = false;
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
-		player.noClip = true;
+		player.noPhysics = true;
 		player.fallDistance = 0;
 		player.setOnGround(false);
 		
 		player.getAbilities().flying = false;
-		player.setVelocity(0, 0, 0);
+		player.setDeltaMovement(0, 0, 0);
 		
 		float speed = 0.2F;
-		if(MC.options.jumpKey.isPressed())
-			player.addVelocity(0, speed, 0);
-		if(MC.options.sneakKey.isPressed())
-			player.addVelocity(0, -speed, 0);
+		if(MC.options.keyJump.isDown())
+			player.push(0, speed, 0);
+		if(MC.options.keyShift.isDown())
+			player.push(0, -speed, 0);
 	}
 	
 	@Override
@@ -78,7 +78,7 @@ public final class NoClipHack extends Hack
 	@Override
 	public void onPlayerMove()
 	{
-		MC.player.noClip = true;
+		MC.player.noPhysics = true;
 	}
 	
 	@Override

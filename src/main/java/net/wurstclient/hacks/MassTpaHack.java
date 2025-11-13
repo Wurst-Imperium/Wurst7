@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.util.StringHelper;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.util.StringUtil;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
@@ -86,11 +86,11 @@ public final class MassTpaHack extends Hack
 		command = commandSetting.getValue().substring(1);
 		
 		// collect player names
-		String playerName = MC.getSession().getUsername();
-		for(PlayerListEntry info : MC.player.networkHandler.getPlayerList())
+		String playerName = MC.getUser().getName();
+		for(PlayerInfo info : MC.player.connection.getOnlinePlayers())
 		{
 			String name = info.getProfile().name();
-			name = StringHelper.stripTextFormat(name);
+			name = StringUtil.stripColor(name);
 			
 			if(name.equalsIgnoreCase(playerName))
 				continue;
@@ -132,8 +132,7 @@ public final class MassTpaHack extends Hack
 			return;
 		}
 		
-		MC.getNetworkHandler()
-			.sendChatCommand(command + " " + players.get(index));
+		MC.getConnection().sendCommand(command + " " + players.get(index));
 		
 		index++;
 		timer = delay.getValueI() - 1;

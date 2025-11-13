@@ -7,14 +7,14 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.Angerable;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.PufferfishEntity;
-import net.minecraft.entity.passive.WaterAnimalEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.ambient.AmbientCreature;
+import net.minecraft.world.entity.animal.AgeableWaterCreature;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Pufferfish;
+import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.monster.Enemy;
 
 public final class FilterPassiveSetting extends EntityFilterCheckbox
 {
@@ -30,16 +30,15 @@ public final class FilterPassiveSetting extends EntityFilterCheckbox
 	public boolean test(Entity e)
 	{
 		// never filter out hostile mobs (including hoglins)
-		if(e instanceof Monster)
+		if(e instanceof Enemy)
 			return true;
 		
 		// never filter out neutral mobs (including pufferfish)
-		if(e instanceof Angerable || e instanceof PufferfishEntity)
+		if(e instanceof NeutralMob || e instanceof Pufferfish)
 			return true;
 		
-		return !(e instanceof AnimalEntity || e instanceof AmbientEntity
-			|| e instanceof WaterCreatureEntity
-			|| e instanceof WaterAnimalEntity);
+		return !(e instanceof Animal || e instanceof AmbientCreature
+			|| e instanceof WaterAnimal || e instanceof AgeableWaterCreature);
 	}
 	
 	public static FilterPassiveSetting genericCombat(boolean checked)

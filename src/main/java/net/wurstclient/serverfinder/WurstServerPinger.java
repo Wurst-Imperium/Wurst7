@@ -9,16 +9,17 @@ package net.wurstclient.serverfinder;
 
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.minecraft.client.network.MultiplayerServerListPinger;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.network.ServerInfo.ServerType;
-import net.minecraft.network.NetworkingBackend;
+
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.ServerData.Type;
+import net.minecraft.client.multiplayer.ServerStatusPinger;
+import net.minecraft.server.network.EventLoopGroupHolder;
 import net.wurstclient.WurstClient;
 
 public class WurstServerPinger
 {
 	private static final AtomicInteger threadNumber = new AtomicInteger(0);
-	private ServerInfo server;
+	private ServerData server;
 	private boolean done = false;
 	private boolean failed = false;
 	
@@ -29,7 +30,7 @@ public class WurstServerPinger
 	
 	public void ping(String ip, int port)
 	{
-		server = new ServerInfo("", ip + ":" + port, ServerType.OTHER);
+		server = new ServerData("", ip + ":" + port, Type.OTHER);
 		
 		new Thread(() -> pingInCurrentThread(ip, port),
 			"Wurst Server Pinger #" + threadNumber.incrementAndGet()).start();
@@ -37,13 +38,13 @@ public class WurstServerPinger
 	
 	private void pingInCurrentThread(String ip, int port)
 	{
-		MultiplayerServerListPinger pinger = new MultiplayerServerListPinger();
+		ServerStatusPinger pinger = new ServerStatusPinger();
 		System.out.println("Pinging " + ip + ":" + port + "...");
 		
 		try
 		{
-			pinger.add(server, () -> {}, () -> {}, NetworkingBackend
-				.remote(WurstClient.MC.options.shouldUseNativeTransport()));
+			pinger.pingServer(server, () -> {}, () -> {}, EventLoopGroupHolder
+				.remote(WurstClient.MC.options.useNativeTransport()));
 			System.out.println("Ping successful: " + ip + ":" + port);
 			
 		}catch(UnknownHostException e)
@@ -57,7 +58,7 @@ public class WurstServerPinger
 			failed = true;
 		}
 		
-		pinger.cancel();
+		pinger.removeAll();
 		done = true;
 	}
 	
@@ -73,6 +74,6 @@ public class WurstServerPinger
 	
 	public String getServerIP()
 	{
-		return server.address;
+		return server.ip;
 	}
 }

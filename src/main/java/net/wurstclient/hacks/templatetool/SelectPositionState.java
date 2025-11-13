@@ -9,11 +9,12 @@ package net.wurstclient.hacks.templatetool;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.wurstclient.hacks.TemplateToolHack;
 import net.wurstclient.util.RenderUtils;
 
@@ -26,7 +27,7 @@ public abstract class SelectPositionState extends TemplateToolState
 	{
 		crosshairBlock = getCrosshairBlock();
 		
-		if(MC.options.useKey.isPressed() && crosshairBlock != null)
+		if(MC.options.keyUse.isDown() && crosshairBlock != null)
 		{
 			setSelectedPos(hack, crosshairBlock);
 			return;
@@ -38,29 +39,29 @@ public abstract class SelectPositionState extends TemplateToolState
 	
 	private BlockPos getCrosshairBlock()
 	{
-		if(!(MC.crosshairTarget instanceof BlockHitResult bHitResult))
+		if(!(MC.hitResult instanceof BlockHitResult bHitResult))
 			return null;
 		
 		BlockPos pos = bHitResult.getBlockPos();
-		if(MC.options.sneakKey.isPressed())
-			pos = pos.offset(bHitResult.getSide());
+		if(MC.options.keyShift.isDown())
+			pos = pos.relative(bHitResult.getDirection());
 		
 		return pos;
 	}
 	
 	private boolean isPressingEnter()
 	{
-		return InputUtil.isKeyPressed(MC.getWindow(), GLFW.GLFW_KEY_ENTER);
+		return InputConstants.isKeyDown(MC.getWindow(), GLFW.GLFW_KEY_ENTER);
 	}
 	
 	@Override
-	public void onRender(TemplateToolHack hack, MatrixStack matrixStack,
+	public void onRender(TemplateToolHack hack, PoseStack matrixStack,
 		float partialTicks)
 	{
 		if(crosshairBlock == null)
 			return;
 		
-		Box box = new Box(crosshairBlock).contract(1 / 16.0);
+		AABB box = new AABB(crosshairBlock).deflate(1 / 16.0);
 		int black = 0x80000000;
 		int gray = 0x26404040;
 		RenderUtils.drawOutlinedBox(matrixStack, box, black, false);

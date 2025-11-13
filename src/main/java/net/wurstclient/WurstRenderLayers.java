@@ -7,60 +7,63 @@
  */
 package net.wurstclient;
 
-import net.minecraft.client.render.LayeringTransform;
-import net.minecraft.client.render.OutputTarget;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderSetup;
+import net.minecraft.client.renderer.rendertype.LayeringTransform;
+import net.minecraft.client.renderer.rendertype.OutputTarget;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
 public enum WurstRenderLayers
 {
 	;
 	
 	/**
-	 * Similar to {@link RenderLayer#getLines()}, but with line width 2.
+	 * Similar to {@link RenderType#getLines()}, but with line width 2.
 	 */
-	public static final RenderLayer LINES = RenderLayer.of("wurst:lines",
+	public static final RenderType LINES = RenderType.create("wurst:lines",
 		RenderSetup.builder(WurstShaderPipelines.DEPTH_TEST_LINES)
-			.layeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-			.outputTarget(OutputTarget.ITEM_ENTITY_TARGET).build());
+			.setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
+			.setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
+			.createRenderSetup());
 	
 	/**
-	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
+	 * Similar to {@link RenderType#getLines()}, but with line width 2 and no
 	 * depth test.
 	 */
-	public static final RenderLayer ESP_LINES =
-		RenderLayer.of("wurst:esp_lines",
+	public static final RenderType ESP_LINES =
+		RenderType.create("wurst:esp_lines",
 			RenderSetup.builder(WurstShaderPipelines.ESP_LINES)
-				.layeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-				.outputTarget(OutputTarget.ITEM_ENTITY_TARGET).build());
+				.setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
+				.setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
+				.createRenderSetup());
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled.
+	 * Similar to {@link RenderType#getDebugQuads()}, but with culling enabled.
 	 */
-	public static final RenderLayer QUADS = RenderLayer.of("wurst:quads",
-		RenderSetup.builder(WurstShaderPipelines.QUADS).translucent().build());
+	public static final RenderType QUADS = RenderType.create("wurst:quads",
+		RenderSetup.builder(WurstShaderPipelines.QUADS).sortOnUpload()
+			.createRenderSetup());
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled
+	 * Similar to {@link RenderType#getDebugQuads()}, but with culling enabled
 	 * and no depth test.
 	 */
-	public static final RenderLayer ESP_QUADS =
-		RenderLayer.of("wurst:esp_quads", RenderSetup
-			.builder(WurstShaderPipelines.ESP_QUADS).translucent().build());
+	public static final RenderType ESP_QUADS = RenderType.create(
+		"wurst:esp_quads", RenderSetup.builder(WurstShaderPipelines.ESP_QUADS)
+			.sortOnUpload().createRenderSetup());
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugQuads()}, but with no depth test.
+	 * Similar to {@link RenderType#getDebugQuads()}, but with no depth test.
 	 */
-	public static final RenderLayer ESP_QUADS_NO_CULLING =
-		RenderLayer.of("wurst:esp_quads_no_culling",
+	public static final RenderType ESP_QUADS_NO_CULLING =
+		RenderType.create("wurst:esp_quads_no_culling",
 			RenderSetup.builder(WurstShaderPipelines.ESP_QUADS_NO_CULLING)
-				.translucent().useLightmap().build());
+				.sortOnUpload().useLightmap().createRenderSetup());
 	
 	/**
 	 * Returns either {@link #QUADS} or {@link #ESP_QUADS} depending on the
 	 * value of {@code depthTest}.
 	 */
-	public static RenderLayer getQuads(boolean depthTest)
+	public static RenderType getQuads(boolean depthTest)
 	{
 		return depthTest ? QUADS : ESP_QUADS;
 	}
@@ -69,7 +72,7 @@ public enum WurstRenderLayers
 	 * Returns either {@link #LINES} or {@link #ESP_LINES} depending on the
 	 * value of {@code depthTest}.
 	 */
-	public static RenderLayer getLines(boolean depthTest)
+	public static RenderType getLines(boolean depthTest)
 	{
 		return depthTest ? LINES : ESP_LINES;
 	}

@@ -10,8 +10,8 @@ package net.wurstclient.commands;
 import java.util.Comparator;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -38,14 +38,13 @@ public final class FollowCmd extends Command
 			followHack.setEnabled(false);
 		
 		Entity entity = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
+			.stream(MC.level.entitiesForRendering().spliterator(), true)
 			.filter(LivingEntity.class::isInstance)
 			.filter(e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> args[0].equalsIgnoreCase(e.getName().getString()))
-			.min(
-				Comparator.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+			.min(Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 			.orElse(null);
 		
 		if(entity == null)

@@ -7,9 +7,9 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -34,19 +34,19 @@ public final class CopyItemCmd extends Command
 		if(args.length != 2)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.getAbilities().creativeMode)
+		if(!MC.player.getAbilities().instabuild)
 			throw new CmdError("Creative mode only.");
 		
-		AbstractClientPlayerEntity player = getPlayer(args[0]);
+		AbstractClientPlayer player = getPlayer(args[0]);
 		ItemStack item = getItem(player, args[1]);
 		CmdUtils.giveItem(item);
 		
 		ChatUtils.message("Item copied.");
 	}
 	
-	private AbstractClientPlayerEntity getPlayer(String name) throws CmdError
+	private AbstractClientPlayer getPlayer(String name) throws CmdError
 	{
-		for(AbstractClientPlayerEntity player : MC.world.getPlayers())
+		for(AbstractClientPlayer player : MC.level.players())
 		{
 			if(!player.getName().getString().equalsIgnoreCase(name))
 				continue;
@@ -57,25 +57,25 @@ public final class CopyItemCmd extends Command
 		throw new CmdError("Player \"" + name + "\" could not be found.");
 	}
 	
-	private ItemStack getItem(AbstractClientPlayerEntity player, String slot)
+	private ItemStack getItem(AbstractClientPlayer player, String slot)
 		throws CmdSyntaxError
 	{
 		switch(slot.toLowerCase())
 		{
 			case "hand":
-			return player.getMainHandStack();
+			return player.getMainHandItem();
 			
 			case "head":
-			return player.getEquippedStack(EquipmentSlot.HEAD);
+			return player.getItemBySlot(EquipmentSlot.HEAD);
 			
 			case "chest":
-			return player.getEquippedStack(EquipmentSlot.CHEST);
+			return player.getItemBySlot(EquipmentSlot.CHEST);
 			
 			case "legs":
-			return player.getEquippedStack(EquipmentSlot.LEGS);
+			return player.getItemBySlot(EquipmentSlot.LEGS);
 			
 			case "feet":
-			return player.getEquippedStack(EquipmentSlot.FEET);
+			return player.getItemBySlot(EquipmentSlot.FEET);
 			
 			default:
 			throw new CmdSyntaxError();

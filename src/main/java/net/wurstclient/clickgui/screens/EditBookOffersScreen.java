@@ -12,26 +12,26 @@ import java.util.Objects;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.EnchantmentTags;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.util.CommonColors;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.util.RenderUtils;
@@ -43,13 +43,13 @@ public final class EditBookOffersScreen extends Screen
 	private final BookOffersSetting bookOffers;
 	
 	private ListGui listGui;
-	private ButtonWidget editButton;
-	private ButtonWidget removeButton;
-	private ButtonWidget doneButton;
+	private Button editButton;
+	private Button removeButton;
+	private Button doneButton;
 	
 	public EditBookOffersScreen(Screen prevScreen, BookOffersSetting bookOffers)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.prevScreen = prevScreen;
 		this.bookOffers = bookOffers;
 	}
@@ -57,51 +57,52 @@ public final class EditBookOffersScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(client, this, bookOffers.getOffers());
-		addSelectableChild(listGui);
+		listGui = new ListGui(minecraft, this, bookOffers.getOffers());
+		addWidget(listGui);
 		
-		addDrawableChild(
-			ButtonWidget
-				.builder(Text.literal("Add"),
-					b -> client
-						.setScreen(new AddBookOfferScreen(this, bookOffers)))
-				.dimensions(width / 2 - 154, height - 56, 100, 20).build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Add"),
+				b -> minecraft
+					.setScreen(new AddBookOfferScreen(this, bookOffers)))
+			.bounds(width / 2 - 154, height - 56, 100, 20).build());
 		
-		addDrawableChild(
-			editButton = ButtonWidget.builder(Text.literal("Edit"), b -> {
+		addRenderableWidget(
+			editButton = Button.builder(Component.literal("Edit"), b -> {
 				BookOffer selected = listGui.getSelectedOffer();
 				if(selected == null)
 					return;
 				
-				client.setScreen(new EditBookOfferScreen(this, bookOffers,
+				minecraft.setScreen(new EditBookOfferScreen(this, bookOffers,
 					bookOffers.indexOf(selected)));
-			}).dimensions(width / 2 - 50, height - 56, 100, 20).build());
+			}).bounds(width / 2 - 50, height - 56, 100, 20).build());
 		editButton.active = false;
 		
-		addDrawableChild(
-			removeButton = ButtonWidget.builder(Text.literal("Remove"), b -> {
+		addRenderableWidget(
+			removeButton = Button.builder(Component.literal("Remove"), b -> {
 				bookOffers
 					.remove(bookOffers.indexOf(listGui.getSelectedOffer()));
-				client.setScreen(EditBookOffersScreen.this);
-			}).dimensions(width / 2 + 54, height - 56, 100, 20).build());
+				minecraft.setScreen(EditBookOffersScreen.this);
+			}).bounds(width / 2 + 54, height - 56, 100, 20).build());
 		removeButton.active = false;
 		
-		addDrawableChild(ButtonWidget.builder(Text.literal("Reset to Defaults"),
-			b -> client.setScreen(new ConfirmScreen(b2 -> {
-				if(b2)
-					bookOffers.resetToDefaults();
-				client.setScreen(EditBookOffersScreen.this);
-			}, Text.literal("Reset to Defaults"),
-				Text.literal("Are you sure?"))))
-			.dimensions(width - 106, 6, 100, 20).build());
+		addRenderableWidget(
+			Button.builder(Component.literal("Reset to Defaults"),
+				b -> minecraft.setScreen(new ConfirmScreen(b2 -> {
+					if(b2)
+						bookOffers.resetToDefaults();
+					minecraft.setScreen(EditBookOffersScreen.this);
+				}, Component.literal("Reset to Defaults"),
+					Component.literal("Are you sure?"))))
+				.bounds(width - 106, 6, 100, 20).build());
 		
-		addDrawableChild(doneButton = ButtonWidget
-			.builder(Text.literal("Done"), b -> client.setScreen(prevScreen))
-			.dimensions(width / 2 - 100, height - 32, 200, 20).build());
+		addRenderableWidget(doneButton = Button
+			.builder(Component.literal("Done"),
+				b -> minecraft.setScreen(prevScreen))
+			.bounds(width / 2 - 100, height - 32, 200, 20).build());
 	}
 	
 	@Override
-	public boolean mouseClicked(Click context, boolean doubleClick)
+	public boolean mouseClicked(MouseButtonEvent context, boolean doubleClick)
 	{
 		boolean childClicked = super.mouseClicked(context, doubleClick);
 		
@@ -112,7 +113,7 @@ public final class EditBookOffersScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(KeyInput context)
+	public boolean keyPressed(KeyEvent context)
 	{
 		switch(context.key())
 		{
@@ -140,27 +141,27 @@ public final class EditBookOffersScreen extends Screen
 	@Override
 	public void tick()
 	{
-		boolean selected = listGui.getSelectedOrNull() != null;
+		boolean selected = listGui.getSelected() != null;
 		editButton.active = selected;
 		removeButton.active = selected;
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		context.drawCenteredTextWithShadow(client.textRenderer,
+		context.drawCenteredString(minecraft.font,
 			bookOffers.getName() + " (" + bookOffers.getOffers().size() + ")",
-			width / 2, 12, Colors.WHITE);
+			width / 2, 12, CommonColors.WHITE);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public boolean shouldPause()
+	public boolean isPauseScreen()
 	{
 		return false;
 	}
@@ -172,7 +173,7 @@ public final class EditBookOffersScreen extends Screen
 	}
 	
 	private final class Entry
-		extends AlwaysSelectedEntryListWidget.Entry<EditBookOffersScreen.Entry>
+		extends ObjectSelectionList.Entry<EditBookOffersScreen.Entry>
 	{
 		private final BookOffer bookOffer;
 		
@@ -182,43 +183,44 @@ public final class EditBookOffersScreen extends Screen
 		}
 		
 		@Override
-		public Text getNarration()
+		public Component getNarration()
 		{
-			return Text.translatable("narrator.select",
+			return Component.translatable("narrator.select",
 				"Book offer " + bookOffer.getEnchantmentNameWithLevel()
 					+ ", ID " + bookOffer.id() + ", " + getPriceText());
 		}
 		
 		@Override
-		public void render(DrawContext context, int mouseX, int mouseY,
+		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
 			int y = getContentY();
 			
-			Item item = Registries.ITEM.get(Identifier.of("enchanted_book"));
+			Item item = BuiltInRegistries.ITEM
+				.getValue(Identifier.parse("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
 			
-			TextRenderer tr = client.textRenderer;
+			Font tr = minecraft.font;
 			String name = bookOffer.getEnchantmentNameWithLevel();
 			
-			RegistryEntry<Enchantment> enchantment =
+			Holder<Enchantment> enchantment =
 				bookOffer.getEnchantmentEntry().get();
-			int nameColor = enchantment.isIn(EnchantmentTags.CURSE)
+			int nameColor = enchantment.is(EnchantmentTags.CURSE)
 				? WurstColors.LIGHT_RED : WurstColors.VERY_LIGHT_GRAY;
-			context.drawText(tr, name, x + 28, y, nameColor, false);
+			context.drawString(tr, name, x + 28, y, nameColor, false);
 			
-			context.drawText(tr, bookOffer.id(), x + 28, y + 9,
-				Colors.LIGHT_GRAY, false);
+			context.drawString(tr, bookOffer.id(), x + 28, y + 9,
+				CommonColors.LIGHT_GRAY, false);
 			
 			String price = getPriceText();
-			context.drawText(tr, price, x + 28, y + 18, Colors.LIGHT_GRAY,
-				false);
+			context.drawString(tr, price, x + 28, y + 18,
+				CommonColors.LIGHT_GRAY, false);
 			
 			if(bookOffer.price() < 64)
 				RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
-					x + 28 + tr.getWidth(price), y + 16, false);
+					x + 28 + tr.width(price), y + 16, false);
 		}
 		
 		private String getPriceText()
@@ -231,9 +233,9 @@ public final class EditBookOffersScreen extends Screen
 	}
 	
 	private final class ListGui
-		extends AlwaysSelectedEntryListWidget<EditBookOffersScreen.Entry>
+		extends ObjectSelectionList<EditBookOffersScreen.Entry>
 	{
-		public ListGui(MinecraftClient minecraft, EditBookOffersScreen screen,
+		public ListGui(Minecraft minecraft, EditBookOffersScreen screen,
 			List<BookOffer> list)
 		{
 			super(minecraft, screen.width, screen.height - 108, 36, 30);
@@ -244,7 +246,7 @@ public final class EditBookOffersScreen extends Screen
 		
 		public BookOffer getSelectedOffer()
 		{
-			EditBookOffersScreen.Entry entry = getSelectedOrNull();
+			EditBookOffersScreen.Entry entry = getSelected();
 			return entry != null ? entry.bookOffer : null;
 		}
 	}

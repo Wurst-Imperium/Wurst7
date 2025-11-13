@@ -7,14 +7,14 @@
  */
 package net.wurstclient.clickgui;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.wurstclient.WurstClient;
 
 public abstract class Component
 {
-	protected static final MinecraftClient MC = WurstClient.MC;
+	protected static final Minecraft MC = WurstClient.MC;
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
 	
 	private int x;
@@ -25,12 +25,12 @@ public abstract class Component
 	private Window parent;
 	
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
-		Click context)
+		MouseButtonEvent context)
 	{
 		
 	}
 	
-	public abstract void render(DrawContext context, int mouseX, int mouseY,
+	public abstract void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks);
 	
 	public abstract int getDefaultWidth();

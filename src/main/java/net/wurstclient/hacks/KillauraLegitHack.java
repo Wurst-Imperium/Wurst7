@@ -11,13 +11,14 @@ import java.util.Comparator;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.events.HandleInputListener;
 import net.wurstclient.events.MouseUpdateListener;
@@ -171,12 +172,12 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		target = null;
 		
 		// don't attack when a container/inventory screen is open
-		if(MC.currentScreen instanceof HandledScreen)
+		if(MC.screen instanceof AbstractContainerScreen)
 			return;
 		
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		double rangeSq = range.getValueSq();
-		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
+		stream = stream.filter(e -> MC.player.distanceToSqr(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
@@ -215,15 +216,15 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 			return;
 		
 		// attack entity
-		MC.interactionManager.attackEntity(MC.player, target);
-		swingHand.swing(Hand.MAIN_HAND);
+		MC.gameMode.attack(MC.player, target);
+		swingHand.swing(InteractionHand.MAIN_HAND);
 		speed.resetTimer(speedRandMS.getValue());
 	}
 	
 	private boolean faceEntityClient(Entity entity)
 	{
 		// get needed rotation
-		Box box = entity.getBoundingBox();
+		AABB box = entity.getBoundingBox();
 		Rotation needed = RotationUtils.getNeededRotations(box.getCenter());
 		
 		// turn towards center of boundingBox
@@ -246,9 +247,9 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		if(target == null || MC.player == null)
 			return;
 		
-		int diffYaw = (int)(nextYaw - MC.player.getYaw());
-		int diffPitch = (int)(nextPitch - MC.player.getPitch());
-		if(MathHelper.abs(diffYaw) < 1 && MathHelper.abs(diffPitch) < 1)
+		int diffYaw = (int)(nextYaw - MC.player.getYRot());
+		int diffPitch = (int)(nextPitch - MC.player.getXRot());
+		if(Mth.abs(diffYaw) < 1 && Mth.abs(diffPitch) < 1)
 			return;
 		
 		event.setDeltaX(event.getDefaultDeltaX() + diffYaw);
@@ -256,7 +257,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(target == null || !damageIndicator.isChecked())
 			return;
@@ -270,11 +271,10 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		int quadColor = RenderUtils.toIntColor(rgb, 0.25F);
 		int lineColor = RenderUtils.toIntColor(rgb, 0.5F);
 		
-		Box box = EntityUtils.getLerpedBox(target, partialTicks);
+		AABB box = EntityUtils.getLerpedBox(target, partialTicks);
 		if(p < 1)
-			box = box.contract((1 - p) * 0.5 * box.getLengthX(),
-				(1 - p) * 0.5 * box.getLengthY(),
-				(1 - p) * 0.5 * box.getLengthZ());
+			box = box.deflate((1 - p) * 0.5 * box.getXsize(),
+				(1 - p) * 0.5 * box.getYsize(), (1 - p) * 0.5 * box.getZsize());
 		
 		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
 		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);
@@ -282,7 +282,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", e -> MC.player.squaredDistanceTo(e)),
+		DISTANCE("Distance", e -> MC.player.distanceToSqr(e)),
 		
 		ANGLE("Angle",
 			e -> RotationUtils

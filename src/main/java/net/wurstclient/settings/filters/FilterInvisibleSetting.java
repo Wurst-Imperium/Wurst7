@@ -7,7 +7,7 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 public final class FilterInvisibleSetting extends EntityFilterCheckbox
 {

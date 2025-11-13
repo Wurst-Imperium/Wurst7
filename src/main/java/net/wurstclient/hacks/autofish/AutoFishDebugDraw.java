@@ -10,14 +10,15 @@ package net.wurstclient.hacks.autofish;
 import java.awt.Color;
 import java.util.stream.Stream;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.settings.CheckboxSetting;
@@ -29,7 +30,7 @@ import net.wurstclient.util.RenderUtils;
 
 public final class AutoFishDebugDraw
 {
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	private final CheckboxSetting debugDraw = new CheckboxSetting("Debug draw",
 		"Shows where bites are occurring and where they will be detected."
@@ -41,7 +42,7 @@ public final class AutoFishDebugDraw
 	
 	private final SliderSetting validRange;
 	private final FishingSpotManager fishingSpots;
-	private Vec3d lastSoundPos;
+	private Vec3 lastSoundPos;
 	
 	public AutoFishDebugDraw(SliderSetting validRange,
 		FishingSpotManager fishingSpots)
@@ -60,19 +61,19 @@ public final class AutoFishDebugDraw
 		lastSoundPos = null;
 	}
 	
-	public void updateSoundPos(PlaySoundS2CPacket sound)
+	public void updateSoundPos(ClientboundSoundPacket sound)
 	{
-		lastSoundPos = new Vec3d(sound.getX(), sound.getY(), sound.getZ());
+		lastSoundPos = new Vec3(sound.getX(), sound.getY(), sound.getZ());
 	}
 	
-	public void render(MatrixStack matrices, float partialTicks)
+	public void render(PoseStack matrices, float partialTicks)
 	{
 		if(!debugDraw.isChecked() && !fishingSpots.isMcmmoMode())
 			return;
 		
 		if(debugDraw.isChecked())
 		{
-			FishingBobberEntity bobber = MC.player.fishHook;
+			FishingHook bobber = MC.player.fishing;
 			if(bobber != null)
 				drawValidRange(matrices, partialTicks, bobber);
 			
@@ -86,20 +87,20 @@ public final class AutoFishDebugDraw
 			drawMcmmoRange(matrices);
 	}
 	
-	private void drawValidRange(MatrixStack matrices, float partialTicks,
-		FishingBobberEntity bobber)
+	private void drawValidRange(PoseStack matrices, float partialTicks,
+		FishingHook bobber)
 	{
 		double vr = validRange.getValue();
-		Vec3d pos = EntityUtils.getLerpedPos(bobber, partialTicks);
-		Box vrBox = new Box(-vr, -1 / 16.0, -vr, vr, 1 / 16.0, vr).offset(pos);
+		Vec3 pos = EntityUtils.getLerpedPos(bobber, partialTicks);
+		AABB vrBox = new AABB(-vr, -1 / 16.0, -vr, vr, 1 / 16.0, vr).move(pos);
 		
 		RenderUtils.drawOutlinedBox(matrices, vrBox, ddColor.getColorI(0x80),
 			false);
 	}
 	
-	private void drawLastBite(MatrixStack matrixStack)
+	private void drawLastBite(PoseStack matrixStack)
 	{
-		Vec3d pos = lastSoundPos;
+		Vec3 pos = lastSoundPos;
 		int color = ddColor.getColorI(0x80);
 		
 		RenderUtils.drawLine(matrixStack, pos.add(-0.125, 0, -0.125),
@@ -108,26 +109,26 @@ public final class AutoFishDebugDraw
 			pos.add(-0.125, 0, 0.125), color, false);
 	}
 	
-	private void drawFishingSpots(MatrixStack matrices)
+	private void drawFishingSpots(PoseStack matrices)
 	{
-		Box headBox = new Box(-0.25, 0, -0.25, 0.25, 0.5, 0.25);
-		Box noseBox =
-			headBox.offset(0.125, 0.125, 0.5).shrink(0.25, 0.35, 0.45);
+		AABB headBox = new AABB(-0.25, 0, -0.25, 0.25, 0.5, 0.25);
+		AABB noseBox =
+			headBox.move(0.125, 0.125, 0.5).contract(0.25, 0.35, 0.45);
 		
 		int color = ddColor.getColorI(0xC0);
 		
-		VertexConsumerProvider.Immediate vcp = RenderUtils.getVCP();
-		Vec3d camPos = RenderUtils.getCameraPos();
+		MultiBufferSource.BufferSource vcp = RenderUtils.getVCP();
+		Vec3 camPos = RenderUtils.getCameraPos();
 		
 		for(FishingSpot spot : fishingSpots.getFishingSpots())
 		{
-			Vec3d playerPos = spot.input().pos();
-			Vec3d bobberPos = spot.bobberPos();
+			Vec3 playerPos = spot.input().pos();
+			Vec3 bobberPos = spot.bobberPos();
 			
-			matrices.push();
+			matrices.pushPose();
 			matrices.translate(playerPos.x - camPos.x, playerPos.y - camPos.y,
 				playerPos.z - camPos.z);
-			matrices.multiply(spot.input().rotation().toQuaternion());
+			matrices.mulPose(spot.input().rotation().toQuaternion());
 			
 			VertexConsumer lineBuffer =
 				vcp.getBuffer(WurstRenderLayers.ESP_LINES);
@@ -137,17 +138,17 @@ public final class AutoFishDebugDraw
 			if(!spot.openWater())
 				RenderUtils.drawCrossBox(matrices, lineBuffer, headBox, color);
 			
-			matrices.pop();
+			matrices.popPose();
 			
 			RenderUtils.drawArrow(matrices, lineBuffer,
 				playerPos.subtract(camPos), bobberPos.subtract(camPos), color,
 				0.1F);
 			
-			vcp.draw(WurstRenderLayers.ESP_LINES);
+			vcp.endBatch(WurstRenderLayers.ESP_LINES);
 		}
 	}
 	
-	private void drawMcmmoRange(MatrixStack matrices)
+	private void drawMcmmoRange(PoseStack matrices)
 	{
 		FishingSpot lastSpot = fishingSpots.getLastSpot();
 		if(lastSpot == null)
@@ -158,16 +159,16 @@ public final class AutoFishDebugDraw
 			return;
 		
 		int mcmmoRange = fishingSpots.getRange();
-		Vec3d bobberPos = lastSpot.bobberPos();
-		Box rangeBox = new Box(0, 0, 0, 0, 0, 0)
-			.expand(mcmmoRange, 1, mcmmoRange).offset(bobberPos);
+		Vec3 bobberPos = lastSpot.bobberPos();
+		AABB rangeBox = new AABB(0, 0, 0, 0, 0, 0)
+			.inflate(mcmmoRange, 1, mcmmoRange).move(bobberPos);
 		
 		int quadsColor = 0x40FF0000;
 		RenderUtils.drawSolidBox(matrices, rangeBox, quadsColor, false);
 		
 		int linesColor = 0x80FF0000;
 		RenderUtils.drawOutlinedBox(matrices, rangeBox, linesColor, false);
-		RenderUtils.drawOutlinedBox(matrices, rangeBox.contract(0, 1, 0),
+		RenderUtils.drawOutlinedBox(matrices, rangeBox.deflate(0, 1, 0),
 			linesColor, false);
 	}
 }

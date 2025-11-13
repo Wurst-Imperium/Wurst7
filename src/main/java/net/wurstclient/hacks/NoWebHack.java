@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -35,6 +35,6 @@ public final class NoWebHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		MC.player.movementMultiplier = Vec3d.ZERO;
+		MC.player.stuckSpeedMultiplier = Vec3.ZERO;
 	}
 }

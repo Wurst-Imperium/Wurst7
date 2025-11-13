@@ -11,15 +11,16 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleBlockBreakingListener;
@@ -96,8 +97,8 @@ public final class NukerLegitHack extends Hack
 		EVENTS.remove(RenderListener.class, this);
 		
 		// resets
-		IKeyBinding.get(MC.options.attackKey).resetPressedState();
-		MC.interactionManager.cancelBlockBreaking();
+		IKeyBinding.get(MC.options.keyAttack).resetPressedState();
+		MC.gameMode.stopDestroyBlock();
 		overlay.resetProgress();
 		currentBlock = null;
 		commonSettings.reset();
@@ -117,16 +118,16 @@ public final class NukerLegitHack extends Hack
 		// Ignore the attack cooldown because opening any screen
 		// will set it to 10k ticks.
 		
-		if(MC.player.isRiding())
+		if(MC.player.isHandsBusy())
 		{
 			overlay.resetProgress();
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.stopDestroyBlock();
 			return;
 		}
 		
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
-		double maxRange = MC.player.getBlockInteractionRange() + 1;
+		Vec3 eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.containing(eyesVec);
+		double maxRange = MC.player.blockInteractionRange() + 1;
 		double rangeSq = commonSettings.isSphereShape() ? range.getValueSq()
 			: maxRange * maxRange;
 		int blockRange = range.getValueCeil();
@@ -146,7 +147,7 @@ public final class NukerLegitHack extends Hack
 		// reset if no block was found
 		if(currentBlock == null)
 		{
-			IKeyBinding.get(MC.options.attackKey).resetPressedState();
+			IKeyBinding.get(MC.options.keyAttack).resetPressedState();
 			overlay.resetProgress();
 		}
 		
@@ -155,24 +156,24 @@ public final class NukerLegitHack extends Hack
 	
 	private boolean breakBlock(BlockBreakingParams params)
 	{
-		ClientPlayerInteractionManager im = MC.interactionManager;
+		MultiPlayerGameMode im = MC.gameMode;
 		
 		WURST.getRotationFaker().faceVectorClient(params.hitVec());
-		HitResult hitResult = MC.crosshairTarget;
+		HitResult hitResult = MC.hitResult;
 		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
 			|| !(hitResult instanceof BlockHitResult bHitResult))
 		{
-			im.cancelBlockBreaking();
+			im.stopDestroyBlock();
 			return true;
 		}
 		
 		BlockPos pos = bHitResult.getBlockPos();
-		BlockState state = MC.world.getBlockState(pos);
-		Direction side = bHitResult.getSide();
+		BlockState state = MC.level.getBlockState(pos);
+		Direction side = bHitResult.getDirection();
 		if(state.isAir() || !params.pos().equals(pos)
 			|| !params.side().equals(side))
 		{
-			im.cancelBlockBreaking();
+			im.stopDestroyBlock();
 			return true;
 		}
 		
@@ -182,14 +183,14 @@ public final class NukerLegitHack extends Hack
 			// This case doesn't cancel block breaking in vanilla Minecraft.
 			return true;
 		
-		if(!im.isBreakingBlock())
-			im.attackBlock(pos, side);
+		if(!im.isDestroying())
+			im.startDestroyBlock(pos, side);
 		
-		if(im.updateBlockBreakingProgress(pos, side))
+		if(im.continueDestroyBlock(pos, side))
 		{
-			MC.world.spawnBlockBreakingParticle(pos, side);
-			swingHand.swing(Hand.MAIN_HAND);
-			MC.options.attackKey.setPressed(true);
+			MC.level.addBreakingBlockEffect(pos, side);
+			swingHand.swing(InteractionHand.MAIN_HAND);
+			MC.options.keyAttack.setDown(true);
 		}
 		
 		return true;
@@ -204,7 +205,7 @@ public final class NukerLegitHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		overlay.render(matrixStack, partialTicks, currentBlock);
 	}

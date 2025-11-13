@@ -13,17 +13,18 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.BowItem;
-import net.minecraft.item.CrossbowItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.GUIRenderListener;
@@ -102,10 +103,10 @@ public final class BowAimbotHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
 		// check if item is ranged weapon
-		ItemStack stack = MC.player.getInventory().getSelectedStack();
+		ItemStack stack = MC.player.getInventory().getSelectedItem();
 		Item item = stack.getItem();
 		if(!(item instanceof BowItem || item instanceof CrossbowItem))
 		{
@@ -114,7 +115,7 @@ public final class BowAimbotHack extends Hack
 		}
 		
 		// check if using bow
-		if(item instanceof BowItem && !MC.options.useKey.isPressed()
+		if(item instanceof BowItem && !MC.options.keyUse.isDown()
 			&& !player.isUsingItem())
 		{
 			target = null;
@@ -131,13 +132,13 @@ public final class BowAimbotHack extends Hack
 		// set target
 		if(filterEntities(Stream.of(target)) == null)
 			target = filterEntities(StreamSupport
-				.stream(MC.world.getEntities().spliterator(), true));
+				.stream(MC.level.entitiesForRendering().spliterator(), true));
 		
 		if(target == null)
 			return;
 		
 		// set velocity
-		velocity = (72000 - player.getItemUseTimeLeft()) / 20F;
+		velocity = (72000 - player.getUseItemRemainingTicks()) / 20F;
 		velocity = (velocity * velocity + velocity * 2) / 3;
 		if(velocity > 1)
 			velocity = 1;
@@ -145,18 +146,18 @@ public final class BowAimbotHack extends Hack
 		// set position to aim at
 		double d = RotationUtils.getEyesPos().distanceTo(
 			target.getBoundingBox().getCenter()) * predictMovement.getValue();
-		double posX = target.getX() + (target.getX() - target.lastRenderX) * d
-			- player.getX();
-		double posY = target.getY() + (target.getY() - target.lastRenderY) * d
-			+ target.getHeight() * 0.5 - player.getY()
+		double posX =
+			target.getX() + (target.getX() - target.xOld) * d - player.getX();
+		double posY = target.getY() + (target.getY() - target.yOld) * d
+			+ target.getBbHeight() * 0.5 - player.getY()
 			- player.getEyeHeight(player.getPose());
-		double posZ = target.getZ() + (target.getZ() - target.lastRenderZ) * d
-			- player.getZ();
+		double posZ =
+			target.getZ() + (target.getZ() - target.zOld) * d - player.getZ();
 		
 		// set yaw
 		float neededYaw = (float)Math.toDegrees(Math.atan2(posZ, posX)) - 90;
-		MC.player.setYaw(
-			RotationUtils.limitAngleChange(MC.player.getYaw(), neededYaw));
+		MC.player.setYRot(
+			RotationUtils.limitAngleChange(MC.player.getYRot(), neededYaw));
 		
 		// calculate needed pitch
 		double hDistance = Math.sqrt(posX * posX + posZ * posZ);
@@ -173,7 +174,7 @@ public final class BowAimbotHack extends Hack
 			WURST.getRotationFaker()
 				.faceVectorClient(target.getBoundingBox().getCenter());
 		else
-			MC.player.setPitch(neededPitch);
+			MC.player.setXRot(neededPitch);
 	}
 	
 	private Entity filterEntities(Stream<Entity> s)
@@ -185,13 +186,13 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(target == null)
 			return;
 		
-		Box box = EntityUtils.getLerpedBox(target, partialTicks)
-			.offset(0, 0.05, 0).expand(0.05);
+		AABB box = EntityUtils.getLerpedBox(target, partialTicks)
+			.move(0, 0.05, 0).inflate(0.05);
 		
 		int quadColor = color.getColorI(0.5F * velocity);
 		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
@@ -201,7 +202,7 @@ public final class BowAimbotHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(DrawContext context, float partialTicks)
+	public void onRenderGUI(GuiGraphics context, float partialTicks)
 	{
 		if(target == null)
 			return;
@@ -212,24 +213,25 @@ public final class BowAimbotHack extends Hack
 		else
 			message = "Target Locked";
 		
-		TextRenderer tr = MC.textRenderer;
-		int msgWidth = tr.getWidth(message);
+		Font tr = MC.font;
+		int msgWidth = tr.width(message);
 		
-		int msgX1 = context.getScaledWindowWidth() / 2 - msgWidth / 2;
+		int msgX1 = context.guiWidth() / 2 - msgWidth / 2;
 		int msgX2 = msgX1 + msgWidth + 3;
-		int msgY1 = context.getScaledWindowHeight() / 2 + 1;
+		int msgY1 = context.guiHeight() / 2 + 1;
 		int msgY2 = msgY1 + 10;
 		
 		// background
 		context.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
 		
 		// text
-		context.drawText(tr, message, msgX1 + 2, msgY1 + 1, 0xFFFFFFFF, false);
+		context.drawString(tr, message, msgX1 + 2, msgY1 + 1, 0xFFFFFFFF,
+			false);
 	}
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", e -> MC.player.squaredDistanceTo(e)),
+		DISTANCE("Distance", e -> MC.player.distanceToSqr(e)),
 		
 		ANGLE("Angle",
 			e -> RotationUtils
@@ -239,7 +241,7 @@ public final class BowAimbotHack extends Hack
 			e -> Math
 				.pow(RotationUtils
 					.getAngleToLookVec(e.getBoundingBox().getCenter()), 2)
-				+ MC.player.squaredDistanceTo(e)),
+				+ MC.player.distanceToSqr(e)),
 		
 		HEALTH("Health", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);

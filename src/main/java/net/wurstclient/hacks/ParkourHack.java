@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.util.math.Box;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -60,20 +60,20 @@ public final class ParkourHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(!MC.player.isOnGround() || MC.options.jumpKey.isPressed())
+		if(!MC.player.onGround() || MC.options.keyJump.isDown())
 			return;
 		
 		if(!sneak.isChecked()
-			&& (MC.player.isSneaking() || MC.options.sneakKey.isPressed()))
+			&& (MC.player.isShiftKeyDown() || MC.options.keyShift.isDown()))
 			return;
 		
-		Box box = MC.player.getBoundingBox();
-		Box adjustedBox = box.stretch(0, -minDepth.getValue(), 0)
-			.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
+		AABB box = MC.player.getBoundingBox();
+		AABB adjustedBox = box.expandTowards(0, -minDepth.getValue(), 0)
+			.inflate(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
 		
-		if(!MC.world.isSpaceEmpty(MC.player, adjustedBox))
+		if(!MC.level.noCollision(MC.player, adjustedBox))
 			return;
 		
-		MC.player.jump();
+		MC.player.jumpFromGround();
 	}
 }

@@ -14,15 +14,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.RenderListener;
@@ -45,8 +46,8 @@ import net.wurstclient.util.RotationUtils;
 public final class VeinMinerHack extends Hack
 	implements UpdateListener, LeftClickListener, RenderListener
 {
-	private static final Box BLOCK_BOX =
-		new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0, 15 / 16.0, 15 / 16.0);
+	private static final AABB BLOCK_BOX =
+		new AABB(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0, 15 / 16.0, 15 / 16.0);
 	
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
@@ -111,8 +112,8 @@ public final class VeinMinerHack extends Hack
 		currentVein.clear();
 		if(currentBlock != null)
 		{
-			MC.interactionManager.breakingBlock = true;
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.isDestroying = true;
+			MC.gameMode.stopDestroyBlock();
 			currentBlock = null;
 		}
 		
@@ -124,13 +125,13 @@ public final class VeinMinerHack extends Hack
 	public void onUpdate()
 	{
 		currentBlock = null;
-		currentVein.removeIf(pos -> BlockUtils.getState(pos).isReplaceable());
+		currentVein.removeIf(pos -> BlockUtils.getState(pos).canBeReplaced());
 		
-		if(MC.options.attackKey.isPressed())
+		if(MC.options.keyAttack.isDown())
 			return;
 		
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		Vec3 eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
@@ -146,9 +147,9 @@ public final class VeinMinerHack extends Hack
 		stream = stream.sorted(BlockBreaker.comparingParams());
 		
 		// Break all blocks in creative mode
-		if(MC.player.getAbilities().creativeMode)
+		if(MC.player.getAbilities().instabuild)
 		{
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.stopDestroyBlock();
 			overlay.resetProgress();
 			
 			ArrayList<BlockPos> blocks = cache
@@ -158,7 +159,7 @@ public final class VeinMinerHack extends Hack
 			
 			currentBlock = blocks.get(0);
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
-			swingHand.swing(Hand.MAIN_HAND);
+			swingHand.swing(InteractionHand.MAIN_HAND);
 			return;
 		}
 		
@@ -168,7 +169,7 @@ public final class VeinMinerHack extends Hack
 		
 		if(currentBlock == null)
 		{
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.stopDestroyBlock();
 			overlay.resetProgress();
 			return;
 		}
@@ -188,11 +189,10 @@ public final class VeinMinerHack extends Hack
 	{
 		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
 		
-		if(!MC.interactionManager.updateBlockBreakingProgress(params.pos(),
-			params.side()))
+		if(!MC.gameMode.continueDestroyBlock(params.pos(), params.side()))
 			return false;
 		
-		swingHand.swing(Hand.MAIN_HAND);
+		swingHand.swing(InteractionHand.MAIN_HAND);
 		return true;
 	}
 	
@@ -202,7 +202,7 @@ public final class VeinMinerHack extends Hack
 		if(!currentVein.isEmpty())
 			return;
 		
-		if(!(MC.crosshairTarget instanceof BlockHitResult bHitResult)
+		if(!(MC.hitResult instanceof BlockHitResult bHitResult)
 			|| bHitResult.getType() != HitResult.Type.BLOCK)
 			return;
 		
@@ -227,7 +227,7 @@ public final class VeinMinerHack extends Hack
 			
 			for(Direction direction : Direction.values())
 			{
-				BlockPos neighbor = current.offset(direction);
+				BlockPos neighbor = current.relative(direction);
 				if(!currentVein.contains(neighbor)
 					&& BlockUtils.getBlock(neighbor) == targetBlock)
 				{
@@ -239,14 +239,14 @@ public final class VeinMinerHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		overlay.render(matrixStack, partialTicks, currentBlock);
 		if(currentVein.isEmpty())
 			return;
 		
-		List<Box> boxes =
-			currentVein.stream().map(pos -> BLOCK_BOX.offset(pos)).toList();
+		List<AABB> boxes =
+			currentVein.stream().map(pos -> BLOCK_BOX.move(pos)).toList();
 		RenderUtils.drawOutlinedBoxes(matrixStack, boxes, 0x80000000, false);
 	}
 }

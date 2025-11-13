@@ -9,47 +9,46 @@ package net.wurstclient.util;
 
 import org.joml.Quaternionf;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 
 public record Rotation(float yaw, float pitch)
 {
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	public void applyToClientPlayer()
 	{
 		float adjustedYaw =
-			RotationUtils.limitAngleChange(MC.player.getYaw(), yaw);
-		MC.player.setYaw(adjustedYaw);
-		MC.player.setPitch(pitch);
+			RotationUtils.limitAngleChange(MC.player.getYRot(), yaw);
+		MC.player.setYRot(adjustedYaw);
+		MC.player.setXRot(pitch);
 	}
 	
 	public void sendPlayerLookPacket()
 	{
-		sendPlayerLookPacket(MC.player.isOnGround(),
+		sendPlayerLookPacket(MC.player.onGround(),
 			MC.player.horizontalCollision);
 	}
 	
 	public void sendPlayerLookPacket(boolean onGround,
 		boolean horizontalCollision)
 	{
-		MC.player.networkHandler
-			.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch,
-				onGround, horizontalCollision));
+		MC.player.connection.send(new ServerboundMovePlayerPacket.Rot(yaw,
+			pitch, onGround, horizontalCollision));
 	}
 	
 	public double getAngleTo(Rotation other)
 	{
-		float yaw1 = MathHelper.wrapDegrees(yaw);
-		float yaw2 = MathHelper.wrapDegrees(other.yaw);
-		float diffYaw = MathHelper.wrapDegrees(yaw1 - yaw2);
+		float yaw1 = Mth.wrapDegrees(yaw);
+		float yaw2 = Mth.wrapDegrees(other.yaw);
+		float diffYaw = Mth.wrapDegrees(yaw1 - yaw2);
 		
-		float pitch1 = MathHelper.wrapDegrees(pitch);
-		float pitch2 = MathHelper.wrapDegrees(other.pitch);
-		float diffPitch = MathHelper.wrapDegrees(pitch1 - pitch2);
+		float pitch1 = Mth.wrapDegrees(pitch);
+		float pitch2 = Mth.wrapDegrees(other.pitch);
+		float diffPitch = Mth.wrapDegrees(pitch1 - pitch2);
 		
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
 	}
@@ -64,32 +63,32 @@ public record Rotation(float yaw, float pitch)
 		return new Rotation(yaw, pitch);
 	}
 	
-	public Vec3d toLookVec()
+	public Vec3 toLookVec()
 	{
-		float radPerDeg = MathHelper.RADIANS_PER_DEGREE;
-		float pi = MathHelper.PI;
+		float radPerDeg = Mth.DEG_TO_RAD;
+		float pi = Mth.PI;
 		
-		float adjustedYaw = -MathHelper.wrapDegrees(yaw) * radPerDeg - pi;
-		float cosYaw = MathHelper.cos(adjustedYaw);
-		float sinYaw = MathHelper.sin(adjustedYaw);
+		float adjustedYaw = -Mth.wrapDegrees(yaw) * radPerDeg - pi;
+		float cosYaw = Mth.cos(adjustedYaw);
+		float sinYaw = Mth.sin(adjustedYaw);
 		
-		float adjustedPitch = -MathHelper.wrapDegrees(pitch) * radPerDeg;
-		float nCosPitch = -MathHelper.cos(adjustedPitch);
-		float sinPitch = MathHelper.sin(adjustedPitch);
+		float adjustedPitch = -Mth.wrapDegrees(pitch) * radPerDeg;
+		float nCosPitch = -Mth.cos(adjustedPitch);
+		float sinPitch = Mth.sin(adjustedPitch);
 		
-		return new Vec3d(sinYaw * nCosPitch, sinPitch, cosYaw * nCosPitch);
+		return new Vec3(sinYaw * nCosPitch, sinPitch, cosYaw * nCosPitch);
 	}
 	
 	public Quaternionf toQuaternion()
 	{
-		float radPerDeg = MathHelper.RADIANS_PER_DEGREE;
-		float yawRad = -MathHelper.wrapDegrees(yaw) * radPerDeg;
-		float pitchRad = MathHelper.wrapDegrees(pitch) * radPerDeg;
+		float radPerDeg = Mth.DEG_TO_RAD;
+		float yawRad = -Mth.wrapDegrees(yaw) * radPerDeg;
+		float pitchRad = Mth.wrapDegrees(pitch) * radPerDeg;
 		
-		float sinYaw = MathHelper.sin(yawRad / 2);
-		float cosYaw = MathHelper.cos(yawRad / 2);
-		float sinPitch = MathHelper.sin(pitchRad / 2);
-		float cosPitch = MathHelper.cos(pitchRad / 2);
+		float sinYaw = Mth.sin(yawRad / 2);
+		float cosYaw = Mth.cos(yawRad / 2);
+		float sinPitch = Mth.sin(pitchRad / 2);
+		float cosPitch = Mth.cos(pitchRad / 2);
 		
 		float x = sinPitch * cosYaw;
 		float y = cosPitch * sinYaw;
@@ -101,7 +100,6 @@ public record Rotation(float yaw, float pitch)
 	
 	public static Rotation wrapped(float yaw, float pitch)
 	{
-		return new Rotation(MathHelper.wrapDegrees(yaw),
-			MathHelper.wrapDegrees(pitch));
+		return new Rotation(Mth.wrapDegrees(yaw), Mth.wrapDegrees(pitch));
 	}
 }

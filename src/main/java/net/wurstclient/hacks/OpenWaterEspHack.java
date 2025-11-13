@@ -9,9 +9,10 @@ package net.wurstclient.hacks;
 
 import java.util.Optional;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.util.math.Box;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
@@ -30,8 +31,8 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	@Override
 	public String getRenderName()
 	{
-		FishingBobberEntity bobber = Optional.ofNullable(MC.player)
-			.map(player -> player.fishHook).orElse(null);
+		FishingHook bobber = Optional.ofNullable(MC.player)
+			.map(player -> player.fishing).orElse(null);
 		if(bobber == null)
 			return getName();
 		
@@ -51,13 +52,13 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
-		FishingBobberEntity bobber = MC.player.fishHook;
+		FishingHook bobber = MC.player.fishing;
 		if(bobber == null)
 			return;
 		
-		Box box = new Box(-2, -1, -2, 3, 2, 3).offset(bobber.getBlockPos());
+		AABB box = new AABB(-2, -1, -2, 3, 2, 3).move(bobber.blockPosition());
 		boolean inOpenWater = isInOpenWater(bobber);
 		int color = inOpenWater ? 0x8000FF00 : 0x80FF0000;
 		
@@ -67,8 +68,8 @@ public final class OpenWaterEspHack extends Hack implements RenderListener
 		RenderUtils.drawOutlinedBox(matrixStack, box, color, false);
 	}
 	
-	private boolean isInOpenWater(FishingBobberEntity bobber)
+	private boolean isInOpenWater(FishingHook bobber)
 	{
-		return bobber.isOpenOrWaterAround(bobber.getBlockPos());
+		return bobber.calculateOpenWater(bobber.blockPosition());
 	}
 }

@@ -7,11 +7,11 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.Full;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.LookAndOnGround;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.OnGroundOnly;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.PositionAndOnGround;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.PosRot;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Rot;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.StatusOnly;
 
 public enum PacketUtils
 {
@@ -22,22 +22,22 @@ public enum PacketUtils
 	 * input packet if of a type that can't hold position data, it will be
 	 * upgraded to PositionAndOnGround or Full as needed.
 	 */
-	public static PlayerMoveC2SPacket modifyPosition(PlayerMoveC2SPacket packet,
-		double x, double y, double z)
+	public static ServerboundMovePlayerPacket modifyPosition(
+		ServerboundMovePlayerPacket packet, double x, double y, double z)
 	{
-		if(packet instanceof LookAndOnGround)
-			return new Full(x, y, z, packet.getYaw(0), packet.getPitch(0),
+		if(packet instanceof Rot)
+			return new PosRot(x, y, z, packet.getYRot(0), packet.getXRot(0),
 				packet.isOnGround(), packet.horizontalCollision());
 		
-		if(packet instanceof OnGroundOnly)
-			return new PositionAndOnGround(x, y, z, packet.isOnGround(),
+		if(packet instanceof StatusOnly)
+			return new Pos(x, y, z, packet.isOnGround(),
 				packet.horizontalCollision());
 		
-		if(packet instanceof Full)
-			return new Full(x, y, z, packet.getYaw(0), packet.getPitch(0),
+		if(packet instanceof PosRot)
+			return new PosRot(x, y, z, packet.getYRot(0), packet.getXRot(0),
 				packet.isOnGround(), packet.horizontalCollision());
 		
-		return new PositionAndOnGround(x, y, z, packet.isOnGround(),
+		return new Pos(x, y, z, packet.isOnGround(),
 			packet.horizontalCollision());
 	}
 	
@@ -46,67 +46,67 @@ public enum PacketUtils
 	 * input packet is of a type that can't hold rotation data, it will be
 	 * upgraded to LookAndOnGround or Full as needed.
 	 */
-	public static PlayerMoveC2SPacket modifyRotation(PlayerMoveC2SPacket packet,
-		float yaw, float pitch)
+	public static ServerboundMovePlayerPacket modifyRotation(
+		ServerboundMovePlayerPacket packet, float yaw, float pitch)
 	{
-		if(packet instanceof PositionAndOnGround)
-			return new Full(packet.getX(0), packet.getY(0), packet.getZ(0), yaw,
-				pitch, packet.isOnGround(), packet.horizontalCollision());
+		if(packet instanceof Pos)
+			return new PosRot(packet.getX(0), packet.getY(0), packet.getZ(0),
+				yaw, pitch, packet.isOnGround(), packet.horizontalCollision());
 		
-		if(packet instanceof OnGroundOnly)
-			return new LookAndOnGround(yaw, pitch, packet.isOnGround(),
+		if(packet instanceof StatusOnly)
+			return new Rot(yaw, pitch, packet.isOnGround(),
 				packet.horizontalCollision());
 		
-		if(packet instanceof Full)
-			return new Full(packet.getX(0), packet.getY(0), packet.getZ(0), yaw,
-				pitch, packet.isOnGround(), packet.horizontalCollision());
+		if(packet instanceof PosRot)
+			return new PosRot(packet.getX(0), packet.getY(0), packet.getZ(0),
+				yaw, pitch, packet.isOnGround(), packet.horizontalCollision());
 		
-		return new LookAndOnGround(yaw, pitch, packet.isOnGround(),
+		return new Rot(yaw, pitch, packet.isOnGround(),
 			packet.horizontalCollision());
 	}
 	
 	/**
 	 * Creates a new PlayerMoveC2SPacket with a modified onGround flag.
 	 */
-	public static PlayerMoveC2SPacket modifyOnGround(PlayerMoveC2SPacket packet,
-		boolean onGround)
+	public static ServerboundMovePlayerPacket modifyOnGround(
+		ServerboundMovePlayerPacket packet, boolean onGround)
 	{
-		if(packet instanceof Full)
-			return new Full(packet.getX(0), packet.getY(0), packet.getZ(0),
-				packet.getYaw(0), packet.getPitch(0), onGround,
+		if(packet instanceof PosRot)
+			return new PosRot(packet.getX(0), packet.getY(0), packet.getZ(0),
+				packet.getYRot(0), packet.getXRot(0), onGround,
 				packet.horizontalCollision());
 		
-		if(packet instanceof PositionAndOnGround)
-			return new PositionAndOnGround(packet.getX(0), packet.getY(0),
-				packet.getZ(0), onGround, packet.horizontalCollision());
-		
-		if(packet instanceof LookAndOnGround)
-			return new LookAndOnGround(packet.getYaw(0), packet.getPitch(0),
+		if(packet instanceof Pos)
+			return new Pos(packet.getX(0), packet.getY(0), packet.getZ(0),
 				onGround, packet.horizontalCollision());
 		
-		return new OnGroundOnly(onGround, packet.horizontalCollision());
+		if(packet instanceof Rot)
+			return new Rot(packet.getYRot(0), packet.getXRot(0), onGround,
+				packet.horizontalCollision());
+		
+		return new StatusOnly(onGround, packet.horizontalCollision());
 	}
 	
 	/**
 	 * Creates a new PlayerMoveC2SPacket with a modified horizontal collision
 	 * flag.
 	 */
-	public static PlayerMoveC2SPacket modifyHorizontalCollision(
-		PlayerMoveC2SPacket packet, boolean horizontalCollision)
+	public static ServerboundMovePlayerPacket modifyHorizontalCollision(
+		ServerboundMovePlayerPacket packet, boolean horizontalCollision)
 	{
-		if(packet instanceof Full)
-			return new Full(packet.getX(0), packet.getY(0), packet.getZ(0),
-				packet.getYaw(0), packet.getPitch(0), packet.isOnGround(),
+		if(packet instanceof PosRot)
+			return new PosRot(packet.getX(0), packet.getY(0), packet.getZ(0),
+				packet.getYRot(0), packet.getXRot(0), packet.isOnGround(),
 				horizontalCollision);
 		
-		if(packet instanceof PositionAndOnGround)
-			return new PositionAndOnGround(packet.getX(0), packet.getY(0),
-				packet.getZ(0), packet.isOnGround(), horizontalCollision);
-		
-		if(packet instanceof LookAndOnGround)
-			return new LookAndOnGround(packet.getYaw(0), packet.getPitch(0),
+		if(packet instanceof Pos)
+			return new Pos(packet.getX(0), packet.getY(0), packet.getZ(0),
 				packet.isOnGround(), horizontalCollision);
 		
-		return new OnGroundOnly(packet.isOnGround(), horizontalCollision);
+		if(packet instanceof Rot)
+			return new Rot(packet.getYRot(0), packet.getXRot(0),
+				packet.isOnGround(), horizontalCollision);
+		
+		return new StatusOnly(packet.isOnGround(), horizontalCollision);
 	}
 }

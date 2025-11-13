@@ -10,23 +10,23 @@ package net.wurstclient.util.chunk;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.SectionPos;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.wurstclient.WurstClient;
 
 public enum ChunkUtils
 {
 	;
 	
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	public static Stream<BlockEntity> getLoadedBlockEntities()
 	{
@@ -41,8 +41,9 @@ public enum ChunkUtils
 	
 	/**
 	 * Returns the position of the chunk affected by the given
-	 * {@link BlockUpdateS2CPacket}, {@link ChunkDeltaUpdateS2CPacket}, or
-	 * {@link ChunkDataS2CPacket}.
+	 * {@link ClientboundBlockUpdatePacket},
+	 * {@link ClientboundSectionBlocksUpdatePacket}, or
+	 * {@link ClientboundLevelChunkWithLightPacket}.
 	 *
 	 * <p>
 	 * Returns <code>null</code> if the given packet is of a different type than
@@ -50,26 +51,26 @@ public enum ChunkUtils
 	 */
 	public static ChunkPos getAffectedChunk(Packet<?> packet)
 	{
-		if(packet instanceof BlockUpdateS2CPacket p)
+		if(packet instanceof ClientboundBlockUpdatePacket p)
 			return new ChunkPos(p.getPos());
-		if(packet instanceof ChunkDeltaUpdateS2CPacket p)
-			return p.sectionPos.toChunkPos();
-		if(packet instanceof ChunkDataS2CPacket p)
-			return new ChunkPos(p.getChunkX(), p.getChunkZ());
+		if(packet instanceof ClientboundSectionBlocksUpdatePacket p)
+			return p.sectionPos.chunk();
+		if(packet instanceof ClientboundLevelChunkWithLightPacket p)
+			return new ChunkPos(p.getX(), p.getZ());
 		
 		return null;
 	}
 	
-	public static Stream<WorldChunk> getLoadedChunks()
+	public static Stream<LevelChunk> getLoadedChunks()
 	{
-		int radius = Math.max(2, MC.options.getClampedViewDistance()) + 3;
+		int radius = Math.max(2, MC.options.getEffectiveRenderDistance()) + 3;
 		int diameter = radius * 2 + 1;
 		
-		ChunkPos center = MC.player.getChunkPos();
+		ChunkPos center = MC.player.chunkPosition();
 		ChunkPos min = new ChunkPos(center.x - radius, center.z - radius);
 		ChunkPos max = new ChunkPos(center.x + radius, center.z + radius);
 		
-		Stream<WorldChunk> stream = Stream.<ChunkPos> iterate(min, pos -> {
+		Stream<LevelChunk> stream = Stream.<ChunkPos> iterate(min, pos -> {
 			
 			int x = pos.x;
 			int z = pos.z;
@@ -87,9 +88,8 @@ public enum ChunkUtils
 			
 			return new ChunkPos(x, z);
 			
-		}).limit(diameter * diameter)
-			.filter(c -> MC.world.isChunkLoaded(c.x, c.z))
-			.map(c -> MC.world.getChunk(c.x, c.z)).filter(Objects::nonNull);
+		}).limit(diameter * diameter).filter(c -> MC.level.hasChunk(c.x, c.z))
+			.map(c -> MC.level.getChunk(c.x, c.z)).filter(Objects::nonNull);
 		
 		return stream;
 	}
@@ -99,16 +99,17 @@ public enum ChunkUtils
 	 *
 	 * <p>
 	 * This is a re-implementation of
-	 * {@link Chunk#getHighestNonEmptySectionYOffset()}, which has been
+	 * {@link ChunkAccess#getHighestSectionPosition()}, which has been
 	 * deprecated and marked for removal in 23w17a with no apparent replacement
 	 * provided by Mojang.
 	 */
-	public static int getHighestNonEmptySectionYOffset(Chunk chunk)
+	public static int getHighestNonEmptySectionYOffset(ChunkAccess chunk)
 	{
-		int i = chunk.getHighestNonEmptySection();
+		int i = chunk.getHighestFilledSectionIndex();
 		if(i == -1)
-			return chunk.getBottomY();
+			return chunk.getMinY();
 		
-		return ChunkSectionPos.getBlockCoord(chunk.sectionIndexToCoord(i));
+		return SectionPos
+			.sectionToBlockCoord(chunk.getSectionYFromSectionIndex(i));
 	}
 }

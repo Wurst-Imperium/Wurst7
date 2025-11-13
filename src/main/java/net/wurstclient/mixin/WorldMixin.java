@@ -14,17 +14,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NoWeatherHack;
 
-@Mixin(World.class)
-public abstract class WorldMixin implements WorldAccess, AutoCloseable
+@Mixin(Level.class)
+public abstract class WorldMixin implements LevelAccessor, AutoCloseable
 {
-	@Inject(at = @At("HEAD"),
-		method = "getRainGradient(F)F",
-		cancellable = true)
+	@Inject(at = @At("HEAD"), method = "getRainLevel(F)F", cancellable = true)
 	private void onGetRainGradient(float delta,
 		CallbackInfoReturnable<Float> cir)
 	{
@@ -32,7 +30,7 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable
 			cir.setReturnValue(0F);
 	}
 	
-	@ModifyReturnValue(at = @At("RETURN"), method = "getTimeOfDay()J")
+	@ModifyReturnValue(at = @At("RETURN"), method = "getDayTime()J")
 	public long onGetTimeOfDay(long original)
 	{
 		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;

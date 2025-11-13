@@ -7,7 +7,7 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.multiplayer.ServerData;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
@@ -36,7 +36,7 @@ public final class IpCmd extends Command
 			break;
 			
 			case "copy":
-			MC.keyboard.setClipboard(ip);
+			MC.keyboardHandler.setClipboard(ip);
 			ChatUtils.message("IP copied to clipboard.");
 			break;
 			
@@ -47,11 +47,11 @@ public final class IpCmd extends Command
 	
 	private String getIP()
 	{
-		ServerInfo lastServer = LastServerRememberer.getLastServer();
-		if(lastServer == null || MC.isIntegratedServerRunning())
+		ServerData lastServer = LastServerRememberer.getLastServer();
+		if(lastServer == null || MC.hasSingleplayerServer())
 			return "127.0.0.1:25565";
 		
-		String ip = lastServer.address;
+		String ip = lastServer.ip;
 		if(!ip.contains(":"))
 			ip += ":25565";
 		

@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.world.MoonPhase;
+import net.minecraft.world.level.MoonPhase;
 import net.wurstclient.Category;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;

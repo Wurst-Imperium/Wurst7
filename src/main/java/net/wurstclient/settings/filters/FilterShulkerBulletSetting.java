@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.ShulkerBullet;
 
 public final class FilterShulkerBulletSetting extends EntityFilterCheckbox
 {
@@ -20,7 +20,7 @@ public final class FilterShulkerBulletSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof ShulkerBulletEntity);
+		return !(e instanceof ShulkerBullet);
 	}
 	
 	public static FilterShulkerBulletSetting genericCombat(boolean checked)

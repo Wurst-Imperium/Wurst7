@@ -12,29 +12,28 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen.CreativeScreenHandler;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.ItemPickerMenu;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.wurstclient.WurstClient;
 
-@Mixin(CreativeInventoryScreen.class)
+@Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeInventoryScreenMixin
-	extends HandledScreen<CreativeInventoryScreen.CreativeScreenHandler>
+	extends AbstractContainerScreen<CreativeModeInventoryScreen.ItemPickerMenu>
 {
 	private CreativeInventoryScreenMixin(WurstClient wurst,
-		CreativeScreenHandler screenHandler, PlayerInventory inventory,
-		Text title)
+		ItemPickerMenu screenHandler, Inventory inventory, Component title)
 	{
 		super(screenHandler, inventory, title);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "shouldShowOperatorTab(Lnet/minecraft/entity/player/PlayerEntity;)Z",
+		method = "hasPermissions(Lnet/minecraft/world/entity/player/Player;)Z",
 		cancellable = true)
-	private void onShouldShowOperatorTab(PlayerEntity player,
+	private void onShouldShowOperatorTab(Player player,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		if(WurstClient.INSTANCE.isEnabled())

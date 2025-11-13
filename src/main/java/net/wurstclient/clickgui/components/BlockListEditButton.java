@@ -27,7 +27,7 @@ public final class BlockListEditButton extends AbstractListEditButton
 	@Override
 	protected void openScreen()
 	{
-		MC.setScreen(new EditBlockListScreen(MC.currentScreen, setting));
+		MC.setScreen(new EditBlockListScreen(MC.screen, setting));
 	}
 	
 	@Override

@@ -12,8 +12,8 @@ import java.util.List;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.ChatHudLine;
+import net.minecraft.client.GuiMessage;
+import net.minecraft.client.Minecraft;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.json.JsonException;
@@ -21,7 +21,7 @@ import net.wurstclient.util.json.WsonObject;
 
 public abstract class MessageCompleter
 {
-	protected static final MinecraftClient MC = WurstClient.MC;
+	protected static final Minecraft MC = WurstClient.MC;
 	
 	protected final ModelSettings modelSettings;
 	
@@ -60,8 +60,7 @@ public abstract class MessageCompleter
 		String prompt = "=== Minecraft chat log ===\n";
 		
 		// add chat history
-		List<ChatHudLine.Visible> chatHistory =
-			MC.inGameHud.getChatHud().visibleMessages;
+		List<GuiMessage.Line> chatHistory = MC.gui.getChat().trimmedMessages;
 		int messages = 0;
 		for(int i = chatHistory.size() - 1; i >= 0; i--)
 		{
@@ -90,11 +89,11 @@ public abstract class MessageCompleter
 		
 		// if the chat history is empty, add a dummy system message
 		if(chatHistory.isEmpty())
-			prompt += "<System> " + MC.getSession().getUsername()
-				+ " joined the game.\n";
+			prompt +=
+				"<System> " + MC.getUser().getName() + " joined the game.\n";
 		
 		// add draft message
-		prompt += "<" + MC.getSession().getUsername() + "> " + draftMessage;
+		prompt += "<" + MC.getUser().getName() + "> " + draftMessage;
 		
 		return prompt;
 	}

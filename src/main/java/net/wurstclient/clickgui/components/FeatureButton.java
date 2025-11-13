@@ -9,9 +9,9 @@ package net.wurstclient.clickgui.components;
 
 import java.util.Objects;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.wurstclient.Feature;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
@@ -25,7 +25,7 @@ import net.wurstclient.util.RenderUtils;
 public final class FeatureButton extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	
 	private final Feature feature;
 	private final boolean hasSettings;
@@ -42,7 +42,7 @@ public final class FeatureButton extends Component
 	
 	@Override
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
-		Click context)
+		MouseButtonEvent context)
 	{
 		if(mouseButton != 0)
 			return;
@@ -84,7 +84,7 @@ public final class FeatureButton extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -106,7 +106,7 @@ public final class FeatureButton extends Component
 		if(hasSettings)
 			context.fill(x3, y1, x2, y2, getButtonColor(false, hSettings));
 		
-		context.state.goUpLayer();
+		context.guiRenderState.up();
 		
 		// outlines
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
@@ -121,9 +121,9 @@ public final class FeatureButton extends Component
 		
 		// text
 		String name = feature.getName();
-		int tx = x1 + (x3 - x1 - TR.getWidth(name)) / 2;
+		int tx = x1 + (x3 - x1 - TR.width(name)) / 2;
 		int ty = y1 + 2;
-		context.drawText(TR, name, tx, ty, GUI.getTxtColor(), false);
+		context.drawString(TR, name, tx, ty, GUI.getTxtColor(), false);
 	}
 	
 	private int getButtonColor(boolean enabled, boolean hovering)
@@ -136,7 +136,7 @@ public final class FeatureButton extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		int width = TR.getWidth(feature.getName());
+		int width = TR.width(feature.getName());
 		width += hasSettings ? 15 : 4;
 		return width;
 	}

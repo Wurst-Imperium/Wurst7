@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.hacks.TemplateToolHack;
 import net.wurstclient.hacks.templatetool.SelectPositionState;
 import net.wurstclient.hacks.templatetool.TemplateToolState;
@@ -22,15 +23,15 @@ import net.wurstclient.util.RenderUtils;
 public final class SelectBoxEndState extends SelectPositionState
 {
 	@Override
-	public void onRender(TemplateToolHack hack, MatrixStack matrixStack,
+	public void onRender(TemplateToolHack hack, PoseStack matrixStack,
 		float partialTicks)
 	{
 		super.onRender(hack, matrixStack, partialTicks);
 		
 		BlockPos start = hack.getStartPos();
 		BlockPos end = hack.getEndPos();
-		List<Box> selections = Stream.of(start, end).filter(Objects::nonNull)
-			.map(pos -> new Box(pos).contract(1 / 16.0)).toList();
+		List<AABB> selections = Stream.of(start, end).filter(Objects::nonNull)
+			.map(pos -> new AABB(pos).deflate(1 / 16.0)).toList();
 		
 		int black = 0x80000000;
 		int green15 = 0x2600FF00;

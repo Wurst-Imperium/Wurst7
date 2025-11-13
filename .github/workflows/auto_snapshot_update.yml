@@ -61,15 +61,14 @@ jobs:
 
     - name: Migrate mappings
       run: |
-        ./gradlew migrateMappings --mappings ${{ inputs.yarn_mappings }} --overrideInputsIHaveABackup
-        ./gradlew migrateTestMappings --mappings ${{ inputs.yarn_mappings }} --overrideInputsIHaveABackup
-        ./gradlew migrateClassTweakerMappings --mappings ${{ inputs.yarn_mappings }} --overrideInputsIHaveABackup
+        ./gradlew migrateMappings --mappings "net.minecraft:mappings:${{ inputs.mc_version }}" --overrideInputsIHaveABackup
+        ./gradlew migrateGametestMappings --mappings "net.minecraft:mappings:${{ inputs.mc_version }}" --overrideInputsIHaveABackup
+        ./gradlew migrateClassTweakerMappings --mappings "net.minecraft:mappings:${{ inputs.mc_version }}" --overrideInputsIHaveABackup
 
     - name: Update version constants
       run: |
         python scripts/update_version_constants.py \
           "${{ inputs.mc_version }}" \
-          "${{ inputs.yarn_mappings }}" \
           "${{ inputs.fabric_loader }}" \
           "${{ inputs.fapi_version }}"
 

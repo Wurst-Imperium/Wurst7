@@ -39,7 +39,7 @@ public final class TiredHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		new Rotation(MC.player.getYaw(), MC.player.age % 100)
+		new Rotation(MC.player.getYRot(), MC.player.tickCount % 100)
 			.sendPlayerLookPacket();
 	}
 }

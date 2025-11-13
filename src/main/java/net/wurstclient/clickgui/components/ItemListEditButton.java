@@ -27,7 +27,7 @@ public final class ItemListEditButton extends AbstractListEditButton
 	@Override
 	protected void openScreen()
 	{
-		MC.setScreen(new EditItemListScreen(MC.currentScreen, setting));
+		MC.setScreen(new EditItemListScreen(MC.screen, setting));
 	}
 	
 	@Override

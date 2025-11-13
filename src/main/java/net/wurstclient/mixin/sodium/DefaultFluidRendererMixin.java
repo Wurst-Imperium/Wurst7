@@ -16,11 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
@@ -44,8 +44,8 @@ public class DefaultFluidRendererMixin
 		cancellable = true,
 		remap = false,
 		require = 0)
-	private void onIsFullBlockFluidOccluded(BlockRenderView world, BlockPos pos,
-		Direction dir, BlockState state, FluidState fluid,
+	private void onIsFullBlockFluidOccluded(BlockAndTintGetter world,
+		BlockPos pos, Direction dir, BlockState state, FluidState fluid,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
@@ -68,7 +68,7 @@ public class DefaultFluidRendererMixin
 	{
 		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
 		if(!xray.isOpacityMode()
-			|| xray.isVisible(state.getBlockState().getBlock(), pos))
+			|| xray.isVisible(state.createLegacyBlock().getBlock(), pos))
 			return original;
 		
 		return original & xray.getOpacityColorMask();

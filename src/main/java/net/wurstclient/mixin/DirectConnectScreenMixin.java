@@ -14,28 +14,28 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.multiplayer.DirectConnectScreen;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.DirectJoinServerScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.LastServerRememberer;
 
-@Mixin(DirectConnectScreen.class)
+@Mixin(DirectJoinServerScreen.class)
 public class DirectConnectScreenMixin extends Screen
 {
 	@Shadow
 	@Final
-	private ServerInfo serverEntry;
+	private ServerData serverData;
 	
-	private DirectConnectScreenMixin(WurstClient wurst, Text title)
+	private DirectConnectScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "saveAndClose()V")
+	@Inject(at = @At("TAIL"), method = "onSelect()V")
 	private void onSaveAndClose(CallbackInfo ci)
 	{
-		LastServerRememberer.setLastServer(serverEntry);
+		LastServerRememberer.setLastServer(serverData);
 	}
 }

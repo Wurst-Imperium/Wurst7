@@ -7,10 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -56,22 +56,22 @@ public final class StepHack extends Hack implements UpdateListener
 		if(mode.getSelected() == Mode.SIMPLE)
 			return;
 		
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		if(!player.horizontalCollision)
 			return;
 		
-		if(!player.isOnGround() || player.isClimbing()
-			|| player.isTouchingWater() || player.isInLava())
+		if(!player.onGround() || player.onClimbable() || player.isInWater()
+			|| player.isInLava())
 			return;
 		
-		if(player.input.getMovementInput().length() <= 1e-5F)
+		if(player.input.getMoveVector().length() <= 1e-5F)
 			return;
 		
 		if(player.jumping)
 			return;
 		
-		Box box = player.getBoundingBox().offset(0, 0.05, 0).expand(0.05);
-		if(!MC.world.isSpaceEmpty(player, box.offset(0, 1, 0)))
+		AABB box = player.getBoundingBox().move(0, 0.05, 0).inflate(0.05);
+		if(!MC.level.noCollision(player, box.move(0, 1, 0)))
 			return;
 		
 		double stepHeight = BlockUtils.getBlockCollisions(box)
@@ -82,18 +82,17 @@ public final class StepHack extends Hack implements UpdateListener
 		if(stepHeight < 0 || stepHeight > 1)
 			return;
 		
-		ClientPlayNetworkHandler netHandler = player.networkHandler;
+		ClientPacketListener netHandler = player.connection;
 		
-		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-			player.getX(), player.getY() + 0.42 * stepHeight, player.getZ(),
-			player.isOnGround(), MC.player.horizontalCollision));
+		netHandler.send(new ServerboundMovePlayerPacket.Pos(player.getX(),
+			player.getY() + 0.42 * stepHeight, player.getZ(), player.onGround(),
+			MC.player.horizontalCollision));
 		
-		netHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-			player.getX(), player.getY() + 0.753 * stepHeight, player.getZ(),
-			player.isOnGround(), MC.player.horizontalCollision));
+		netHandler.send(new ServerboundMovePlayerPacket.Pos(player.getX(),
+			player.getY() + 0.753 * stepHeight, player.getZ(),
+			player.onGround(), MC.player.horizontalCollision));
 		
-		player.setPosition(player.getX(), player.getY() + stepHeight,
-			player.getZ());
+		player.setPos(player.getX(), player.getY() + stepHeight, player.getZ());
 	}
 	
 	public float adjustStepHeight(float stepHeight)

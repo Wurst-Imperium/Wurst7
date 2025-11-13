@@ -7,7 +7,7 @@
  */
 package net.wurstclient.mixinterface;
 
-import net.minecraft.client.session.Session;
+import net.minecraft.client.User;
 
 public interface IMinecraftClient
 {
@@ -15,7 +15,7 @@ public interface IMinecraftClient
 	
 	public IClientPlayerEntity getPlayer();
 	
-	public Session getWurstSession();
+	public User getWurstSession();
 	
-	public void setWurstSession(Session session);
+	public void setWurstSession(User session);
 }

@@ -12,12 +12,13 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.ai.PathFinder;
 import net.wurstclient.ai.PathPos;
@@ -81,20 +82,20 @@ public final class FollowHack extends Hack
 		
 		if(entity == null)
 		{
-			Stream<Entity> stream =
-				StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-					.filter(e -> !e.isRemoved())
-					.filter(e -> e instanceof LivingEntity
-						&& ((LivingEntity)e).getHealth() > 0
-						|| e instanceof AbstractMinecartEntity)
-					.filter(e -> e != MC.player)
-					.filter(e -> !(e instanceof FakePlayerEntity));
+			Stream<Entity> stream = StreamSupport
+				.stream(MC.level.entitiesForRendering().spliterator(), true)
+				.filter(e -> !e.isRemoved())
+				.filter(e -> e instanceof LivingEntity
+					&& ((LivingEntity)e).getHealth() > 0
+					|| e instanceof AbstractMinecart)
+				.filter(e -> e != MC.player)
+				.filter(e -> !(e instanceof FakePlayerEntity));
 			
 			stream = entityFilters.applyTo(stream);
 			
 			entity = stream
-				.min(Comparator
-					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+				.min(
+					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 				.orElse(null);
 			
 			if(entity == null)
@@ -146,7 +147,7 @@ public final class FollowHack extends Hack
 			&& ((LivingEntity)entity).getHealth() <= 0)
 		{
 			entity = StreamSupport
-				.stream(MC.world.getEntities().spliterator(), true)
+				.stream(MC.level.entitiesForRendering().spliterator(), true)
 				.filter(LivingEntity.class::isInstance)
 				.filter(
 					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
@@ -154,8 +155,8 @@ public final class FollowHack extends Hack
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> entity.getName().getString()
 					.equalsIgnoreCase(e.getName().getString()))
-				.min(Comparator
-					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+				.min(
+					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 				.orElse(null);
 			
 			if(entity == null)
@@ -202,43 +203,43 @@ public final class FollowHack extends Hack
 		}else
 		{
 			// jump if necessary
-			if(MC.player.horizontalCollision && MC.player.isOnGround())
-				MC.player.jump();
+			if(MC.player.horizontalCollision && MC.player.onGround())
+				MC.player.jumpFromGround();
 			
 			// swim up if necessary
-			if(MC.player.isTouchingWater() && MC.player.getY() < entity.getY())
-				MC.player.setVelocity(MC.player.getVelocity().add(0, 0.04, 0));
+			if(MC.player.isInWater() && MC.player.getY() < entity.getY())
+				MC.player.setDeltaMovement(
+					MC.player.getDeltaMovement().add(0, 0.04, 0));
 			
 			// control height if flying
-			if(!MC.player.isOnGround()
+			if(!MC.player.onGround()
 				&& (MC.player.getAbilities().flying
 					|| WURST.getHax().flightHack.isEnabled())
-				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
-					entity.getZ()) <= MC.player.squaredDistanceTo(
-						MC.player.getX(), entity.getY(), MC.player.getZ()))
+				&& MC.player.distanceToSqr(entity.getX(), MC.player.getY(),
+					entity.getZ()) <= MC.player.distanceToSqr(MC.player.getX(),
+						entity.getY(), MC.player.getZ()))
 			{
 				if(MC.player.getY() > entity.getY() + 1D)
-					MC.options.sneakKey.setPressed(true);
+					MC.options.keyShift.setDown(true);
 				else if(MC.player.getY() < entity.getY() - 1D)
-					MC.options.jumpKey.setPressed(true);
+					MC.options.keyJump.setDown(true);
 			}else
 			{
-				MC.options.sneakKey.setPressed(false);
-				MC.options.jumpKey.setPressed(false);
+				MC.options.keyShift.setDown(false);
+				MC.options.keyJump.setDown(false);
 			}
 			
 			// follow entity
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
 			double distanceSq = Math.pow(distance.getValue(), 2);
-			MC.options.forwardKey
-				.setPressed(MC.player.squaredDistanceTo(entity.getX(),
-					MC.player.getY(), entity.getZ()) > distanceSq);
+			MC.options.keyUp.setDown(MC.player.distanceToSqr(entity.getX(),
+				MC.player.getY(), entity.getZ()) > distanceSq);
 		}
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
@@ -254,16 +255,16 @@ public final class FollowHack extends Hack
 	{
 		public EntityPathFinder()
 		{
-			super(BlockPos.ofFloored(entity.getEntityPos()));
+			super(BlockPos.containing(entity.position()));
 			setThinkTime(1);
 		}
 		
 		@Override
 		protected boolean checkDone()
 		{
-			Vec3d center = Vec3d.ofCenter(current);
+			Vec3 center = Vec3.atCenterOf(current);
 			double distanceSq = Math.pow(distance.getValue(), 2);
-			return done = entity.squaredDistanceTo(center) <= distanceSq;
+			return done = entity.distanceToSqr(center) <= distanceSq;
 		}
 		
 		@Override

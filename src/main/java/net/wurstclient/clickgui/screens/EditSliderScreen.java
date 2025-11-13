@@ -9,15 +9,15 @@ package net.wurstclient.clickgui.screens;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.MathUtils;
@@ -27,12 +27,12 @@ public final class EditSliderScreen extends Screen
 	private final Screen prevScreen;
 	private final SliderSetting slider;
 	
-	private TextFieldWidget valueField;
-	private ButtonWidget doneButton;
+	private EditBox valueField;
+	private Button doneButton;
 	
 	public EditSliderScreen(Screen prevScreen, SliderSetting slider)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.prevScreen = prevScreen;
 		this.slider = slider;
 	}
@@ -44,35 +44,35 @@ public final class EditSliderScreen extends Screen
 		int y1 = 60;
 		int y2 = height / 3 * 2;
 		
-		TextRenderer tr = client.textRenderer;
+		Font tr = minecraft.font;
 		ValueDisplay vd = ValueDisplay.DECIMAL;
 		String valueString = vd.getValueString(slider.getValue());
 		
-		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, Text.literal(""));
-		valueField.setText(valueString);
-		valueField.setSelectionStart(0);
+		valueField = new EditBox(tr, x1, y1, 200, 20, Component.literal(""));
+		valueField.setValue(valueString);
+		valueField.setCursorPosition(0);
 		
-		addSelectableChild(valueField);
+		addWidget(valueField);
 		setFocused(valueField);
 		valueField.setFocused(true);
 		
-		doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
-			.dimensions(x1, y2, 200, 20).build();
-		addDrawableChild(doneButton);
+		doneButton = Button.builder(Component.literal("Done"), b -> done())
+			.bounds(x1, y2, 200, 20).build();
+		addRenderableWidget(doneButton);
 	}
 	
 	private void done()
 	{
-		String value = valueField.getText();
+		String value = valueField.getValue();
 		
 		if(MathUtils.isDouble(value))
 			slider.setValue(Double.parseDouble(value));
 		
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 	
 	@Override
-	public boolean keyPressed(KeyInput context)
+	public boolean keyPressed(KeyEvent context)
 	{
 		switch(context.key())
 		{
@@ -81,7 +81,7 @@ public final class EditSliderScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.setScreen(prevScreen);
+			minecraft.setScreen(prevScreen);
 			break;
 		}
 		
@@ -89,20 +89,20 @@ public final class EditSliderScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		context.drawCenteredTextWithShadow(client.textRenderer,
-			slider.getName(), width / 2, 20, Colors.WHITE);
+		context.drawCenteredString(minecraft.font, slider.getName(), width / 2,
+			20, CommonColors.WHITE);
 		
 		valueField.render(context, mouseX, mouseY, partialTicks);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public boolean shouldPause()
+	public boolean isPauseScreen()
 	{
 		return false;
 	}

@@ -12,17 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.Keyboard;
-import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.input.KeyEvent;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.KeyPressListener.KeyPressEvent;
 
-@Mixin(Keyboard.class)
+@Mixin(KeyboardHandler.class)
 public class KeyboardMixin
 {
 	@Inject(at = @At("HEAD"),
-		method = "onKey(JILnet/minecraft/client/input/KeyInput;)V")
-	private void onOnKey(long windowHandle, int action, KeyInput arg,
+		method = "keyPress(JILnet/minecraft/client/input/KeyEvent;)V")
+	private void onOnKey(long windowHandle, int action, KeyEvent arg,
 		CallbackInfo ci)
 	{
 		EventManager.fire(new KeyPressEvent(arg.key(), arg.scancode(), action,

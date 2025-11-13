@@ -9,9 +9,9 @@ package net.wurstclient.hacks.mobspawnesp;
 
 import java.util.function.Function;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EntityType;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.text.WText;
@@ -19,7 +19,7 @@ import net.wurstclient.util.text.WText;
 public final class HitboxCheckSetting
 	extends EnumSetting<HitboxCheckSetting.HitboxCheck>
 {
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	private static final WText DESCRIPTION =
 		WText.translated("description.wurst.setting.mobspawnesp.hitbox_check")
 			.append(buildDescriptionSuffix());
@@ -43,8 +43,8 @@ public final class HitboxCheckSetting
 	// "unstable" because isSpaceEmpty() is not thread-safe
 	private static boolean unstableHitboxCheck(BlockPos pos)
 	{
-		return MC.world.isSpaceEmpty(EntityType.CREEPER
-			.getSpawnBox(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5));
+		return MC.level.noCollision(EntityType.CREEPER
+			.getSpawnAABB(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5));
 	}
 	
 	private static WText buildDescriptionSuffix()

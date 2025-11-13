@@ -32,7 +32,7 @@ public class FilterOwnMessagesSetting extends CheckboxSetting
 	
 	private void updateOwnMessagePattern()
 	{
-		String username = WurstClient.MC.getSession().getUsername();
+		String username = WurstClient.MC.getUser().getName();
 		if(username.equals(lastUsername))
 			return;
 		

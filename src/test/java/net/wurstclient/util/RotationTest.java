@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.joml.Quaternionf;
 import org.junit.jupiter.api.Test;
 
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 class RotationTest
 {
@@ -123,7 +123,7 @@ class RotationTest
 	void testToLookVec()
 	{
 		Rotation r = new Rotation(0, 0);
-		Vec3d vec = r.toLookVec();
+		Vec3 vec = r.toLookVec();
 		assertAlmostEquals(0, vec.x);
 		assertAlmostEquals(0, vec.y);
 		assertAlmostEquals(1, vec.z);

@@ -7,16 +7,16 @@
  */
 package net.wurstclient.hacks.autofish;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.util.Rotation;
 
-public record PositionAndRotation(Vec3d pos, Rotation rotation)
+public record PositionAndRotation(Vec3 pos, Rotation rotation)
 {
 	public PositionAndRotation(Entity entity)
 	{
-		this(entity.getEntityPos(),
-			Rotation.wrapped(entity.getYaw(), entity.getPitch()));
+		this(entity.position(),
+			Rotation.wrapped(entity.getYRot(), entity.getXRot()));
 	}
 	
 	public boolean isNearlyIdenticalTo(PositionAndRotation other)

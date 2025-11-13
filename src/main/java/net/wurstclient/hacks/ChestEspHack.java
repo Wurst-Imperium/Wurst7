@@ -9,9 +9,10 @@ package net.wurstclient.hacks;
 
 import java.util.List;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
@@ -61,7 +62,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		groups.allGroups.forEach(ChestEspGroup::clear);
 		ChunkUtils.getLoadedBlockEntities().forEach(
 			be -> groups.blockGroups.forEach(group -> group.addIfMatches(be)));
-		MC.world.getEntities().forEach(
+		MC.level.entitiesForRendering().forEach(
 			e -> groups.entityGroups.forEach(group -> group.addIfMatches(e)));
 	}
 	
@@ -74,7 +75,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		groups.entityGroups.stream().filter(ChestEspGroup::isEnabled)
 			.forEach(g -> g.updateBoxes(partialTicks));
@@ -86,14 +87,14 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			renderTracers(matrixStack, partialTicks);
 	}
 	
-	private void renderBoxes(MatrixStack matrixStack)
+	private void renderBoxes(PoseStack matrixStack)
 	{
 		for(ChestEspGroup group : groups.allGroups)
 		{
 			if(!group.isEnabled())
 				continue;
 			
-			List<Box> boxes = group.getBoxes();
+			List<AABB> boxes = group.getBoxes();
 			int quadsColor = group.getColorI(0x40);
 			int linesColor = group.getColorI(0x80);
 			
@@ -103,15 +104,15 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private void renderTracers(MatrixStack matrixStack, float partialTicks)
+	private void renderTracers(PoseStack matrixStack, float partialTicks)
 	{
 		for(ChestEspGroup group : groups.allGroups)
 		{
 			if(!group.isEnabled())
 				continue;
 			
-			List<Box> boxes = group.getBoxes();
-			List<Vec3d> ends = boxes.stream().map(Box::getCenter).toList();
+			List<AABB> boxes = group.getBoxes();
+			List<Vec3> ends = boxes.stream().map(AABB::getCenter).toList();
 			int color = group.getColorI(0x80);
 			
 			RenderUtils.drawTracers(matrixStack, partialTicks, ends, color,

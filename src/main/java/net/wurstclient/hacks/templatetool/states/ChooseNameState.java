@@ -13,16 +13,16 @@ import java.nio.file.Path;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.CheckboxWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.TemplateToolHack;
 import net.wurstclient.hacks.templatetool.TemplateToolState;
@@ -56,46 +56,46 @@ public final class ChooseNameState extends TemplateToolState
 		private static final WurstClient WURST = WurstClient.INSTANCE;
 		private final TemplateToolHack hack;
 		
-		private TextFieldWidget nameField;
-		private CheckboxWidget includeTypesBox;
-		private ButtonWidget doneButton;
-		private ButtonWidget cancelButton;
+		private EditBox nameField;
+		private Checkbox includeTypesBox;
+		private Button doneButton;
+		private Button cancelButton;
 		
 		public ChooseNameScreen(TemplateToolHack hack)
 		{
-			super(ScreenTexts.EMPTY);
+			super(CommonComponents.EMPTY);
 			this.hack = hack;
 		}
 		
 		@Override
 		public void init()
 		{
-			TextRenderer tr = client.textRenderer;
+			Font tr = minecraft.font;
 			int middleX = width / 2;
 			int middleY = height / 2;
 			
-			nameField = new TextFieldWidget(tr, middleX - 99, middleY + 16, 198,
-				16, Text.empty());
-			nameField.setDrawsBackground(false);
+			nameField = new EditBox(tr, middleX - 99, middleY + 16, 198, 16,
+				Component.empty());
+			nameField.setBordered(false);
 			nameField.setMaxLength(32);
 			nameField.setFocused(true);
-			nameField.setEditableColor(Colors.WHITE);
-			addSelectableChild(nameField);
+			nameField.setTextColor(CommonColors.WHITE);
+			addWidget(nameField);
 			setFocused(nameField);
 			
 			includeTypesBox =
-				CheckboxWidget.builder(Text.literal("Include block types"), tr)
-					.pos(middleX - 99, middleY + 32).checked(true).build();
-			addDrawableChild(includeTypesBox);
+				Checkbox.builder(Component.literal("Include block types"), tr)
+					.pos(middleX - 99, middleY + 32).selected(true).build();
+			addRenderableWidget(includeTypesBox);
 			
-			doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
-				.dimensions(middleX - 75, middleY + 56, 150, 20).build();
-			addDrawableChild(doneButton);
+			doneButton = Button.builder(Component.literal("Done"), b -> done())
+				.bounds(middleX - 75, middleY + 56, 150, 20).build();
+			addRenderableWidget(doneButton);
 			
 			cancelButton =
-				ButtonWidget.builder(Text.literal("Cancel"), b -> cancel())
-					.dimensions(middleX - 50, middleY + 80, 100, 15).build();
-			addDrawableChild(cancelButton);
+				Button.builder(Component.literal("Cancel"), b -> cancel())
+					.bounds(middleX - 50, middleY + 80, 100, 15).build();
+			addRenderableWidget(cancelButton);
 		}
 		
 		private void done()
@@ -103,7 +103,7 @@ public final class ChooseNameState extends TemplateToolState
 			if(hack.getFile() == null)
 				return;
 			
-			hack.setBlockTypesEnabled(includeTypesBox.isChecked());
+			hack.setBlockTypesEnabled(includeTypesBox.selected());
 			hack.setState(new SavingFileState());
 		}
 		
@@ -115,13 +115,13 @@ public final class ChooseNameState extends TemplateToolState
 		@Override
 		public void tick()
 		{
-			if(nameField.getText().isEmpty())
+			if(nameField.getValue().isEmpty())
 				hack.setFile(null);
 			else
 				try
 				{
 					Path folder = WURST.getHax().autoBuildHack.getFolder();
-					Path file = folder.resolve(nameField.getText() + ".json");
+					Path file = folder.resolve(nameField.getValue() + ".json");
 					hack.setFile(file.toFile());
 					
 				}catch(InvalidPathException e)
@@ -133,7 +133,7 @@ public final class ChooseNameState extends TemplateToolState
 		}
 		
 		@Override
-		public boolean keyPressed(KeyInput context)
+		public boolean keyPressed(KeyEvent context)
 		{
 			switch(context.key())
 			{
@@ -150,7 +150,7 @@ public final class ChooseNameState extends TemplateToolState
 		}
 		
 		@Override
-		public void render(DrawContext context, int mouseX, int mouseY,
+		public void render(GuiGraphics context, int mouseX, int mouseY,
 			float partialTicks)
 		{
 			super.render(context, mouseX, mouseY, partialTicks);
@@ -173,14 +173,14 @@ public final class ChooseNameState extends TemplateToolState
 		}
 		
 		@Override
-		public void renderBackground(DrawContext context, int mouseX,
+		public void renderBackground(GuiGraphics context, int mouseX,
 			int mouseY, float deltaTicks)
 		{
 			// Don't blur
 		}
 		
 		@Override
-		public boolean shouldPause()
+		public boolean isPauseScreen()
 		{
 			return false;
 		}

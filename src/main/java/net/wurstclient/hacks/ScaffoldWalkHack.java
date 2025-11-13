@@ -9,16 +9,16 @@ package net.wurstclient.hacks;
 
 import java.util.Arrays;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FallingBlock;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.EmptyBlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -52,10 +52,10 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		BlockPos belowPlayer =
-			BlockPos.ofFloored(MC.player.getEntityPos()).down();
+			BlockPos.containing(MC.player.position()).below();
 		
 		// check if block is already placed
-		if(!BlockUtils.getState(belowPlayer).isReplaceable())
+		if(!BlockUtils.getState(belowPlayer).canBeReplaced())
 			return;
 		
 		// search blocks in hotbar
@@ -63,19 +63,20 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// filter out non-block items
-			ItemStack stack = MC.player.getInventory().getStack(i);
+			ItemStack stack = MC.player.getInventory().getItem(i);
 			if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
 				continue;
 			
 			// filter out non-solid blocks
-			Block block = Block.getBlockFromItem(stack.getItem());
-			BlockState state = block.getDefaultState();
-			if(!state.isFullCube(EmptyBlockView.INSTANCE, BlockPos.ORIGIN))
+			Block block = Block.byItem(stack.getItem());
+			BlockState state = block.defaultBlockState();
+			if(!state.isCollisionShapeFullBlock(EmptyBlockGetter.INSTANCE,
+				BlockPos.ZERO))
 				continue;
 			
 			// filter out blocks that would fall
 			if(block instanceof FallingBlock && FallingBlock
-				.canFallThrough(BlockUtils.getState(belowPlayer.down())))
+				.isFree(BlockUtils.getState(belowPlayer.below())))
 				continue;
 			
 			newSlot = i;
@@ -107,7 +108,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 		Direction[] sides = Direction.values();
 		for(Direction side : sides)
 		{
-			BlockPos neighbor = belowPlayer.offset(side);
+			BlockPos neighbor = belowPlayer.relative(side);
 			if(placeBlock(neighbor))
 				return;
 		}
@@ -120,7 +121,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 				if(side.getOpposite().equals(side2))
 					continue;
 				
-				BlockPos neighbor = belowPlayer.offset(side).offset(side2);
+				BlockPos neighbor = belowPlayer.relative(side).relative(side2);
 				if(placeBlock(neighbor))
 					return;
 			}
@@ -128,35 +129,35 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 	
 	private boolean placeBlock(BlockPos pos)
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3 eyesPos = RotationUtils.getEyesPos();
 		
 		for(Direction side : Direction.values())
 		{
-			BlockPos neighbor = pos.offset(side);
+			BlockPos neighbor = pos.relative(side);
 			Direction side2 = side.getOpposite();
 			
 			// check if side is visible (facing away from player)
-			if(eyesPos.squaredDistanceTo(Vec3d.ofCenter(pos)) >= eyesPos
-				.squaredDistanceTo(Vec3d.ofCenter(neighbor)))
+			if(eyesPos.distanceToSqr(Vec3.atCenterOf(pos)) >= eyesPos
+				.distanceToSqr(Vec3.atCenterOf(neighbor)))
 				continue;
 			
 			// check if neighbor can be right clicked
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
-			Vec3d hitVec = Vec3d.ofCenter(neighbor)
-				.add(Vec3d.of(side2.getVector()).multiply(0.5));
+			Vec3 hitVec = Vec3.atCenterOf(neighbor)
+				.add(Vec3.atLowerCornerOf(side2.getUnitVec3i()).scale(0.5));
 			
 			// check if hitVec is within range (4.25 blocks)
-			if(eyesPos.squaredDistanceTo(hitVec) > 18.0625)
+			if(eyesPos.distanceToSqr(hitVec) > 18.0625)
 				continue;
 			
 			// place block
 			RotationUtils.getNeededRotations(hitVec).sendPlayerLookPacket();
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,
 				hitVec);
-			MC.player.swingHand(Hand.MAIN_HAND);
-			MC.itemUseCooldown = 4;
+			MC.player.swing(InteractionHand.MAIN_HAND);
+			MC.rightClickDelay = 4;
 			
 			return true;
 		}

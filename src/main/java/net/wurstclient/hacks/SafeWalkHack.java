@@ -7,8 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -56,9 +56,9 @@ public final class SafeWalkHack extends Hack
 	
 	public void onClipAtLedge(boolean clipping)
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
-		if(!isEnabled() || !sneak.isChecked() || !player.isOnGround())
+		if(!isEnabled() || !sneak.isChecked() || !player.onGround())
 		{
 			if(sneaking)
 				setSneaking(false);
@@ -66,11 +66,11 @@ public final class SafeWalkHack extends Hack
 			return;
 		}
 		
-		Box box = player.getBoundingBox();
-		Box adjustedBox = box.stretch(0, -player.getStepHeight(), 0)
-			.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
+		AABB box = player.getBoundingBox();
+		AABB adjustedBox = box.expandTowards(0, -player.maxUpStep(), 0)
+			.inflate(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
 		
-		if(MC.world.isSpaceEmpty(player, adjustedBox))
+		if(MC.level.noCollision(player, adjustedBox))
 			clipping = true;
 		
 		setSneaking(clipping);
@@ -78,10 +78,10 @@ public final class SafeWalkHack extends Hack
 	
 	private void setSneaking(boolean sneaking)
 	{
-		IKeyBinding sneakKey = IKeyBinding.get(MC.options.sneakKey);
+		IKeyBinding sneakKey = IKeyBinding.get(MC.options.keyShift);
 		
 		if(sneaking)
-			sneakKey.setPressed(true);
+			sneakKey.setDown(true);
 		else
 			sneakKey.resetPressedState();
 		

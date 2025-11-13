@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 
 public final class FilterCrystalsSetting extends EntityFilterCheckbox
 {
@@ -20,7 +20,7 @@ public final class FilterCrystalsSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof EndCrystalEntity);
+		return !(e instanceof EndCrystal);
 	}
 	
 	public static FilterCrystalsSetting genericCombat(boolean checked)

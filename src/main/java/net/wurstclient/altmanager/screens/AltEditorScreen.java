@@ -16,17 +16,17 @@ import java.nio.file.StandardCopyOption;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
@@ -40,16 +40,16 @@ public abstract class AltEditorScreen extends Screen
 	
 	protected final Screen prevScreen;
 	
-	private TextFieldWidget nameOrEmailBox;
-	private TextFieldWidget passwordBox;
+	private EditBox nameOrEmailBox;
+	private EditBox passwordBox;
 	
-	private ButtonWidget doneButton;
-	private ButtonWidget stealSkinButton;
+	private Button doneButton;
+	private Button stealSkinButton;
 	
 	protected String message = "";
 	private int errorTimer;
 	
-	public AltEditorScreen(Screen prevScreen, Text title)
+	public AltEditorScreen(Screen prevScreen, Component title)
 	{
 		super(title);
 		this.prevScreen = prevScreen;
@@ -58,49 +58,45 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void init()
 	{
-		nameOrEmailBox = new TextFieldWidget(textRenderer, width / 2 - 100, 60,
-			200, 20, Text.literal(""));
+		nameOrEmailBox = new EditBox(font, width / 2 - 100, 60, 200, 20,
+			Component.literal(""));
 		nameOrEmailBox.setMaxLength(48);
 		nameOrEmailBox.setFocused(true);
-		nameOrEmailBox.setText(getDefaultNameOrEmail());
-		addSelectableChild(nameOrEmailBox);
+		nameOrEmailBox.setValue(getDefaultNameOrEmail());
+		addWidget(nameOrEmailBox);
 		
-		passwordBox = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
-			200, 20, Text.literal(""));
-		passwordBox.setText(getDefaultPassword());
-		passwordBox.addFormatter(
-			(text, startIndex) -> OrderedText.styledForwardsVisitedString(
-				"*".repeat(text.length()), Style.EMPTY));
+		passwordBox = new EditBox(font, width / 2 - 100, 100, 200, 20,
+			Component.literal(""));
+		passwordBox.setValue(getDefaultPassword());
+		passwordBox.addFormatter((text, startIndex) -> FormattedCharSequence
+			.forward("*".repeat(text.length()), Style.EMPTY));
 		passwordBox.setMaxLength(256);
-		addSelectableChild(passwordBox);
+		addWidget(passwordBox);
 		
-		addDrawableChild(doneButton = ButtonWidget
-			.builder(Text.literal(getDoneButtonText()), b -> pressDoneButton())
-			.dimensions(width / 2 - 100, height / 4 + 72 + 12, 200, 20)
-			.build());
+		addRenderableWidget(doneButton = Button
+			.builder(Component.literal(getDoneButtonText()),
+				b -> pressDoneButton())
+			.bounds(width / 2 - 100, height / 4 + 72 + 12, 200, 20).build());
 		
-		addDrawableChild(
-			ButtonWidget.builder(Text.literal("Cancel"), b -> close())
-				.dimensions(width / 2 - 100, height / 4 + 120 + 12, 200, 20)
-				.build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Cancel"), b -> onClose())
+			.bounds(width / 2 - 100, height / 4 + 120 + 12, 200, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Random Name"),
-				b -> nameOrEmailBox.setText(NameGenerator.generateName()))
-			.dimensions(width / 2 - 100, height / 4 + 96 + 12, 200, 20)
-			.build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Random Name"),
+				b -> nameOrEmailBox.setValue(NameGenerator.generateName()))
+			.bounds(width / 2 - 100, height / 4 + 96 + 12, 200, 20).build());
 		
-		addDrawableChild(stealSkinButton = ButtonWidget
-			.builder(Text.literal("Steal Skin"),
+		addRenderableWidget(stealSkinButton = Button
+			.builder(Component.literal("Steal Skin"),
 				b -> message = stealSkin(getNameOrEmail()))
-			.dimensions(width - (width / 2 - 100) / 2 - 64, height - 32, 128,
-				20)
+			.bounds(width - (width / 2 - 100) / 2 - 64, height - 32, 128, 20)
 			.build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Open Skin Folder"), b -> openSkinFolder())
-			.dimensions((width / 2 - 100) / 2 - 64, height - 32, 128, 20)
-			.build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Open Skin Folder"),
+				b -> openSkinFolder())
+			.bounds((width / 2 - 100) / 2 - 64, height - 32, 128, 20).build());
 		
 		setFocused(nameOrEmailBox);
 	}
@@ -108,7 +104,7 @@ public abstract class AltEditorScreen extends Screen
 	private void openSkinFolder()
 	{
 		createSkinFolder();
-		Util.getOperatingSystem().open(skinFolder.toFile());
+		Util.getPlatform().openFile(skinFolder.toFile());
 	}
 	
 	private void createSkinFolder()
@@ -127,12 +123,12 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void tick()
 	{
-		String nameOrEmail = nameOrEmailBox.getText().trim();
+		String nameOrEmail = nameOrEmailBox.getValue().trim();
 		boolean alex = nameOrEmail.equalsIgnoreCase("Alexander01998");
 		
 		doneButton.active = !nameOrEmail.isEmpty()
-			&& !(alex && passwordBox.getText().isEmpty());
-		doneButton.setMessage(Text.literal(getDoneButtonText()));
+			&& !(alex && passwordBox.getValue().isEmpty());
+		doneButton.setMessage(Component.literal(getDoneButtonText()));
 		
 		stealSkinButton.active = !alex;
 	}
@@ -143,7 +139,7 @@ public abstract class AltEditorScreen extends Screen
 	 */
 	protected final String getNameOrEmail()
 	{
-		return nameOrEmailBox.getText();
+		return nameOrEmailBox.getValue();
 	}
 	
 	/**
@@ -151,12 +147,12 @@ public abstract class AltEditorScreen extends Screen
 	 */
 	protected final String getPassword()
 	{
-		return passwordBox.getText();
+		return passwordBox.getValue();
 	}
 	
 	protected String getDefaultNameOrEmail()
 	{
-		return client.getSession().getUsername();
+		return minecraft.getUser().getName();
 	}
 	
 	protected String getDefaultPassword()
@@ -202,7 +198,7 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(KeyInput context)
+	public boolean keyPressed(KeyEvent context)
 	{
 		if(context.key() == GLFW.GLFW_KEY_ENTER)
 			doneButton.onPress(context);
@@ -211,7 +207,7 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(Click context, boolean doubleClick)
+	public boolean mouseClicked(MouseButtonEvent context, boolean doubleClick)
 	{
 		nameOrEmailBox.mouseClicked(context, doubleClick);
 		passwordBox.mouseClicked(context, doubleClick);
@@ -221,7 +217,7 @@ public abstract class AltEditorScreen extends Screen
 		
 		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
-			close();
+			onClose();
 			return true;
 		}
 		
@@ -229,31 +225,31 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		// skin preview
-		AltRenderer.drawAltBack(context, nameOrEmailBox.getText(),
+		AltRenderer.drawAltBack(context, nameOrEmailBox.getValue(),
 			(width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
-		AltRenderer.drawAltBody(context, nameOrEmailBox.getText(),
+		AltRenderer.drawAltBody(context, nameOrEmailBox.getValue(),
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
 		String accountType = getPassword().isEmpty() ? "cracked" : "premium";
 		
 		// text
-		context.drawTextWithShadow(textRenderer, "Name (for cracked alts), or",
-			width / 2 - 100, 37, Colors.LIGHT_GRAY);
-		context.drawTextWithShadow(textRenderer, "E-Mail (for premium alts)",
-			width / 2 - 100, 47, Colors.LIGHT_GRAY);
-		context.drawTextWithShadow(textRenderer, "Password (for premium alts)",
-			width / 2 - 100, 87, Colors.LIGHT_GRAY);
-		context.drawTextWithShadow(textRenderer, "Account type: " + accountType,
-			width / 2 - 100, 127, Colors.LIGHT_GRAY);
+		context.drawString(font, "Name (for cracked alts), or", width / 2 - 100,
+			37, CommonColors.LIGHT_GRAY);
+		context.drawString(font, "E-Mail (for premium alts)", width / 2 - 100,
+			47, CommonColors.LIGHT_GRAY);
+		context.drawString(font, "Password (for premium alts)", width / 2 - 100,
+			87, CommonColors.LIGHT_GRAY);
+		context.drawString(font, "Account type: " + accountType,
+			width / 2 - 100, 127, CommonColors.LIGHT_GRAY);
 		
 		String[] lines = message.split("\n");
 		for(int i = 0; i < lines.length; i++)
-			context.drawCenteredTextWithShadow(textRenderer, lines[i],
-				width / 2, 142 + 10 * i, Colors.WHITE);
+			context.drawCenteredString(font, lines[i], width / 2, 142 + 10 * i,
+				CommonColors.WHITE);
 		
 		// text boxes
 		nameOrEmailBox.render(context, mouseX, mouseY, partialTicks);
@@ -268,13 +264,13 @@ public abstract class AltEditorScreen extends Screen
 			errorTimer--;
 		}
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public final void close()
+	public final void onClose()
 	{
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 }
