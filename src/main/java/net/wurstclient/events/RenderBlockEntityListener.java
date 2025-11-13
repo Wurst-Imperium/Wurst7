@@ -9,7 +9,7 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 

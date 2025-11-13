@@ -9,11 +9,12 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
@@ -75,8 +76,8 @@ public final class AirPlaceHack extends Hack
 		if(hitResult == null)
 			return;
 		
-		MC.itemUseCooldown = 4;
-		if(MC.player.isRiding())
+		MC.rightClickDelay = 4;
+		if(MC.player.isHandsBusy())
 			return;
 		
 		InteractionSimulator.rightClickBlock(hitResult);
@@ -91,11 +92,11 @@ public final class AirPlaceHack extends Hack
 		if(!guide.isChecked())
 			return;
 		
-		if(MC.player.getMainHandStack().isEmpty()
-			&& MC.player.getOffHandStack().isEmpty())
+		if(MC.player.getMainHandItem().isEmpty()
+			&& MC.player.getOffhandItem().isEmpty())
 			return;
 		
-		if(MC.player.isRiding())
+		if(MC.player.isHandsBusy())
 			return;
 		
 		BlockHitResult hitResult = getHitResultIfMissed();
@@ -105,7 +106,7 @@ public final class AirPlaceHack extends Hack
 	
 	private BlockHitResult getHitResultIfMissed()
 	{
-		HitResult hitResult = MC.player.raycast(range.getValue(), 0, false);
+		HitResult hitResult = MC.player.pick(range.getValue(), 0, false);
 		if(hitResult.getType() != HitResult.Type.MISS)
 			return null;
 		
@@ -116,12 +117,12 @@ public final class AirPlaceHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(renderPos == null)
 			return;
 		
-		Box box = new Box(renderPos);
+		AABB box = new AABB(renderPos);
 		
 		int quadColor = guideColor.getColorI(0x1A);
 		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);

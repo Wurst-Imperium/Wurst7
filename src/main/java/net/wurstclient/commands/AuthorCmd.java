@@ -7,10 +7,10 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.WrittenBookContentComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.WrittenBookContent;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -30,23 +30,22 @@ public final class AuthorCmd extends Command
 		if(args.length == 0)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.getAbilities().creativeMode)
+		if(!MC.player.getAbilities().instabuild)
 			throw new CmdError("Creative mode only.");
 		
-		ItemStack heldStack = MC.player.getInventory().getSelectedStack();
-		if(!heldStack.isOf(Items.WRITTEN_BOOK))
+		ItemStack heldStack = MC.player.getInventory().getSelectedItem();
+		if(!heldStack.is(Items.WRITTEN_BOOK))
 			throw new CmdError(
 				"You must hold a written book in your main hand.");
 		
-		WrittenBookContentComponent oldData = heldStack.getComponents()
-			.get(DataComponentTypes.WRITTEN_BOOK_CONTENT);
+		WrittenBookContent oldData =
+			heldStack.getComponents().get(DataComponents.WRITTEN_BOOK_CONTENT);
 		if(oldData == null)
 			throw new CmdError("Can't find book data.");
 		
 		String author = String.join(" ", args);
-		WrittenBookContentComponent newData =
-			new WrittenBookContentComponent(oldData.title(), author,
-				oldData.generation(), oldData.pages(), oldData.resolved());
-		heldStack.set(DataComponentTypes.WRITTEN_BOOK_CONTENT, newData);
+		WrittenBookContent newData = new WrittenBookContent(oldData.title(),
+			author, oldData.generation(), oldData.pages(), oldData.resolved());
+		heldStack.set(DataComponents.WRITTEN_BOOK_CONTENT, newData);
 	}
 }

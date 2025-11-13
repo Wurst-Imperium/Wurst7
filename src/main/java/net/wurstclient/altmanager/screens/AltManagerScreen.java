@@ -29,26 +29,26 @@ import com.google.gson.JsonObject;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.screen.NoticeScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.StringHelper;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.AlertScreen;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
+import net.minecraft.util.StringUtil;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
 import net.wurstclient.mixinterface.IMinecraftClient;
@@ -68,18 +68,18 @@ public final class AltManagerScreen extends Screen
 	private boolean shouldAsk = true;
 	private int errorTimer;
 	
-	private ButtonWidget useButton;
-	private ButtonWidget starButton;
-	private ButtonWidget editButton;
-	private ButtonWidget deleteButton;
+	private Button useButton;
+	private Button starButton;
+	private Button editButton;
+	private Button deleteButton;
 	
-	private ButtonWidget importButton;
-	private ButtonWidget exportButton;
-	private ButtonWidget logoutButton;
+	private Button importButton;
+	private Button exportButton;
+	private Button logoutButton;
 	
 	public AltManagerScreen(Screen prevScreen, AltManager altManager)
 	{
-		super(Text.literal("Alt Manager"));
+		super(Component.literal("Alt Manager"));
 		this.prevScreen = prevScreen;
 		this.altManager = altManager;
 	}
@@ -87,101 +87,104 @@ public final class AltManagerScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(client, this, altManager.getList());
-		addSelectableChild(listGui);
+		listGui = new ListGui(minecraft, this, altManager.getList());
+		addWidget(listGui);
 		
 		WurstClient wurst = WurstClient.INSTANCE;
 		
 		Exception folderException = altManager.getFolderException();
 		if(folderException != null && shouldAsk)
 		{
-			Text title = Text.literal(
+			Component title = Component.literal(
 				wurst.translate("gui.wurst.altmanager.folder_error.title"));
-			Text message = Text.literal(wurst.translate(
+			Component message = Component.literal(wurst.translate(
 				"gui.wurst.altmanager.folder_error.message", folderException));
-			Text buttonText = Text.translatable("gui.done");
+			Component buttonText = Component.translatable("gui.done");
 			
 			// This just sets shouldAsk to false and closes the message.
 			Runnable action = () -> confirmGenerate(false);
 			
-			NoticeScreen screen =
-				new NoticeScreen(action, title, message, buttonText, false);
-			client.setScreen(screen);
+			AlertScreen screen =
+				new AlertScreen(action, title, message, buttonText, false);
+			minecraft.setScreen(screen);
 			
 		}else if(altManager.getList().isEmpty() && shouldAsk)
 		{
-			Text title = Text
+			Component title = Component
 				.literal(wurst.translate("gui.wurst.altmanager.empty.title"));
-			Text message = Text
+			Component message = Component
 				.literal(wurst.translate("gui.wurst.altmanager.empty.message"));
 			BooleanConsumer callback = this::confirmGenerate;
 			
 			ConfirmScreen screen = new ConfirmScreen(callback, title, message);
-			client.setScreen(screen);
+			minecraft.setScreen(screen);
 		}
 		
-		addDrawableChild(useButton =
-			ButtonWidget.builder(Text.literal("Login"), b -> pressLogin())
-				.dimensions(width / 2 - 154, height - 52, 100, 20).build());
+		addRenderableWidget(useButton =
+			Button.builder(Component.literal("Login"), b -> pressLogin())
+				.bounds(width / 2 - 154, height - 52, 100, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Direct Login"),
-				b -> client.setScreen(new DirectLoginScreen(this)))
-			.dimensions(width / 2 - 50, height - 52, 100, 20).build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Direct Login"),
+				b -> minecraft.setScreen(new DirectLoginScreen(this)))
+			.bounds(width / 2 - 50, height - 52, 100, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Add"),
-				b -> client.setScreen(new AddAltScreen(this, altManager)))
-			.dimensions(width / 2 + 54, height - 52, 100, 20).build());
+		addRenderableWidget(
+			Button
+				.builder(Component.literal("Add"),
+					b -> minecraft
+						.setScreen(new AddAltScreen(this, altManager)))
+				.bounds(width / 2 + 54, height - 52, 100, 20).build());
 		
-		addDrawableChild(starButton =
-			ButtonWidget.builder(Text.literal("Favorite"), b -> pressFavorite())
-				.dimensions(width / 2 - 154, height - 28, 75, 20).build());
+		addRenderableWidget(starButton =
+			Button.builder(Component.literal("Favorite"), b -> pressFavorite())
+				.bounds(width / 2 - 154, height - 28, 75, 20).build());
 		
-		addDrawableChild(editButton =
-			ButtonWidget.builder(Text.literal("Edit"), b -> pressEdit())
-				.dimensions(width / 2 - 76, height - 28, 74, 20).build());
+		addRenderableWidget(editButton =
+			Button.builder(Component.literal("Edit"), b -> pressEdit())
+				.bounds(width / 2 - 76, height - 28, 74, 20).build());
 		
-		addDrawableChild(deleteButton =
-			ButtonWidget.builder(Text.literal("Delete"), b -> pressDelete())
-				.dimensions(width / 2 + 2, height - 28, 74, 20).build());
+		addRenderableWidget(deleteButton =
+			Button.builder(Component.literal("Delete"), b -> pressDelete())
+				.bounds(width / 2 + 2, height - 28, 74, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
-			.dimensions(width / 2 + 80, height - 28, 75, 20).build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Cancel"),
+				b -> minecraft.setScreen(prevScreen))
+			.bounds(width / 2 + 80, height - 28, 75, 20).build());
 		
-		addDrawableChild(importButton =
-			ButtonWidget.builder(Text.literal("Import"), b -> pressImportAlts())
-				.dimensions(8, 8, 50, 20).build());
+		addRenderableWidget(importButton =
+			Button.builder(Component.literal("Import"), b -> pressImportAlts())
+				.bounds(8, 8, 50, 20).build());
 		
-		addDrawableChild(exportButton =
-			ButtonWidget.builder(Text.literal("Export"), b -> pressExportAlts())
-				.dimensions(58, 8, 50, 20).build());
+		addRenderableWidget(exportButton =
+			Button.builder(Component.literal("Export"), b -> pressExportAlts())
+				.bounds(58, 8, 50, 20).build());
 		
-		addDrawableChild(logoutButton =
-			ButtonWidget.builder(Text.literal("Logout"), b -> pressLogout())
-				.dimensions(width - 50 - 8, 8, 50, 20).build());
+		addRenderableWidget(logoutButton =
+			Button.builder(Component.literal("Logout"), b -> pressLogout())
+				.bounds(width - 50 - 8, 8, 50, 20).build());
 		
 		updateAltButtons();
-		boolean windowMode = !client.options.getFullscreen().getValue();
+		boolean windowMode = !minecraft.options.fullscreen().get();
 		importButton.active = windowMode;
 		exportButton.active = windowMode;
 	}
 	
 	private void updateAltButtons()
 	{
-		boolean altSelected = listGui.getSelectedOrNull() != null;
+		boolean altSelected = listGui.getSelected() != null;
 		useButton.active = altSelected;
 		starButton.active = altSelected;
 		editButton.active = altSelected;
 		deleteButton.active = altSelected;
 		
 		logoutButton.active =
-			((IMinecraftClient)client).getWurstSession() != null;
+			((IMinecraftClient)minecraft).getWurstSession() != null;
 	}
 	
 	@Override
-	public boolean keyPressed(KeyInput context)
+	public boolean keyPressed(KeyEvent context)
 	{
 		if(context.key() == GLFW.GLFW_KEY_ENTER)
 			useButton.onPress(context);
@@ -190,11 +193,11 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(Click context, boolean doubleClick)
+	public boolean mouseClicked(MouseButtonEvent context, boolean doubleClick)
 	{
 		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
-			close();
+			onClose();
 			return true;
 		}
 		
@@ -211,7 +214,7 @@ public final class AltManagerScreen extends Screen
 		{
 			altManager.login(alt);
 			failedLogins.remove(alt);
-			client.setScreen(prevScreen);
+			minecraft.setScreen(prevScreen);
 			
 		}catch(LoginException e)
 		{
@@ -222,7 +225,7 @@ public final class AltManagerScreen extends Screen
 	
 	private void pressLogout()
 	{
-		((IMinecraftClient)client).setWurstSession(null);
+		((IMinecraftClient)minecraft).setWurstSession(null);
 		updateAltButtons();
 	}
 	
@@ -242,7 +245,7 @@ public final class AltManagerScreen extends Screen
 		if(alt == null)
 			return;
 		
-		client.setScreen(new EditAltScreen(this, altManager, alt));
+		minecraft.setScreen(new EditAltScreen(this, altManager, alt));
 	}
 	
 	private void pressDelete()
@@ -251,15 +254,16 @@ public final class AltManagerScreen extends Screen
 		if(alt == null)
 			return;
 		
-		Text text = Text.literal("Are you sure you want to remove this alt?");
+		Component text =
+			Component.literal("Are you sure you want to remove this alt?");
 		
 		String altName = alt.getDisplayName();
-		Text message = Text.literal(
+		Component message = Component.literal(
 			"\"" + altName + "\" will be lost forever! (A long time!)");
 		
 		ConfirmScreen screen = new ConfirmScreen(this::confirmRemove, text,
-			message, Text.literal("Delete"), Text.literal("Cancel"));
-		client.setScreen(screen);
+			message, Component.literal("Delete"), Component.literal("Cancel"));
+		minecraft.setScreen(screen);
 	}
 	
 	private void pressImportAlts()
@@ -389,7 +393,7 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		shouldAsk = false;
-		client.setScreen(this);
+		minecraft.setScreen(this);
 	}
 	
 	private void confirmRemove(boolean confirmed)
@@ -401,11 +405,11 @@ public final class AltManagerScreen extends Screen
 		if(confirmed)
 			altManager.remove(alt);
 		
-		client.setScreen(this);
+		minecraft.setScreen(this);
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		listGui.render(context, mouseX, mouseY, partialTicks);
@@ -422,15 +426,14 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		// title text
-		context.drawCenteredTextWithShadow(textRenderer, "Alt Manager",
-			width / 2, 4, Colors.WHITE);
-		context.drawCenteredTextWithShadow(textRenderer,
-			"Alts: " + altManager.getList().size(), width / 2, 14,
-			Colors.LIGHT_GRAY);
-		context.drawCenteredTextWithShadow(
-			textRenderer, "premium: " + altManager.getNumPremium()
-				+ ", cracked: " + altManager.getNumCracked(),
-			width / 2, 24, Colors.LIGHT_GRAY);
+		context.drawCenteredString(font, "Alt Manager", width / 2, 4,
+			CommonColors.WHITE);
+		context.drawCenteredString(font, "Alts: " + altManager.getList().size(),
+			width / 2, 14, CommonColors.LIGHT_GRAY);
+		context.drawCenteredString(font,
+			"premium: " + altManager.getNumPremium() + ", cracked: "
+				+ altManager.getNumCracked(),
+			width / 2, 24, CommonColors.LIGHT_GRAY);
 		
 		// red flash for errors
 		if(errorTimer > 0)
@@ -441,14 +444,14 @@ public final class AltManagerScreen extends Screen
 			errorTimer--;
 		}
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
 		renderButtonTooltip(context, mouseX, mouseY);
 		renderAltTooltip(context, mouseX, mouseY);
 	}
 	
-	private void renderAltTooltip(DrawContext context, int mouseX, int mouseY)
+	private void renderAltTooltip(GuiGraphics context, int mouseX, int mouseY)
 	{
 		if(!listGui.isMouseOver(mouseX, mouseY))
 			return;
@@ -465,9 +468,9 @@ public final class AltManagerScreen extends Screen
 			return;
 		
 		Alt alt = hoveredEntry.alt;
-		ArrayList<Text> tooltip = new ArrayList<>();
+		ArrayList<Component> tooltip = new ArrayList<>();
 		
-		if(itemX >= 31 + textRenderer.getWidth(hoveredEntry.getBottomText()))
+		if(itemX >= 31 + font.width(hoveredEntry.getBottomText()))
 			return;
 		
 		if(alt.isCracked())
@@ -488,34 +491,35 @@ public final class AltManagerScreen extends Screen
 		if(alt.isFavorite())
 			addTooltip(tooltip, "favorite");
 		
-		context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
+		context.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(DrawContext context, int mouseX,
+	private void renderButtonTooltip(GuiGraphics context, int mouseX,
 		int mouseY)
 	{
-		for(ClickableWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getButtons(this))
 		{
-			if(!button.isSelected())
+			if(!button.isHoveredOrFocused())
 				continue;
 			
 			if(button != importButton && button != exportButton)
 				continue;
 			
-			ArrayList<Text> tooltip = new ArrayList<>();
+			ArrayList<Component> tooltip = new ArrayList<>();
 			addTooltip(tooltip, "window");
 			
-			if(client.options.getFullscreen().getValue())
+			if(minecraft.options.fullscreen().get())
 				addTooltip(tooltip, "fullscreen");
 			else
 				addTooltip(tooltip, "window_freeze");
 			
-			context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
+			context.setComponentTooltipForNextFrame(font, tooltip, mouseX,
+				mouseY);
 			break;
 		}
 	}
 	
-	private void addTooltip(ArrayList<Text> tooltip, String trKey)
+	private void addTooltip(ArrayList<Component> tooltip, String trKey)
 	{
 		// translate
 		String translated = WurstClient.INSTANCE
@@ -523,24 +527,23 @@ public final class AltManagerScreen extends Screen
 		
 		// line-wrap
 		StringJoiner joiner = new StringJoiner("\n");
-		textRenderer.getTextHandler().wrapLines(translated, 200, Style.EMPTY)
-			.stream().map(StringVisitable::getString)
-			.forEach(s -> joiner.add(s));
+		font.getSplitter().splitLines(translated, 200, Style.EMPTY).stream()
+			.map(FormattedText::getString).forEach(s -> joiner.add(s));
 		String wrapped = joiner.toString();
 		
 		// add to tooltip
 		for(String line : wrapped.split("\n"))
-			tooltip.add(Text.literal(line));
+			tooltip.add(Component.literal(line));
 	}
 	
 	@Override
-	public void close()
+	public void onClose()
 	{
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 	
 	private final class Entry
-		extends AlwaysSelectedEntryListWidget.Entry<AltManagerScreen.Entry>
+		extends ObjectSelectionList.Entry<AltManagerScreen.Entry>
 	{
 		private final Alt alt;
 		private long lastClickTime;
@@ -551,20 +554,21 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public Text getNarration()
+		public Component getNarration()
 		{
-			return Text.translatable("narrator.select", "Alt " + alt + ", "
-				+ StringHelper.stripTextFormat(getBottomText()));
+			return Component.translatable("narrator.select",
+				"Alt " + alt + ", " + StringUtil.stripColor(getBottomText()));
 		}
 		
 		@Override
-		public boolean mouseClicked(Click context, boolean doubleClick)
+		public boolean mouseClicked(MouseButtonEvent context,
+			boolean doubleClick)
 		{
 			if(context.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT)
 				return false;
 			
-			long timeSinceLastClick = Util.getMeasuringTimeMs() - lastClickTime;
-			lastClickTime = Util.getMeasuringTimeMs();
+			long timeSinceLastClick = Util.getMillis() - lastClickTime;
+			lastClickTime = Util.getMillis();
 			
 			if(timeSinceLastClick < 250)
 				pressLogin();
@@ -573,18 +577,18 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public void render(DrawContext context, int mouseX, int mouseY,
+		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
 			int y = getContentY();
 			
 			// green glow when logged in
-			if(client.getSession().getUsername().equals(alt.getName()))
+			if(minecraft.getUser().getName().equals(alt.getName()))
 			{
 				float opacity =
-					0.3F - Math.abs(MathHelper.sin(System.currentTimeMillis()
-						% 10000L / 10000F * (float)Math.PI * 2.0F) * 0.15F);
+					0.3F - Math.abs(Mth.sin(System.currentTimeMillis() % 10000L
+						/ 10000F * (float)Math.PI * 2.0F) * 0.15F);
 				
 				int color = 0x00FF00 | (int)(opacity * 255) << 24;
 				context.fill(x - 2, y - 2, x + 218, y + 28, color);
@@ -592,17 +596,17 @@ public final class AltManagerScreen extends Screen
 			
 			// face
 			AltRenderer.drawAltFace(context, alt.getName(), x + 1, y + 1, 24,
-				24, listGui.getSelectedOrNull() == this);
+				24, listGui.getSelected() == this);
 			
-			TextRenderer tr = client.textRenderer;
+			Font tr = minecraft.font;
 			
 			// name / email
-			context.drawText(tr, "Name: " + alt.getDisplayName(), x + 31, y + 3,
-				Colors.LIGHT_GRAY, false);
+			context.drawString(tr, "Name: " + alt.getDisplayName(), x + 31,
+				y + 3, CommonColors.LIGHT_GRAY, false);
 			
 			// status
-			context.drawText(tr, getBottomText(), x + 31, y + 15,
-				Colors.LIGHT_GRAY, false);
+			context.drawString(tr, getBottomText(), x + 31, y + 15,
+				CommonColors.LIGHT_GRAY, false);
 		}
 		
 		private String getBottomText()
@@ -622,9 +626,9 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	private final class ListGui
-		extends AlwaysSelectedEntryListWidget<AltManagerScreen.Entry>
+		extends ObjectSelectionList<AltManagerScreen.Entry>
 	{
-		public ListGui(MinecraftClient minecraft, AltManagerScreen screen,
+		public ListGui(Minecraft minecraft, AltManagerScreen screen,
 			List<Alt> list)
 		{
 			super(minecraft, screen.width, screen.height - 96, 36, 30);
@@ -653,7 +657,7 @@ public final class AltManagerScreen extends Screen
 		 */
 		public Alt getSelectedAlt()
 		{
-			AltManagerScreen.Entry selected = getSelectedOrNull();
+			AltManagerScreen.Entry selected = getSelected();
 			return selected != null ? selected.alt : null;
 		}
 		
@@ -663,7 +667,7 @@ public final class AltManagerScreen extends Screen
 		public AltManagerScreen.Entry getHoveredEntry(double mouseX,
 			double mouseY)
 		{
-			Optional<Element> hovered = hoveredElement(mouseX, mouseY);
+			Optional<GuiEventListener> hovered = getChildAt(mouseX, mouseY);
 			return hovered.map(e -> ((AltManagerScreen.Entry)e)).orElse(null);
 		}
 	}

@@ -11,34 +11,34 @@ import java.util.ArrayList;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.CollisionView;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.CollisionGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.WurstClient;
 
 public enum BlockUtils
 {
 	;
 	
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	public static BlockState getState(BlockPos pos)
 	{
-		return MC.world.getBlockState(pos);
+		return MC.level.getBlockState(pos);
 	}
 	
 	public static Block getBlock(BlockPos pos)
@@ -48,7 +48,7 @@ public enum BlockUtils
 	
 	public static int getId(BlockPos pos)
 	{
-		return Block.getRawIdFromState(getState(pos));
+		return Block.getId(getState(pos));
 	}
 	
 	public static String getName(BlockPos pos)
@@ -58,12 +58,13 @@ public enum BlockUtils
 	
 	public static String getName(Block block)
 	{
-		return Registries.BLOCK.getId(block).toString();
+		return BuiltInRegistries.BLOCK.getKey(block).toString();
 	}
 	
 	/**
 	 * @param name
-	 *            a String containing the block's name ({@link Identifier})
+	 *            a String containing the block's name
+	 *            ({@link ResourceLocation})
 	 * @return the requested block, or <code>minecraft:air</code> if the block
 	 *         doesn't exist.
 	 */
@@ -71,9 +72,10 @@ public enum BlockUtils
 	{
 		try
 		{
-			return Registries.BLOCK.get(Identifier.of(name));
+			return BuiltInRegistries.BLOCK
+				.getValue(ResourceLocation.parse(name));
 			
-		}catch(InvalidIdentifierException e)
+		}catch(ResourceLocationException e)
 		{
 			return Blocks.AIR;
 		}
@@ -81,7 +83,8 @@ public enum BlockUtils
 	
 	/**
 	 * @param nameOrId
-	 *            a String containing the block's name ({@link Identifier}) or
+	 *            a String containing the block's name
+	 *            ({@link ResourceLocation}) or
 	 *            numeric ID.
 	 * @return the requested block, or null if the block doesn't exist.
 	 */
@@ -89,7 +92,8 @@ public enum BlockUtils
 	{
 		if(MathUtils.isInteger(nameOrId))
 		{
-			BlockState state = Block.STATE_IDS.get(Integer.parseInt(nameOrId));
+			BlockState state =
+				Block.BLOCK_STATE_REGISTRY.byId(Integer.parseInt(nameOrId));
 			if(state == null)
 				return null;
 			
@@ -98,13 +102,13 @@ public enum BlockUtils
 		
 		try
 		{
-			Identifier id = Identifier.of(nameOrId);
-			if(!Registries.BLOCK.containsId(id))
+			ResourceLocation id = ResourceLocation.parse(nameOrId);
+			if(!BuiltInRegistries.BLOCK.containsKey(id))
 				return null;
 			
-			return Registries.BLOCK.get(id);
+			return BuiltInRegistries.BLOCK.getValue(id);
 			
-		}catch(InvalidIdentifierException e)
+		}catch(ResourceLocationException e)
 		{
 			return null;
 		}
@@ -112,54 +116,54 @@ public enum BlockUtils
 	
 	public static float getHardness(BlockPos pos)
 	{
-		return getState(pos).calcBlockBreakingDelta(MC.player, MC.world, pos);
+		return getState(pos).getDestroyProgress(MC.player, MC.level, pos);
 	}
 	
 	public static boolean isUnbreakable(BlockPos pos)
 	{
-		return getBlock(pos).getHardness() < 0;
+		return getBlock(pos).defaultDestroyTime() < 0;
 	}
 	
 	private static VoxelShape getOutlineShape(BlockPos pos)
 	{
-		return getState(pos).getOutlineShape(MC.world, pos);
+		return getState(pos).getShape(MC.level, pos);
 	}
 	
-	public static Box getBoundingBox(BlockPos pos)
+	public static AABB getBoundingBox(BlockPos pos)
 	{
-		return getOutlineShape(pos).getBoundingBox().offset(pos);
+		return getOutlineShape(pos).bounds().move(pos);
 	}
 	
 	public static boolean canBeClicked(BlockPos pos)
 	{
-		return getOutlineShape(pos) != VoxelShapes.empty();
+		return getOutlineShape(pos) != Shapes.empty();
 	}
 	
 	public static boolean isOpaqueFullCube(BlockPos pos)
 	{
-		return getState(pos).isOpaqueFullCube();
+		return getState(pos).isSolidRender();
 	}
 	
-	public static BlockHitResult raycast(Vec3d from, Vec3d to,
-		RaycastContext.FluidHandling fluidHandling)
+	public static BlockHitResult raycast(Vec3 from, Vec3 to,
+		ClipContext.Fluid fluidHandling)
 	{
-		RaycastContext context = new RaycastContext(from, to,
-			RaycastContext.ShapeType.COLLIDER, fluidHandling, MC.player);
+		ClipContext context = new ClipContext(from, to,
+			ClipContext.Block.COLLIDER, fluidHandling, MC.player);
 		
-		return MC.world.raycast(context);
+		return MC.level.clip(context);
 	}
 	
-	public static BlockHitResult raycast(Vec3d from, Vec3d to)
+	public static BlockHitResult raycast(Vec3 from, Vec3 to)
 	{
-		return raycast(from, to, RaycastContext.FluidHandling.NONE);
+		return raycast(from, to, ClipContext.Fluid.NONE);
 	}
 	
-	public static boolean hasLineOfSight(Vec3d from, Vec3d to)
+	public static boolean hasLineOfSight(Vec3 from, Vec3 to)
 	{
 		return raycast(from, to).getType() == HitResult.Type.MISS;
 	}
 	
-	public static boolean hasLineOfSight(Vec3d to)
+	public static boolean hasLineOfSight(Vec3 to)
 	{
 		return raycast(RotationUtils.getEyesPos(), to)
 			.getType() == HitResult.Type.MISS;
@@ -169,18 +173,19 @@ public enum BlockUtils
 	 * Returns a stream of all blocks that collide with the given box.
 	 *
 	 * <p>
-	 * Unlike {@link CollisionView#getBlockCollisions(Entity, Box)}, this method
+	 * Unlike {@link CollisionGetter#getBlockCollisions(Entity, AABB)}, this
+	 * method
 	 * breaks the voxel shapes down into their bounding boxes and only returns
 	 * those that actually intersect with the given box. It also assumes that
 	 * the entity is the player.
 	 */
-	public static Stream<Box> getBlockCollisions(Box box)
+	public static Stream<AABB> getBlockCollisions(AABB box)
 	{
 		Iterable<VoxelShape> blockCollisions =
-			MC.world.getBlockCollisions(MC.player, box);
+			MC.level.getBlockCollisions(MC.player, box);
 		
 		return StreamSupport.stream(blockCollisions.spliterator(), false)
-			.flatMap(shape -> shape.getBoundingBoxes().stream())
+			.flatMap(shape -> shape.toAabbs().stream())
 			.filter(shapeBox -> shapeBox.intersects(box));
 	}
 	
@@ -203,8 +208,8 @@ public enum BlockUtils
 	
 	public static ArrayList<BlockPos> getAllInBox(BlockPos center, int range)
 	{
-		return getAllInBox(center.add(-range, -range, -range),
-			center.add(range, range, range));
+		return getAllInBox(center.offset(-range, -range, -range),
+			center.offset(range, range, range));
 	}
 	
 	public static Stream<BlockPos> getAllInBoxStream(BlockPos from, BlockPos to)
@@ -248,7 +253,7 @@ public enum BlockUtils
 	
 	public static Stream<BlockPos> getAllInBoxStream(BlockPos center, int range)
 	{
-		return getAllInBoxStream(center.add(-range, -range, -range),
-			center.add(range, range, range));
+		return getAllInBoxStream(center.offset(-range, -range, -range),
+			center.offset(range, range, range));
 	}
 }

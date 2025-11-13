@@ -7,7 +7,7 @@
  */
 package net.wurstclient.clickgui;
 
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 public abstract class Popup
 {
@@ -27,7 +27,7 @@ public abstract class Popup
 	public abstract void handleMouseClick(int mouseX, int mouseY,
 		int mouseButton);
 	
-	public abstract void render(DrawContext context, int mouseX, int mouseY);
+	public abstract void render(GuiGraphics context, int mouseX, int mouseY);
 	
 	public abstract int getDefaultWidth();
 	

@@ -9,11 +9,12 @@ package net.wurstclient.hacks.newchunks;
 
 import java.util.List;
 
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.ChunkPos;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.RegionPos;
@@ -37,15 +38,15 @@ public final class NewChunksReasonsRenderer
 		for(BlockPos pos : reasons)
 		{
 			ChunkPos chunkPos = new ChunkPos(pos);
-			if(chunkPos.getChebyshevDistance(camChunkPos) > drawDistance)
+			if(chunkPos.getChessboardDistance(camChunkPos) > drawDistance)
 				continue;
 			
-			Box box = new Box(pos).offset(-region.x(), 0, -region.z());
+			AABB box = new AABB(pos).move(-region.x(), 0, -region.z());
 			RenderUtils.drawSolidBox(buffer, box, 0xFFFFFFFF);
 		}
 	}
 	
-	public RenderLayer.MultiPhase getLayer()
+	public RenderType.CompositeRenderType getLayer()
 	{
 		return WurstRenderLayers.ESP_QUADS;
 	}

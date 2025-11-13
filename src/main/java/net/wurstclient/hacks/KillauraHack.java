@@ -11,12 +11,13 @@ import java.util.Comparator;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleInputListener;
@@ -153,7 +154,7 @@ public final class KillauraHack extends Hack
 		
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		double rangeSq = range.getValueSq();
-		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
+		stream = stream.filter(e -> MC.player.distanceToSqr(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
@@ -168,7 +169,7 @@ public final class KillauraHack extends Hack
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
 		
-		Vec3d hitVec = target.getBoundingBox().getCenter();
+		Vec3 hitVec = target.getBoundingBox().getCenter();
 		if(checkLOS.isChecked() && !BlockUtils.hasLineOfSight(hitVec))
 		{
 			target = null;
@@ -184,15 +185,15 @@ public final class KillauraHack extends Hack
 		if(target == null)
 			return;
 		
-		MC.interactionManager.attackEntity(MC.player, target);
-		swingHand.swing(Hand.MAIN_HAND);
+		MC.gameMode.attack(MC.player, target);
+		swingHand.swing(InteractionHand.MAIN_HAND);
 		
 		target = null;
 		speed.resetTimer(speedRandMS.getValue());
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(renderTarget == null || !damageIndicator.isChecked())
 			return;
@@ -206,11 +207,10 @@ public final class KillauraHack extends Hack
 		int quadColor = RenderUtils.toIntColor(rgb, 0.25F);
 		int lineColor = RenderUtils.toIntColor(rgb, 0.5F);
 		
-		Box box = EntityUtils.getLerpedBox(renderTarget, partialTicks);
+		AABB box = EntityUtils.getLerpedBox(renderTarget, partialTicks);
 		if(p < 1)
-			box = box.contract((1 - p) * 0.5 * box.getLengthX(),
-				(1 - p) * 0.5 * box.getLengthY(),
-				(1 - p) * 0.5 * box.getLengthZ());
+			box = box.deflate((1 - p) * 0.5 * box.getXsize(),
+				(1 - p) * 0.5 * box.getYsize(), (1 - p) * 0.5 * box.getZsize());
 		
 		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
 		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);
@@ -218,7 +218,7 @@ public final class KillauraHack extends Hack
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", e -> MC.player.squaredDistanceTo(e)),
+		DISTANCE("Distance", e -> MC.player.distanceToSqr(e)),
 		
 		ANGLE("Angle",
 			e -> RotationUtils

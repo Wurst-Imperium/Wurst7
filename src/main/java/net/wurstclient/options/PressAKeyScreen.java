@@ -9,13 +9,14 @@ package net.wurstclient.options;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
+import com.mojang.blaze3d.platform.InputConstants;
+
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
 
 public class PressAKeyScreen extends Screen
 {
@@ -23,7 +24,7 @@ public class PressAKeyScreen extends Screen
 	
 	public PressAKeyScreen(PressAKeyCallback prevScreen)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		
 		if(!(prevScreen instanceof Screen))
 			throw new IllegalArgumentException("prevScreen is not a screen");
@@ -32,18 +33,18 @@ public class PressAKeyScreen extends Screen
 	}
 	
 	@Override
-	public boolean keyPressed(KeyInput context)
+	public boolean keyPressed(KeyEvent context)
 	{
 		if(context.key() != GLFW.GLFW_KEY_ESCAPE)
 			prevScreen.setKey(getKeyName(context));
 		
-		client.setScreen((Screen)prevScreen);
+		minecraft.setScreen((Screen)prevScreen);
 		return super.keyPressed(context);
 	}
 	
-	private String getKeyName(KeyInput context)
+	private String getKeyName(KeyEvent context)
 	{
-		return InputUtil.fromKeyCode(context).getTranslationKey();
+		return InputConstants.getKey(context).getName();
 	}
 	
 	@Override
@@ -53,13 +54,13 @@ public class PressAKeyScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		context.drawCenteredTextWithShadow(textRenderer, "Press a key",
-			width / 2, height / 4 + 48, Colors.WHITE);
+		context.drawCenteredString(font, "Press a key", width / 2,
+			height / 4 + 48, CommonColors.WHITE);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 }

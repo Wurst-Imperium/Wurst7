@@ -11,14 +11,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import net.minecraft.client.font.MultilineText;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.StringHelper;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.StringUtil;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.util.ChatUtils;
@@ -32,23 +32,23 @@ public final class NcrModRequiredScreen extends Screen
 		"You do not have No Chat Reports, and this server is configured to require it on client!");
 	
 	private final Screen prevScreen;
-	private final Text reason;
-	private MultilineText reasonFormatted = MultilineText.EMPTY;
+	private final Component reason;
+	private MultiLineLabel reasonFormatted = MultiLineLabel.EMPTY;
 	private int reasonHeight;
 	
-	private ButtonWidget signatureButton;
+	private Button signatureButton;
 	private final Supplier<String> sigButtonMsg;
 	
-	private ButtonWidget vsButton;
+	private Button vsButton;
 	private final Supplier<String> vsButtonMsg;
 	
 	public NcrModRequiredScreen(Screen prevScreen)
 	{
-		super(Text.literal(ChatUtils.WURST_PREFIX + WurstClient.INSTANCE
+		super(Component.literal(ChatUtils.WURST_PREFIX + WurstClient.INSTANCE
 			.translate("gui.wurst.nochatreports.ncr_mod_server.title")));
 		this.prevScreen = prevScreen;
 		
-		reason = Text.literal(WurstClient.INSTANCE
+		reason = Component.literal(WurstClient.INSTANCE
 			.translate("gui.wurst.nochatreports.ncr_mod_server.message"));
 		
 		OtfList otfs = WurstClient.INSTANCE.getOtfs();
@@ -76,62 +76,63 @@ public final class NcrModRequiredScreen extends Screen
 	@Override
 	protected void init()
 	{
-		reasonFormatted =
-			MultilineText.create(textRenderer, reason, width - 50);
-		reasonHeight = reasonFormatted.getLineCount() * textRenderer.fontHeight;
+		reasonFormatted = MultiLineLabel.create(font, reason, width - 50);
+		reasonHeight = reasonFormatted.getLineCount() * font.lineHeight;
 		
 		int buttonX = width / 2 - 100;
 		int belowReasonY =
-			(height - 78) / 2 + reasonHeight / 2 + textRenderer.fontHeight * 2;
+			(height - 78) / 2 + reasonHeight / 2 + font.lineHeight * 2;
 		int signaturesY = Math.min(belowReasonY, height - 68);
 		int reconnectY = signaturesY + 24;
 		int backButtonY = reconnectY + 24;
 		
-		addDrawableChild(signatureButton = ButtonWidget
-			.builder(Text.literal(sigButtonMsg.get()), b -> toggleSignatures())
-			.dimensions(buttonX - 48, signaturesY, 148, 20).build());
+		addRenderableWidget(signatureButton = Button
+			.builder(Component.literal(sigButtonMsg.get()),
+				b -> toggleSignatures())
+			.bounds(buttonX - 48, signaturesY, 148, 20).build());
 		
-		addDrawableChild(vsButton = ButtonWidget
-			.builder(Text.literal(vsButtonMsg.get()), b -> toggleVanillaSpoof())
-			.dimensions(buttonX + 102, signaturesY, 148, 20).build());
+		addRenderableWidget(vsButton = Button
+			.builder(Component.literal(vsButtonMsg.get()),
+				b -> toggleVanillaSpoof())
+			.bounds(buttonX + 102, signaturesY, 148, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Reconnect"),
+		addRenderableWidget(Button
+			.builder(Component.literal("Reconnect"),
 				b -> LastServerRememberer.reconnect(prevScreen))
-			.dimensions(buttonX, reconnectY, 200, 20).build());
+			.bounds(buttonX, reconnectY, 200, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.translatable("gui.toMenu"),
-				b -> client.setScreen(prevScreen))
-			.dimensions(buttonX, backButtonY, 200, 20).build());
+		addRenderableWidget(Button
+			.builder(Component.translatable("gui.toMenu"),
+				b -> minecraft.setScreen(prevScreen))
+			.bounds(buttonX, backButtonY, 200, 20).build());
 	}
 	
 	private void toggleSignatures()
 	{
 		WurstClient.INSTANCE.getOtfs().noChatReportsOtf.doPrimaryAction();
-		signatureButton.setMessage(Text.literal(sigButtonMsg.get()));
+		signatureButton.setMessage(Component.literal(sigButtonMsg.get()));
 	}
 	
 	private void toggleVanillaSpoof()
 	{
 		WurstClient.INSTANCE.getOtfs().vanillaSpoofOtf.doPrimaryAction();
-		vsButton.setMessage(Text.literal(vsButtonMsg.get()));
+		vsButton.setMessage(Component.literal(vsButtonMsg.get()));
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
-		int titleY = reasonY - textRenderer.fontHeight * 2;
+		int titleY = reasonY - font.lineHeight * 2;
 		
-		context.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
-			Colors.LIGHT_GRAY);
-		reasonFormatted.draw(context, MultilineText.Alignment.CENTER, centerX,
+		context.drawCenteredString(font, title, centerX, titleY,
+			CommonColors.LIGHT_GRAY);
+		reasonFormatted.render(context, MultiLineLabel.Align.CENTER, centerX,
 			reasonY, 9, true, -1);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
@@ -141,7 +142,7 @@ public final class NcrModRequiredScreen extends Screen
 		return false;
 	}
 	
-	public static boolean isCausedByLackOfNCR(Text disconnectReason)
+	public static boolean isCausedByLackOfNCR(Component disconnectReason)
 	{
 		OtfList otfs = WurstClient.INSTANCE.getOtfs();
 		if(otfs.noChatReportsOtf.isActive()
@@ -152,7 +153,7 @@ public final class NcrModRequiredScreen extends Screen
 		if(text == null)
 			return false;
 		
-		text = StringHelper.stripTextFormat(text);
+		text = StringUtil.stripColor(text);
 		return DISCONNECT_REASONS.contains(text);
 	}
 }

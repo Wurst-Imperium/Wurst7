@@ -67,7 +67,7 @@ public final class MojangAlt extends Alt
 	
 	private String getNameFromSession()
 	{
-		String name = WurstClient.MC.getSession().getUsername();
+		String name = WurstClient.MC.getUser().getName();
 		
 		if(name == null || name.isEmpty())
 			throw new RuntimeException(

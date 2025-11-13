@@ -9,7 +9,7 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.protocol.Packet;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;

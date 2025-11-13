@@ -7,9 +7,9 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
@@ -27,12 +27,12 @@ public final class FilterFlyingSetting extends SliderSetting
 	@Override
 	public boolean test(Entity e)
 	{
-		if(!(e instanceof PlayerEntity))
+		if(!(e instanceof Player))
 			return true;
 		
-		Box box = e.getBoundingBox();
-		box = box.union(box.offset(0, -getValue(), 0));
-		return !WurstClient.MC.world.isSpaceEmpty(box);
+		AABB box = e.getBoundingBox();
+		box = box.minmax(box.move(0, -getValue(), 0));
+		return !WurstClient.MC.level.noCollision(box);
 	}
 	
 	@Override

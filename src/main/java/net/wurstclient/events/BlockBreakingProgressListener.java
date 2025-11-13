@@ -9,8 +9,8 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.wurstclient.event.Event;
 import net.wurstclient.event.Listener;
 

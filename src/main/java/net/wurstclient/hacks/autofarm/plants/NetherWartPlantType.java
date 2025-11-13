@@ -7,12 +7,12 @@
  */
 package net.wurstclient.hacks.autofarm.plants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.NetherWartBlock;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.NetherWartBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
@@ -28,7 +28,7 @@ public final class NetherWartPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.down()).isOf(Blocks.SOUL_SAND);
+		return BlockUtils.getState(pos.below()).is(Blocks.SOUL_SAND);
 	}
 	
 	@Override
@@ -43,7 +43,7 @@ public final class NetherWartPlantType extends AutoFarmPlantType
 		if(!(state.getBlock() instanceof NetherWartBlock))
 			return false;
 		
-		return state.get(NetherWartBlock.AGE) >= NetherWartBlock.MAX_AGE;
+		return state.getValue(NetherWartBlock.AGE) >= NetherWartBlock.MAX_AGE;
 	}
 	
 	@Override

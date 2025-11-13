@@ -12,9 +12,9 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-import net.minecraft.item.Item;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -107,7 +107,7 @@ public final class AutoBuildTemplate
 		Direction direction)
 	{
 		Direction front = direction;
-		Direction left = front.rotateYCounterclockwise();
+		Direction left = front.getCounterClockWise();
 		LinkedHashMap<BlockPos, Item> blocksToPlace = new LinkedHashMap<>();
 		
 		for(BlockData block : blocks)
@@ -140,7 +140,8 @@ public final class AutoBuildTemplate
 		public BlockPos toBlockPos(BlockPos origin, Direction front,
 			Direction left)
 		{
-			return origin.offset(left, pos[0]).up(pos[1]).offset(front, pos[2]);
+			return origin.relative(left, pos[0]).above(pos[1]).relative(front,
+				pos[2]);
 		}
 		
 		public Item toItem()

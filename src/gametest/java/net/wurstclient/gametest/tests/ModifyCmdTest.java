@@ -12,10 +12,10 @@ import static net.wurstclient.gametest.WurstClientTestHelper.*;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.wurstclient.gametest.WurstTest;
 
 public enum ModifyCmdTest
@@ -38,9 +38,9 @@ public enum ModifyCmdTest
 			"modify set custom_name {\"text\":\"$cRed Name\"}");
 		assertOneItemInSlot(context, 0, Items.DIAMOND);
 		ItemStack stack = context
-			.computeOnClient(mc -> mc.player.getInventory().getSelectedStack());
+			.computeOnClient(mc -> mc.player.getInventory().getSelectedItem());
 		String name = stack.getComponents()
-			.getOrDefault(DataComponentTypes.CUSTOM_NAME, Text.empty())
+			.getOrDefault(DataComponents.CUSTOM_NAME, Component.empty())
 			.getString();
 		if(!name.equals("\u00a7cRed Name"))
 			throw new RuntimeException("Custom name is wrong: " + name);

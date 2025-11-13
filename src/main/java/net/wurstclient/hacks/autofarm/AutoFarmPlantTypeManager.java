@@ -10,8 +10,8 @@ package net.wurstclient.hacks.autofarm;
 import java.util.List;
 import java.util.stream.Stream;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.hacks.autofarm.plants.*;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.ToggleAllPlantTypesSetting;

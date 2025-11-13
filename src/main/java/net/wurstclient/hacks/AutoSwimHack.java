@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.player.LocalPlayer;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -37,15 +37,15 @@ public final class AutoSwimHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
-		if(player.horizontalCollision || player.isSneaking())
+		if(player.horizontalCollision || player.isShiftKeyDown())
 			return;
 		
-		if(!player.isTouchingWater())
+		if(!player.isInWater())
 			return;
 		
-		if(player.forwardSpeed > 0)
+		if(player.zza > 0)
 			player.setSprinting(true);
 	}
 }

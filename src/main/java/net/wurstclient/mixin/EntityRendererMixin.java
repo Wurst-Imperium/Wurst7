@@ -17,11 +17,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.HealthTagsHack;
 
@@ -32,10 +32,11 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	 * Disables the nametag distance limit if configured in NameTags.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/entity/EntityRenderManager;getSquaredDistanceToCamera(Lnet/minecraft/entity/Entity;)D"),
-		method = "updateRenderState(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/entity/state/EntityRenderState;F)V")
-	private double fakeSquaredDistanceToCamera(EntityRenderManager dispatcher,
-		Entity entity, Operation<Double> original,
+		target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"),
+		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V")
+	private double fakeSquaredDistanceToCamera(
+		EntityRenderDispatcher dispatcher, Entity entity,
+		Operation<Double> original,
 		@Share("actualDistanceSq") LocalDoubleRef actualDistanceSq)
 	{
 		actualDistanceSq.set(original.call(dispatcher, entity));
@@ -51,12 +52,12 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	 * might rely on it.
 	 */
 	@Inject(at = @At("TAIL"),
-		method = "updateRenderState(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/entity/state/EntityRenderState;F)V")
+		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V")
 	private void restoreSquaredDistanceToCamera(T entity, S state,
 		float tickDelta, CallbackInfo ci,
 		@Share("actualDistanceSq") LocalDoubleRef actualDistanceSq)
 	{
-		state.squaredDistanceToCamera = actualDistanceSq.get();
+		state.distanceToCameraSq = actualDistanceSq.get();
 	}
 	
 	/**
@@ -66,11 +67,11 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	 * HealthTags is disabled.
 	 */
 	@Inject(at = @At("TAIL"),
-		method = "updateRenderState(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/entity/state/EntityRenderState;F)V")
+		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V")
 	private void addHealthToDisplayName(T entity, S state, float tickProgress,
 		CallbackInfo ci)
 	{
-		if(state.displayName == null)
+		if(state.nameTag == null)
 			return;
 		if(!(entity instanceof LivingEntity le))
 			return;
@@ -80,6 +81,6 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 		if(!healthTags.isEnabled())
 			return;
 		
-		state.displayName = healthTags.addHealth(le, state.displayName.copy());
+		state.nameTag = healthTags.addHealth(le, state.nameTag.copy());
 	}
 }

@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.Setting;
@@ -23,7 +23,7 @@ import net.wurstclient.util.BlockUtils;
 
 public final class PortalEspBlockGroup
 {
-	protected final ArrayList<Box> boxes = new ArrayList<>();
+	protected final ArrayList<AABB> boxes = new ArrayList<>();
 	private final Block block;
 	private final ColorSetting color;
 	private final CheckboxSetting enabled;
@@ -38,14 +38,14 @@ public final class PortalEspBlockGroup
 	
 	public void add(BlockPos pos)
 	{
-		Box box = getBox(pos);
+		AABB box = getBox(pos);
 		if(box == null)
 			return;
 		
 		boxes.add(box);
 	}
 	
-	private Box getBox(BlockPos pos)
+	private AABB getBox(BlockPos pos)
 	{
 		if(!BlockUtils.canBeClicked(pos))
 			return null;
@@ -78,7 +78,7 @@ public final class PortalEspBlockGroup
 		return color.getColorI(alpha);
 	}
 	
-	public List<Box> getBoxes()
+	public List<AABB> getBoxes()
 	{
 		return Collections.unmodifiableList(boxes);
 	}

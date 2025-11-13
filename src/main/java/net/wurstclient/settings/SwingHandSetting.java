@@ -9,9 +9,9 @@ package net.wurstclient.settings;
 
 import java.util.function.Consumer;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.util.Hand;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.world.InteractionHand;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.text.WText;
@@ -19,7 +19,7 @@ import net.wurstclient.util.text.WText;
 public final class SwingHandSetting
 	extends EnumSetting<SwingHandSetting.SwingHand>
 {
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	private static final WText FULL_DESCRIPTION_SUFFIX =
 		buildDescriptionSuffix(true);
 	private static final WText REDUCED_DESCRIPTION_SUFFIX =
@@ -76,7 +76,7 @@ public final class SwingHandSetting
 			+ hack.getName().toLowerCase() + ".swing_hand");
 	}
 	
-	public void swing(Hand hand)
+	public void swing(InteractionHand hand)
 	{
 		getSelected().swing(hand);
 	}
@@ -99,19 +99,19 @@ public final class SwingHandSetting
 		OFF("Off", hand -> {}),
 		
 		SERVER("Server-side",
-			hand -> MC.player.networkHandler
-				.sendPacket(new HandSwingC2SPacket(hand))),
+			hand -> MC.player.connection
+				.send(new ServerboundSwingPacket(hand))),
 		
-		CLIENT("Client-side", hand -> MC.player.swingHand(hand));
+		CLIENT("Client-side", hand -> MC.player.swing(hand));
 		
 		private static final String TRANSLATION_KEY_PREFIX =
 			"description.wurst.setting.generic.swing_hand.";
 		
 		private final String name;
 		private final WText description;
-		private final Consumer<Hand> swing;
+		private final Consumer<InteractionHand> swing;
 		
-		private SwingHand(String name, Consumer<Hand> swing)
+		private SwingHand(String name, Consumer<InteractionHand> swing)
 		{
 			this.name = name;
 			description =
@@ -119,7 +119,7 @@ public final class SwingHandSetting
 			this.swing = swing;
 		}
 		
-		public void swing(Hand hand)
+		public void swing(InteractionHand hand)
 		{
 			swing.accept(hand);
 		}

@@ -9,10 +9,11 @@ package net.wurstclient.hacks.newchunks;
 
 import java.util.Set;
 
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
@@ -28,11 +29,11 @@ public final class NewChunksOutlineRenderer implements NewChunksChunkRenderer
 		
 		for(ChunkPos chunkPos : chunks)
 		{
-			if(chunkPos.getChebyshevDistance(camChunkPos) > drawDistance)
+			if(chunkPos.getChessboardDistance(camChunkPos) > drawDistance)
 				continue;
 			
 			BlockPos blockPos =
-				chunkPos.getBlockPos(-region.x(), 0, -region.z());
+				chunkPos.getBlockAt(-region.x(), 0, -region.z());
 			float x1 = blockPos.getX() + 0.5F;
 			float x2 = x1 + 15;
 			float z1 = blockPos.getZ() + 0.5F;
@@ -47,7 +48,7 @@ public final class NewChunksOutlineRenderer implements NewChunksChunkRenderer
 	}
 	
 	@Override
-	public RenderLayer.MultiPhase getLayer()
+	public RenderType.CompositeRenderType getLayer()
 	{
 		return WurstRenderLayers.ESP_LINES;
 	}

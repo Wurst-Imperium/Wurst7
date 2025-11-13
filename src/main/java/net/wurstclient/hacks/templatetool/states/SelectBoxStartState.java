@@ -7,9 +7,10 @@
  */
 package net.wurstclient.hacks.templatetool.states;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.hacks.TemplateToolHack;
 import net.wurstclient.hacks.templatetool.SelectPositionState;
 import net.wurstclient.hacks.templatetool.TemplateToolState;
@@ -18,7 +19,7 @@ import net.wurstclient.util.RenderUtils;
 public final class SelectBoxStartState extends SelectPositionState
 {
 	@Override
-	public void onRender(TemplateToolHack hack, MatrixStack matrixStack,
+	public void onRender(TemplateToolHack hack, PoseStack matrixStack,
 		float partialTicks)
 	{
 		super.onRender(hack, matrixStack, partialTicks);
@@ -27,7 +28,7 @@ public final class SelectBoxStartState extends SelectPositionState
 		if(start == null)
 			return;
 		
-		Box box = new Box(start).contract(1 / 16.0);
+		AABB box = new AABB(start).deflate(1 / 16.0);
 		int black = 0x80000000;
 		int green15 = 0x2600FF00;
 		RenderUtils.drawOutlinedBox(matrixStack, box, black, false);

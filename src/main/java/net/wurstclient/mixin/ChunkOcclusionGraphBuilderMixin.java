@@ -12,16 +12,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.render.chunk.ChunkOcclusionDataBuilder;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.renderer.chunk.VisGraph;
+import net.minecraft.core.BlockPos;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.SetOpaqueCubeListener.SetOpaqueCubeEvent;
 
-@Mixin(ChunkOcclusionDataBuilder.class)
+@Mixin(VisGraph.class)
 public class ChunkOcclusionGraphBuilderMixin
 {
 	@Inject(at = @At("HEAD"),
-		method = "markClosed(Lnet/minecraft/util/math/BlockPos;)V",
+		method = "setOpaque(Lnet/minecraft/core/BlockPos;)V",
 		cancellable = true)
 	private void onMarkClosed(BlockPos pos, CallbackInfo ci)
 	{

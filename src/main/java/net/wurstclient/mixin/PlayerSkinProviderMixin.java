@@ -23,13 +23,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 
-import net.minecraft.client.texture.PlayerSkinProvider;
-import net.minecraft.entity.player.SkinTextures;
-import net.minecraft.util.Uuids;
+import net.minecraft.client.resources.SkinManager;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.world.entity.player.PlayerSkin;
 import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonObject;
 
-@Mixin(PlayerSkinProvider.class)
+@Mixin(SkinManager.class)
 public abstract class PlayerSkinProviderMixin
 {
 	@Unique
@@ -39,10 +39,10 @@ public abstract class PlayerSkinProviderMixin
 	private MinecraftProfileTexture currentCape;
 	
 	@Inject(at = @At("HEAD"),
-		method = "fetchSkinTextures(Ljava/util/UUID;Lcom/mojang/authlib/minecraft/MinecraftProfileTextures;)Ljava/util/concurrent/CompletableFuture;")
+		method = "registerTextures(Ljava/util/UUID;Lcom/mojang/authlib/minecraft/MinecraftProfileTextures;)Ljava/util/concurrent/CompletableFuture;")
 	private void onFetchSkinTextures(UUID uuid,
 		MinecraftProfileTextures textures,
-		CallbackInfoReturnable<CompletableFuture<SkinTextures>> cir)
+		CallbackInfoReturnable<CompletableFuture<PlayerSkin>> cir)
 	{
 		String uuidString = uuid.toString();
 		
@@ -69,7 +69,7 @@ public abstract class PlayerSkinProviderMixin
 	}
 	
 	@ModifyVariable(at = @At("STORE"),
-		method = "fetchSkinTextures(Ljava/util/UUID;Lcom/mojang/authlib/minecraft/MinecraftProfileTextures;)Ljava/util/concurrent/CompletableFuture;",
+		method = "registerTextures(Ljava/util/UUID;Lcom/mojang/authlib/minecraft/MinecraftProfileTextures;)Ljava/util/concurrent/CompletableFuture;",
 		ordinal = 1,
 		name = "minecraftProfileTexture2")
 	private MinecraftProfileTexture modifyCapeTexture(
@@ -112,7 +112,8 @@ public abstract class PlayerSkinProviderMixin
 				}
 				
 				// convert name to offline UUID
-				String offlineUUID = "" + Uuids.getOfflinePlayerUuid(name);
+				String offlineUUID =
+					"" + UUIDUtil.createOfflinePlayerUUID(name);
 				capes.put(offlineUUID, capeURL);
 			}
 			

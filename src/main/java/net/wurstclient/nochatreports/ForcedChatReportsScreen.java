@@ -11,15 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import net.minecraft.client.font.MultilineText;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.PlainTextContent.Literal;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.Colors;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.util.CommonColors;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.NoChatReportsOtf;
 import net.wurstclient.util.ChatUtils;
@@ -39,21 +39,21 @@ public final class ForcedChatReportsScreen extends Screen
 			"Secure profile expired.", "Secure profile invalid.");
 	
 	private final Screen prevScreen;
-	private final Text reason;
-	private MultilineText reasonFormatted = MultilineText.EMPTY;
+	private final Component reason;
+	private MultiLineLabel reasonFormatted = MultiLineLabel.EMPTY;
 	private int reasonHeight;
 	
-	private ButtonWidget signatureButton;
+	private Button signatureButton;
 	private final Supplier<String> sigButtonMsg;
 	
 	public ForcedChatReportsScreen(Screen prevScreen)
 	{
-		super(Text.literal(ChatUtils.WURST_PREFIX)
-			.append(Text.literal(WurstClient.INSTANCE
+		super(Component.literal(ChatUtils.WURST_PREFIX)
+			.append(Component.literal(WurstClient.INSTANCE
 				.translate("gui.wurst.nochatreports.unsafe_server.title"))));
 		this.prevScreen = prevScreen;
 		
-		reason = Text.literal(WurstClient.INSTANCE
+		reason = Component.literal(WurstClient.INSTANCE
 			.translate("gui.wurst.nochatreports.unsafe_server.message"));
 		
 		NoChatReportsOtf ncr = WurstClient.INSTANCE.getOtfs().noChatReportsOtf;
@@ -71,52 +71,52 @@ public final class ForcedChatReportsScreen extends Screen
 	@Override
 	protected void init()
 	{
-		reasonFormatted =
-			MultilineText.create(textRenderer, reason, width - 50);
-		reasonHeight = reasonFormatted.getLineCount() * textRenderer.fontHeight;
+		reasonFormatted = MultiLineLabel.create(font, reason, width - 50);
+		reasonHeight = reasonFormatted.getLineCount() * font.lineHeight;
 		
 		int buttonX = width / 2 - 100;
 		int belowReasonY =
-			(height - 78) / 2 + reasonHeight / 2 + textRenderer.fontHeight * 2;
+			(height - 78) / 2 + reasonHeight / 2 + font.lineHeight * 2;
 		int signaturesY = Math.min(belowReasonY, height - 68);
 		int reconnectY = signaturesY + 24;
 		int backButtonY = reconnectY + 24;
 		
-		addDrawableChild(signatureButton = ButtonWidget
-			.builder(Text.literal(sigButtonMsg.get()), b -> toggleSignatures())
-			.dimensions(buttonX, signaturesY, 200, 20).build());
+		addRenderableWidget(signatureButton = Button
+			.builder(Component.literal(sigButtonMsg.get()),
+				b -> toggleSignatures())
+			.bounds(buttonX, signaturesY, 200, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Reconnect"),
+		addRenderableWidget(Button
+			.builder(Component.literal("Reconnect"),
 				b -> LastServerRememberer.reconnect(prevScreen))
-			.dimensions(buttonX, reconnectY, 200, 20).build());
+			.bounds(buttonX, reconnectY, 200, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.translatable("gui.toMenu"),
-				b -> client.setScreen(prevScreen))
-			.dimensions(buttonX, backButtonY, 200, 20).build());
+		addRenderableWidget(Button
+			.builder(Component.translatable("gui.toMenu"),
+				b -> minecraft.setScreen(prevScreen))
+			.bounds(buttonX, backButtonY, 200, 20).build());
 	}
 	
 	private void toggleSignatures()
 	{
 		WurstClient.INSTANCE.getOtfs().noChatReportsOtf.doPrimaryAction();
-		signatureButton.setMessage(Text.literal(sigButtonMsg.get()));
+		signatureButton.setMessage(Component.literal(sigButtonMsg.get()));
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
-		int titleY = reasonY - textRenderer.fontHeight * 2;
+		int titleY = reasonY - font.lineHeight * 2;
 		
-		context.drawCenteredTextWithShadow(textRenderer, title, centerX, titleY,
-			Colors.LIGHT_GRAY);
-		reasonFormatted.draw(context, MultilineText.Alignment.CENTER, centerX,
+		context.drawCenteredString(font, title, centerX, titleY,
+			CommonColors.LIGHT_GRAY);
+		reasonFormatted.render(context, MultiLineLabel.Align.CENTER, centerX,
 			reasonY, 9, true, -1);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
@@ -126,17 +126,17 @@ public final class ForcedChatReportsScreen extends Screen
 		return false;
 	}
 	
-	public static boolean isCausedByNoChatReports(Text disconnectReason)
+	public static boolean isCausedByNoChatReports(Component disconnectReason)
 	{
 		if(!WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
 			return false;
 		
-		if(disconnectReason.getContent() instanceof TranslatableTextContent tr
+		if(disconnectReason.getContents() instanceof TranslatableContents tr
 			&& TRANSLATABLE_DISCONNECT_REASONS.contains(tr.getKey()))
 			return true;
 		
-		if(disconnectReason.getContent() instanceof Literal lt
-			&& LITERAL_DISCONNECT_REASONS.contains(lt.string()))
+		if(disconnectReason.getContents() instanceof LiteralContents lt
+			&& LITERAL_DISCONNECT_REASONS.contains(lt.text()))
 			return true;
 		
 		return false;

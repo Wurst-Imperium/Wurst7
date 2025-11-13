@@ -11,7 +11,7 @@ import static net.wurstclient.gametest.WurstClientTestHelper.*;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Items;
 import net.wurstclient.gametest.WurstTest;
 
 public enum GiveCmdTest

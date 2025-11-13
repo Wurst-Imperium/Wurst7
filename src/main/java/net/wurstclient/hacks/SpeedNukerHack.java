@@ -12,9 +12,9 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.LeftClickListener;
@@ -87,8 +87,8 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		if(commonSettings.isIdModeWithAir())
 			return;
 		
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		Vec3 eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
@@ -98,12 +98,12 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 				.filter(commonSettings::shouldBreakBlock);
 		
 		if(commonSettings.isSphereShape())
-			stream = stream
-				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq);
+			stream =
+				stream.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq);
 		
 		ArrayList<BlockPos> blocks = stream
-			.sorted(Comparator
-				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
+			.sorted(
+				Comparator.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
 		
 		if(blocks.isEmpty())
@@ -111,6 +111,6 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		
 		WURST.getHax().autoToolHack.equipIfEnabled(blocks.get(0));
 		BlockBreaker.breakBlocksWithPacketSpam(blocks);
-		swingHand.swing(Hand.MAIN_HAND);
+		swingHand.swing(InteractionHand.MAIN_HAND);
 	}
 }

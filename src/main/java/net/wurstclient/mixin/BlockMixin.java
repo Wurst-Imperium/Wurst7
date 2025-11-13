@@ -12,17 +12,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemConvertible;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hack.HackList;
 
 @Mixin(Block.class)
-public abstract class BlockMixin implements ItemConvertible
+public abstract class BlockMixin implements ItemLike
 {
-	@Inject(at = @At("HEAD"),
-		method = "getVelocityMultiplier()F",
-		cancellable = true)
+	@Inject(at = @At("HEAD"), method = "getSpeedFactor()F", cancellable = true)
 	private void onGetVelocityMultiplier(CallbackInfoReturnable<Float> cir)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();

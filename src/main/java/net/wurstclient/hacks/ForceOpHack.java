@@ -61,7 +61,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 		try
 		{
 			process = MultiProcessingUtils.startProcessWithIO(
-				ForceOpDialog.class, MC.getSession().getUsername());
+				ForceOpDialog.class, MC.getUser().getName());
 			
 			new Thread(this::handleDialogOutput, "ForceOP dialog output")
 				.start();
@@ -172,8 +172,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			return;
 		}
 		
-		MC.getNetworkHandler()
-			.sendChatCommand("login " + MC.getSession().getUsername());
+		MC.getConnection().sendCommand("login " + MC.getUser().getName());
 		lastPW = 0;
 		sendIndexToDialog();
 		
@@ -203,8 +202,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			while(!sent)
 				try
 				{
-					MC.getNetworkHandler()
-						.sendChatCommand("login " + passwords[i]);
+					MC.getConnection().sendCommand("login " + passwords[i]);
 					sent = true;
 					
 				}catch(Exception e)
@@ -267,7 +265,7 @@ public final class ForceOpHack extends Hack implements ChatInputListener
 			
 			String password;
 			if(lastPW == 0)
-				password = MC.getSession().getUsername();
+				password = MC.getUser().getName();
 			else
 				password = passwords[lastPW - 1];
 			

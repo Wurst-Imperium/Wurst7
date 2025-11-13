@@ -7,7 +7,7 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
@@ -24,11 +24,11 @@ public final class LeaveCmd extends Command
 	{
 		if(args.length == 1 && args[0].equalsIgnoreCase("taco"))
 			for(int i = 0; i < 128; i++)
-				MC.getNetworkHandler().sendChatMessage("Taco!");
+				MC.getConnection().sendChat("Taco!");
 		else if(args.length != 0)
 			throw new CmdSyntaxError();
 		
-		MC.world.disconnect(ClientWorld.QUITTING_MULTIPLAYER_TEXT);
+		MC.level.disconnect(ClientLevel.DEFAULT_QUIT_MESSAGE);
 	}
 	
 	@Override

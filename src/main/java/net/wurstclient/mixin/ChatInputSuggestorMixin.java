@@ -18,21 +18,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.brigadier.suggestion.Suggestions;
 
-import net.minecraft.client.gui.screen.ChatInputSuggestor;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.components.CommandSuggestions;
+import net.minecraft.client.gui.components.EditBox;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoCompleteHack;
 
-@Mixin(ChatInputSuggestor.class)
+@Mixin(CommandSuggestions.class)
 public abstract class ChatInputSuggestorMixin
 {
 	@Shadow
 	@Final
-	private TextFieldWidget textField;
+	private EditBox input;
 	@Shadow
 	private CompletableFuture<Suggestions> pendingSuggestions;
 	
-	@Inject(at = @At("TAIL"), method = "refresh()V")
+	@Inject(at = @At("TAIL"), method = "updateCommandInfo()V")
 	private void onRefresh(CallbackInfo ci)
 	{
 		AutoCompleteHack autoComplete =
@@ -41,14 +41,14 @@ public abstract class ChatInputSuggestorMixin
 			return;
 		
 		String draftMessage =
-			textField.getText().substring(0, textField.getCursor());
+			input.getValue().substring(0, input.getCursorPosition());
 		autoComplete.onRefresh(draftMessage, (builder, suggestion) -> {
-			textField.setSuggestion(suggestion);
+			input.setSuggestion(suggestion);
 			pendingSuggestions = builder.buildFuture();
-			show(false);
+			showSuggestions(false);
 		});
 	}
 	
 	@Shadow
-	public abstract void show(boolean narrateFirstSuggestion);
+	public abstract void showSuggestions(boolean narrateFirstSuggestion);
 }

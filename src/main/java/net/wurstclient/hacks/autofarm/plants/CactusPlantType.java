@@ -7,14 +7,14 @@
  */
 package net.wurstclient.hacks.autofarm.plants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
@@ -24,10 +24,10 @@ public final class CactusPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean isReplantingSpot(BlockPos pos, BlockState state)
 	{
-		if(!state.isOf(Blocks.CACTUS))
+		if(!state.is(Blocks.CACTUS))
 			return false;
 		
-		return !BlockUtils.getState(pos.down()).isOf(Blocks.CACTUS)
+		return !BlockUtils.getState(pos.below()).is(Blocks.CACTUS)
 			&& hasPlantingSurface(pos);
 	}
 	
@@ -36,14 +36,14 @@ public final class CactusPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		BlockPos floorPos = pos.down();
+		BlockPos floorPos = pos.below();
 		BlockState floor = BlockUtils.getState(floorPos);
-		if(!floor.isIn(BlockTags.SAND))
+		if(!floor.is(BlockTags.SAND))
 			return false;
 		
-		return Direction.Type.HORIZONTAL.stream().map(pos::offset)
+		return Direction.Plane.HORIZONTAL.stream().map(pos::relative)
 			.map(BlockUtils::getState).noneMatch(neighbor -> neighbor.isSolid()
-				|| neighbor.getFluidState().isIn(FluidTags.LAVA));
+				|| neighbor.getFluidState().is(FluidTags.LAVA));
 	}
 	
 	@Override
@@ -55,10 +55,10 @@ public final class CactusPlantType extends AutoFarmPlantType
 	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
-		if(!state.isOf(Blocks.CACTUS) && !state.isOf(Blocks.CACTUS_FLOWER))
+		if(!state.is(Blocks.CACTUS) && !state.is(Blocks.CACTUS_FLOWER))
 			return false;
 		
-		BlockPos below = pos.down();
+		BlockPos below = pos.below();
 		return isReplantingSpot(below, BlockUtils.getState(below));
 	}
 	

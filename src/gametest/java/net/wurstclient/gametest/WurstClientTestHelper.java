@@ -24,6 +24,7 @@ import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -34,12 +35,11 @@ import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotCompa
 import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotComparisonAlgorithm.RawImage;
 import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotComparisonAlgorithms.RawImageImpl;
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
 public enum WurstClientTestHelper
 {
@@ -99,7 +99,7 @@ public enum WurstClientTestHelper
 	
 	private static boolean[][] alphaChannelToMask(NativeImage template)
 	{
-		if(!template.getFormat().hasAlpha())
+		if(!template.format().hasAlpha())
 		{
 			int width = template.getWidth();
 			int height = template.getHeight();
@@ -115,15 +115,15 @@ public enum WurstClientTestHelper
 		boolean[][] mask = new boolean[width][height];
 		
 		int size = width * height;
-		int alphaOffset = template.getFormat().getAlphaOffset() / 8;
-		int channelCount = template.getFormat().getChannelCount();
+		int alphaOffset = template.format().alphaOffset() / 8;
+		int channelCount = template.format().components();
 		
 		for(int i = 0; i < size; i++)
 		{
 			int x = i % width;
 			int y = i / width;
 			int alpha = MemoryUtil.memGetByte(
-				template.imageId() + i * channelCount + alphaOffset) & 0xff;
+				template.getPointer() + i * channelCount + alphaOffset) & 0xff;
 			mask[x][y] = alpha > 127;
 		}
 		
@@ -172,7 +172,7 @@ public enum WurstClientTestHelper
 	public static void hideSplashTexts(ClientGameTestContext context)
 	{
 		context.runOnClient(mc -> {
-			mc.options.getHideSplashTexts().setValue(true);
+			mc.options.hideSplashTexts().set(true);
 		});
 	}
 	
@@ -183,10 +183,10 @@ public enum WurstClientTestHelper
 	public static void waitForTitleScreenFade(ClientGameTestContext context)
 	{
 		context.waitFor(mc -> {
-			if(!(mc.currentScreen instanceof TitleScreen titleScreen))
+			if(!(mc.screen instanceof TitleScreen titleScreen))
 				return false;
 			
-			return !titleScreen.doBackgroundFade;
+			return !titleScreen.fading;
 		});
 	}
 	
@@ -194,9 +194,9 @@ public enum WurstClientTestHelper
 	{
 		String commandWithPlayer = "execute as @p at @s run " + command;
 		server.runOnServer(mc -> {
-			ParseResults<ServerCommandSource> results =
-				mc.getCommandManager().getDispatcher().parse(commandWithPlayer,
-					mc.getCommandSource());
+			ParseResults<CommandSourceStack> results =
+				mc.getCommands().getDispatcher().parse(commandWithPlayer,
+					mc.createCommandSourceStack());
 			
 			if(!results.getExceptions().isEmpty())
 			{
@@ -208,7 +208,7 @@ public enum WurstClientTestHelper
 				throw new RuntimeException(errors.toString());
 			}
 			
-			mc.getCommandManager().execute(results, commandWithPlayer);
+			mc.getCommands().performCommand(results, commandWithPlayer);
 		});
 	}
 	
@@ -288,14 +288,14 @@ public enum WurstClientTestHelper
 	public static void waitForBlock(ClientGameTestContext context, int relX,
 		int relY, int relZ, Block block)
 	{
-		context.waitFor(mc -> mc.world
-			.getBlockState(mc.player.getBlockPos().add(relX, relY, relZ))
+		context.waitFor(mc -> mc.level
+			.getBlockState(mc.player.blockPosition().offset(relX, relY, relZ))
 			.getBlock() == block);
 	}
 	
 	public static void clearChat(ClientGameTestContext context)
 	{
-		context.runOnClient(mc -> mc.inGameHud.getChatHud().clear(true));
+		context.runOnClient(mc -> mc.gui.getChat().clearMessages(true));
 	}
 	
 	public static void clearInventory(ClientGameTestContext context)
@@ -308,7 +308,7 @@ public enum WurstClientTestHelper
 	
 	public static void clearParticles(ClientGameTestContext context)
 	{
-		context.runOnClient(mc -> mc.particleManager.clearParticles());
+		context.runOnClient(mc -> mc.particleEngine.clearParticles());
 	}
 	
 	public static void clearToasts(ClientGameTestContext context)
@@ -320,8 +320,8 @@ public enum WurstClientTestHelper
 		int slot, Item item)
 	{
 		ItemStack stack = context
-			.computeOnClient(mc -> mc.player.getInventory().getStack(slot));
-		if(!stack.isOf(item) || stack.getCount() != 1)
+			.computeOnClient(mc -> mc.player.getInventory().getItem(slot));
+		if(!stack.is(item) || stack.getCount() != 1)
 			throw new RuntimeException(
 				"Expected 1 " + item.getName().getString() + " at slot " + slot
 					+ ", found " + stack.getCount() + " "
@@ -332,7 +332,7 @@ public enum WurstClientTestHelper
 		int slot)
 	{
 		ItemStack stack = context
-			.computeOnClient(mc -> mc.player.getInventory().getStack(slot));
+			.computeOnClient(mc -> mc.player.getInventory().getItem(slot));
 		if(!stack.isEmpty())
 			throw new RuntimeException("Expected no item in slot " + slot
 				+ ", found " + stack.getCount() + " "

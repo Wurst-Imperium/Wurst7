@@ -9,7 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayDeque;
 
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -30,7 +30,8 @@ public final class BlinkHack extends Hack
 			+ "0 = no limit",
 		0, 0, 500, 1, ValueDisplay.INTEGER.withLabel(0, "disabled"));
 	
-	private final ArrayDeque<PlayerMoveC2SPacket> packets = new ArrayDeque<>();
+	private final ArrayDeque<ServerboundMovePlayerPacket> packets =
+		new ArrayDeque<>();
 	private FakePlayerEntity fakePlayer;
 	
 	public BlinkHack()
@@ -65,7 +66,7 @@ public final class BlinkHack extends Hack
 		EVENTS.remove(PacketOutputListener.class, this);
 		
 		fakePlayer.despawn();
-		packets.forEach(p -> MC.player.networkHandler.sendPacket(p));
+		packets.forEach(p -> MC.player.connection.send(p));
 		packets.clear();
 	}
 	
@@ -85,17 +86,18 @@ public final class BlinkHack extends Hack
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
-		if(!(event.getPacket() instanceof PlayerMoveC2SPacket))
+		if(!(event.getPacket() instanceof ServerboundMovePlayerPacket))
 			return;
 		
 		event.cancel();
 		
-		PlayerMoveC2SPacket packet = (PlayerMoveC2SPacket)event.getPacket();
-		PlayerMoveC2SPacket prevPacket = packets.peekLast();
+		ServerboundMovePlayerPacket packet =
+			(ServerboundMovePlayerPacket)event.getPacket();
+		ServerboundMovePlayerPacket prevPacket = packets.peekLast();
 		
 		if(prevPacket != null && packet.isOnGround() == prevPacket.isOnGround()
-			&& packet.getYaw(-1) == prevPacket.getYaw(-1)
-			&& packet.getPitch(-1) == prevPacket.getPitch(-1)
+			&& packet.getYRot(-1) == prevPacket.getYRot(-1)
+			&& packet.getXRot(-1) == prevPacket.getXRot(-1)
 			&& packet.getX(-1) == prevPacket.getX(-1)
 			&& packet.getY(-1) == prevPacket.getY(-1)
 			&& packet.getZ(-1) == prevPacket.getZ(-1))

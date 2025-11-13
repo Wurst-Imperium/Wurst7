@@ -10,13 +10,13 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.item.ItemGroups;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
@@ -72,41 +72,41 @@ public final class InvWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		Screen screen = MC.currentScreen;
+		Screen screen = MC.screen;
 		if(screen == null)
 			return;
 		
 		if(!isAllowedScreen(screen))
 			return;
 		
-		ArrayList<KeyBinding> keys =
-			new ArrayList<>(Arrays.asList(MC.options.forwardKey,
-				MC.options.backKey, MC.options.leftKey, MC.options.rightKey));
+		ArrayList<KeyMapping> keys =
+			new ArrayList<>(Arrays.asList(MC.options.keyUp, MC.options.keyDown,
+				MC.options.keyLeft, MC.options.keyRight));
 		
 		if(allowSneak.isChecked())
-			keys.add(MC.options.sneakKey);
+			keys.add(MC.options.keyShift);
 		
 		if(allowSprint.isChecked())
-			keys.add(MC.options.sprintKey);
+			keys.add(MC.options.keySprint);
 		
 		if(allowJump.isChecked())
-			keys.add(MC.options.jumpKey);
+			keys.add(MC.options.keyJump);
 		
-		for(KeyBinding key : keys)
+		for(KeyMapping key : keys)
 			IKeyBinding.get(key).resetPressedState();
 	}
 	
 	private boolean isAllowedScreen(Screen screen)
 	{
 		if((screen instanceof InventoryScreen
-			|| screen instanceof CreativeInventoryScreen)
+			|| screen instanceof CreativeModeInventoryScreen)
 			&& !isCreativeSearchBarOpen(screen))
 			return true;
 		
 		if(allowClickGUI.isChecked() && screen instanceof ClickGuiScreen)
 			return true;
 		
-		if(allowOther.isChecked() && screen instanceof HandledScreen
+		if(allowOther.isChecked() && screen instanceof AbstractContainerScreen
 			&& !hasTextBox(screen))
 			return true;
 		
@@ -115,16 +115,15 @@ public final class InvWalkHack extends Hack implements UpdateListener
 	
 	private boolean isCreativeSearchBarOpen(Screen screen)
 	{
-		if(!(screen instanceof CreativeInventoryScreen))
+		if(!(screen instanceof CreativeModeInventoryScreen))
 			return false;
 		
-		return CreativeInventoryScreen.selectedTab == ItemGroups
-			.getSearchGroup();
+		return CreativeModeInventoryScreen.selectedTab == CreativeModeTabs
+			.searchTab();
 	}
 	
 	private boolean hasTextBox(Screen screen)
 	{
-		return screen.children().stream()
-			.anyMatch(TextFieldWidget.class::isInstance);
+		return screen.children().stream().anyMatch(EditBox.class::isInstance);
 	}
 }

@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;

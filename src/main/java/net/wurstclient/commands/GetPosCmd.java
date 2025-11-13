@@ -7,7 +7,7 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
@@ -24,7 +24,7 @@ public final class GetPosCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		BlockPos pos = BlockPos.ofFloored(MC.player.getEntityPos());
+		BlockPos pos = BlockPos.containing(MC.player.position());
 		String posString = pos.getX() + " " + pos.getY() + " " + pos.getZ();
 		
 		switch(String.join(" ", args).toLowerCase())
@@ -34,7 +34,7 @@ public final class GetPosCmd extends Command
 			break;
 			
 			case "copy":
-			MC.keyboard.setClipboard(posString);
+			MC.keyboardHandler.setClipboard(posString);
 			ChatUtils.message("Position copied to clipboard.");
 			break;
 			

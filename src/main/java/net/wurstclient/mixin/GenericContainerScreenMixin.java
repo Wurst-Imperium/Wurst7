@@ -12,30 +12,29 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ChestMenu;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
 
-@Mixin(GenericContainerScreen.class)
+@Mixin(ContainerScreen.class)
 public abstract class GenericContainerScreenMixin
-	extends HandledScreen<GenericContainerScreenHandler>
+	extends AbstractContainerScreen<ChestMenu>
 {
 	@Shadow
 	@Final
-	private int rows;
+	private int containerRows;
 	
 	@Unique
 	private final AutoStealHack autoSteal =
 		WurstClient.INSTANCE.getHax().autoStealHack;
 	
-	public GenericContainerScreenMixin(WurstClient wurst,
-		GenericContainerScreenHandler container,
-		PlayerInventory playerInventory, Text name)
+	public GenericContainerScreenMixin(WurstClient wurst, ChestMenu container,
+		Inventory playerInventory, Component name)
 	{
 		super(container, playerInventory, name);
 	}
@@ -50,18 +49,19 @@ public abstract class GenericContainerScreenMixin
 		
 		if(autoSteal.areButtonsVisible())
 		{
-			addDrawableChild(ButtonWidget
-				.builder(Text.literal("Steal"),
-					b -> autoSteal.steal(this, rows))
-				.dimensions(x + backgroundWidth - 108, y + 4, 50, 12).build());
+			addRenderableWidget(Button
+				.builder(Component.literal("Steal"),
+					b -> autoSteal.steal(this, containerRows))
+				.bounds(leftPos + imageWidth - 108, topPos + 4, 50, 12)
+				.build());
 			
-			addDrawableChild(ButtonWidget
-				.builder(Text.literal("Store"),
-					b -> autoSteal.store(this, rows))
-				.dimensions(x + backgroundWidth - 56, y + 4, 50, 12).build());
+			addRenderableWidget(Button
+				.builder(Component.literal("Store"),
+					b -> autoSteal.store(this, containerRows))
+				.bounds(leftPos + imageWidth - 56, topPos + 4, 50, 12).build());
 		}
 		
 		if(autoSteal.isEnabled())
-			autoSteal.steal(this, rows);
+			autoSteal.steal(this, containerRows);
 	}
 }

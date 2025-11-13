@@ -43,7 +43,7 @@ public final class AutoRespawnHack extends Hack implements DeathListener
 	@Override
 	public void onDeath()
 	{
-		MC.player.requestRespawn();
+		MC.player.respawn();
 		MC.setScreen(null);
 	}
 	

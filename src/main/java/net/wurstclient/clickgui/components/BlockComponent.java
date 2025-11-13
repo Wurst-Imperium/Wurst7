@@ -9,12 +9,12 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.Window;
@@ -25,7 +25,7 @@ import net.wurstclient.util.RenderUtils;
 public final class BlockComponent extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	private static final int BLOCK_WIDTH = 24;
 	
 	private final BlockSetting setting;
@@ -39,7 +39,7 @@ public final class BlockComponent extends Component
 	
 	@Override
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
-		Click context)
+		MouseButtonEvent context)
 	{
 		if(mouseX < getX() + getWidth() - BLOCK_WIDTH)
 			return;
@@ -47,7 +47,7 @@ public final class BlockComponent extends Component
 		switch(mouseButton)
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
-			MC.setScreen(new EditBlockScreen(MC.currentScreen, setting));
+			MC.setScreen(new EditBlockScreen(MC.screen, setting));
 			break;
 			
 			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
@@ -57,7 +57,7 @@ public final class BlockComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -81,11 +81,11 @@ public final class BlockComponent extends Component
 			RenderUtils.toIntColor(GUI.getBgColor(), GUI.getOpacity());
 		context.fill(x1, y1, x2, y2, bgColor);
 		
-		context.state.goUpLayer();
+		context.guiRenderState.up();
 		
 		// text
 		String name = setting.getName() + ":";
-		context.drawText(TR, name, x1, y1 + 2, GUI.getTxtColor(), false);
+		context.drawString(TR, name, x1, y1 + 2, GUI.getTxtColor(), false);
 		
 		// block
 		ItemStack stack = new ItemStack(setting.getBlock());
@@ -106,17 +106,17 @@ public final class BlockComponent extends Component
 	private String getBlockTooltip()
 	{
 		Block block = setting.getBlock();
-		BlockState state = block.getDefaultState();
+		BlockState state = block.defaultBlockState();
 		ItemStack stack = new ItemStack(block);
 		
 		String translatedName = stack.isEmpty() ? "\u00a7ounknown block\u00a7r"
-			: stack.getName().getString();
+			: stack.getHoverName().getString();
 		String tooltip = "\u00a76Name:\u00a7r " + translatedName;
 		
 		String blockId = setting.getBlockName();
 		tooltip += "\n\u00a76ID:\u00a7r " + blockId;
 		
-		int blockNumber = Block.getRawIdFromState(state);
+		int blockNumber = Block.getId(state);
 		tooltip += "\n\u00a76Block #:\u00a7r " + blockNumber;
 		
 		tooltip += "\n\n\u00a7e[left-click]\u00a7r to edit";
@@ -128,7 +128,7 @@ public final class BlockComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return TR.getWidth(setting.getName() + ":") + BLOCK_WIDTH + 4;
+		return TR.width(setting.getName() + ":") + BLOCK_WIDTH + 4;
 	}
 	
 	@Override

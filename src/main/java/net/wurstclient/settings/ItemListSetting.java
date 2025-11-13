@@ -20,9 +20,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.ItemListEditButton;
@@ -41,10 +41,11 @@ public final class ItemListSetting extends Setting
 		super(name, description);
 		
 		Arrays.stream(items).parallel()
-			.map(s -> Registries.ITEM.get(Identifier.of(s)))
+			.map(
+				s -> BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(s)))
 			.filter(Objects::nonNull)
-			.map(i -> Registries.ITEM.getId(i).toString()).distinct().sorted()
-			.forEachOrdered(s -> itemNames.add(s));
+			.map(i -> BuiltInRegistries.ITEM.getKey(i).toString()).distinct()
+			.sorted().forEachOrdered(s -> itemNames.add(s));
 		defaultNames = itemNames.toArray(new String[0]);
 	}
 	
@@ -60,7 +61,7 @@ public final class ItemListSetting extends Setting
 	
 	public void add(Item item)
 	{
-		String name = Registries.ITEM.getId(item).toString();
+		String name = BuiltInRegistries.ITEM.getKey(item).toString();
 		if(Collections.binarySearch(itemNames, name) >= 0)
 			return;
 		
@@ -107,10 +108,11 @@ public final class ItemListSetting extends Setting
 			
 			// otherwise, load the items in the JSON array
 			JsonUtils.getAsArray(json).getAllStrings().parallelStream()
-				.map(s -> Registries.ITEM.get(Identifier.of(s)))
+				.map(s -> BuiltInRegistries.ITEM
+					.getValue(ResourceLocation.parse(s)))
 				.filter(Objects::nonNull)
-				.map(i -> Registries.ITEM.getId(i).toString()).distinct()
-				.sorted().forEachOrdered(s -> itemNames.add(s));
+				.map(i -> BuiltInRegistries.ITEM.getKey(i).toString())
+				.distinct().sorted().forEachOrdered(s -> itemNames.add(s));
 			
 		}catch(JsonException e)
 		{

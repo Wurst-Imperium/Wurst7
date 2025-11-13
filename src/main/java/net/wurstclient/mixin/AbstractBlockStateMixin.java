@@ -16,17 +16,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.mojang.serialization.MapCodec;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
-import net.minecraft.block.AbstractBlock.AbstractBlockState;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.state.State;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateHolder;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOcclusionLightLevelEvent;
@@ -34,8 +34,9 @@ import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.hacks.HandNoClipHack;
 
-@Mixin(AbstractBlockState.class)
-public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
+@Mixin(BlockStateBase.class)
+public abstract class AbstractBlockStateMixin
+	extends StateHolder<Block, BlockState>
 {
 	private AbstractBlockStateMixin(WurstClient wurst, Block owner,
 		Reference2ObjectArrayMap<Property<?>, Comparable<?>> propertyMap,
@@ -45,9 +46,9 @@ public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "isFullCube(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Z",
+		method = "isCollisionShapeFullBlock(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Z",
 		cancellable = true)
-	private void onIsFullCube(BlockView world, BlockPos pos,
+	private void onIsFullCube(BlockGetter world, BlockPos pos,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		IsNormalCubeEvent event = new IsNormalCubeEvent();
@@ -57,9 +58,9 @@ public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "getAmbientOcclusionLightLevel(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F",
+		method = "getShadeBrightness(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F",
 		cancellable = true)
-	private void onGetAmbientOcclusionLightLevel(BlockView blockView,
+	private void onGetAmbientOcclusionLightLevel(BlockGetter blockView,
 		BlockPos blockPos, CallbackInfoReturnable<Float> cir)
 	{
 		GetAmbientOcclusionLightLevelEvent event =
@@ -71,12 +72,12 @@ public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getOutlineShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;",
+		method = "getShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
 		cancellable = true)
-	private void onGetOutlineShape(BlockView view, BlockPos pos,
-		ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)
+	private void onGetOutlineShape(BlockGetter view, BlockPos pos,
+		CollisionContext context, CallbackInfoReturnable<VoxelShape> cir)
 	{
-		if(context == ShapeContext.absent())
+		if(context == CollisionContext.empty())
 			return;
 		
 		HackList hax = WurstClient.INSTANCE.getHax();
@@ -87,14 +88,14 @@ public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 		if(!handNoClipHack.isEnabled() || handNoClipHack.isBlockInList(pos))
 			return;
 		
-		cir.setReturnValue(VoxelShapes.empty());
+		cir.setReturnValue(Shapes.empty());
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getCollisionShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;",
+		method = "getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
 		cancellable = true)
-	private void onGetCollisionShape(BlockView world, BlockPos pos,
-		ShapeContext context, CallbackInfoReturnable<VoxelShape> cir)
+	private void onGetCollisionShape(BlockGetter world, BlockPos pos,
+		CollisionContext context, CallbackInfoReturnable<VoxelShape> cir)
 	{
 		if(getFluidState().isEmpty())
 			return;
@@ -103,7 +104,7 @@ public abstract class AbstractBlockStateMixin extends State<Block, BlockState>
 		if(hax == null || !hax.jesusHack.shouldBeSolid())
 			return;
 		
-		cir.setReturnValue(VoxelShapes.fullCube());
+		cir.setReturnValue(Shapes.block());
 		cir.cancel();
 	}
 	

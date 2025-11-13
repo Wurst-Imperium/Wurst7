@@ -9,10 +9,11 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.ai.PathFinder;
@@ -57,7 +58,7 @@ public final class AntiAfkHack extends Hack
 			"description.wurst.setting.antiafk.show_wait_time", true);
 	
 	private int timer;
-	private Random random = Random.createLocal();
+	private RandomSource random = RandomSource.createNewThreadLocalInstance();
 	private BlockPos start;
 	private BlockPos nextBlock;
 	
@@ -90,7 +91,7 @@ public final class AntiAfkHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		start = BlockPos.ofFloored(MC.player.getEntityPos());
+		start = BlockPos.containing(MC.player.position());
 		nextBlock = null;
 		pathFinder =
 			new RandomPathFinder(randomize(start, aiRange.getValueI(), true));
@@ -127,10 +128,10 @@ public final class AntiAfkHack extends Hack
 		if(useAi.isChecked())
 		{
 			// prevent drowning
-			if(MC.player.isSubmergedInWater()
+			if(MC.player.isUnderWater()
 				&& !WURST.getHax().jesusHack.isEnabled())
 			{
-				MC.options.jumpKey.setPressed(true);
+				MC.options.keyJump.setDown(true);
 				return;
 			}
 			
@@ -188,16 +189,16 @@ public final class AntiAfkHack extends Hack
 			
 			// face block
 			WURST.getRotationFaker()
-				.faceVectorClientIgnorePitch(Vec3d.ofCenter(nextBlock));
+				.faceVectorClientIgnorePitch(Vec3.atCenterOf(nextBlock));
 			
 			// walk
-			if(MC.player.squaredDistanceTo(Vec3d.ofCenter(nextBlock)) > 0.5)
-				MC.options.forwardKey.setPressed(true);
+			if(MC.player.distanceToSqr(Vec3.atCenterOf(nextBlock)) > 0.5)
+				MC.options.keyUp.setDown(true);
 			else
-				MC.options.forwardKey.setPressed(false);
+				MC.options.keyUp.setDown(false);
 			
 			// swim up
-			MC.options.jumpKey.setPressed(MC.player.isTouchingWater());
+			MC.options.keyJump.setDown(MC.player.isInWater());
 			
 			// update timer
 			if(timer > 0)
@@ -206,7 +207,7 @@ public final class AntiAfkHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(!useAi.isChecked())
 			return;
@@ -230,7 +231,7 @@ public final class AntiAfkHack extends Hack
 		int x = random.nextInt(2 * range + 1) - range;
 		int y = includeY ? random.nextInt(2 * range + 1) - range : 0;
 		int z = random.nextInt(2 * range + 1) - range;
-		return pos.add(x, y, z);
+		return pos.offset(x, y, z);
 	}
 	
 	private class RandomPathFinder extends PathFinder

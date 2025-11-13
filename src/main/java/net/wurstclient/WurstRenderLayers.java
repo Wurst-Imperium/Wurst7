@@ -9,85 +9,94 @@ package net.wurstclient;
 
 import java.util.OptionalDouble;
 
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
 
 public enum WurstRenderLayers
 {
 	;
 	
 	/**
-	 * Similar to {@link RenderLayer#getLines()}, but with line width 2.
+	 * Similar to {@link RenderType#lines()}, but with line width 2.
 	 */
-	public static final RenderLayer.MultiPhase LINES = RenderLayer.of(
-		"wurst:lines", 1536, WurstShaderPipelines.DEPTH_TEST_LINES,
-		RenderLayer.MultiPhaseParameters.builder()
-			.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-			.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-			.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+	public static final RenderType.CompositeRenderType LINES = RenderType
+		.create("wurst:lines", 1536, WurstShaderPipelines.DEPTH_TEST_LINES,
+			RenderType.CompositeState.builder()
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(2)))
+				.setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
+				.setOutputState(RenderType.ITEM_ENTITY_TARGET)
+				.createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
+	 * Similar to {@link RenderType#lines()}, but with line width 2 and no
 	 * depth test.
 	 */
-	public static final RenderLayer.MultiPhase ESP_LINES =
-		RenderLayer.of("wurst:esp_lines", 1536, WurstShaderPipelines.ESP_LINES,
-			RenderLayer.MultiPhaseParameters.builder()
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+	public static final RenderType.CompositeRenderType ESP_LINES = RenderType
+		.create("wurst:esp_lines", 1536, WurstShaderPipelines.ESP_LINES,
+			RenderType.CompositeState.builder()
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(2)))
+				.setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
+				.setOutputState(RenderType.ITEM_ENTITY_TARGET)
+				.createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2.
+	 * Similar to {@link RenderType#lineStrip()}, but with line width 2.
 	 */
-	public static final RenderLayer.MultiPhase LINE_STRIP =
-		RenderLayer.of("wurst:line_strip", 1536, false, true,
+	public static final RenderType.CompositeRenderType LINE_STRIP =
+		RenderType.create("wurst:line_strip", 1536, false, true,
 			WurstShaderPipelines.DEPTH_TEST_LINE_STRIP,
-			RenderLayer.MultiPhaseParameters.builder()
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+			RenderType.CompositeState.builder()
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(2)))
+				.setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
+				.setOutputState(RenderType.ITEM_ENTITY_TARGET)
+				.createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2 and
+	 * Similar to {@link RenderType#lineStrip()}, but with line width 2 and
 	 * no depth test.
 	 */
-	public static final RenderLayer.MultiPhase ESP_LINE_STRIP =
-		RenderLayer.of("wurst:esp_line_strip", 1536, false, true,
+	public static final RenderType.CompositeRenderType ESP_LINE_STRIP =
+		RenderType.create("wurst:esp_line_strip", 1536, false, true,
 			WurstShaderPipelines.ESP_LINE_STRIP,
-			RenderLayer.MultiPhaseParameters.builder()
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.target(RenderLayer.ITEM_ENTITY_TARGET).build(false));
+			RenderType.CompositeState.builder()
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(2)))
+				.setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
+				.setOutputState(RenderType.ITEM_ENTITY_TARGET)
+				.createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled.
+	 * Similar to {@link RenderType#debugQuads()}, but with culling enabled.
 	 */
-	public static final RenderLayer.MultiPhase QUADS = RenderLayer.of(
-		"wurst:quads", 1536, false, true, WurstShaderPipelines.QUADS,
-		RenderLayer.MultiPhaseParameters.builder().build(false));
+	public static final RenderType.CompositeRenderType QUADS = RenderType
+		.create("wurst:quads", 1536, false, true, WurstShaderPipelines.QUADS,
+			RenderType.CompositeState.builder().createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled
+	 * Similar to {@link RenderType#debugQuads()}, but with culling enabled
 	 * and no depth test.
 	 */
-	public static final RenderLayer.MultiPhase ESP_QUADS = RenderLayer.of(
-		"wurst:esp_quads", 1536, false, true, WurstShaderPipelines.ESP_QUADS,
-		RenderLayer.MultiPhaseParameters.builder().build(false));
+	public static final RenderType.CompositeRenderType ESP_QUADS =
+		RenderType.create("wurst:esp_quads", 1536, false, true,
+			WurstShaderPipelines.ESP_QUADS,
+			RenderType.CompositeState.builder().createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugQuads()}, but with no depth test.
+	 * Similar to {@link RenderType#debugQuads()}, but with no depth test.
 	 */
-	public static final RenderLayer.MultiPhase ESP_QUADS_NO_CULLING =
-		RenderLayer.of("wurst:esp_quads_no_culling", 1536, false, true,
+	public static final RenderType.CompositeRenderType ESP_QUADS_NO_CULLING =
+		RenderType.create("wurst:esp_quads_no_culling", 1536, false, true,
 			WurstShaderPipelines.ESP_QUADS_NO_CULLING,
-			RenderLayer.MultiPhaseParameters.builder().build(false));
+			RenderType.CompositeState.builder().createCompositeState(false));
 	
 	/**
 	 * Returns either {@link #QUADS} or {@link #ESP_QUADS} depending on the
 	 * value of {@code depthTest}.
 	 */
-	public static RenderLayer.MultiPhase getQuads(boolean depthTest)
+	public static RenderType.CompositeRenderType getQuads(boolean depthTest)
 	{
 		return depthTest ? QUADS : ESP_QUADS;
 	}
@@ -96,7 +105,7 @@ public enum WurstRenderLayers
 	 * Returns either {@link #LINES} or {@link #ESP_LINES} depending on the
 	 * value of {@code depthTest}.
 	 */
-	public static RenderLayer.MultiPhase getLines(boolean depthTest)
+	public static RenderType.CompositeRenderType getLines(boolean depthTest)
 	{
 		return depthTest ? LINES : ESP_LINES;
 	}
@@ -105,7 +114,7 @@ public enum WurstRenderLayers
 	 * Returns either {@link #LINE_STRIP} or {@link #ESP_LINE_STRIP} depending
 	 * on the value of {@code depthTest}.
 	 */
-	public static RenderLayer.MultiPhase getLineStrip(boolean depthTest)
+	public static RenderType.CompositeRenderType getLineStrip(boolean depthTest)
 	{
 		return depthTest ? LINE_STRIP : ESP_LINE_STRIP;
 	}

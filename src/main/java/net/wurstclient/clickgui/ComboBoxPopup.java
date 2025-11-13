@@ -9,8 +9,8 @@ package net.wurstclient.clickgui;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.RenderUtils;
@@ -18,7 +18,7 @@ import net.wurstclient.util.RenderUtils;
 public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 {
 	private static final ClickGui GUI = WurstClient.INSTANCE.getGui();
-	private static final TextRenderer TR = WurstClient.MC.textRenderer;
+	private static final Font TR = WurstClient.MC.font;
 	
 	private final EnumSetting<T> setting;
 	private final int popupWidth;
@@ -62,7 +62,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY)
+	public void render(GuiGraphics context, int mouseX, int mouseY)
 	{
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -90,8 +90,8 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 			context.fill(x1, yi1, x2, yi2, RenderUtils.toIntColor(
 				GUI.getBgColor(), GUI.getOpacity() * (hValue ? 1.5F : 1)));
 			
-			context.state.goUpLayer();
-			context.drawText(TR, value.toString(), x1 + 2, yi1 + 2,
+			context.guiRenderState.up();
+			context.drawString(TR, value.toString(), x1 + 2, yi1 + 2,
 				GUI.getTxtColor(), false);
 		}
 	}

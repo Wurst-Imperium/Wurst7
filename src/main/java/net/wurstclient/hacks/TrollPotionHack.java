@@ -10,17 +10,17 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -46,7 +46,7 @@ public final class TrollPotionHack extends Hack
 	protected void onEnable()
 	{
 		// check gamemode
-		if(!MC.player.getAbilities().creativeMode)
+		if(!MC.player.getAbilities().instabuild)
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
@@ -57,8 +57,8 @@ public final class TrollPotionHack extends Hack
 		ItemStack stack = potionType.getSelected().createPotionStack();
 		
 		// give potion
-		PlayerInventory inventory = MC.player.getInventory();
-		int slot = inventory.getEmptySlot();
+		Inventory inventory = MC.player.getInventory();
+		int slot = inventory.getFreeSlot();
 		if(slot < 0)
 			ChatUtils.error("Cannot give potion. Your inventory is full.");
 		else
@@ -101,24 +101,23 @@ public final class TrollPotionHack extends Hack
 		{
 			ItemStack stack = new ItemStack(item);
 			
-			ArrayList<StatusEffectInstance> effects = new ArrayList<>();
+			ArrayList<MobEffectInstance> effects = new ArrayList<>();
 			for(int i = 1; i <= 23; i++)
 			{
-				StatusEffect effect =
-					Registries.STATUS_EFFECT.getEntry(i).get().value();
-				RegistryEntry<StatusEffect> entry =
-					Registries.STATUS_EFFECT.getEntry(effect);
+				MobEffect effect =
+					BuiltInRegistries.MOB_EFFECT.get(i).get().value();
+				Holder<MobEffect> entry =
+					BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect);
 				
-				effects.add(new StatusEffectInstance(entry, Integer.MAX_VALUE,
+				effects.add(new MobEffectInstance(entry, Integer.MAX_VALUE,
 					Integer.MAX_VALUE));
 			}
 			
-			stack.set(DataComponentTypes.POTION_CONTENTS,
-				new PotionContentsComponent(Optional.empty(), Optional.empty(),
-					effects, Optional.empty()));
+			stack.set(DataComponents.POTION_CONTENTS, new PotionContents(
+				Optional.empty(), Optional.empty(), effects, Optional.empty()));
 			
 			String name = "\u00a7f" + itemName + " of Trolling";
-			stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(name));
+			stack.set(DataComponents.CUSTOM_NAME, Component.literal(name));
 			
 			return stack;
 		}

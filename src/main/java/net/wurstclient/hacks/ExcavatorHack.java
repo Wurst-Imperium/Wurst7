@@ -16,16 +16,17 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Colors;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.ai.PathFinder;
 import net.wurstclient.ai.PathProcessor;
@@ -118,7 +119,7 @@ public final class ExcavatorHack extends Hack
 		posLookingAt = null;
 		area = null;
 		
-		MC.interactionManager.cancelBlockBreaking();
+		MC.gameMode.stopDestroyBlock();
 		overlay.resetProgress();
 		currentBlock = null;
 		
@@ -139,7 +140,7 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(pathFinder != null)
 		{
@@ -159,28 +160,27 @@ public final class ExcavatorHack extends Hack
 			// recently scanned blocks
 			if(step == Step.SCAN_AREA && area.progress < 1)
 			{
-				ArrayList<Box> boxes = new ArrayList<>();
+				ArrayList<AABB> boxes = new ArrayList<>();
 				for(int i = Math.max(0, area.blocksList.size()
 					- area.scanSpeed); i < area.blocksList.size(); i++)
-					boxes.add(new Box(area.blocksList.get(i)).expand(0.005));
+					boxes.add(new AABB(area.blocksList.get(i)).inflate(0.005));
 				
 				RenderUtils.drawOutlinedBoxes(matrixStack, boxes, black, true);
 				RenderUtils.drawSolidBoxes(matrixStack, boxes, green1, true);
 			}
 			
 			// area box
-			Box areaBox =
-				new Box(area.minX, area.minY, area.minZ, area.minX + area.sizeX,
-					area.minY + area.sizeY, area.minZ + area.sizeZ)
-						.contract(1 / 16.0);
+			AABB areaBox = new AABB(area.minX, area.minY, area.minZ,
+				area.minX + area.sizeX, area.minY + area.sizeY,
+				area.minZ + area.sizeZ).deflate(1 / 16.0);
 			RenderUtils.drawOutlinedBox(matrixStack, areaBox, black, true);
 			
 			// area scanner
 			if(area.progress < 1)
 			{
 				double scannerX =
-					MathHelper.lerp(area.progress, areaBox.minX, areaBox.maxX);
-				Box scanner = areaBox.withMinX(scannerX).withMaxX(scannerX);
+					Mth.lerp(area.progress, areaBox.minX, areaBox.maxX);
+				AABB scanner = areaBox.setMinX(scannerX).setMaxX(scannerX);
 				
 				RenderUtils.drawOutlinedBox(matrixStack, scanner, black, true);
 				RenderUtils.drawSolidBox(matrixStack, scanner, green2, true);
@@ -190,23 +190,24 @@ public final class ExcavatorHack extends Hack
 		// area preview
 		if(area == null && step == Step.END_POS && step.pos != null)
 		{
-			Box preview = Box.enclosing(Step.START_POS.pos, Step.END_POS.pos)
-				.contract(1 / 16.0);
+			AABB preview = AABB
+				.encapsulatingFullBlocks(Step.START_POS.pos, Step.END_POS.pos)
+				.deflate(1 / 16.0);
 			RenderUtils.drawOutlinedBox(matrixStack, preview, black, true);
 		}
 		
 		// selected positions
-		ArrayList<Box> selectedBoxes = new ArrayList<>();
+		ArrayList<AABB> selectedBoxes = new ArrayList<>();
 		for(Step step : Step.SELECT_POSITION_STEPS)
 			if(step.pos != null)
-				selectedBoxes.add(new Box(step.pos).contract(1 / 16.0));
+				selectedBoxes.add(new AABB(step.pos).deflate(1 / 16.0));
 		RenderUtils.drawOutlinedBoxes(matrixStack, selectedBoxes, black, false);
 		RenderUtils.drawSolidBoxes(matrixStack, selectedBoxes, green1, false);
 		
 		// posLookingAt
 		if(posLookingAt != null)
 		{
-			Box box = new Box(posLookingAt).contract(1 / 16.0);
+			AABB box = new AABB(posLookingAt).deflate(1 / 16.0);
 			RenderUtils.drawOutlinedBox(matrixStack, box, black, false);
 			RenderUtils.drawSolidBox(matrixStack, box, gray, false);
 		}
@@ -215,7 +216,7 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(DrawContext context, float partialTicks)
+	public void onRenderGUI(GuiGraphics context, float partialTicks)
 	{
 		String message;
 		if(step.selectPos && step.pos != null)
@@ -223,20 +224,20 @@ public final class ExcavatorHack extends Hack
 		else
 			message = step.message;
 		
-		TextRenderer tr = MC.textRenderer;
-		int msgWidth = tr.getWidth(message);
+		Font tr = MC.font;
+		int msgWidth = tr.width(message);
 		
-		int msgX1 = context.getScaledWindowWidth() / 2 - msgWidth / 2;
+		int msgX1 = context.guiWidth() / 2 - msgWidth / 2;
 		int msgX2 = msgX1 + msgWidth + 2;
-		int msgY1 = context.getScaledWindowHeight() / 2 + 1;
+		int msgY1 = context.guiHeight() / 2 + 1;
 		int msgY2 = msgY1 + 10;
 		
 		// background
 		context.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
 		
 		// text
-		context.drawText(tr, message, msgX1 + 2, msgY1 + 1, Colors.WHITE,
-			false);
+		context.drawString(tr, message, msgX1 + 2, msgY1 + 1,
+			CommonColors.WHITE, false);
 	}
 	
 	public void enableWithArea(BlockPos pos1, BlockPos pos2)
@@ -251,7 +252,7 @@ public final class ExcavatorHack extends Hack
 	{
 		// continue with next step
 		if(step.pos != null
-			&& InputUtil.isKeyPressed(MC.getWindow(), GLFW.GLFW_KEY_ENTER))
+			&& InputConstants.isKeyDown(MC.getWindow(), GLFW.GLFW_KEY_ENTER))
 		{
 			step = Step.values()[step.ordinal() + 1];
 			
@@ -262,21 +263,21 @@ public final class ExcavatorHack extends Hack
 			return;
 		}
 		
-		if(MC.crosshairTarget instanceof BlockHitResult)
+		if(MC.hitResult instanceof BlockHitResult)
 		{
 			// set posLookingAt
-			posLookingAt = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
+			posLookingAt = ((BlockHitResult)MC.hitResult).getBlockPos();
 			
 			// offset if sneaking
-			if(MC.options.sneakKey.isPressed())
+			if(MC.options.keyShift.isDown())
 				posLookingAt = posLookingAt
-					.offset(((BlockHitResult)MC.crosshairTarget).getSide());
+					.relative(((BlockHitResult)MC.hitResult).getDirection());
 			
 		}else
 			posLookingAt = null;
 		
 		// set selected position
-		if(posLookingAt != null && MC.options.useKey.isPressed())
+		if(posLookingAt != null && MC.options.keyUse.isDown())
 			step.pos = posLookingAt;
 	}
 	
@@ -321,10 +322,10 @@ public final class ExcavatorHack extends Hack
 			return;
 		
 		// prioritize the closest block from the top layer
-		Vec3d eyesVec = RotationUtils.getEyesPos();
+		Vec3 eyesVec = RotationUtils.getEyesPos();
 		Comparator<BlockPos> cNextTargetBlock =
-			Comparator.comparingInt(BlockPos::getY).reversed()
-				.thenComparingDouble(pos -> pos.getSquaredDistance(eyesVec));
+			Comparator.<BlockPos> comparingInt(BlockPos::getY).reversed()
+				.thenComparingDouble(pos -> pos.distToCenterSqr(eyesVec));
 		
 		// get valid blocks
 		ArrayList<BlockPos> validBlocks = getValidBlocks();
@@ -333,9 +334,9 @@ public final class ExcavatorHack extends Hack
 		
 		// nuke all
 		boolean legit = mode.getSelected() == Mode.LEGIT;
-		if(MC.player.getAbilities().creativeMode && !legit)
+		if(MC.player.getAbilities().instabuild && !legit)
 		{
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.stopDestroyBlock();
 			overlay.resetProgress();
 			
 			// set closest block as current
@@ -364,7 +365,7 @@ public final class ExcavatorHack extends Hack
 			// reset if no block was found
 			if(currentBlock == null)
 			{
-				MC.interactionManager.cancelBlockBreaking();
+				MC.gameMode.stopDestroyBlock();
 				overlay.resetProgress();
 			}
 		}
@@ -372,7 +373,7 @@ public final class ExcavatorHack extends Hack
 		overlay.updateProgress();
 		
 		// get remaining blocks
-		Predicate<BlockPos> pBreakable = MC.player.getAbilities().creativeMode
+		Predicate<BlockPos> pBreakable = MC.player.getAbilities().instabuild
 			? BlockUtils::canBeClicked : pos -> BlockUtils.canBeClicked(pos)
 				&& !BlockUtils.isUnbreakable(pos);
 		area.remainingBlocks =
@@ -429,17 +430,17 @@ public final class ExcavatorHack extends Hack
 	
 	private ArrayList<BlockPos> getValidBlocks()
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		Vec3 eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = Math.pow(range.getValue() + 0.5, 2);
 		int blockRange = range.getValueCeil();
 		
 		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+			.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
 			.filter(area.blocksSet::contains).filter(BlockUtils::canBeClicked)
 			.filter(pos -> !BlockUtils.isUnbreakable(pos))
-			.sorted(Comparator
-				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
+			.sorted(
+				Comparator.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
@@ -521,7 +522,7 @@ public final class ExcavatorHack extends Hack
 			sizeZ = Math.abs(startZ - endZ);
 			
 			totalBlocks = (sizeX + 1) * (sizeY + 1) * (sizeZ + 1);
-			scanSpeed = MathHelper.clamp(totalBlocks / 30, 1, 16384);
+			scanSpeed = Mth.clamp(totalBlocks / 30, 1, 16384);
 			iterator = BlockUtils.getAllInBox(start, end).iterator();
 		}
 	}
@@ -544,14 +545,14 @@ public final class ExcavatorHack extends Hack
 		{
 			BlockPos goal = getGoal();
 			
-			return done = goal.down(2).equals(current)
-				|| goal.up().equals(current) || goal.north().equals(current)
+			return done = goal.below(2).equals(current)
+				|| goal.above().equals(current) || goal.north().equals(current)
 				|| goal.south().equals(current) || goal.west().equals(current)
 				|| goal.east().equals(current)
-				|| goal.down().north().equals(current)
-				|| goal.down().south().equals(current)
-				|| goal.down().west().equals(current)
-				|| goal.down().east().equals(current);
+				|| goal.below().north().equals(current)
+				|| goal.below().south().equals(current)
+				|| goal.below().west().equals(current)
+				|| goal.below().east().equals(current);
 		}
 	}
 }

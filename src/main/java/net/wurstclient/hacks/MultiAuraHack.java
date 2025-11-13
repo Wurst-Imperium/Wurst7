@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.Hand;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -99,7 +99,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// get entities
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		double rangeSq = Math.pow(range.getValue(), 2);
-		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
+		stream = stream.filter(e -> MC.player.distanceToSqr(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
@@ -121,10 +121,10 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 				.getNeededRotations(entity.getBoundingBox().getCenter())
 				.sendPlayerLookPacket();
 			
-			MC.interactionManager.attackEntity(MC.player, entity);
+			MC.gameMode.attack(MC.player, entity);
 		}
 		
-		swingHand.swing(Hand.MAIN_HAND);
+		swingHand.swing(InteractionHand.MAIN_HAND);
 		speed.resetTimer();
 	}
 }

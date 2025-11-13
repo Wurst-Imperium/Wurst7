@@ -7,9 +7,9 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -57,11 +57,11 @@ public final class BoatFlyHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// check if riding
-		if(!MC.player.hasVehicle())
+		if(!MC.player.isPassenger())
 			return;
 		
 		Entity vehicle = MC.player.getVehicle();
-		Vec3d velocity = vehicle.getVelocity();
+		Vec3 velocity = vehicle.getDeltaMovement();
 		
 		// default motion
 		double motionX = velocity.x;
@@ -69,22 +69,22 @@ public final class BoatFlyHack extends Hack implements UpdateListener
 		double motionZ = velocity.z;
 		
 		// up/down
-		if(MC.options.jumpKey.isPressed())
+		if(MC.options.keyJump.isDown())
 			motionY = upwardSpeed.getValue();
-		else if(MC.options.sprintKey.isPressed())
+		else if(MC.options.keySprint.isDown())
 			motionY = velocity.y;
 		
 		// forward
-		if(MC.options.forwardKey.isPressed() && changeForwardSpeed.isChecked())
+		if(MC.options.keyUp.isDown() && changeForwardSpeed.isChecked())
 		{
 			double speed = forwardSpeed.getValue();
-			float yawRad = vehicle.getYaw() * MathHelper.RADIANS_PER_DEGREE;
+			float yawRad = vehicle.getYRot() * Mth.DEG_TO_RAD;
 			
-			motionX = MathHelper.sin(-yawRad) * speed;
-			motionZ = MathHelper.cos(yawRad) * speed;
+			motionX = Mth.sin(-yawRad) * speed;
+			motionZ = Mth.cos(yawRad) * speed;
 		}
 		
 		// apply motion
-		vehicle.setVelocity(motionX, motionY, motionZ);
+		vehicle.setDeltaMovement(motionX, motionY, motionZ);
 	}
 }

@@ -15,20 +15,20 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.FluidRenderer;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.renderer.block.LiquidBlockRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.hacks.XRayHack;
 
-@Mixin(FluidRenderer.class)
+@Mixin(LiquidBlockRenderer.class)
 public class FluidRendererMixin
 {
 	@Unique
@@ -39,11 +39,11 @@ public class FluidRendererMixin
 	 * Hides and shows fluids when using X-Ray without Sodium installed.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/block/FluidRenderer;shouldSkipRendering(Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z"),
-		method = "render(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/block/BlockState;Lnet/minecraft/fluid/FluidState;)V")
+		target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;isFaceOccludedByNeighbor(Lnet/minecraft/core/Direction;FLnet/minecraft/world/level/block/state/BlockState;)Z"),
+		method = "tesselate(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/material/FluidState;)V")
 	private boolean modifyShouldSkipRendering(Direction side, float height,
 		BlockState neighborState, Operation<Boolean> original,
-		BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer,
+		BlockAndTintGetter world, BlockPos pos, VertexConsumer vertexConsumer,
 		BlockState blockState, FluidState fluidState)
 	{
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(blockState, null);
@@ -65,7 +65,7 @@ public class FluidRendererMixin
 	 * Modifies opacity of fluids when using X-Ray without Sodium installed.
 	 */
 	@ModifyConstant(
-		method = "vertex(Lnet/minecraft/client/render/VertexConsumer;FFFFFFFFI)V",
+		method = "vertex(Lcom/mojang/blaze3d/vertex/VertexConsumer;FFFFFFFFI)V",
 		constant = @Constant(floatValue = 1F, ordinal = 0))
 	private float modifyOpacity(float original)
 	{

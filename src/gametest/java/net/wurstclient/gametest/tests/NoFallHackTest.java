@@ -32,7 +32,7 @@ public enum NoFallHackTest
 		
 		input.pressKey(GLFW.GLFW_KEY_F5);
 		runCommand(server, "gamemode survival");
-		if(!context.computeOnClient(mc -> mc.player.isOnGround()))
+		if(!context.computeOnClient(mc -> mc.player.onGround()))
 			throw new RuntimeException("Player is not on ground");
 		assertPlayerHealth(context, health -> health == 20);
 		
@@ -62,8 +62,8 @@ public enum NoFallHackTest
 		TestServerContext server)
 	{
 		runCommand(server, "tp ~ ~5 ~");
-		context.waitFor(mc -> !mc.player.isOnGround());
-		context.waitFor(mc -> mc.player.isOnGround());
+		context.waitFor(mc -> !mc.player.onGround());
+		context.waitFor(mc -> mc.player.onGround());
 		context.waitTick();
 	}
 	

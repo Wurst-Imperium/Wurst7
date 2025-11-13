@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.enums.CameraSubmersionType;
-import net.minecraft.client.render.Camera;
+import net.minecraft.client.Camera;
+import net.minecraft.world.level.material.FogType;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.CameraDistanceHack;
 
@@ -22,7 +22,7 @@ import net.wurstclient.hacks.CameraDistanceHack;
 public abstract class CameraMixin
 {
 	@ModifyVariable(at = @At("HEAD"),
-		method = "clipToSpace(F)F",
+		method = "getMaxZoom(F)F",
 		argsOnly = true)
 	private float changeClipToSpaceDistance(float desiredCameraDistance)
 	{
@@ -34,7 +34,7 @@ public abstract class CameraMixin
 		return desiredCameraDistance;
 	}
 	
-	@Inject(at = @At("HEAD"), method = "clipToSpace(F)F", cancellable = true)
+	@Inject(at = @At("HEAD"), method = "getMaxZoom(F)F", cancellable = true)
 	private void onClipToSpace(float desiredCameraDistance,
 		CallbackInfoReturnable<Float> cir)
 	{
@@ -43,12 +43,11 @@ public abstract class CameraMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getSubmersionType()Lnet/minecraft/block/enums/CameraSubmersionType;",
+		method = "getFluidInCamera()Lnet/minecraft/world/level/material/FogType;",
 		cancellable = true)
-	private void onGetSubmersionType(
-		CallbackInfoReturnable<CameraSubmersionType> cir)
+	private void onGetSubmersionType(CallbackInfoReturnable<FogType> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
-			cir.setReturnValue(CameraSubmersionType.NONE);
+			cir.setReturnValue(FogType.NONE);
 	}
 }

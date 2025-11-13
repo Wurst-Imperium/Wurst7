@@ -9,9 +9,9 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.screens.EditSliderScreen;
@@ -21,7 +21,7 @@ import net.wurstclient.util.RenderUtils;
 public final class SliderComponent extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	private static final int TEXT_HEIGHT = 11;
 	
 	private final SliderSetting setting;
@@ -36,9 +36,9 @@ public final class SliderComponent extends Component
 	
 	@Override
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
-		Click context)
+		MouseButtonEvent context)
 	{
-		boolean hasControlDown = context.hasCtrl();
+		boolean hasControlDown = context.hasControlDown();
 		if(mouseY < getY() + 11)
 			return;
 		
@@ -46,7 +46,7 @@ public final class SliderComponent extends Component
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
 			if(hasControlDown)
-				MC.setScreen(new EditSliderScreen(MC.currentScreen, setting));
+				MC.setScreen(new EditSliderScreen(MC.screen, setting));
 			else
 				dragging = true;
 			break;
@@ -80,7 +80,7 @@ public final class SliderComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -142,7 +142,7 @@ public final class SliderComponent extends Component
 		RenderUtils.drawBorder2D(context, x3, y4, x4, y5,
 			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
-		context.state.goUpLayer();
+		context.guiRenderState.up();
 		
 		// knob
 		float xk1 = x1 + (x2 - x1 - 8) * (float)setting.getPercentage();
@@ -157,10 +157,10 @@ public final class SliderComponent extends Component
 		// text
 		String name = setting.getName();
 		String value = setting.getValueString();
-		int valueWidth = TR.getWidth(value);
+		int valueWidth = TR.width(value);
 		int txtColor = GUI.getTxtColor();
-		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
-		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
+		context.drawString(TR, name, x1, y1 + 2, txtColor, false);
+		context.drawString(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
 	}
 	
 	private String getTextTooltip()
@@ -189,8 +189,8 @@ public final class SliderComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		int nameWitdh = TR.getWidth(setting.getName());
-		int valueWidth = TR.getWidth(setting.getValueString());
+		int nameWitdh = TR.width(setting.getName());
+		int valueWidth = TR.width(setting.getValueString());
 		return nameWitdh + valueWidth + 6;
 	}
 	

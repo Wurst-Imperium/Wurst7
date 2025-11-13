@@ -9,9 +9,9 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.screens.SelectFileScreen;
@@ -21,7 +21,7 @@ import net.wurstclient.util.RenderUtils;
 public final class FileComponent extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	
 	private final FileSetting setting;
 	
@@ -34,7 +34,7 @@ public final class FileComponent extends Component
 	
 	@Override
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
-		Click context)
+		MouseButtonEvent context)
 	{
 		if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
 			return;
@@ -42,11 +42,11 @@ public final class FileComponent extends Component
 		if(mouseX < getX() + getWidth() - getButtonWidth() - 4)
 			return;
 		
-		MC.setScreen(new SelectFileScreen(MC.currentScreen, setting));
+		MC.setScreen(new SelectFileScreen(MC.screen, setting));
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -77,9 +77,9 @@ public final class FileComponent extends Component
 		int txtColor = GUI.getTxtColor();
 		String labelText = setting.getName() + ":";
 		String buttonText = setting.getSelectedFileName();
-		context.state.goUpLayer();
-		context.drawText(TR, labelText, x1, y1 + 2, txtColor, false);
-		context.drawText(TR, buttonText, x3 + 2, y1 + 2, txtColor, false);
+		context.guiRenderState.up();
+		context.drawString(TR, labelText, x1, y1 + 2, txtColor, false);
+		context.drawString(TR, buttonText, x3 + 2, y1 + 2, txtColor, false);
 	}
 	
 	private int getFillColor(boolean hovering)
@@ -90,14 +90,14 @@ public final class FileComponent extends Component
 	
 	private int getButtonWidth()
 	{
-		return TR.getWidth(setting.getSelectedFileName());
+		return TR.width(setting.getSelectedFileName());
 	}
 	
 	@Override
 	public int getDefaultWidth()
 	{
 		String text = setting.getName() + ":";
-		return TR.getWidth(text) + getButtonWidth() + 6;
+		return TR.width(text) + getButtonWidth() + 6;
 	}
 	
 	@Override

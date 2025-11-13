@@ -7,11 +7,11 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.wurstclient.SearchTags;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -31,14 +31,14 @@ public final class ViewNbtCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		ClientPlayerEntity player = MC.player;
-		ItemStack stack = player.getInventory().getSelectedStack();
+		LocalPlayer player = MC.player;
+		ItemStack stack = player.getInventory().getSelectedItem();
 		if(stack.isEmpty())
 			throw new CmdError("You must hold an item in your main hand.");
 		
-		NbtCompound tag = stack
-			.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT)
-			.copyNbt();
+		CompoundTag tag =
+			stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
+				.copyTag();
 		String nbtString = tag.toString();
 		
 		switch(String.join(" ", args).toLowerCase())
@@ -48,7 +48,7 @@ public final class ViewNbtCmd extends Command
 			break;
 			
 			case "copy":
-			MC.keyboard.setClipboard(nbtString);
+			MC.keyboardHandler.setClipboard(nbtString);
 			ChatUtils.message("NBT data copied to clipboard.");
 			break;
 			

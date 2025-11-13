@@ -15,13 +15,13 @@ import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentType;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -43,15 +43,15 @@ public final class ModifyCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		ClientPlayerEntity player = MC.player;
-		if(!player.getAbilities().creativeMode)
+		LocalPlayer player = MC.player;
+		if(!player.getAbilities().instabuild)
 			throw new CmdError("Creative mode only.");
 		if(args.length < 2)
 			throw new CmdSyntaxError();
 		
-		PlayerInventory inventory = player.getInventory();
+		Inventory inventory = player.getInventory();
 		int slot = inventory.getSelectedSlot();
-		ItemStack stack = inventory.getSelectedStack();
+		ItemStack stack = inventory.getSelectedItem();
 		if(stack == null)
 			throw new CmdError("You must hold an item in your main hand.");
 		
@@ -78,19 +78,20 @@ public final class ModifyCmd extends Command
 		if(args.length < 3)
 			throw new CmdSyntaxError();
 		
-		ComponentType<?> type = parseComponentType(args[1]);
+		DataComponentType<?> type = parseComponentType(args[1]);
 		
 		String valueString =
 			String.join(" ", Arrays.copyOfRange(args, 2, args.length))
 				.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
 		JsonElement valueJson = parseJson(valueString);
-		DataResult<?> valueResult = type.getCodec().parse(
-			MC.player.getRegistryManager().getOps(JsonOps.INSTANCE), valueJson);
+		DataResult<?> valueResult =
+			type.codec().parse(MC.player.registryAccess()
+				.createSerializationContext(JsonOps.INSTANCE), valueJson);
 		Object value = valueResult.resultOrPartial().orElse(null);
 		
-		ComponentMap.Builder builder = ComponentMap.builder();
-		builder.put(type, value);
-		stack.applyComponentsFrom(builder.build());
+		DataComponentMap.Builder builder = DataComponentMap.builder();
+		builder.setUnchecked(type, value);
+		stack.applyComponents(builder.build());
 	}
 	
 	private void remove(ItemStack stack, String[] args) throws CmdException
@@ -101,10 +102,11 @@ public final class ModifyCmd extends Command
 		stack.set(parseComponentType(args[1]), null);
 	}
 	
-	private ComponentType<?> parseComponentType(String typeName) throws CmdError
+	private DataComponentType<?> parseComponentType(String typeName)
+		throws CmdError
 	{
-		ComponentType<?> type =
-			Registries.DATA_COMPONENT_TYPE.get(Identifier.tryParse(typeName));
+		DataComponentType<?> type = BuiltInRegistries.DATA_COMPONENT_TYPE
+			.getValue(ResourceLocation.tryParse(typeName));
 		
 		if(type == null)
 			throw new CmdError(

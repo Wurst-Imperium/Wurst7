@@ -7,12 +7,12 @@
  */
 package net.wurstclient.hacks.autofarm.plants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.PotatoesBlock;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.PotatoBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
@@ -22,13 +22,13 @@ public final class PotatoesPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean isReplantingSpot(BlockPos pos, BlockState state)
 	{
-		return state.getBlock() instanceof PotatoesBlock;
+		return state.getBlock() instanceof PotatoBlock;
 	}
 	
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.down()).isOf(Blocks.FARMLAND);
+		return BlockUtils.getState(pos.below()).is(Blocks.FARMLAND);
 	}
 	
 	@Override
@@ -40,10 +40,10 @@ public final class PotatoesPlantType extends AutoFarmPlantType
 	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
-		if(!(state.getBlock() instanceof PotatoesBlock potato))
+		if(!(state.getBlock() instanceof PotatoBlock potato))
 			return false;
 		
-		return potato.isMature(state);
+		return potato.isMaxAge(state);
 	}
 	
 	@Override

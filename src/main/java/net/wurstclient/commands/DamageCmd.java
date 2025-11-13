@@ -7,8 +7,8 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -31,7 +31,7 @@ public final class DamageCmd extends Command
 		if(args.length == 0)
 			throw new CmdSyntaxError();
 		
-		if(MC.player.getAbilities().creativeMode)
+		if(MC.player.getAbilities().instabuild)
 			throw new CmdError("Cannot damage in creative mode.");
 		
 		int amount = parseAmount(args[0]);
@@ -56,7 +56,7 @@ public final class DamageCmd extends Command
 	
 	private void applyDamage(int amount)
 	{
-		Vec3d pos = MC.player.getEntityPos();
+		Vec3 pos = MC.player.position();
 		
 		for(int i = 0; i < 80; i++)
 		{
@@ -69,8 +69,7 @@ public final class DamageCmd extends Command
 	
 	private void sendPosition(double x, double y, double z, boolean onGround)
 	{
-		MC.player.networkHandler
-			.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z,
-				onGround, MC.player.horizontalCollision));
+		MC.player.connection.send(new ServerboundMovePlayerPacket.Pos(x, y, z,
+			onGround, MC.player.horizontalCollision));
 	}
 }

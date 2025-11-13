@@ -14,12 +14,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
@@ -98,8 +99,8 @@ public final class AutoFarmHack extends Hack
 		
 		if(currentlyMining != null)
 		{
-			MC.interactionManager.breakingBlock = true;
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.isDestroying = true;
+			MC.gameMode.stopDestroyBlock();
 			currentlyMining = null;
 		}
 		
@@ -112,14 +113,14 @@ public final class AutoFarmHack extends Hack
 	public void onUpdate()
 	{
 		currentlyMining = null;
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		Vec3 eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
 		List<BlockPos> nonEmptyBlocks =
 			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-				.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+				.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
 				.filter(BlockUtils::canBeClicked).toList();
 		
 		for(BlockPos pos : nonEmptyBlocks)
@@ -138,26 +139,27 @@ public final class AutoFarmHack extends Hack
 			blocksToMine = nonEmptyBlocks.stream()
 				.filter(plantTypes::shouldHarvestByMining)
 				.sorted(Comparator
-					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
+					.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
 				.toList();
 			
 			blocksToInteract = nonEmptyBlocks.stream()
 				.filter(plantTypes::shouldHarvestByInteracting)
 				.sorted(Comparator
-					.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
+					.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
 				.toList();
 			
 			blocksToReplant =
 				BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-					.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
-					.filter(pos -> BlockUtils.getState(pos).isReplaceable())
+					.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
+					.filter(pos -> BlockUtils.getState(pos).canBeReplaced())
 					.filter(pos -> {
 						AutoFarmPlantType plantType = replantingSpots.get(pos);
 						return plantType != null
 							&& plantType.isReplantingEnabled()
 							&& plantType.hasPlantingSurface(pos);
-					}).sorted(Comparator.comparingDouble(
-						pos -> pos.getSquaredDistance(eyesVec)))
+					})
+					.sorted(Comparator
+						.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
 					.toList();
 		}
 		
@@ -176,7 +178,7 @@ public final class AutoFarmHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		renderer.render(matrixStack);
 		
@@ -194,10 +196,10 @@ public final class AutoFarmHack extends Hack
 	
 	private boolean replant(List<BlockPos> blocksToReplant)
 	{
-		if(MC.itemUseCooldown > 0)
+		if(MC.rightClickDelay > 0)
 			return false;
 		
-		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
+		if(MC.gameMode.isDestroying() || MC.player.isHandsBusy())
 			return false;
 		
 		Optional<Item> heldSeed =
@@ -208,8 +210,8 @@ public final class AutoFarmHack extends Hack
 		if(heldSeed.isPresent())
 		{
 			Item item = heldSeed.get();
-			Hand hand = MC.player.getMainHandStack().isOf(item) ? Hand.MAIN_HAND
-				: Hand.OFF_HAND;
+			InteractionHand hand = MC.player.getMainHandItem().is(item)
+				? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
 			
 			for(BlockPos pos : blocksToReplant)
 			{
@@ -225,7 +227,7 @@ public final class AutoFarmHack extends Hack
 				if(checkLOS.isChecked() && !params.lineOfSight())
 					continue;
 				
-				MC.itemUseCooldown = 4;
+				MC.rightClickDelay = 4;
 				faceTarget.face(params.hitVec());
 				InteractionSimulator.rightClickBlock(params.toHitResult(), hand,
 					swingHand.getSelected());
@@ -253,10 +255,10 @@ public final class AutoFarmHack extends Hack
 	
 	private boolean harvestByInteracting(List<BlockPos> blocksToInteract)
 	{
-		if(MC.itemUseCooldown > 0)
+		if(MC.rightClickDelay > 0)
 			return false;
 		
-		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
+		if(MC.gameMode.isDestroying() || MC.player.isHandsBusy())
 			return false;
 		
 		for(BlockPos pos : blocksToInteract)
@@ -269,10 +271,10 @@ public final class AutoFarmHack extends Hack
 			if(checkLOS.isChecked() && !params.lineOfSight())
 				continue;
 			
-			if(MC.player.getMainHandStack().isOf(Items.BONE_MEAL))
-				return InventoryUtils.selectItem(s -> !s.isOf(Items.BONE_MEAL));
+			if(MC.player.getMainHandItem().is(Items.BONE_MEAL))
+				return InventoryUtils.selectItem(s -> !s.is(Items.BONE_MEAL));
 			
-			MC.itemUseCooldown = 4;
+			MC.rightClickDelay = 4;
 			faceTarget.face(params.hitVec());
 			InteractionSimulator.rightClickBlock(params.toHitResult(),
 				swingHand.getSelected());
@@ -295,10 +297,10 @@ public final class AutoFarmHack extends Hack
 		stream = stream.sorted(BlockBreaker.comparingParams());
 		
 		// Break all blocks in creative mode
-		if(MC.player.getAbilities().creativeMode
+		if(MC.player.getAbilities().instabuild
 			&& faceTarget.getSelected() == FaceTarget.OFF)
 		{
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.stopDestroyBlock();
 			overlay.resetProgress();
 			
 			List<BlockPos> blocks = cache
@@ -308,7 +310,7 @@ public final class AutoFarmHack extends Hack
 			
 			currentlyMining = blocks.get(0);
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
-			swingHand.swing(Hand.MAIN_HAND);
+			swingHand.swing(InteractionHand.MAIN_HAND);
 			return;
 		}
 		
@@ -318,7 +320,7 @@ public final class AutoFarmHack extends Hack
 		
 		if(currentlyMining == null)
 		{
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.stopDestroyBlock();
 			overlay.resetProgress();
 			return;
 		}
@@ -330,11 +332,10 @@ public final class AutoFarmHack extends Hack
 	{
 		faceTarget.face(params.hitVec());
 		
-		if(!MC.interactionManager.updateBlockBreakingProgress(params.pos(),
-			params.side()))
+		if(!MC.gameMode.continueDestroyBlock(params.pos(), params.side()))
 			return false;
 		
-		swingHand.swing(Hand.MAIN_HAND);
+		swingHand.swing(InteractionHand.MAIN_HAND);
 		return true;
 	}
 }

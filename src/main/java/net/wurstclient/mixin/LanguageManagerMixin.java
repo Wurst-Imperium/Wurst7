@@ -12,21 +12,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.resource.language.LanguageManager;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloader;
+import net.minecraft.client.resources.language.LanguageManager;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.wurstclient.WurstClient;
 
 @Mixin(LanguageManager.class)
 public abstract class LanguageManagerMixin
-	implements SynchronousResourceReloader
+	implements ResourceManagerReloadListener
 {
 	@Inject(at = @At("HEAD"),
-		method = "reload(Lnet/minecraft/resource/ResourceManager;)V")
+		method = "onResourceManagerReload(Lnet/minecraft/server/packs/resources/ResourceManager;)V")
 	private void onReload(ResourceManager manager, CallbackInfo ci)
 	{
 		// Using a mixin for this because WurstClient.initialize() runs too
 		// early to call ResourceManager.registerReloader()
-		WurstClient.INSTANCE.getTranslator().reload(manager);
+		WurstClient.INSTANCE.getTranslator().onResourceManagerReload(manager);
 	}
 }
