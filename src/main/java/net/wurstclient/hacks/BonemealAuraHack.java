@@ -11,12 +11,19 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import net.minecraft.block.*;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.CocoaBlock;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.GrassBlock;
+import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.level.block.StemBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleInputListener;
@@ -96,10 +103,10 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	public void onHandleInput()
 	{
 		// wait for right click timer
-		if(MC.itemUseCooldown > 0)
+		if(MC.rightClickDelay > 0)
 			return;
 		
-		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
+		if(MC.gameMode.isDestroying() || MC.player.isHandsBusy())
 			return;
 		
 		// get valid blocks
@@ -142,14 +149,14 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 				
 			// swing arm
 			if(shouldSwing)
-				MC.player.swingHand(Hand.MAIN_HAND);
+				MC.player.swing(InteractionHand.MAIN_HAND);
 		}
 	}
 	
 	private ArrayList<BlockPos> getValidBlocks()
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		Vec3 eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
@@ -157,11 +164,11 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		// sight to other plants behind them. That's why we need to bone-meal
 		// the farthest plants first.
 		Comparator<BlockPos> farthestFirst = Comparator
-			.comparingDouble((BlockPos pos) -> pos.getSquaredDistance(eyesVec))
+			.comparingDouble((BlockPos pos) -> pos.distToCenterSqr(eyesVec))
 			.reversed();
 		
 		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+			.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
 			.filter(this::isCorrectBlock).sorted(farthestFirst)
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
@@ -170,29 +177,29 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	{
 		Block block = BlockUtils.getBlock(pos);
 		BlockState state = BlockUtils.getState(pos);
-		ClientWorld world = MC.world;
+		ClientLevel world = MC.level;
 		
-		if(!(block instanceof Fertilizable fBlock)
-			|| !fBlock.canGrow(world, world.random, pos, state))
+		if(!(block instanceof BonemealableBlock fBlock)
+			|| !fBlock.isBonemealSuccess(world, world.random, pos, state))
 			return false;
 		
 		if(block instanceof GrassBlock)
 			return false;
 		
 		if(block instanceof SaplingBlock sapling
-			&& sapling.isFertilizable(world, pos, state))
+			&& sapling.isValidBonemealTarget(world, pos, state))
 			return saplings.isChecked();
 		
 		if(block instanceof CropBlock crop
-			&& crop.isFertilizable(world, pos, state))
+			&& crop.isValidBonemealTarget(world, pos, state))
 			return crops.isChecked();
 		
 		if(block instanceof StemBlock stem
-			&& stem.isFertilizable(world, pos, state))
+			&& stem.isValidBonemealTarget(world, pos, state))
 			return stems.isChecked();
 		
 		if(block instanceof CocoaBlock cocoaBlock
-			&& cocoaBlock.isFertilizable(world, pos, state))
+			&& cocoaBlock.isValidBonemealTarget(world, pos, state))
 			return cocoa.isChecked();
 		
 		return other.isChecked();
@@ -201,7 +208,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	private boolean rightClickBlockLegit(BlockPos pos)
 	{
 		// if breaking or riding, stop and don't try other blocks
-		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
+		if(MC.gameMode.isDestroying() || MC.player.isHandsBusy())
 			return true;
 		
 		// if this block is unreachable, try the next one
@@ -211,7 +218,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 			return false;
 		
 		// face and right click the block
-		MC.itemUseCooldown = 4;
+		MC.rightClickDelay = 4;
 		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
 		InteractionSimulator.rightClickBlock(params.toHitResult());
 		return true;

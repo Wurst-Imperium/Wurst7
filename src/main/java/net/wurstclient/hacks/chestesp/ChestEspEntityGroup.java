@@ -9,7 +9,7 @@ package net.wurstclient.hacks.chestesp;
 
 import java.util.ArrayList;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import net.wurstclient.util.EntityUtils;
 
 public abstract class ChestEspEntityGroup extends ChestEspGroup

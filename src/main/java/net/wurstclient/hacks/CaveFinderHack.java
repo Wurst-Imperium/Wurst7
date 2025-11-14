@@ -16,13 +16,13 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.client.render.VertexFormat.DrawMode;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Blocks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstRenderLayers;
@@ -158,23 +158,23 @@ public final class CaveFinderHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(vertexBuffer == null || bufferRegion == null)
 			return;
 		
 		float x = System.currentTimeMillis() % 2000 / 1000F;
-		float alpha = 0.25F + 0.25F * MathHelper.sin(x * MathHelper.PI);
+		float alpha = 0.25F + 0.25F * Mth.sin(x * Mth.PI);
 		if(opacity.getValue() > 0)
 			alpha = opacity.getValueF();
 		color.setAsShaderColor(alpha);
 		
-		matrixStack.push();
+		matrixStack.pushPose();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
 		
 		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_QUADS);
 		
-		matrixStack.pop();
+		matrixStack.popPose();
 		
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
@@ -198,9 +198,9 @@ public final class CaveFinderHack extends Hack
 	
 	private void startGetMatchingBlocksTask()
 	{
-		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
+		BlockPos eyesPos = BlockPos.containing(RotationUtils.getEyesPos());
 		Comparator<BlockPos> comparator =
-			Comparator.comparingInt(pos -> eyesPos.getManhattanDistance(pos));
+			Comparator.comparingInt(pos -> eyesPos.distManhattan(pos));
 		
 		getMatchingBlocksTask = forkJoinPool.submit(() -> coordinator
 			.getMatches().parallel().map(ChunkSearcher.Result::pos)
@@ -234,11 +234,11 @@ public final class CaveFinderHack extends Hack
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		
-		vertexBuffer = EasyVertexBuffer.createAndUpload(DrawMode.QUADS,
-			VertexFormats.POSITION_COLOR, buffer -> {
+		vertexBuffer = EasyVertexBuffer.createAndUpload(Mode.QUADS,
+			DefaultVertexFormat.POSITION_COLOR, buffer -> {
 				for(int[] vertex : vertices)
-					buffer.vertex(vertex[0] - region.x(), vertex[1],
-						vertex[2] - region.z()).color(0xFFFFFFFF);
+					buffer.addVertex(vertex[0] - region.x(), vertex[1],
+						vertex[2] - region.z()).setColor(0xFFFFFFFF);
 			});
 		
 		bufferUpToDate = true;

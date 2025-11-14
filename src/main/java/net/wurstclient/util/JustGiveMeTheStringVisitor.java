@@ -7,20 +7,20 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.CharacterVisitor;
-import net.minecraft.text.Style;
+import net.minecraft.client.GuiMessage;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSink;
 
 /**
- * A {@link CharacterVisitor} to completely bypass Mojang's visitor
+ * A {@link FormattedCharSink} to completely bypass Mojang's visitor
  * system and just get the damn {@link String} out of a
- * {@link ChatHudLine.Visible}.
+ * {@link GuiMessage.Line}.
  *
  * <p>
  * Is this seriously the replacement for <code>getString()</code>?
  * What were they thinking?!
  */
-public class JustGiveMeTheStringVisitor implements CharacterVisitor
+public class JustGiveMeTheStringVisitor implements FormattedCharSink
 {
 	private final StringBuilder sb = new StringBuilder();
 	

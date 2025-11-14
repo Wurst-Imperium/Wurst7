@@ -7,11 +7,11 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -64,8 +64,8 @@ public final class AutoDropHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// check screen
-		if(MC.currentScreen instanceof HandledScreen
-			&& !(MC.currentScreen instanceof InventoryScreen))
+		if(MC.screen instanceof AbstractContainerScreen
+			&& !(MC.screen instanceof InventoryScreen))
 			return;
 		
 		for(int slot = 9; slot < 45; slot++)
@@ -73,13 +73,13 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			int adjustedSlot = slot;
 			if(adjustedSlot >= 36)
 				adjustedSlot -= 36;
-			ItemStack stack = MC.player.getInventory().getStack(adjustedSlot);
+			ItemStack stack = MC.player.getInventory().getItem(adjustedSlot);
 			
 			if(stack.isEmpty())
 				continue;
 			
 			Item item = stack.getItem();
-			String itemName = Registries.ITEM.getId(item).toString();
+			String itemName = BuiltInRegistries.ITEM.getKey(item).toString();
 			
 			if(!items.getItemNames().contains(itemName))
 				continue;

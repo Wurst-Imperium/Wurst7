@@ -9,18 +9,18 @@ package net.wurstclient.util;
 
 import java.util.function.Consumer;
 
+import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexBuffer;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BuiltBuffer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormat.DrawMode;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.renderer.RenderType;
 
 /**
  * An abstraction of Minecraft 1.21.5's new {@code GpuBuffer} system that makes
@@ -37,23 +37,23 @@ public final class EasyVertexBuffer implements AutoCloseable
 	/**
 	 * Drop-in replacement for {@code VertexBuffer.createAndUpload()}.
 	 */
-	public static EasyVertexBuffer createAndUpload(DrawMode drawMode,
+	public static EasyVertexBuffer createAndUpload(Mode drawMode,
 		VertexFormat format, Consumer<VertexConsumer> callback)
 	{
 		BufferBuilder bufferBuilder =
-			Tessellator.getInstance().begin(drawMode, format);
+			Tesselator.getInstance().begin(drawMode, format);
 		callback.accept(bufferBuilder);
 		
-		BuiltBuffer buffer = bufferBuilder.endNullable();
+		MeshData buffer = bufferBuilder.build();
 		if(buffer == null)
 			return new EasyVertexBuffer();
 		
 		return new EasyVertexBuffer(buffer);
 	}
 	
-	private EasyVertexBuffer(BuiltBuffer buffer)
+	private EasyVertexBuffer(MeshData buffer)
 	{
-		vertexBuffer = new VertexBuffer(GlUsage.STATIC_WRITE);
+		vertexBuffer = new VertexBuffer(BufferUsage.STATIC_WRITE);
 		vertexBuffer.bind();
 		vertexBuffer.upload(buffer);
 		VertexBuffer.unbind();
@@ -69,28 +69,28 @@ public final class EasyVertexBuffer implements AutoCloseable
 	 * customizable view matrix. Use this if you need to translate/scale/rotate
 	 * the buffer.
 	 */
-	public void draw(MatrixStack matrixStack, RenderLayer layer)
+	public void draw(PoseStack matrixStack, RenderType layer)
 	{
 		if(vertexBuffer == null)
 			return;
 		
-		layer.startDrawing();
+		layer.setupRenderState();
 		vertexBuffer.bind();
-		vertexBuffer.draw(matrixStack.peek().getPositionMatrix(),
+		vertexBuffer.drawWithShader(matrixStack.last().pose(),
 			RenderSystem.getProjectionMatrix(), RenderSystem.getShader());
 		VertexBuffer.unbind();
-		layer.endDrawing();
+		layer.clearRenderState();
 	}
 	
 	/**
 	 * Drop-in replacement for {@code VertexBuffer.draw(RenderLayer)}.
 	 */
-	public void draw(RenderLayer layer)
+	public void draw(RenderType layer)
 	{
 		if(vertexBuffer == null)
 			return;
 		
-		vertexBuffer.draw(layer);
+		vertexBuffer.drawWithRenderType(layer);
 	}
 	
 	@Override

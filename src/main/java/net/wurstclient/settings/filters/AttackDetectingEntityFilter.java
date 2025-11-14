@@ -9,7 +9,7 @@ package net.wurstclient.settings.filters;
 
 import java.util.function.Supplier;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.Setting;

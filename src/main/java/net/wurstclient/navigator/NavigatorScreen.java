@@ -11,12 +11,13 @@ import java.awt.Rectangle;
 
 import org.joml.Matrix4f;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.util.RenderUtils;
@@ -35,7 +36,7 @@ public abstract class NavigatorScreen extends Screen
 	
 	public NavigatorScreen()
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 	}
 	
 	@Override
@@ -141,7 +142,7 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final void render(DrawContext context, int mouseX, int mouseY,
+	public final void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		// background
@@ -178,7 +179,7 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final boolean shouldPause()
+	public final boolean isPauseScreen()
 	{
 		return false;
 	}
@@ -196,12 +197,12 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected abstract void onUpdate();
 	
-	protected abstract void onRender(DrawContext context, int mouseX,
+	protected abstract void onRender(GuiGraphics context, int mouseX,
 		int mouseY, float partialTicks);
 	
 	protected final int getStringHeight(String s)
 	{
-		int fontHeight = client.textRenderer.fontHeight;
+		int fontHeight = minecraft.font.lineHeight;
 		int height = fontHeight;
 		
 		for(int i = 0; i < s.length(); i++)
@@ -222,7 +223,7 @@ public abstract class NavigatorScreen extends Screen
 			scroll = maxScroll;
 	}
 	
-	protected final void drawDownShadow(DrawContext context, int x1, int y1,
+	protected final void drawDownShadow(GuiGraphics context, int x1, int y1,
 		int x2, int y2)
 	{
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
@@ -236,19 +237,19 @@ public abstract class NavigatorScreen extends Screen
 		int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);
 		int shadowColor2 = 0x00000000;
 		
-		MatrixStack matrixStack = context.getMatrices();
-		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		PoseStack matrixStack = context.pose();
+		Matrix4f matrix = matrixStack.last().pose();
 		
-		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
-			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
-			buffer.vertex(matrix, x1, y2, 0).color(shadowColor2);
-			buffer.vertex(matrix, x2, y2, 0).color(shadowColor2);
-			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
+		context.drawSpecial(consumers -> {
+			VertexConsumer buffer = consumers.getBuffer(RenderType.gui());
+			buffer.addVertex(matrix, x1, y1, 0).setColor(shadowColor1);
+			buffer.addVertex(matrix, x1, y2, 0).setColor(shadowColor2);
+			buffer.addVertex(matrix, x2, y2, 0).setColor(shadowColor2);
+			buffer.addVertex(matrix, x2, y1, 0).setColor(shadowColor1);
 		});
 	}
 	
-	protected final void drawBox(DrawContext context, int x1, int y1, int x2,
+	protected final void drawBox(GuiGraphics context, int x1, int y1, int x2,
 		int y2, int color)
 	{
 		context.fill(x1, y1, x2, y2, color);
@@ -262,7 +263,7 @@ public abstract class NavigatorScreen extends Screen
 		return RenderUtils.toIntColor(gui.getBgColor(), gui.getOpacity());
 	}
 	
-	protected final void drawBackgroundBox(DrawContext context, int x1, int y1,
+	protected final void drawBackgroundBox(GuiGraphics context, int x1, int y1,
 		int x2, int y2)
 	{
 		drawBox(context, x1, y1, x2, y2, getBackgroundColor());

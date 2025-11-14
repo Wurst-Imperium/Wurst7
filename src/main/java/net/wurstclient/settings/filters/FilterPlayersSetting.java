@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 public final class FilterPlayersSetting extends EntityFilterCheckbox
 {
@@ -20,7 +20,7 @@ public final class FilterPlayersSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof PlayerEntity);
+		return !(e instanceof Player);
 	}
 	
 	public static FilterPlayersSetting genericCombat(boolean checked)

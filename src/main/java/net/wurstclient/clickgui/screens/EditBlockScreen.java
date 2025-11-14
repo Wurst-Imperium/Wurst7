@@ -9,17 +9,18 @@ package net.wurstclient.clickgui.screens;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.wurstclient.settings.BlockSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RenderUtils;
@@ -29,12 +30,12 @@ public final class EditBlockScreen extends Screen
 	private final Screen prevScreen;
 	private final BlockSetting setting;
 	
-	private TextFieldWidget blockField;
-	private ButtonWidget doneButton;
+	private EditBox blockField;
+	private Button doneButton;
 	
 	public EditBlockScreen(Screen prevScreen, BlockSetting setting)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.prevScreen = prevScreen;
 		this.setting = setting;
 	}
@@ -46,32 +47,32 @@ public final class EditBlockScreen extends Screen
 		int y1 = 59;
 		int y2 = height / 3 * 2;
 		
-		TextRenderer tr = client.textRenderer;
+		Font tr = minecraft.font;
 		String valueString = setting.getBlockName();
 		
-		blockField = new TextFieldWidget(tr, x1, y1, 178, 20, Text.literal(""));
-		blockField.setText(valueString);
-		blockField.setSelectionStart(0);
+		blockField = new EditBox(tr, x1, y1, 178, 20, Component.literal(""));
+		blockField.setValue(valueString);
+		blockField.setCursorPosition(0);
 		blockField.setMaxLength(256);
 		
-		addSelectableChild(blockField);
+		addWidget(blockField);
 		setFocused(blockField);
 		blockField.setFocused(true);
 		
-		doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
-			.dimensions(x1, y2, 200, 20).build();
-		addDrawableChild(doneButton);
+		doneButton = Button.builder(Component.literal("Done"), b -> done())
+			.bounds(x1, y2, 200, 20).build();
+		addRenderableWidget(doneButton);
 	}
 	
 	private void done()
 	{
-		String nameOrId = blockField.getText();
+		String nameOrId = blockField.getValue();
 		Block block = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(block != null)
 			setting.setBlock(block);
 		
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -84,7 +85,7 @@ public final class EditBlockScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.setScreen(prevScreen);
+			minecraft.setScreen(prevScreen);
 			break;
 		}
 		
@@ -92,32 +93,32 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
-		TextRenderer tr = client.textRenderer;
+		PoseStack matrixStack = context.pose();
+		Font tr = minecraft.font;
 		
 		renderBackground(context, mouseX, mouseY, partialTicks);
-		context.drawCenteredTextWithShadow(tr, setting.getName(), width / 2, 20,
+		context.drawCenteredString(tr, setting.getName(), width / 2, 20,
 			0xFFFFFF);
 		
 		blockField.render(context, mouseX, mouseY, partialTicks);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		matrixStack.push();
+		matrixStack.pushPose();
 		matrixStack.translate(-64 + width / 2 - 100, 115, 0);
 		
 		boolean lblAbove =
-			!blockField.getText().isEmpty() || blockField.isFocused();
+			!blockField.getValue().isEmpty() || blockField.isFocused();
 		String lblText =
 			lblAbove ? "Block ID or number:" : "block ID or number";
 		int lblX = lblAbove ? 50 : 68;
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor = lblAbove ? 0xF0F0F0 : 0x808080;
-		context.drawTextWithShadow(tr, lblText, lblX, lblY, lblColor);
+		context.drawString(tr, lblText, lblX, lblY, lblColor);
 		
 		int border = blockField.isFocused() ? 0xffffffff : 0xffa0a0a0;
 		int black = 0xff000000;
@@ -127,9 +128,9 @@ public final class EditBlockScreen extends Screen
 		context.fill(242, -56, 246, -36, border);
 		context.fill(241, -55, 245, -37, black);
 		
-		matrixStack.pop();
+		matrixStack.popPose();
 		
-		String nameOrId = blockField.getText();
+		String nameOrId = blockField.getValue();
 		Block blockToAdd = BlockUtils.getBlockFromNameOrID(nameOrId);
 		
 		if(blockToAdd == null)
@@ -140,7 +141,7 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public boolean shouldPause()
+	public boolean isPauseScreen()
 	{
 		return false;
 	}

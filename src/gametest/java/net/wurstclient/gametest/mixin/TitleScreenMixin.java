@@ -12,17 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
 import net.wurstclient.WurstClient;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen
 {
-	private TitleScreenMixin(WurstClient wurst, Text title)
+	private TitleScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}
@@ -31,13 +31,11 @@ public abstract class TitleScreenMixin extends Screen
 	 * Replaces the panorama background with a gray background to make test
 	 * screenshots consistent.
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "renderPanoramaBackground",
-		cancellable = true)
-	public void renderPanoramaBackground(DrawContext context, float deltaTicks,
+	@Inject(at = @At("HEAD"), method = "renderPanorama", cancellable = true)
+	public void renderPanoramaBackground(GuiGraphics context, float deltaTicks,
 		CallbackInfo ci)
 	{
-		context.fill(0, 0, width, height, Colors.GRAY);
+		context.fill(0, 0, width, height, CommonColors.GRAY);
 		ci.cancel();
 	}
 }

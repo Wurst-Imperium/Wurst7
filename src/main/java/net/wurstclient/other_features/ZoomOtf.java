@@ -7,9 +7,10 @@
  */
 package net.wurstclient.other_features;
 
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
+import com.mojang.blaze3d.platform.InputConstants;
+
+import net.minecraft.client.OptionInstance;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.MouseScrollListener;
@@ -60,8 +61,8 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	
 	public float changeFovBasedOnZoom(float fov)
 	{
-		SimpleOption<Double> mouseSensitivitySetting =
-			MC.options.getMouseSensitivity();
+		OptionInstance<Double> mouseSensitivitySetting =
+			MC.options.sensitivity();
 		
 		if(currentLevel == null)
 			currentLevel = level.getValue();
@@ -72,7 +73,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 			
 			if(defaultMouseSensitivity != null)
 			{
-				mouseSensitivitySetting.setValue(defaultMouseSensitivity);
+				mouseSensitivitySetting.set(defaultMouseSensitivity);
 				defaultMouseSensitivity = null;
 			}
 			
@@ -80,13 +81,13 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		}
 		
 		if(defaultMouseSensitivity == null)
-			defaultMouseSensitivity = mouseSensitivitySetting.getValue();
+			defaultMouseSensitivity = mouseSensitivitySetting.get();
 			
 		// Adjust mouse sensitivity in relation to zoom level.
 		// 1.0 / currentLevel is a value between 0.02 (50x zoom)
 		// and 1 (no zoom).
 		mouseSensitivitySetting
-			.setValue(defaultMouseSensitivity * (1.0 / currentLevel));
+			.set(defaultMouseSensitivity * (1.0 / currentLevel));
 		
 		return (float)(fov / currentLevel);
 	}
@@ -114,10 +115,9 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		return isZoomKeyPressed() && scroll.isChecked();
 	}
 	
-	public Text getTranslatedKeybindName()
+	public Component getTranslatedKeybindName()
 	{
-		return InputUtil.fromTranslationKey(keybind.getValue())
-			.getLocalizedText();
+		return InputConstants.getKey(keybind.getValue()).getDisplayName();
 	}
 	
 	public void setBoundKey(String translationKey)
@@ -127,18 +127,18 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	
 	private boolean isZoomKeyPressed()
 	{
-		if(MC.currentScreen != null && !zoomInScreens.isChecked())
+		if(MC.screen != null && !zoomInScreens.isChecked())
 			return false;
 		
-		return InputUtil.isKeyPressed(MC.getWindow().getHandle(),
-			InputUtil.fromTranslationKey(keybind.getValue()).getCode());
+		return InputConstants.isKeyDown(MC.getWindow().getWindow(),
+			InputConstants.getKey(keybind.getValue()).getValue());
 	}
 	
 	private boolean isValidKeybind(String keybind)
 	{
 		try
 		{
-			return InputUtil.fromTranslationKey(keybind) != null;
+			return InputConstants.getKey(keybind) != null;
 			
 		}catch(IllegalArgumentException e)
 		{

@@ -11,27 +11,27 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.OtherClientPlayerEntity;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.player.RemotePlayer;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.wurstclient.WurstClient;
 
-public class FakePlayerEntity extends OtherClientPlayerEntity
+public class FakePlayerEntity extends RemotePlayer
 {
-	private final ClientPlayerEntity player = WurstClient.MC.player;
-	private final ClientWorld world = WurstClient.MC.world;
-	private PlayerListEntry playerListEntry;
+	private final LocalPlayer player = WurstClient.MC.player;
+	private final ClientLevel world = WurstClient.MC.level;
+	private PlayerInfo playerListEntry;
 	
 	public FakePlayerEntity()
 	{
-		super(WurstClient.MC.world, WurstClient.MC.player.getGameProfile());
-		setUuid(UUID.randomUUID());
-		copyPositionAndRotation(player);
+		super(WurstClient.MC.level, WurstClient.MC.player.getGameProfile());
+		setUUID(UUID.randomUUID());
+		copyPosition(player);
 		
 		copyInventory();
 		copyPlayerModel(player, this);
@@ -42,45 +42,46 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	}
 	
 	@Override
-	protected @Nullable PlayerListEntry getPlayerListEntry()
+	protected @Nullable PlayerInfo getPlayerInfo()
 	{
 		if(playerListEntry == null)
-			playerListEntry = MinecraftClient.getInstance().getNetworkHandler()
-				.getPlayerListEntry(getGameProfile().getId());
+			playerListEntry = Minecraft.getInstance().getConnection()
+				.getPlayerInfo(getGameProfile().getId());
 		
 		return playerListEntry;
 	}
 	
 	@Override
-	protected void pushAway(Entity entity)
+	protected void doPush(Entity entity)
 	{
 		// Prevents pushing the real player away
 	}
 	
 	private void copyInventory()
 	{
-		getInventory().clone(player.getInventory());
+		getInventory().replaceWith(player.getInventory());
 	}
 	
 	private void copyPlayerModel(Entity from, Entity to)
 	{
-		DataTracker fromTracker = from.getDataTracker();
-		DataTracker toTracker = to.getDataTracker();
-		Byte playerModel = fromTracker.get(PlayerEntity.PLAYER_MODEL_PARTS);
-		toTracker.set(PlayerEntity.PLAYER_MODEL_PARTS, playerModel);
+		SynchedEntityData fromTracker = from.getEntityData();
+		SynchedEntityData toTracker = to.getEntityData();
+		Byte playerModel =
+			fromTracker.get(Player.DATA_PLAYER_MODE_CUSTOMISATION);
+		toTracker.set(Player.DATA_PLAYER_MODE_CUSTOMISATION, playerModel);
 	}
 	
 	private void copyRotation()
 	{
-		headYaw = player.headYaw;
-		bodyYaw = player.bodyYaw;
+		yHeadRot = player.yHeadRot;
+		yBodyRot = player.yBodyRot;
 	}
 	
 	private void resetCapeMovement()
 	{
-		capeX = getX();
-		capeY = getY();
-		capeZ = getZ();
+		xCloak = getX();
+		yCloak = getY();
+		zCloak = getZ();
 	}
 	
 	private void spawn()
@@ -95,7 +96,6 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
 	
 	public void resetPlayerPosition()
 	{
-		player.refreshPositionAndAngles(getX(), getY(), getZ(), getYaw(),
-			getPitch());
+		player.moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
 	}
 }

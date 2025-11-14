@@ -15,16 +15,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.BasicBakedModel;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.SimpleBakedModel;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
-@Mixin(BasicBakedModel.class)
+@Mixin(SimpleBakedModel.class)
 public class BasicBakedModelMixin
 {
 	/**
@@ -32,10 +32,10 @@ public class BasicBakedModelMixin
 	 * with and without Sodium installed.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "getQuads(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/random/Random;)Ljava/util/List;",
+		method = "getQuads(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/util/RandomSource;)Ljava/util/List;",
 		cancellable = true)
 	private void onGetQuads(@Nullable BlockState state,
-		@Nullable Direction face, Random random,
+		@Nullable Direction face, RandomSource random,
 		CallbackInfoReturnable<List<BakedQuad>> cir)
 	{
 		if(state == null || face != null

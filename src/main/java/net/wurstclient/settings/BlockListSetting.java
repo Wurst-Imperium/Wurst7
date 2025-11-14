@@ -20,8 +20,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.BlockListEditButton;
@@ -135,7 +135,7 @@ public class BlockListSetting extends Setting
 			// otherwise, load the blocks in the JSON array
 			for(String rawName : JsonUtils.getAsArray(json).getAllStrings())
 			{
-				Identifier id = Identifier.tryParse(rawName);
+				ResourceLocation id = ResourceLocation.tryParse(rawName);
 				if(id == null)
 				{
 					System.out.println("Discarding BlockList entry \"" + rawName

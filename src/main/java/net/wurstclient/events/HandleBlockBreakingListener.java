@@ -9,27 +9,27 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 
 /**
  * Fired at the beginning of
- * {@link MinecraftClient#handleBlockBreaking(boolean)}.
+ * {@link Minecraft#continueAttack(boolean)}.
  * Allows you to cancel vanilla block breaking and replace it with your own.
  */
 public interface HandleBlockBreakingListener extends Listener
 {
 	/**
 	 * Fired at the beginning of
-	 * {@link MinecraftClient#handleBlockBreaking(boolean)}.
+	 * {@link Minecraft#continueAttack(boolean)}.
 	 * Allows you to cancel vanilla block breaking and replace it with your own.
 	 */
 	public void onHandleBlockBreaking(HandleBlockBreakingEvent event);
 	
 	/**
 	 * Fired at the beginning of
-	 * {@link MinecraftClient#handleBlockBreaking(boolean)}.
+	 * {@link Minecraft#continueAttack(boolean)}.
 	 * Allows you to cancel vanilla block breaking and replace it with your own.
 	 */
 	public static class HandleBlockBreakingEvent

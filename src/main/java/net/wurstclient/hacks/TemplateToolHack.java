@@ -11,11 +11,12 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.events.GUIRenderListener;
 import net.wurstclient.events.RenderListener;
@@ -84,7 +85,7 @@ public final class TemplateToolHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		int black = 0x80000000;
 		int green15 = 0x2600FF00;
@@ -92,14 +93,15 @@ public final class TemplateToolHack extends Hack
 		// Draw template bounds
 		if(startPos != null && endPos != null)
 		{
-			Box bounds = Box.enclosing(startPos, endPos).contract(1 / 16.0);
+			AABB bounds = AABB.encapsulatingFullBlocks(startPos, endPos)
+				.deflate(1 / 16.0);
 			RenderUtils.drawOutlinedBox(matrixStack, bounds, black, true);
 		}
 		
 		// Draw origin
 		if(originPos != null)
 		{
-			Box box = new Box(originPos).contract(1 / 16.0);
+			AABB box = new AABB(originPos).deflate(1 / 16.0);
 			RenderUtils.drawOutlinedBox(matrixStack, box, black, false);
 			RenderUtils.drawSolidBox(matrixStack, box, green15, false);
 		}
@@ -110,7 +112,7 @@ public final class TemplateToolHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(DrawContext context, float partialTicks)
+	public void onRenderGUI(GuiGraphics context, float partialTicks)
 	{
 		if(state != null)
 			state.onRenderGUI(this, context, partialTicks);

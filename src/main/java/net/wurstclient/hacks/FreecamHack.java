@@ -9,13 +9,14 @@ package net.wurstclient.hacks;
 
 import java.awt.Color;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Options;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.*;
@@ -71,11 +72,11 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		
 		fakePlayer = new FakePlayerEntity();
 		
-		GameOptions opt = MC.options;
-		KeyBinding[] bindings = {opt.forwardKey, opt.backKey, opt.leftKey,
-			opt.rightKey, opt.jumpKey, opt.sneakKey};
+		Options opt = MC.options;
+		KeyMapping[] bindings = {opt.keyUp, opt.keyDown, opt.keyLeft,
+			opt.keyRight, opt.keyJump, opt.keyShift};
 		
-		for(KeyBinding binding : bindings)
+		for(KeyMapping binding : bindings)
 			IKeyBinding.get(binding).resetPressedState();
 	}
 	
@@ -95,27 +96,27 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		fakePlayer.resetPlayerPosition();
 		fakePlayer.despawn();
 		
-		ClientPlayerEntity player = MC.player;
-		player.setVelocity(Vec3d.ZERO);
+		LocalPlayer player = MC.player;
+		player.setDeltaMovement(Vec3.ZERO);
 		
-		MC.worldRenderer.reload();
+		MC.levelRenderer.allChanged();
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
-		player.setVelocity(Vec3d.ZERO);
+		LocalPlayer player = MC.player;
+		player.setDeltaMovement(Vec3.ZERO);
 		player.getAbilities().flying = false;
 		
 		player.setOnGround(false);
-		Vec3d velocity = player.getVelocity();
+		Vec3 velocity = player.getDeltaMovement();
 		
-		if(MC.options.jumpKey.isPressed())
-			player.setVelocity(velocity.add(0, speed.getValue(), 0));
+		if(MC.options.keyJump.isDown())
+			player.setDeltaMovement(velocity.add(0, speed.getValue(), 0));
 		
-		if(MC.options.sneakKey.isPressed())
-			player.setVelocity(velocity.subtract(0, speed.getValue(), 0));
+		if(MC.options.keyShift.isDown())
+			player.setDeltaMovement(velocity.subtract(0, speed.getValue(), 0));
 	}
 	
 	@Override
@@ -127,7 +128,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
-		if(event.getPacket() instanceof PlayerMoveC2SPacket)
+		if(event.getPacket() instanceof ServerboundMovePlayerPacket)
 			event.cancel();
 	}
 	
@@ -164,7 +165,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(fakePlayer == null || !tracer.isChecked())
 			return;
@@ -173,8 +174,8 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		
 		// box
 		double extraSize = 0.05;
-		Box box = fakePlayer.getBoundingBox().offset(0, extraSize, 0)
-			.expand(extraSize);
+		AABB box = fakePlayer.getBoundingBox().move(0, extraSize, 0)
+			.inflate(extraSize);
 		RenderUtils.drawOutlinedBox(matrixStack, box, colorI, false);
 		
 		// line

@@ -9,21 +9,22 @@ package net.wurstclient.util;
 
 import java.util.function.Consumer;
 
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
-public record BufferWithLayer(EasyVertexBuffer buffer, RenderLayer layer)
+import net.minecraft.client.renderer.RenderType;
+
+public record BufferWithLayer(EasyVertexBuffer buffer, RenderType layer)
 	implements AutoCloseable
 {
-	public static BufferWithLayer createAndUpload(RenderLayer layer,
+	public static BufferWithLayer createAndUpload(RenderType layer,
 		Consumer<VertexConsumer> callback)
 	{
-		return new BufferWithLayer(EasyVertexBuffer.createAndUpload(
-			layer.getDrawMode(), layer.getVertexFormat(), callback), layer);
+		return new BufferWithLayer(EasyVertexBuffer
+			.createAndUpload(layer.mode(), layer.format(), callback), layer);
 	}
 	
-	public void draw(MatrixStack matrixStack)
+	public void draw(PoseStack matrixStack)
 	{
 		buffer.draw(matrixStack, layer);
 	}

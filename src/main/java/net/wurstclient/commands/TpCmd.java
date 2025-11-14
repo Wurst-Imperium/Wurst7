@@ -10,8 +10,8 @@ package net.wurstclient.commands;
 import java.util.Comparator;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -45,7 +45,7 @@ public final class TpCmd extends Command
 		if(disableFreecam.isChecked() && WURST.getHax().freecamHack.isEnabled())
 			WURST.getHax().freecamHack.setEnabled(false);
 		
-		MC.player.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+		MC.player.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 	}
 	
 	private BlockPos argsToPos(String... args) throws CmdException
@@ -66,25 +66,24 @@ public final class TpCmd extends Command
 	private BlockPos argsToEntityPos(String name) throws CmdError
 	{
 		LivingEntity entity = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
+			.stream(MC.level.entitiesForRendering().spliterator(), true)
 			.filter(LivingEntity.class::isInstance).map(e -> (LivingEntity)e)
 			.filter(e -> !e.isRemoved() && e.getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> name.equalsIgnoreCase(e.getDisplayName().getString()))
-			.min(
-				Comparator.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+			.min(Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 			.orElse(null);
 		
 		if(entity == null)
 			throw new CmdError("Entity \"" + name + "\" could not be found.");
 		
-		return BlockPos.ofFloored(entity.getPos());
+		return BlockPos.containing(entity.position());
 	}
 	
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
-		BlockPos playerPos = BlockPos.ofFloored(MC.player.getPos());
+		BlockPos playerPos = BlockPos.containing(MC.player.position());
 		int[] player = {playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
 		

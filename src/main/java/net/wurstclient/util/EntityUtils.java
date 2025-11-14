@@ -11,15 +11,15 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.projectile.ShulkerBullet;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 
 public enum EntityUtils
@@ -27,30 +27,31 @@ public enum EntityUtils
 	;
 	
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
-	protected static final MinecraftClient MC = WurstClient.MC;
+	protected static final Minecraft MC = WurstClient.MC;
 	
 	public static Stream<Entity> getAttackableEntities()
 	{
-		return StreamSupport.stream(MC.world.getEntities().spliterator(), true)
+		return StreamSupport
+			.stream(MC.level.entitiesForRendering().spliterator(), true)
 			.filter(IS_ATTACKABLE);
 	}
 	
-	public static final Predicate<Entity> IS_ATTACKABLE = e -> e != null
-		&& !e.isRemoved()
-		&& (e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
-			|| e instanceof EndCrystalEntity
-			|| e instanceof ShulkerBulletEntity)
-		&& e != MC.player && !(e instanceof FakePlayerEntity)
-		&& !WURST.getFriends().isFriend(e);
+	public static final Predicate<Entity> IS_ATTACKABLE =
+		e -> e != null && !e.isRemoved()
+			&& (e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
+				|| e instanceof EndCrystal || e instanceof ShulkerBullet)
+			&& e != MC.player && !(e instanceof FakePlayerEntity)
+			&& !WURST.getFriends().isFriend(e);
 	
-	public static Stream<AnimalEntity> getValidAnimals()
+	public static Stream<Animal> getValidAnimals()
 	{
-		return StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-			.filter(AnimalEntity.class::isInstance).map(e -> (AnimalEntity)e)
+		return StreamSupport
+			.stream(MC.level.entitiesForRendering().spliterator(), true)
+			.filter(Animal.class::isInstance).map(e -> (Animal)e)
 			.filter(IS_VALID_ANIMAL);
 	}
 	
-	public static final Predicate<AnimalEntity> IS_VALID_ANIMAL =
+	public static final Predicate<Animal> IS_VALID_ANIMAL =
 		a -> a != null && !a.isRemoved() && a.getHealth() > 0;
 	
 	/**
@@ -63,17 +64,17 @@ public enum EntityUtils
 	 * current tick position directly would cause animations to look choppy
 	 * because that position is only updated 20 times per second.
 	 */
-	public static Vec3d getLerpedPos(Entity e, float partialTicks)
+	public static Vec3 getLerpedPos(Entity e, float partialTicks)
 	{
 		// When an entity is removed, it stops moving and its lastRenderX/Y/Z
 		// values are no longer updated.
 		if(e.isRemoved())
-			return e.getPos();
+			return e.position();
 		
-		double x = MathHelper.lerp(partialTicks, e.lastRenderX, e.getX());
-		double y = MathHelper.lerp(partialTicks, e.lastRenderY, e.getY());
-		double z = MathHelper.lerp(partialTicks, e.lastRenderZ, e.getZ());
-		return new Vec3d(x, y, z);
+		double x = Mth.lerp(partialTicks, e.xOld, e.getX());
+		double y = Mth.lerp(partialTicks, e.yOld, e.getY());
+		double z = Mth.lerp(partialTicks, e.zOld, e.getZ());
+		return new Vec3(x, y, z);
 	}
 	
 	/**
@@ -87,14 +88,14 @@ public enum EntityUtils
 	 * because that box, just like the position, is only updated 20 times per
 	 * second.
 	 */
-	public static Box getLerpedBox(Entity e, float partialTicks)
+	public static AABB getLerpedBox(Entity e, float partialTicks)
 	{
 		// When an entity is removed, it stops moving and its lastRenderX/Y/Z
 		// values are no longer updated.
 		if(e.isRemoved())
 			return e.getBoundingBox();
 		
-		Vec3d offset = getLerpedPos(e, partialTicks).subtract(e.getPos());
-		return e.getBoundingBox().offset(offset);
+		Vec3 offset = getLerpedPos(e, partialTicks).subtract(e.position());
+		return e.getBoundingBox().move(offset);
 	}
 }

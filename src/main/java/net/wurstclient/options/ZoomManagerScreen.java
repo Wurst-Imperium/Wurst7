@@ -7,11 +7,11 @@
  */
 package net.wurstclient.options;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.ZoomOtf;
 import net.wurstclient.settings.CheckboxSetting;
@@ -20,11 +20,11 @@ import net.wurstclient.settings.SliderSetting;
 public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 {
 	private Screen prevScreen;
-	private ButtonWidget scrollButton;
+	private Button scrollButton;
 	
 	public ZoomManagerScreen(Screen par1GuiScreen)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		prevScreen = par1GuiScreen;
 	}
 	
@@ -36,39 +36,38 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		SliderSetting level = zoom.getLevelSetting();
 		CheckboxSetting scroll = zoom.getScrollSetting();
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Back"), b -> client.setScreen(prevScreen))
-			.dimensions(width / 2 - 100, height / 4 + 144 - 16, 200, 20)
-			.build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Back"),
+				b -> minecraft.setScreen(prevScreen))
+			.bounds(width / 2 - 100, height / 4 + 144 - 16, 200, 20).build());
 		
-		addDrawableChild(ButtonWidget
+		addRenderableWidget(Button
 			.builder(
-				Text.literal("Zoom Key: ")
+				Component.literal("Zoom Key: ")
 					.append(zoom.getTranslatedKeybindName()),
-				b -> client.setScreen(new PressAKeyScreen(this)))
-			.dimensions(width / 2 - 79, height / 4 + 24 - 16, 158, 20).build());
+				b -> minecraft.setScreen(new PressAKeyScreen(this)))
+			.bounds(width / 2 - 79, height / 4 + 24 - 16, 158, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("More"), b -> level.increaseValue())
-			.dimensions(width / 2 - 79, height / 4 + 72 - 16, 50, 20).build());
+		addRenderableWidget(Button
+			.builder(Component.literal("More"), b -> level.increaseValue())
+			.bounds(width / 2 - 79, height / 4 + 72 - 16, 50, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Less"), b -> level.decreaseValue())
-			.dimensions(width / 2 - 25, height / 4 + 72 - 16, 50, 20).build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Less"), b -> level.decreaseValue())
+			.bounds(width / 2 - 25, height / 4 + 72 - 16, 50, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Default"),
+		addRenderableWidget(Button
+			.builder(Component.literal("Default"),
 				b -> level.setValue(level.getDefaultValue()))
-			.dimensions(width / 2 + 29, height / 4 + 72 - 16, 50, 20).build());
+			.bounds(width / 2 + 29, height / 4 + 72 - 16, 50, 20).build());
 		
-		addDrawableChild(
-			scrollButton = ButtonWidget
+		addRenderableWidget(scrollButton =
+			Button
 				.builder(
-					Text.literal(
+					Component.literal(
 						"Use Mouse Wheel: " + onOrOff(scroll.isChecked())),
 					b -> toggleScroll())
-				.dimensions(width / 2 - 79, height / 4 + 96 - 16, 158, 20)
-				.build());
+				.bounds(width / 2 - 79, height / 4 + 96 - 16, 158, 20).build());
 	}
 	
 	private void toggleScroll()
@@ -77,8 +76,8 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		CheckboxSetting scroll = zoom.getScrollSetting();
 		
 		scroll.setChecked(!scroll.isChecked());
-		scrollButton.setMessage(
-			Text.literal("Use Mouse Wheel: " + onOrOff(scroll.isChecked())));
+		scrollButton.setMessage(Component
+			.literal("Use Mouse Wheel: " + onOrOff(scroll.isChecked())));
 	}
 	
 	private String onOrOff(boolean on)
@@ -87,26 +86,25 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	}
 	
 	@Override
-	public void close()
+	public void onClose()
 	{
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		
 		renderBackground(context, mouseX, mouseY, partialTicks);
-		context.drawCenteredTextWithShadow(textRenderer, "Zoom Manager",
-			width / 2, 40, 0xffffff);
-		context.drawTextWithShadow(textRenderer,
-			"Zoom Level: " + level.getValueString(), width / 2 - 75,
-			height / 4 + 44, 0xcccccc);
+		context.drawCenteredString(font, "Zoom Manager", width / 2, 40,
+			0xffffff);
+		context.drawString(font, "Zoom Level: " + level.getValueString(),
+			width / 2 - 75, height / 4 + 44, 0xcccccc);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	

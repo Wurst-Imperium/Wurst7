@@ -13,9 +13,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IKeyBinding;
 import net.wurstclient.settings.CheckboxSetting;
@@ -28,7 +28,7 @@ import net.wurstclient.util.RotationUtils;
 
 public final class FishingSpotManager
 {
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	private final CheckboxSetting mcmmoMode = new CheckboxSetting("mcMMO mode",
 		"If enabled, AutoFish will cycle between two different fishing spots"
@@ -129,15 +129,15 @@ public final class FishingSpotManager
 	
 	private void moveToNextSpot()
 	{
-		IKeyBinding forwardKey = IKeyBinding.get(MC.options.forwardKey);
-		IKeyBinding jumpKey = IKeyBinding.get(MC.options.jumpKey);
+		IKeyBinding forwardKey = IKeyBinding.get(MC.options.keyUp);
+		IKeyBinding jumpKey = IKeyBinding.get(MC.options.keyJump);
 		
 		PositionAndRotation nextPosRot = nextSpot.input();
 		forwardKey.resetPressedState();
 		jumpKey.resetPressedState();
 		
 		// match position
-		Vec3d nextPos = nextPosRot.pos();
+		Vec3 nextPos = nextPosRot.pos();
 		double distance = nextPos.distanceTo(castPosRot.pos());
 		if(distance > 0.1)
 		{
@@ -152,14 +152,14 @@ public final class FishingSpotManager
 			}
 			
 			// jump if necessary
-			jumpKey.setPressed(
-				MC.player.isTouchingWater() || MC.player.horizontalCollision);
+			jumpKey.setDown(
+				MC.player.isInWater() || MC.player.horizontalCollision);
 			
 			// walk or teleport depending on distance
 			if(distance < 0.2)
-				MC.player.setPosition(nextPos.x, nextPos.y, nextPos.z);
-			else if(distance > 0.7 || MC.player.age % 10 == 0)
-				forwardKey.setPressed(true);
+				MC.player.setPos(nextPos.x, nextPos.y, nextPos.z);
+			else if(distance > 0.7 || MC.player.tickCount % 10 == 0)
+				forwardKey.setDown(true);
 			return;
 		}
 		
@@ -177,12 +177,12 @@ public final class FishingSpotManager
 		fishCaughtAtLastSpot = 0;
 	}
 	
-	public void onBite(FishingBobberEntity bobber)
+	public void onBite(FishingHook bobber)
 	{
 		boolean samePlayerInput = lastSpot != null
 			&& lastSpot.input().isNearlyIdenticalTo(castPosRot);
 		boolean sameBobberPos = lastSpot != null
-			&& isInRange(lastSpot.bobberPos(), bobber.getPos());
+			&& isInRange(lastSpot.bobberPos(), bobber.position());
 		
 		// update counter based on bobber position
 		if(sameBobberPos)
@@ -229,7 +229,7 @@ public final class FishingSpotManager
 			.orElse(null);
 	}
 	
-	private boolean isInRange(Vec3d pos1, Vec3d pos2)
+	private boolean isInRange(Vec3 pos1, Vec3 pos2)
 	{
 		double dy = Math.abs(pos1.y - pos2.y);
 		if(dy > 2)

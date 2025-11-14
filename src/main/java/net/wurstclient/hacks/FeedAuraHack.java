@@ -12,18 +12,19 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.passive.AbstractHorseEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleInputListener;
@@ -64,8 +65,8 @@ public final class FeedAuraHack extends Hack
 		false);
 	
 	private final Random random = new Random();
-	private AnimalEntity target;
-	private AnimalEntity renderTarget;
+	private Animal target;
+	private Animal renderTarget;
 	
 	public FeedAuraHack()
 	{
@@ -108,14 +109,13 @@ public final class FeedAuraHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
-		ItemStack heldStack = player.getInventory().getMainHandStack();
+		LocalPlayer player = MC.player;
+		ItemStack heldStack = player.getInventory().getSelected();
 		
 		double rangeSq = range.getValueSq();
-		Stream<AnimalEntity> stream = EntityUtils.getValidAnimals()
-			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
-			.filter(e -> e.isBreedingItem(heldStack))
-			.filter(AnimalEntity::canEat);
+		Stream<Animal> stream = EntityUtils.getValidAnimals()
+			.filter(e -> player.distanceToSqr(e) <= rangeSq)
+			.filter(e -> e.isFood(heldStack)).filter(Animal::canFallInLove);
 		
 		if(filterBabies.isChecked())
 			stream = stream.filter(filterBabies);
@@ -124,10 +124,10 @@ public final class FeedAuraHack extends Hack
 			stream = stream.filter(e -> !isUntamed(e));
 		
 		if(filterHorses.isChecked())
-			stream = stream.filter(e -> !(e instanceof AbstractHorseEntity));
+			stream = stream.filter(e -> !(e instanceof AbstractHorse));
 		
 		// convert targets to list
-		ArrayList<AnimalEntity> targets =
+		ArrayList<Animal> targets =
 			stream.collect(Collectors.toCollection(ArrayList::new));
 		
 		// pick a target at random
@@ -148,35 +148,35 @@ public final class FeedAuraHack extends Hack
 		if(target == null)
 			return;
 		
-		ClientPlayerInteractionManager im = MC.interactionManager;
-		ClientPlayerEntity player = MC.player;
-		Hand hand = Hand.MAIN_HAND;
+		MultiPlayerGameMode im = MC.gameMode;
+		LocalPlayer player = MC.player;
+		InteractionHand hand = InteractionHand.MAIN_HAND;
 		
-		if(im.isBreakingBlock() || player.isRiding())
+		if(im.isDestroying() || player.isHandsBusy())
 			return;
 		
 		// create realistic hit result
-		Box box = target.getBoundingBox();
-		Vec3d start = RotationUtils.getEyesPos();
-		Vec3d end = box.getCenter();
-		Vec3d hitVec = box.raycast(start, end).orElse(start);
+		AABB box = target.getBoundingBox();
+		Vec3 start = RotationUtils.getEyesPos();
+		Vec3 end = box.getCenter();
+		Vec3 hitVec = box.clip(start, end).orElse(start);
 		EntityHitResult hitResult = new EntityHitResult(target, hitVec);
 		
-		ActionResult actionResult =
-			im.interactEntityAtLocation(player, target, hitResult, hand);
+		InteractionResult actionResult =
+			im.interactAt(player, target, hitResult, hand);
 		
-		if(!actionResult.isAccepted())
-			actionResult = im.interactEntity(player, target, hand);
+		if(!actionResult.consumesAction())
+			actionResult = im.interact(player, target, hand);
 		
-		if(actionResult instanceof ActionResult.Success success
-			&& success.swingSource() == ActionResult.SwingSource.CLIENT)
-			player.swingHand(hand);
+		if(actionResult instanceof InteractionResult.Success success
+			&& success.swingSource() == InteractionResult.SwingSource.CLIENT)
+			player.swing(hand);
 		
 		target = null;
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(renderTarget == null)
 			return;
@@ -190,22 +190,21 @@ public final class FeedAuraHack extends Hack
 		int quadColor = RenderUtils.toIntColor(rgb, 0.25F);
 		int lineColor = RenderUtils.toIntColor(rgb, 0.5F);
 		
-		Box box = EntityUtils.getLerpedBox(renderTarget, partialTicks);
+		AABB box = EntityUtils.getLerpedBox(renderTarget, partialTicks);
 		if(p < 1)
-			box = box.contract((1 - p) * 0.5 * box.getLengthX(),
-				(1 - p) * 0.5 * box.getLengthY(),
-				(1 - p) * 0.5 * box.getLengthZ());
+			box = box.deflate((1 - p) * 0.5 * box.getXsize(),
+				(1 - p) * 0.5 * box.getYsize(), (1 - p) * 0.5 * box.getZsize());
 		
 		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
 		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);
 	}
 	
-	private boolean isUntamed(AnimalEntity e)
+	private boolean isUntamed(Animal e)
 	{
-		if(e instanceof AbstractHorseEntity horse && !horse.isTame())
+		if(e instanceof AbstractHorse horse && !horse.isTamed())
 			return true;
 		
-		if(e instanceof TameableEntity tame && !tame.isTamed())
+		if(e instanceof TamableAnimal tame && !tame.isTame())
 			return true;
 		
 		return false;

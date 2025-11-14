@@ -9,8 +9,8 @@ package net.wurstclient.clickgui;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.Font;
+import net.minecraft.util.Mth;
 import net.wurstclient.WurstClient;
 
 public class Window
@@ -68,8 +68,8 @@ public class Window
 	 */
 	public final int getX()
 	{
-		int scaledWidth = WurstClient.MC.getWindow().getScaledWidth();
-		return MathHelper.clamp(x, -width + 1, scaledWidth - 1);
+		int scaledWidth = WurstClient.MC.getWindow().getGuiScaledWidth();
+		return Mth.clamp(x, -width + 1, scaledWidth - 1);
 	}
 	
 	/**
@@ -92,8 +92,8 @@ public class Window
 	 */
 	public final int getY()
 	{
-		int scaledHeight = WurstClient.MC.getWindow().getScaledHeight();
-		return MathHelper.clamp(y, -12, scaledHeight - 1);
+		int scaledHeight = WurstClient.MC.getWindow().getGuiScaledHeight();
+		return Mth.clamp(y, -12, scaledHeight - 1);
 	}
 	
 	/**
@@ -148,8 +148,8 @@ public class Window
 				maxChildWidth = c.getDefaultWidth();
 		maxChildWidth += 4;
 		
-		TextRenderer tr = WurstClient.MC.textRenderer;
-		int titleBarWidth = tr.getWidth(title) + 4;
+		Font tr = WurstClient.MC.font;
+		int titleBarWidth = tr.width(title) + 4;
 		if(minimizable)
 			titleBarWidth += 11;
 		if(pinnable)

@@ -9,10 +9,11 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.screens.EditSliderScreen;
@@ -22,7 +23,7 @@ import net.wurstclient.util.RenderUtils;
 public final class SliderComponent extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	private static final int TEXT_HEIGHT = 11;
 	
 	private final SliderSetting setting;
@@ -45,7 +46,7 @@ public final class SliderComponent extends Component
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
 			if(Screen.hasControlDown())
-				MC.setScreen(new EditSliderScreen(MC.currentScreen, setting));
+				MC.setScreen(new EditSliderScreen(MC.screen, setting));
 			else
 				dragging = true;
 			break;
@@ -79,7 +80,7 @@ public final class SliderComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -142,8 +143,8 @@ public final class SliderComponent extends Component
 		RenderUtils.drawBorder2D(context, xl1, y4, xl2, y5,
 			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
-		MatrixStack matrices = context.getMatrices();
-		matrices.push();
+		PoseStack matrices = context.pose();
+		matrices.pushPose();
 		matrices.translate(0, 0, 2);
 		
 		// knob
@@ -156,15 +157,15 @@ public final class SliderComponent extends Component
 		RenderUtils.fill2D(context, xk1, yk1, xk2, yk2, knobColor);
 		RenderUtils.drawBorder2D(context, xk1, yk1, xk2, yk2, 0x80101010);
 		
-		matrices.pop();
+		matrices.popPose();
 		
 		// text
 		String name = setting.getName();
 		String value = setting.getValueString();
-		int valueWidth = TR.getWidth(value);
+		int valueWidth = TR.width(value);
 		int txtColor = GUI.getTxtColor();
-		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
-		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
+		context.drawString(TR, name, x1, y1 + 2, txtColor, false);
+		context.drawString(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
 	}
 	
 	private String getTextTooltip()
@@ -193,8 +194,8 @@ public final class SliderComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		int nameWitdh = TR.getWidth(setting.getName());
-		int valueWidth = TR.getWidth(setting.getValueString());
+		int nameWitdh = TR.width(setting.getName());
+		int valueWidth = TR.width(setting.getValueString());
 		return nameWitdh + valueWidth + 6;
 	}
 	

@@ -12,9 +12,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
 import net.wurstclient.WurstClient;
 
 public final class EventManager
@@ -72,11 +72,12 @@ public final class EventManager
 		{
 			e.printStackTrace();
 			
-			CrashReport report = CrashReport.create(e, "Firing Wurst event");
-			CrashReportSection section = report.addElement("Affected event");
-			section.add("Event class", () -> event.getClass().getName());
+			CrashReport report =
+				CrashReport.forThrowable(e, "Firing Wurst event");
+			CrashReportCategory section = report.addCategory("Affected event");
+			section.setDetail("Event class", () -> event.getClass().getName());
 			
-			throw new CrashException(report);
+			throw new ReportedException(report);
 		}
 	}
 	
@@ -101,12 +102,14 @@ public final class EventManager
 			e.printStackTrace();
 			
 			CrashReport report =
-				CrashReport.create(e, "Adding Wurst event listener");
-			CrashReportSection section = report.addElement("Affected listener");
-			section.add("Listener type", () -> type.getName());
-			section.add("Listener class", () -> listener.getClass().getName());
+				CrashReport.forThrowable(e, "Adding Wurst event listener");
+			CrashReportCategory section =
+				report.addCategory("Affected listener");
+			section.setDetail("Listener type", () -> type.getName());
+			section.setDetail("Listener class",
+				() -> listener.getClass().getName());
 			
-			throw new CrashException(report);
+			throw new ReportedException(report);
 		}
 	}
 	
@@ -125,12 +128,14 @@ public final class EventManager
 			e.printStackTrace();
 			
 			CrashReport report =
-				CrashReport.create(e, "Removing Wurst event listener");
-			CrashReportSection section = report.addElement("Affected listener");
-			section.add("Listener type", () -> type.getName());
-			section.add("Listener class", () -> listener.getClass().getName());
+				CrashReport.forThrowable(e, "Removing Wurst event listener");
+			CrashReportCategory section =
+				report.addCategory("Affected listener");
+			section.setDetail("Listener type", () -> type.getName());
+			section.setDetail("Listener class",
+				() -> listener.getClass().getName());
 			
-			throw new CrashException(report);
+			throw new ReportedException(report);
 		}
 	}
 }

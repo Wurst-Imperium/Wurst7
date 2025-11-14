@@ -8,11 +8,11 @@
 package net.wurstclient.gametest.tests;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.resources.language.I18n;
 import net.wurstclient.gametest.WurstTest;
 
 public enum AltManagerTest
@@ -26,12 +26,12 @@ public enum AltManagerTest
 		WurstTest.LOGGER.info("Checking AltManager button position");
 		
 		context.runOnClient(mc -> {
-			if(!(mc.currentScreen instanceof TitleScreen))
+			if(!(mc.screen instanceof TitleScreen))
 				throw new RuntimeException("Not on the title screen");
 			
-			ButtonWidget multiplayerButton = findButton(mc, "menu.multiplayer");
-			ButtonWidget realmsButton = findButton(mc, "menu.online");
-			ButtonWidget altManagerButton = findButton(mc, "Alt Manager");
+			Button multiplayerButton = findButton(mc, "menu.multiplayer");
+			Button realmsButton = findButton(mc, "menu.online");
+			Button altManagerButton = findButton(mc, "Alt Manager");
 			
 			checkButtonPosition(altManagerButton, realmsButton.getRight() + 4,
 				multiplayerButton.getBottom() + 4);
@@ -46,13 +46,12 @@ public enum AltManagerTest
 	 * For non-translated buttons, the translationKey parameter should be the
 	 * raw button text instead.
 	 */
-	public static ButtonWidget findButton(MinecraftClient mc,
-		String translationKey)
+	public static Button findButton(Minecraft mc, String translationKey)
 	{
-		String message = I18n.translate(translationKey);
+		String message = I18n.get(translationKey);
 		
-		for(Drawable drawable : mc.currentScreen.drawables)
-			if(drawable instanceof ButtonWidget button
+		for(Renderable drawable : mc.screen.renderables)
+			if(drawable instanceof Button button
 				&& button.getMessage().getString().equals(message))
 				return button;
 			
@@ -63,7 +62,7 @@ public enum AltManagerTest
 	 * Looks for the given button at the given coordinates and fails if it is
 	 * not there.
 	 */
-	public static void checkButtonPosition(ButtonWidget button, int expectedX,
+	public static void checkButtonPosition(Button button, int expectedX,
 		int expectedY)
 	{
 		String buttonName = button.getMessage().getString();

@@ -13,21 +13,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import net.minecraft.client.network.ClientCommonNetworkHandler;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.listener.ClientCommonPacketListener;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 
-@Mixin(ClientCommonNetworkHandler.class)
+@Mixin(ClientCommonPacketListenerImpl.class)
 public abstract class ClientCommonNetworkHandlerMixin
 	implements ClientCommonPacketListener
 {
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;)V"),
-		method = "sendPacket(Lnet/minecraft/network/packet/Packet;)V")
-	private void wrapSendPacket(ClientConnection connection, Packet<?> packet,
+		target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V"),
+		method = "send(Lnet/minecraft/network/protocol/Packet;)V")
+	private void wrapSendPacket(Connection connection, Packet<?> packet,
 		Operation<Void> original)
 	{
 		PacketOutputEvent event = new PacketOutputEvent(packet);

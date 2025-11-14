@@ -9,7 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.function.Predicate;
 
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.player.LocalPlayer;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -50,28 +50,27 @@ public final class BunnyHopHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
-		if(!player.isOnGround() || player.isSneaking())
+		LocalPlayer player = MC.player;
+		if(!player.onGround() || player.isShiftKeyDown())
 			return;
 		
 		if(jumpIf.getSelected().condition.test(player))
-			player.jump();
+			player.jumpFromGround();
 	}
 	
 	private enum JumpIf
 	{
 		SPRINTING("Sprinting",
-			p -> p.isSprinting()
-				&& (p.forwardSpeed != 0 || p.sidewaysSpeed != 0)),
+			p -> p.isSprinting() && (p.zza != 0 || p.xxa != 0)),
 		
-		WALKING("Walking", p -> p.forwardSpeed != 0 || p.sidewaysSpeed != 0),
+		WALKING("Walking", p -> p.zza != 0 || p.xxa != 0),
 		
 		ALWAYS("Always", p -> true);
 		
 		private final String name;
-		private final Predicate<ClientPlayerEntity> condition;
+		private final Predicate<LocalPlayer> condition;
 		
-		private JumpIf(String name, Predicate<ClientPlayerEntity> condition)
+		private JumpIf(String name, Predicate<LocalPlayer> condition)
 		{
 			this.name = name;
 			this.condition = condition;

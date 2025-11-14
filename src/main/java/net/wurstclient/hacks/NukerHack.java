@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.RenderListener;
@@ -87,8 +88,8 @@ public final class NukerHack extends Hack
 		
 		if(currentBlock != null)
 		{
-			MC.interactionManager.breakingBlock = true;
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.isDestroying = true;
+			MC.gameMode.stopDestroyBlock();
 			currentBlock = null;
 		}
 		
@@ -102,11 +103,11 @@ public final class NukerHack extends Hack
 	{
 		currentBlock = null;
 		
-		if(MC.options.attackKey.isPressed() || commonSettings.isIdModeWithAir())
+		if(MC.options.keyAttack.isDown() || commonSettings.isIdModeWithAir())
 			return;
 		
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		Vec3 eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
@@ -121,9 +122,9 @@ public final class NukerHack extends Hack
 		stream = stream.sorted(BlockBreaker.comparingParams());
 		
 		// Break all blocks in creative mode
-		if(MC.player.getAbilities().creativeMode)
+		if(MC.player.getAbilities().instabuild)
 		{
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.stopDestroyBlock();
 			overlay.resetProgress();
 			
 			ArrayList<BlockPos> blocks = cache
@@ -133,7 +134,7 @@ public final class NukerHack extends Hack
 			
 			currentBlock = blocks.get(0);
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
-			swingHand.swing(Hand.MAIN_HAND);
+			swingHand.swing(InteractionHand.MAIN_HAND);
 			return;
 		}
 		
@@ -143,7 +144,7 @@ public final class NukerHack extends Hack
 		
 		if(currentBlock == null)
 		{
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.stopDestroyBlock();
 			overlay.resetProgress();
 			return;
 		}
@@ -155,16 +156,15 @@ public final class NukerHack extends Hack
 	{
 		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
 		
-		if(!MC.interactionManager.updateBlockBreakingProgress(params.pos(),
-			params.side()))
+		if(!MC.gameMode.continueDestroyBlock(params.pos(), params.side()))
 			return false;
 		
-		swingHand.swing(Hand.MAIN_HAND);
+		swingHand.swing(InteractionHand.MAIN_HAND);
 		return true;
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		overlay.render(matrixStack, partialTicks, currentBlock);
 	}

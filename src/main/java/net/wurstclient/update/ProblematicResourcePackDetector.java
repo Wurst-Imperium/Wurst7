@@ -12,9 +12,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.minecraft.resource.InputSupplier;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourcePackProfile;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.resources.IoSupplier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.util.ChatUtils;
@@ -49,15 +49,15 @@ public final class ProblematicResourcePackDetector implements UpdateListener
 	
 	private boolean isTwinklingStarsInstalled()
 	{
-		Collection<ResourcePackProfile> enabledProfiles =
-			WurstClient.MC.getResourcePackManager().getEnabledProfiles();
+		Collection<Pack> enabledProfiles =
+			WurstClient.MC.getResourcePackRepository().getSelectedPacks();
 		
-		for(ResourcePackProfile profile : enabledProfiles)
+		for(Pack profile : enabledProfiles)
 		{
 			if(!isVanillaTweaks(profile))
 				continue;
 			
-			ResourcePack pack = profile.createResourcePack();
+			PackResources pack = profile.open();
 			if(!containsTwinklingStars(pack))
 				continue;
 			
@@ -67,20 +67,20 @@ public final class ProblematicResourcePackDetector implements UpdateListener
 		return false;
 	}
 	
-	private boolean isVanillaTweaks(ResourcePackProfile profile)
+	private boolean isVanillaTweaks(Pack profile)
 	{
 		return profile.getDescription().getString().contains("Vanilla Tweaks");
 	}
 	
-	private boolean containsTwinklingStars(ResourcePack pack)
+	private boolean containsTwinklingStars(PackResources pack)
 	{
 		try
 		{
 			// some implementations of ResourcePack.openRoot() throw an
 			// IllegalArgumentException when the pack doesn't contain the
 			// specified file
-			InputSupplier<InputStream> supplier =
-				pack.openRoot("Selected Packs.txt");
+			IoSupplier<InputStream> supplier =
+				pack.getRootResource("Selected Packs.txt");
 			if(supplier == null)
 				return false;
 			

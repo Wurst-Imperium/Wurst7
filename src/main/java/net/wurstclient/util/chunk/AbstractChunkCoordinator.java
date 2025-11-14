@@ -15,12 +15,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.PacketInputListener;
 import net.wurstclient.settings.ChunkAreaSetting;
@@ -44,7 +44,7 @@ public abstract class AbstractChunkCoordinator implements PacketInputListener
 	
 	public boolean update()
 	{
-		DimensionType dimension = WurstClient.MC.world.getDimension();
+		DimensionType dimension = WurstClient.MC.level.dimensionType();
 		HashSet<ChunkPos> chunkUpdates = clearChunksToUpdate();
 		boolean searchersChanged = false;
 		
@@ -76,7 +76,7 @@ public abstract class AbstractChunkCoordinator implements PacketInputListener
 		}
 		
 		// add new ChunkSearchers
-		for(Chunk chunk : area.getChunksInRange())
+		for(ChunkAccess chunk : area.getChunksInRange())
 		{
 			ChunkPos chunkPos = chunk.getPos();
 			if(searchers.containsKey(chunkPos))

@@ -20,33 +20,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.client.gui.hud.MessageIndicator;
-import net.minecraft.network.message.MessageSignatureData;
-import net.minecraft.text.Text;
+import net.minecraft.client.GuiMessage;
+import net.minecraft.client.GuiMessageTag;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MessageSignature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 
-@Mixin(ChatHud.class)
+@Mixin(ChatComponent.class)
 public class ChatHudMixin
 {
 	@Shadow
 	@Final
-	private List<ChatHudLine.Visible> visibleMessages;
+	private List<GuiMessage.Line> trimmedMessages;
 	
 	@Inject(at = @At("HEAD"),
-		method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
+		method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V",
 		cancellable = true)
-	private void onAddMessage(Text messageDontUse,
-		@Nullable MessageSignatureData signature,
-		@Nullable MessageIndicator indicatorDontUse, CallbackInfo ci,
-		@Local(argsOnly = true) LocalRef<Text> message,
-		@Local(argsOnly = true) LocalRef<MessageIndicator> indicator)
+	private void onAddMessage(Component messageDontUse,
+		@Nullable MessageSignature signature,
+		@Nullable GuiMessageTag indicatorDontUse, CallbackInfo ci,
+		@Local(argsOnly = true) LocalRef<Component> message,
+		@Local(argsOnly = true) LocalRef<GuiMessageTag> indicator)
 	{
 		ChatInputEvent event =
-			new ChatInputEvent(message.get(), visibleMessages);
+			new ChatInputEvent(message.get(), trimmedMessages);
 		
 		EventManager.fire(event);
 		if(event.isCancelled())

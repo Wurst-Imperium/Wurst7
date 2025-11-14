@@ -12,10 +12,10 @@ import java.util.Random;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Hand;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -106,12 +106,12 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		if(pauseOnContainers.shouldPause())
 			return;
 		
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
 		// set entity
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		double rangeSq = Math.pow(range.getValue(), 2);
-		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
+		stream = stream.filter(e -> MC.player.distanceToSqr(e) <= rangeSq);
 		
 		stream = entityFilters.applyTo(stream);
 		
@@ -123,25 +123,25 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		WURST.getHax().autoSwordHack.setSlot(entity);
 		
 		// teleport
-		player.setPosition(entity.getX() + random.nextInt(3) * 2 - 2,
-			entity.getY(), entity.getZ() + random.nextInt(3) * 2 - 2);
+		player.setPos(entity.getX() + random.nextInt(3) * 2 - 2, entity.getY(),
+			entity.getZ() + random.nextInt(3) * 2 - 2);
 		
 		// check cooldown
-		if(player.getAttackCooldownProgress(0) < 1)
+		if(player.getAttackStrengthScale(0) < 1)
 			return;
 		
 		// attack entity
 		RotationUtils.getNeededRotations(entity.getBoundingBox().getCenter())
 			.sendPlayerLookPacket();
 		
-		MC.interactionManager.attackEntity(player, entity);
-		swingHand.swing(Hand.MAIN_HAND);
+		MC.gameMode.attack(player, entity);
+		swingHand.swing(InteractionHand.MAIN_HAND);
 		speed.resetTimer();
 	}
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", e -> MC.player.squaredDistanceTo(e)),
+		DISTANCE("Distance", e -> MC.player.distanceToSqr(e)),
 		
 		ANGLE("Angle",
 			e -> RotationUtils

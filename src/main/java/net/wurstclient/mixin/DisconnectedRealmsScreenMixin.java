@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.realms.gui.screen.DisconnectedRealmsScreen;
-import net.minecraft.client.realms.gui.screen.RealmsScreen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.realms.DisconnectedRealmsScreen;
+import net.minecraft.realms.RealmsScreen;
 import net.wurstclient.WurstClient;
 import net.wurstclient.nochatreports.ForcedChatReportsScreen;
 
@@ -26,12 +26,12 @@ public class DisconnectedRealmsScreenMixin extends RealmsScreen
 {
 	@Shadow
 	@Final
-	private Text reason;
+	private Component reason;
 	@Shadow
 	@Final
 	private Screen parent;
 	
-	private DisconnectedRealmsScreenMixin(WurstClient wurst, Text title)
+	private DisconnectedRealmsScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}
@@ -45,6 +45,6 @@ public class DisconnectedRealmsScreenMixin extends RealmsScreen
 		System.out.println("Realms disconnected: " + reason);
 		
 		if(ForcedChatReportsScreen.isCausedByNoChatReports(reason))
-			client.setScreen(new ForcedChatReportsScreen(parent));
+			minecraft.setScreen(new ForcedChatReportsScreen(parent));
 	}
 }

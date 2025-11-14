@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -38,22 +38,22 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// return if sneaking or not walking
-		if(MC.player.isSneaking()
-			|| MC.player.forwardSpeed == 0 && MC.player.sidewaysSpeed == 0)
+		if(MC.player.isShiftKeyDown()
+			|| MC.player.zza == 0 && MC.player.xxa == 0)
 			return;
 		
 		// activate sprint if walking forward
-		if(MC.player.forwardSpeed > 0 && !MC.player.horizontalCollision)
+		if(MC.player.zza > 0 && !MC.player.horizontalCollision)
 			MC.player.setSprinting(true);
 		
 		// activate mini jump if on ground
-		if(!MC.player.isOnGround())
+		if(!MC.player.onGround())
 			return;
 		
-		Vec3d v = MC.player.getVelocity();
-		MC.player.setVelocity(v.x * 1.8, v.y + 0.1, v.z * 1.8);
+		Vec3 v = MC.player.getDeltaMovement();
+		MC.player.setDeltaMovement(v.x * 1.8, v.y + 0.1, v.z * 1.8);
 		
-		v = MC.player.getVelocity();
+		v = MC.player.getDeltaMovement();
 		double currentSpeed = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.z, 2));
 		
 		// limit speed to highest value that works on NoCheat+ version
@@ -62,7 +62,7 @@ public final class SpeedHackHack extends Hack implements UpdateListener
 		double maxSpeed = 0.66F;
 		
 		if(currentSpeed > maxSpeed)
-			MC.player.setVelocity(v.x / currentSpeed * maxSpeed, v.y,
+			MC.player.setDeltaMovement(v.x / currentSpeed * maxSpeed, v.y,
 				v.z / currentSpeed * maxSpeed);
 	}
 }

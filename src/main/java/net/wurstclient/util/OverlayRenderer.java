@@ -7,17 +7,18 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
 public final class OverlayRenderer
 {
-	protected static final MinecraftClient MC = WurstClient.MC;
+	protected static final Minecraft MC = WurstClient.MC;
 	protected static final IMinecraftClient IMC = WurstClient.IMC;
 	
 	private float progress;
@@ -34,14 +35,13 @@ public final class OverlayRenderer
 	public void updateProgress()
 	{
 		prevProgress = progress;
-		progress = MC.interactionManager.currentBreakingProgress;
+		progress = MC.gameMode.destroyProgress;
 		
 		if(progress < prevProgress)
 			prevProgress = progress;
 	}
 	
-	public void render(MatrixStack matrixStack, float partialTicks,
-		BlockPos pos)
+	public void render(PoseStack matrixStack, float partialTicks, BlockPos pos)
 	{
 		if(pos == null)
 			return;
@@ -53,10 +53,10 @@ public final class OverlayRenderer
 		prevPos = pos;
 		
 		// Get interpolated progress
-		boolean breaksInstantly = MC.player.getAbilities().creativeMode
+		boolean breaksInstantly = MC.player.getAbilities().instabuild
 			|| BlockUtils.getHardness(pos) >= 1;
 		float p = breaksInstantly ? 1
-			: MathHelper.lerp(partialTicks, prevProgress, progress);
+			: Mth.lerp(partialTicks, prevProgress, progress);
 		
 		// Get colors
 		float red = p * 2F;
@@ -66,9 +66,9 @@ public final class OverlayRenderer
 		int lineColor = RenderUtils.toIntColor(rgb, 0.5F);
 		
 		// Set size
-		Box box = new Box(pos);
+		AABB box = new AABB(pos);
 		if(p < 1)
-			box = box.contract((1 - p) * 0.5);
+			box = box.deflate((1 - p) * 0.5);
 		
 		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
 		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);

@@ -7,12 +7,12 @@
  */
 package net.wurstclient.hacks.autofarm.plants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CaveVines;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.CaveVines;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
@@ -29,9 +29,9 @@ public final class GlowBerryPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		BlockState ceiling = BlockUtils.getState(pos.up());
-		return !(ceiling.getBlock() instanceof CaveVines) && ceiling
-			.isSideSolidFullSquare(WurstClient.MC.world, pos, Direction.DOWN);
+		BlockState ceiling = BlockUtils.getState(pos.above());
+		return !(ceiling.getBlock() instanceof CaveVines)
+			&& ceiling.isFaceSturdy(WurstClient.MC.level, pos, Direction.DOWN);
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public final class GlowBerryPlantType extends AutoFarmPlantType
 	{
 		// Right-click-harvest the top-most part so we don't have to replant it.
 		return state.getBlock() instanceof CaveVines
-			&& CaveVines.hasBerries(state) && isReplantingSpot(pos, state);
+			&& CaveVines.hasGlowBerries(state) && isReplantingSpot(pos, state);
 	}
 	
 	@Override

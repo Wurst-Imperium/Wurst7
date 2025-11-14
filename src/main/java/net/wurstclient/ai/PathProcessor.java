@@ -9,21 +9,21 @@ package net.wurstclient.ai;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IKeyBinding;
 
 public abstract class PathProcessor
 {
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
-	protected static final MinecraftClient MC = WurstClient.MC;
+	protected static final Minecraft MC = WurstClient.MC;
 	
-	private static final KeyBinding[] CONTROLS =
-		{MC.options.forwardKey, MC.options.backKey, MC.options.rightKey,
-			MC.options.leftKey, MC.options.jumpKey, MC.options.sneakKey};
+	private static final KeyMapping[] CONTROLS =
+		{MC.options.keyUp, MC.options.keyDown, MC.options.keyRight,
+			MC.options.keyLeft, MC.options.keyJump, MC.options.keyShift};
 	
 	protected final ArrayList<PathPos> path;
 	protected int index;
@@ -60,14 +60,14 @@ public abstract class PathProcessor
 	protected final void facePosition(BlockPos pos)
 	{
 		WURST.getRotationFaker()
-			.faceVectorClientIgnorePitch(Vec3d.ofCenter(pos));
+			.faceVectorClientIgnorePitch(Vec3.atCenterOf(pos));
 	}
 	
 	public static final void lockControls()
 	{
 		// disable keys
-		for(KeyBinding key : CONTROLS)
-			key.setPressed(false);
+		for(KeyMapping key : CONTROLS)
+			key.setDown(false);
 		
 		// disable sprinting
 		MC.player.setSprinting(false);
@@ -76,7 +76,7 @@ public abstract class PathProcessor
 	public static final void releaseControls()
 	{
 		// reset keys
-		for(KeyBinding key : CONTROLS)
+		for(KeyMapping key : CONTROLS)
 			IKeyBinding.get(key).resetPressedState();
 	}
 }

@@ -28,10 +28,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.resource.language.LanguageManager;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.resources.language.LanguageManager;
 
 /**
  * An implementation of the Plausible Events API for privacy-friendly
@@ -100,26 +100,26 @@ public final class PlausibleAnalytics
 		return version;
 	}
 	
-	private void onWorldChange(MinecraftClient client, ClientWorld world)
+	private void onWorldChange(Minecraft client, ClientLevel world)
 	{
 		sessionProp("language", getLanguage(client));
 		sessionProp("game_type", getGameType(client));
 		pageview("/in-game");
 	}
 	
-	private String getLanguage(MinecraftClient client)
+	private String getLanguage(Minecraft client)
 	{
 		return Optional.ofNullable(client.getLanguageManager())
-			.map(LanguageManager::getLanguage).map(String::toLowerCase)
+			.map(LanguageManager::getSelected).map(String::toLowerCase)
 			.orElse(null);
 	}
 	
-	private String getGameType(MinecraftClient client)
+	private String getGameType(Minecraft client)
 	{
-		ServerInfo server = client.getCurrentServerEntry();
+		ServerData server = client.getCurrentServer();
 		if(server == null)
 			return "singleplayer";
-		if(server.isLocal())
+		if(server.isLan())
 			return "lan";
 		if(server.isRealm())
 			return "realms";

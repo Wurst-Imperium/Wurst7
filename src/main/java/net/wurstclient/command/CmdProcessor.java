@@ -9,9 +9,9 @@ package net.wurstclient.command;
 
 import java.util.Arrays;
 
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.hacks.TooManyHaxHack;
@@ -88,10 +88,12 @@ public final class CmdProcessor implements ChatOutputListener
 			
 		}catch(Throwable e)
 		{
-			CrashReport report = CrashReport.create(e, "Running Wurst command");
-			CrashReportSection section = report.addElement("Affected command");
-			section.add("Command input", () -> input);
-			throw new CrashException(report);
+			CrashReport report =
+				CrashReport.forThrowable(e, "Running Wurst command");
+			CrashReportCategory section =
+				report.addCategory("Affected command");
+			section.setDetail("Command input", () -> input);
+			throw new ReportedException(report);
 		}
 	}
 	

@@ -16,19 +16,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.command.CommandOutput;
-import net.minecraft.util.Nameable;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.entity.EntityLike;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.world.Nameable;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.entity.EntityAccess;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromEntityCollisionListener.VelocityFromEntityCollisionEvent;
 import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
+public abstract class EntityMixin
+	implements Nameable, EntityAccess, CommandSource
 {
 	/**
 	 * This mixin makes the VelocityFromFluidEvent work, which is used by
@@ -36,12 +37,12 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 	 * when using Sinytra Connector.
 	 */
 	@WrapWithCondition(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/Entity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V",
+		target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V",
 		opcode = Opcodes.INVOKEVIRTUAL,
 		ordinal = 0),
-		method = "updateMovementInFluid(Lnet/minecraft/registry/tag/TagKey;D)Z",
+		method = "updateFluidHeightAndDoFluidPushing(Lnet/minecraft/tags/TagKey;D)Z",
 		require = 0)
-	private boolean shouldSetVelocity(Entity instance, Vec3d velocity)
+	private boolean shouldSetVelocity(Entity instance, Vec3 velocity)
 	{
 		VelocityFromFluidEvent event = new VelocityFromFluidEvent(instance);
 		EventManager.fire(event);
@@ -49,7 +50,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "Lnet/minecraft/entity/Entity;pushAwayFrom(Lnet/minecraft/entity/Entity;)V",
+		method = "push(Lnet/minecraft/world/entity/Entity;)V",
 		cancellable = true)
 	private void onPushAwayFrom(Entity entity, CallbackInfo ci)
 	{
@@ -65,9 +66,9 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 	 * Makes invisible entities render as ghosts if TrueSight is enabled.
 	 */
 	@Inject(at = @At("RETURN"),
-		method = "Lnet/minecraft/entity/Entity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z",
+		method = "isInvisibleTo(Lnet/minecraft/world/entity/player/Player;)Z",
 		cancellable = true)
-	private void onIsInvisibleTo(PlayerEntity player,
+	private void onIsInvisibleTo(Player player,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		// Return early if the entity is not invisible

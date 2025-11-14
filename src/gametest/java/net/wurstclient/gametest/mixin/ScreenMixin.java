@@ -13,15 +13,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.AbstractParentElement;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.Colors;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.util.CommonColors;
 
 @Mixin(Screen.class)
-public abstract class ScreenMixin extends AbstractParentElement
-	implements Drawable
+public abstract class ScreenMixin extends AbstractContainerEventHandler
+	implements Renderable
 {
 	@Shadow
 	public int width;
@@ -32,13 +32,11 @@ public abstract class ScreenMixin extends AbstractParentElement
 	 * Replaces the panorama background with a gray background to make test
 	 * screenshots consistent.
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "renderPanoramaBackground",
-		cancellable = true)
-	public void renderPanoramaBackground(DrawContext context, float deltaTicks,
+	@Inject(at = @At("HEAD"), method = "renderPanorama", cancellable = true)
+	public void renderPanoramaBackground(GuiGraphics context, float deltaTicks,
 		CallbackInfo ci)
 	{
-		context.fill(0, 0, width, height, Colors.GRAY);
+		context.fill(0, 0, width, height, CommonColors.GRAY);
 		ci.cancel();
 	}
 }

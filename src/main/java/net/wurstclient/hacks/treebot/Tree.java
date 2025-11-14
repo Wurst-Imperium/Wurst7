@@ -10,9 +10,10 @@ package net.wurstclient.hacks.treebot;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.util.RenderUtils;
 
 public class Tree
@@ -26,15 +27,15 @@ public class Tree
 		this.logs = logs;
 	}
 	
-	public void draw(MatrixStack matrixStack)
+	public void draw(PoseStack matrixStack)
 	{
 		int green = 0x8000FF00;
-		Box box = new Box(BlockPos.ORIGIN).contract(1 / 16.0);
+		AABB box = new AABB(BlockPos.ZERO).deflate(1 / 16.0);
 		
-		Box stumpBox = box.offset(stump);
+		AABB stumpBox = box.move(stump);
 		RenderUtils.drawCrossBox(matrixStack, stumpBox, green, false);
 		
-		List<Box> logBoxes = logs.stream().map(pos -> box.offset(pos)).toList();
+		List<AABB> logBoxes = logs.stream().map(pos -> box.move(pos)).toList();
 		RenderUtils.drawOutlinedBoxes(matrixStack, logBoxes, green, false);
 	}
 	

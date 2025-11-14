@@ -10,11 +10,12 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
@@ -71,7 +72,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	public void onUpdate()
 	{
 		items.clear();
-		for(Entity entity : MC.world.getEntities())
+		for(Entity entity : MC.level.entitiesForRendering())
 			if(entity instanceof ItemEntity)
 				items.add((ItemEntity)entity);
 	}
@@ -85,7 +86,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		int lineColor = color.getColorI(0x80);
 		
@@ -93,17 +94,17 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		{
 			double extraSize = boxSize.getExtraSize() / 2;
 			
-			ArrayList<Box> boxes = new ArrayList<>(items.size());
+			ArrayList<AABB> boxes = new ArrayList<>(items.size());
 			for(ItemEntity e : items)
 				boxes.add(EntityUtils.getLerpedBox(e, partialTicks)
-					.offset(0, extraSize, 0).expand(extraSize));
+					.move(0, extraSize, 0).inflate(extraSize));
 			
 			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, lineColor, false);
 		}
 		
 		if(style.hasLines())
 		{
-			ArrayList<Vec3d> ends = new ArrayList<>(items.size());
+			ArrayList<Vec3> ends = new ArrayList<>(items.size());
 			for(ItemEntity e : items)
 				ends.add(EntityUtils.getLerpedBox(e, partialTicks).getCenter());
 			

@@ -9,8 +9,8 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.screens.EditColorScreen;
@@ -21,7 +21,7 @@ import net.wurstclient.util.RenderUtils;
 public final class ColorComponent extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	private static final int TEXT_HEIGHT = 11;
 	
 	private final ColorSetting setting;
@@ -42,7 +42,7 @@ public final class ColorComponent extends Component
 		switch(mouseButton)
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
-			MC.setScreen(new EditColorScreen(MC.currentScreen, setting));
+			MC.setScreen(new EditColorScreen(MC.screen, setting));
 			break;
 			
 			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
@@ -52,7 +52,7 @@ public final class ColorComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -84,10 +84,10 @@ public final class ColorComponent extends Component
 		// text
 		String name = setting.getName();
 		String value = ColorUtils.toHex(setting.getColor());
-		int valueWidth = TR.getWidth(value);
+		int valueWidth = TR.width(value);
 		int txtColor = GUI.getTxtColor();
-		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
-		context.drawText(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
+		context.drawString(TR, name, x1, y1 + 2, txtColor, false);
+		context.drawString(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
 	}
 	
 	private String getColorTooltip()
@@ -103,7 +103,7 @@ public final class ColorComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return TR.getWidth(setting.getName() + "#FFFFFF") + 6;
+		return TR.width(setting.getName() + "#FFFFFF") + 6;
 	}
 	
 	@Override

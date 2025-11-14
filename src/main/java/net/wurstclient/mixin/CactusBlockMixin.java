@@ -12,13 +12,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CactusBlock;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CactusBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.CactusCollisionShapeListener.CactusCollisionShapeEvent;
@@ -26,16 +26,16 @@ import net.wurstclient.events.CactusCollisionShapeListener.CactusCollisionShapeE
 @Mixin(CactusBlock.class)
 public abstract class CactusBlockMixin extends Block
 {
-	private CactusBlockMixin(WurstClient wurst, Settings settings)
+	private CactusBlockMixin(WurstClient wurst, Properties settings)
 	{
 		super(settings);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getCollisionShape(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;",
+		method = "getCollisionShape(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
 		cancellable = true)
-	private void onGetCollisionShape(BlockState state, BlockView world,
-		BlockPos pos, ShapeContext context,
+	private void onGetCollisionShape(BlockState state, BlockGetter world,
+		BlockPos pos, CollisionContext context,
 		CallbackInfoReturnable<VoxelShape> cir)
 	{
 		CactusCollisionShapeEvent event = new CactusCollisionShapeEvent();

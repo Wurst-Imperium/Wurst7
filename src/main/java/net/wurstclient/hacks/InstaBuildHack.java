@@ -12,14 +12,14 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.events.RightClickListener;
 import net.wurstclient.events.UpdateListener;
@@ -125,7 +125,7 @@ public final class InstaBuildHack extends Hack
 		if(status != Status.IDLE)
 			return;
 		
-		HitResult hitResult = MC.crosshairTarget;
+		HitResult hitResult = MC.hitResult;
 		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
 			|| !(hitResult instanceof BlockHitResult blockHitResult))
 			return;
@@ -134,8 +134,9 @@ public final class InstaBuildHack extends Hack
 		if(!BlockUtils.canBeClicked(hitResultPos))
 			return;
 		
-		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
-		Direction direction = MC.player.getHorizontalFacing();
+		BlockPos startPos =
+			hitResultPos.relative(blockHitResult.getDirection());
+		Direction direction = MC.player.getDirection();
 		remainingBlocks = template.getBlocksToPlace(startPos, direction);
 		
 		buildInstantly();
@@ -163,15 +164,15 @@ public final class InstaBuildHack extends Hack
 	
 	private void buildInstantly()
 	{
-		PlayerInventory inventory = MC.player.getInventory();
-		int oldSlot = inventory.selectedSlot;
+		Inventory inventory = MC.player.getInventory();
+		int oldSlot = inventory.selected;
 		
 		for(Map.Entry<BlockPos, Item> entry : remainingBlocks.entrySet())
 		{
 			BlockPos pos = entry.getKey();
 			Item item = entry.getValue();
 			
-			if(!BlockUtils.getState(pos).isReplaceable())
+			if(!BlockUtils.getState(pos).canBeReplaced())
 				continue;
 			
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
@@ -179,14 +180,14 @@ public final class InstaBuildHack extends Hack
 				continue;
 			
 			if(useSavedBlocks.isChecked() && item != Items.AIR
-				&& !MC.player.getMainHandStack().isOf(item))
+				&& !MC.player.getMainHandItem().is(item))
 				giveOrSelectItem(item);
 			
 			InteractionSimulator.rightClickBlock(params.toHitResult(),
 				SwingHand.OFF);
 		}
 		
-		inventory.setSelectedSlot(oldSlot);
+		inventory.setSelectedHotbarSlot(oldSlot);
 		remainingBlocks.clear();
 	}
 	
@@ -195,13 +196,13 @@ public final class InstaBuildHack extends Hack
 		if(InventoryUtils.selectItem(item, 9))
 			return;
 		
-		if(!MC.player.isInCreativeMode())
+		if(!MC.player.hasInfiniteMaterials())
 			return;
 		
-		PlayerInventory inventory = MC.player.getInventory();
-		int slot = inventory.getEmptySlot();
-		if(!PlayerInventory.isValidHotbarIndex(slot))
-			slot = inventory.selectedSlot;
+		Inventory inventory = MC.player.getInventory();
+		int slot = inventory.getFreeSlot();
+		if(!Inventory.isHotbarSlot(slot))
+			slot = inventory.selected;
 		
 		ItemStack stack = new ItemStack(item);
 		InventoryUtils.setCreativeStack(slot, stack);

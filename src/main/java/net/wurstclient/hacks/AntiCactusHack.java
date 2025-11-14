@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.CactusCollisionShapeListener;
@@ -38,6 +38,6 @@ public final class AntiCactusHack extends Hack
 	@Override
 	public void onCactusCollisionShape(CactusCollisionShapeEvent event)
 	{
-		event.setCollisionShape(VoxelShapes.fullCube());
+		event.setCollisionShape(Shapes.block());
 	}
 }

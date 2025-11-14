@@ -10,9 +10,9 @@ package net.wurstclient.hacks;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -46,18 +46,18 @@ public final class AutoStealHack extends Hack
 		addSetting(reverseSteal);
 	}
 	
-	public void steal(HandledScreen<?> screen, int rows)
+	public void steal(AbstractContainerScreen<?> screen, int rows)
 	{
 		startClickingSlots(screen, 0, rows * 9, true);
 	}
 	
-	public void store(HandledScreen<?> screen, int rows)
+	public void store(AbstractContainerScreen<?> screen, int rows)
 	{
 		startClickingSlots(screen, rows * 9, rows * 9 + 36, false);
 	}
 	
-	private void startClickingSlots(HandledScreen<?> screen, int from, int to,
-		boolean steal)
+	private void startClickingSlots(AbstractContainerScreen<?> screen, int from,
+		int to, boolean steal)
 	{
 		if(thread != null && thread.isAlive())
 			thread.interrupt();
@@ -67,11 +67,11 @@ public final class AutoStealHack extends Hack
 			.start(() -> shiftClickSlots(screen, from, to, steal));
 	}
 	
-	private void shiftClickSlots(HandledScreen<?> screen, int from, int to,
-		boolean steal)
+	private void shiftClickSlots(AbstractContainerScreen<?> screen, int from,
+		int to, boolean steal)
 	{
 		List<Slot> slots = IntStream.range(from, to)
-			.mapToObj(i -> screen.getScreenHandler().slots.get(i)).toList();
+			.mapToObj(i -> screen.getMenu().slots.get(i)).toList();
 		
 		if(reverseSteal.isChecked() && steal)
 			slots = slots.reversed();
@@ -79,16 +79,15 @@ public final class AutoStealHack extends Hack
 		for(Slot slot : slots)
 			try
 			{
-				if(slot.getStack().isEmpty())
+				if(slot.getItem().isEmpty())
 					continue;
 				
 				Thread.sleep(delay.getValueI());
 				
-				if(MC.currentScreen == null)
+				if(MC.screen == null)
 					break;
 				
-				screen.onMouseClick(slot, slot.id, 0,
-					SlotActionType.QUICK_MOVE);
+				screen.slotClicked(slot, slot.index, 0, ClickType.QUICK_MOVE);
 				
 			}catch(InterruptedException e)
 			{

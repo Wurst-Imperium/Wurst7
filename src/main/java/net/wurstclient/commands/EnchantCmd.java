@@ -7,14 +7,14 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.EnchantmentTags;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -32,7 +32,7 @@ public final class EnchantCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		if(!MC.player.getAbilities().creativeMode)
+		if(!MC.player.getAbilities().instabuild)
 			throw new CmdError("Creative mode only.");
 		
 		if(args.length > 1)
@@ -44,10 +44,10 @@ public final class EnchantCmd extends Command
 	
 	private ItemStack getHeldItem() throws CmdError
 	{
-		ItemStack stack = MC.player.getMainHandStack();
+		ItemStack stack = MC.player.getMainHandItem();
 		
 		if(stack.isEmpty())
-			stack = MC.player.getOffHandStack();
+			stack = MC.player.getOffhandItem();
 		
 		if(stack.isEmpty())
 			throw new CmdError("There is no item in your hand.");
@@ -57,28 +57,28 @@ public final class EnchantCmd extends Command
 	
 	private void enchant(ItemStack stack, int level)
 	{
-		DynamicRegistryManager drm = MC.world.getRegistryManager();
+		RegistryAccess drm = MC.level.registryAccess();
 		Registry<Enchantment> registry =
-			drm.getOrThrow(RegistryKeys.ENCHANTMENT);
+			drm.lookupOrThrow(Registries.ENCHANTMENT);
 		
-		for(RegistryEntry<Enchantment> entry : registry.getIndexedEntries())
+		for(Holder<Enchantment> entry : registry.asHolderIdMap())
 		{
 			// Skip curses
-			if(entry.isIn(EnchantmentTags.CURSE))
+			if(entry.is(EnchantmentTags.CURSE))
 				continue;
 			
 			// Skip Silk Touch so it doesn't remove Fortune
-			if(entry.getKey().orElse(null) == Enchantments.SILK_TOUCH)
+			if(entry.unwrapKey().orElse(null) == Enchantments.SILK_TOUCH)
 				continue;
 			
 			// Limit Quick Charge to level 5 so it doesn't break
-			if(entry.getKey().orElse(null) == Enchantments.QUICK_CHARGE)
+			if(entry.unwrapKey().orElse(null) == Enchantments.QUICK_CHARGE)
 			{
-				stack.addEnchantment(entry, Math.min(level, 5));
+				stack.enchant(entry, Math.min(level, 5));
 				continue;
 			}
 			
-			stack.addEnchantment(entry, level);
+			stack.enchant(entry, level);
 		}
 	}
 	

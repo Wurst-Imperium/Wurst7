@@ -7,9 +7,9 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -71,16 +71,16 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 				return;
 			
 			// save old slot
-			int oldSlot = MC.player.getInventory().selectedSlot;
+			int oldSlot = MC.player.getInventory().selected;
 			
 			// throw potion in hotbar
-			MC.player.getInventory().selectedSlot = potionInHotbar;
-			new Rotation(MC.player.getYaw(), 90).sendPlayerLookPacket();
+			MC.player.getInventory().selected = potionInHotbar;
+			new Rotation(MC.player.getYRot(), 90).sendPlayerLookPacket();
 			IMC.getInteractionManager().rightClickItem();
 			
 			// reset slot and rotation
-			MC.player.getInventory().selectedSlot = oldSlot;
-			new Rotation(MC.player.getYaw(), MC.player.getPitch())
+			MC.player.getInventory().selected = oldSlot;
+			new Rotation(MC.player.getYRot(), MC.player.getXRot())
 				.sendPlayerLookPacket();
 			
 			// reset timer
@@ -102,14 +102,14 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	{
 		for(int i = startSlot; i < endSlot; i++)
 		{
-			ItemStack stack = MC.player.getInventory().getStack(i);
+			ItemStack stack = MC.player.getInventory().getItem(i);
 			
 			// filter out non-splash potion items
 			if(stack.getItem() != Items.SPLASH_POTION)
 				continue;
 			
 			// search for instant health effects
-			if(ItemUtils.hasEffect(stack, StatusEffects.INSTANT_HEALTH))
+			if(ItemUtils.hasEffect(stack, MobEffects.HEAL))
 				return i;
 		}
 		

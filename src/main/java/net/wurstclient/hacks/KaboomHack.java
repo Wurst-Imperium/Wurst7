@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -39,7 +39,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 	private final CheckboxSetting particles = new CheckboxSetting("Particles",
 		"description.wurst.setting.kaboom.particles", true);
 	
-	private final Random random = Random.create();
+	private final RandomSource random = RandomSource.create();
 	
 	public KaboomHack()
 	{
@@ -66,7 +66,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// Abort if flying to prevent getting kicked
-		if(!MC.player.getAbilities().creativeMode && !MC.player.isOnGround())
+		if(!MC.player.getAbilities().instabuild && !MC.player.onGround())
 			return;
 		
 		double x = MC.player.getX();
@@ -78,12 +78,12 @@ public final class KaboomHack extends Hack implements UpdateListener
 		{
 			float soundPitch =
 				(1F + (random.nextFloat() - random.nextFloat()) * 0.2F) * 0.7F;
-			MC.world.playSound(x, y, z,
-				SoundEvents.ENTITY_GENERIC_EXPLODE.value(),
-				SoundCategory.BLOCKS, 4, soundPitch, false);
+			MC.level.playLocalSound(x, y, z,
+				SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 4,
+				soundPitch, false);
 		}
 		if(particles.isChecked())
-			MC.world.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 1, 0,
+			MC.level.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 1, 0,
 				0);
 		
 		// Break all blocks
@@ -96,16 +96,16 @@ public final class KaboomHack extends Hack implements UpdateListener
 	
 	private ArrayList<BlockPos> getBlocksByDistanceReversed()
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		Vec3 eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = 36;
 		int blockRange = 6;
 		
 		// farthest blocks first
 		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+			.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
 			.sorted(Comparator
-				.comparingDouble(pos -> -pos.getSquaredDistance(eyesVec)))
+				.comparingDouble(pos -> -pos.distToCenterSqr(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 }

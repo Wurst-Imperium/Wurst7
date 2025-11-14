@@ -16,16 +16,16 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.ColorUtils;
 
@@ -35,15 +35,15 @@ public final class EditColorScreen extends Screen
 	private final ColorSetting colorSetting;
 	private Color color;
 	
-	private TextFieldWidget hexValueField;
-	private TextFieldWidget redValueField;
-	private TextFieldWidget greenValueField;
-	private TextFieldWidget blueValueField;
+	private EditBox hexValueField;
+	private EditBox redValueField;
+	private EditBox greenValueField;
+	private EditBox blueValueField;
 	
-	private ButtonWidget doneButton;
+	private Button doneButton;
 	
-	private final Identifier paletteIdentifier =
-		Identifier.of("wurst", "colorpalette.png");
+	private final ResourceLocation paletteIdentifier =
+		ResourceLocation.fromNamespaceAndPath("wurst", "colorpalette.png");
 	private BufferedImage paletteAsBufferedImage;
 	
 	private int paletteX = 0;
@@ -59,7 +59,7 @@ public final class EditColorScreen extends Screen
 	
 	public EditColorScreen(Screen prevScreen, ColorSetting colorSetting)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.prevScreen = prevScreen;
 		this.colorSetting = colorSetting;
 		color = colorSetting.getColor();
@@ -69,8 +69,8 @@ public final class EditColorScreen extends Screen
 	public void init()
 	{
 		// Cache color palette
-		try(InputStream stream = client.getResourceManager()
-			.getResourceOrThrow(paletteIdentifier).getInputStream())
+		try(InputStream stream = minecraft.getResourceManager()
+			.getResourceOrThrow(paletteIdentifier).open())
 		{
 			paletteAsBufferedImage = ImageIO.read(stream);
 			
@@ -80,50 +80,50 @@ public final class EditColorScreen extends Screen
 			e.printStackTrace();
 		}
 		
-		TextRenderer tr = client.textRenderer;
+		Font tr = minecraft.font;
 		paletteX = width / 2 - 100;
 		paletteY = 32;
 		fieldsX = width / 2 - 100;
 		fieldsY = 129 + 5;
 		
 		hexValueField =
-			new TextFieldWidget(tr, fieldsX, fieldsY, 92, 20, Text.literal(""));
-		hexValueField.setText(ColorUtils.toHex(color).substring(1));
+			new EditBox(tr, fieldsX, fieldsY, 92, 20, Component.literal(""));
+		hexValueField.setValue(ColorUtils.toHex(color).substring(1));
 		hexValueField.setMaxLength(6);
-		hexValueField.setChangedListener(s -> updateColor(true));
+		hexValueField.setResponder(s -> updateColor(true));
 		
 		// RGB fields
-		redValueField = new TextFieldWidget(tr, fieldsX, fieldsY + 35, 50, 20,
-			Text.literal(""));
-		redValueField.setText("" + color.getRed());
+		redValueField = new EditBox(tr, fieldsX, fieldsY + 35, 50, 20,
+			Component.literal(""));
+		redValueField.setValue("" + color.getRed());
 		redValueField.setMaxLength(3);
-		redValueField.setChangedListener(s -> updateColor(false));
+		redValueField.setResponder(s -> updateColor(false));
 		
-		greenValueField = new TextFieldWidget(tr, fieldsX + 75, fieldsY + 35,
-			50, 20, Text.literal(""));
-		greenValueField.setText("" + color.getGreen());
+		greenValueField = new EditBox(tr, fieldsX + 75, fieldsY + 35, 50, 20,
+			Component.literal(""));
+		greenValueField.setValue("" + color.getGreen());
 		greenValueField.setMaxLength(3);
-		greenValueField.setChangedListener(s -> updateColor(false));
+		greenValueField.setResponder(s -> updateColor(false));
 		
-		blueValueField = new TextFieldWidget(tr, fieldsX + 150, fieldsY + 35,
-			50, 20, Text.literal(""));
-		blueValueField.setText("" + color.getBlue());
+		blueValueField = new EditBox(tr, fieldsX + 150, fieldsY + 35, 50, 20,
+			Component.literal(""));
+		blueValueField.setValue("" + color.getBlue());
 		blueValueField.setMaxLength(3);
-		blueValueField.setChangedListener(s -> updateColor(false));
+		blueValueField.setResponder(s -> updateColor(false));
 		
-		addSelectableChild(hexValueField);
-		addSelectableChild(redValueField);
-		addSelectableChild(greenValueField);
-		addSelectableChild(blueValueField);
+		addWidget(hexValueField);
+		addWidget(redValueField);
+		addWidget(greenValueField);
+		addWidget(blueValueField);
 		
 		setFocused(hexValueField);
 		hexValueField.setFocused(true);
-		hexValueField.setSelectionStart(0);
-		hexValueField.setSelectionEnd(6);
+		hexValueField.setCursorPosition(0);
+		hexValueField.setHighlightPos(6);
 		
-		doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
-			.dimensions(fieldsX, height - 30, 200, 20).build();
-		addDrawableChild(doneButton);
+		doneButton = Button.builder(Component.literal("Done"), b -> done())
+			.bounds(fieldsX, height - 30, 200, 20).build();
+		addRenderableWidget(doneButton);
 	}
 	
 	private void updateColor(boolean hex)
@@ -134,38 +134,38 @@ public final class EditColorScreen extends Screen
 		Color newColor;
 		
 		if(hex)
-			newColor = ColorUtils.tryParseHex("#" + hexValueField.getText());
+			newColor = ColorUtils.tryParseHex("#" + hexValueField.getValue());
 		else
-			newColor = ColorUtils.tryParseRGB(redValueField.getText(),
-				greenValueField.getText(), blueValueField.getText());
+			newColor = ColorUtils.tryParseRGB(redValueField.getValue(),
+				greenValueField.getValue(), blueValueField.getValue());
 		
 		if(newColor == null || newColor.equals(color))
 			return;
 		
 		color = newColor;
 		ignoreChanges = true;
-		hexValueField.setText(ColorUtils.toHex(color).substring(1));
-		redValueField.setText("" + color.getRed());
-		greenValueField.setText("" + color.getGreen());
-		blueValueField.setText("" + color.getBlue());
+		hexValueField.setValue(ColorUtils.toHex(color).substring(1));
+		redValueField.setValue("" + color.getRed());
+		greenValueField.setValue("" + color.getGreen());
+		blueValueField.setValue("" + color.getBlue());
 		ignoreChanges = false;
 	}
 	
 	private void done()
 	{
 		colorSetting.setColor(color);
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		TextRenderer tr = client.textRenderer;
+		Font tr = minecraft.font;
 		
 		renderBackground(context, mouseX, mouseY, partialTicks);
-		context.drawCenteredTextWithShadow(client.textRenderer,
-			colorSetting.getName(), width / 2, 16, 0xF0F0F0);
+		context.drawCenteredString(minecraft.font, colorSetting.getName(),
+			width / 2, 16, 0xF0F0F0);
 		
 		// Draw palette
 		int x = paletteX;
@@ -176,17 +176,17 @@ public final class EditColorScreen extends Screen
 		int fh = paletteHeight;
 		float u = 0;
 		float v = 0;
-		context.drawTexture(RenderLayer::getGuiTextured, paletteIdentifier, x,
-			y, u, v, w, h, fw, fh);
+		context.blit(RenderType::guiTextured, paletteIdentifier, x, y, u, v, w,
+			h, fw, fh);
 		
 		// RGB letters
-		context.drawText(tr, "#", fieldsX - 3 - tr.getWidth("#"), fieldsY + 6,
+		context.drawString(tr, "#", fieldsX - 3 - tr.width("#"), fieldsY + 6,
 			0xF0F0F0, false);
-		context.drawText(tr, "R:", fieldsX - 3 - tr.getWidth("R:"),
+		context.drawString(tr, "R:", fieldsX - 3 - tr.width("R:"),
 			fieldsY + 6 + 35, 0xFF0000, false);
-		context.drawText(tr, "G:", fieldsX + 75 - 3 - tr.getWidth("G:"),
+		context.drawString(tr, "G:", fieldsX + 75 - 3 - tr.width("G:"),
 			fieldsY + 6 + 35, 0x00FF00, false);
-		context.drawText(tr, "B:", fieldsX + 150 - 3 - tr.getWidth("B:"),
+		context.drawString(tr, "B:", fieldsX + 150 - 3 - tr.width("B:"),
 			fieldsY + 6 + 35, 0x0000FF, false);
 		
 		hexValueField.render(context, mouseX, mouseY, partialTicks);
@@ -211,24 +211,24 @@ public final class EditColorScreen extends Screen
 		context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight,
 			color.getRGB());
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public void resize(MinecraftClient client, int width, int height)
+	public void resize(Minecraft client, int width, int height)
 	{
-		String hex = hexValueField.getText();
-		String r = redValueField.getText();
-		String g = greenValueField.getText();
-		String b = blueValueField.getText();
+		String hex = hexValueField.getValue();
+		String r = redValueField.getValue();
+		String g = greenValueField.getValue();
+		String b = blueValueField.getValue();
 		
 		init(client, width, height);
 		
-		hexValueField.setText(hex);
-		redValueField.setText(r);
-		greenValueField.setText(g);
-		blueValueField.setText(b);
+		hexValueField.setValue(hex);
+		redValueField.setValue(r);
+		greenValueField.setValue(g);
+		blueValueField.setValue(b);
 	}
 	
 	@Override
@@ -241,7 +241,7 @@ public final class EditColorScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.setScreen(prevScreen);
+			minecraft.setScreen(prevScreen);
 			break;
 		}
 		
@@ -279,14 +279,14 @@ public final class EditColorScreen extends Screen
 	
 	private void setColor(Color color)
 	{
-		hexValueField.setText(ColorUtils.toHex(color).substring(1));
-		redValueField.setText("" + color.getRed());
-		greenValueField.setText("" + color.getGreen());
-		blueValueField.setText("" + color.getBlue());
+		hexValueField.setValue(ColorUtils.toHex(color).substring(1));
+		redValueField.setValue("" + color.getRed());
+		greenValueField.setValue("" + color.getGreen());
+		blueValueField.setValue("" + color.getBlue());
 	}
 	
 	@Override
-	public boolean shouldPause()
+	public boolean isPauseScreen()
 	{
 		return false;
 	}

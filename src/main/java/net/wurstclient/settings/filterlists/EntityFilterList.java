@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.filters.*;
 
