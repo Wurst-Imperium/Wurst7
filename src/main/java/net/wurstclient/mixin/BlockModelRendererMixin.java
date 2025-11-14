@@ -15,19 +15,19 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.BlockModelRenderer;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.hacks.XRayHack;
 
-@Mixin(BlockModelRenderer.class)
-public abstract class BlockModelRendererMixin implements ItemConvertible
+@Mixin(ModelBlockRenderer.class)
+public abstract class BlockModelRendererMixin implements ItemLike
 {
 	private static ThreadLocal<Float> currentOpacity =
 		ThreadLocal.withInitial(() -> 1F);
@@ -38,11 +38,11 @@ public abstract class BlockModelRendererMixin implements ItemConvertible
 	 * seeing a piston retract.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/block/Block;shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z"),
-		method = "shouldDrawFace(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/block/BlockState;ZLnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/BlockPos;)Z")
+		target = "Lnet/minecraft/world/level/block/Block;shouldRenderFace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z"),
+		method = "shouldRenderFace(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;ZLnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos;)Z")
 	private static boolean onRenderSmoothOrFlat(BlockState state,
 		BlockState otherState, Direction side, Operation<Boolean> original,
-		BlockRenderView world, BlockState stateButFromTheOtherMethod,
+		BlockAndTintGetter world, BlockState stateButFromTheOtherMethod,
 		boolean cull, Direction sideButFromTheOtherMethod, BlockPos pos)
 	{
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
@@ -65,7 +65,7 @@ public abstract class BlockModelRendererMixin implements ItemConvertible
 	 * coloring and shading is done, if neither Sodium nor Indigo are running.
 	 */
 	@ModifyConstant(
-		method = "renderQuad(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/util/math/MatrixStack$Entry;Lnet/minecraft/client/render/model/BakedQuad;Lnet/minecraft/client/render/block/BlockModelRenderer$LightmapCache;I)V",
+		method = "putQuadData(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;Lnet/minecraft/client/renderer/block/ModelBlockRenderer$CommonRenderStorage;I)V",
 		constant = @Constant(floatValue = 1F))
 	private float modifyOpacity(float original)
 	{

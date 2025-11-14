@@ -7,10 +7,11 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.network.OtherClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.player.RemotePlayer;
+import net.minecraft.world.entity.Entity;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
@@ -34,7 +35,7 @@ public final class InvseeCmd extends Command implements RenderListener
 		if(args.length != 1)
 			throw new CmdSyntaxError();
 		
-		if(MC.player.getAbilities().creativeMode)
+		if(MC.player.getAbilities().instabuild)
 		{
 			ChatUtils.error("Survival mode only.");
 			return;
@@ -45,16 +46,16 @@ public final class InvseeCmd extends Command implements RenderListener
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		boolean found = false;
 		
-		for(Entity entity : MC.world.getEntities())
+		for(Entity entity : MC.level.entitiesForRendering())
 		{
-			if(!(entity instanceof OtherClientPlayerEntity))
+			if(!(entity instanceof RemotePlayer))
 				continue;
 			
-			OtherClientPlayerEntity player = (OtherClientPlayerEntity)entity;
+			RemotePlayer player = (RemotePlayer)entity;
 			
 			String otherPlayerName = player.getName().getString();
 			if(!otherPlayerName.equalsIgnoreCase(targetName))

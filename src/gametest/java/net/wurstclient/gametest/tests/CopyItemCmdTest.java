@@ -16,7 +16,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Items;
 import net.wurstclient.gametest.WurstTest;
 
 public enum CopyItemCmdTest

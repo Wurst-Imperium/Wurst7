@@ -10,11 +10,11 @@ package net.wurstclient.util;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
@@ -23,22 +23,22 @@ public enum InventoryUtils
 {
 	;
 	
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	private static final IMinecraftClient IMC = WurstClient.IMC;
 	
 	public static int indexOf(Item item)
 	{
-		return indexOf(stack -> stack.isOf(item), 36, false);
+		return indexOf(stack -> stack.is(item), 36, false);
 	}
 	
 	public static int indexOf(Item item, int maxInvSlot)
 	{
-		return indexOf(stack -> stack.isOf(item), maxInvSlot, false);
+		return indexOf(stack -> stack.is(item), maxInvSlot, false);
 	}
 	
 	public static int indexOf(Item item, int maxInvSlot, boolean includeOffhand)
 	{
-		return indexOf(stack -> stack.isOf(item), maxInvSlot, includeOffhand);
+		return indexOf(stack -> stack.is(item), maxInvSlot, includeOffhand);
 	}
 	
 	public static int indexOf(Predicate<ItemStack> predicate)
@@ -75,17 +75,17 @@ public enum InventoryUtils
 	
 	public static int count(Item item)
 	{
-		return count(stack -> stack.isOf(item), 36, false);
+		return count(stack -> stack.is(item), 36, false);
 	}
 	
 	public static int count(Item item, int maxInvSlot)
 	{
-		return count(stack -> stack.isOf(item), maxInvSlot, false);
+		return count(stack -> stack.is(item), maxInvSlot, false);
 	}
 	
 	public static int count(Item item, int maxInvSlot, boolean includeOffhand)
 	{
-		return count(stack -> stack.isOf(item), maxInvSlot, includeOffhand);
+		return count(stack -> stack.is(item), maxInvSlot, includeOffhand);
 	}
 	
 	public static int count(Predicate<ItemStack> predicate)
@@ -118,16 +118,16 @@ public enum InventoryUtils
 	public static int count(Predicate<ItemStack> predicate, int maxInvSlot,
 		boolean includeOffhand)
 	{
-		PlayerInventory inventory = MC.player.getInventory();
+		Inventory inventory = MC.player.getInventory();
 		
 		return getMatchingSlots(predicate, maxInvSlot, includeOffhand)
-			.map(slot -> inventory.getStack(slot).getCount()).sum();
+			.map(slot -> inventory.getItem(slot).getCount()).sum();
 	}
 	
 	private static IntStream getMatchingSlots(Predicate<ItemStack> predicate,
 		int maxInvSlot, boolean includeOffhand)
 	{
-		PlayerInventory inventory = MC.player.getInventory();
+		Inventory inventory = MC.player.getInventory();
 		
 		// create a stream of all slots that we want to search
 		IntStream stream = IntStream.range(0, maxInvSlot);
@@ -135,24 +135,23 @@ public enum InventoryUtils
 			stream = IntStream.concat(stream, IntStream.of(40));
 		
 		// filter out the slots we don't want
-		return stream.filter(i -> predicate.test(inventory.getStack(i)));
+		return stream.filter(i -> predicate.test(inventory.getItem(i)));
 	}
 	
 	public static boolean selectItem(Item item)
 	{
-		return selectItem(stack -> stack.isOf(item), 36, false);
+		return selectItem(stack -> stack.is(item), 36, false);
 	}
 	
 	public static boolean selectItem(Item item, int maxInvSlot)
 	{
-		return selectItem(stack -> stack.isOf(item), maxInvSlot, false);
+		return selectItem(stack -> stack.is(item), maxInvSlot, false);
 	}
 	
 	public static boolean selectItem(Item item, int maxInvSlot,
 		boolean takeFromOffhand)
 	{
-		return selectItem(stack -> stack.isOf(item), maxInvSlot,
-			takeFromOffhand);
+		return selectItem(stack -> stack.is(item), maxInvSlot, takeFromOffhand);
 	}
 	
 	public static boolean selectItem(Predicate<ItemStack> predicate)
@@ -207,7 +206,7 @@ public enum InventoryUtils
 	 */
 	public static boolean selectItem(int slot)
 	{
-		PlayerInventory inventory = MC.player.getInventory();
+		Inventory inventory = MC.player.getInventory();
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		
 		// if the slot is negative, abort and return false
@@ -219,7 +218,7 @@ public enum InventoryUtils
 			inventory.setSelectedSlot(slot);
 		// if there is an empty slot in the hotbar, shift-click the item there
 		// it will be selected in the next tick
-		else if(inventory.getEmptySlot() > -1 && inventory.getEmptySlot() < 9)
+		else if(inventory.getFreeSlot() > -1 && inventory.getFreeSlot() < 9)
 			im.windowClick_QUICK_MOVE(toNetworkSlot(slot));
 		// otherwise, swap with the currently selected item
 		else
@@ -260,7 +259,7 @@ public enum InventoryUtils
 	 */
 	public static boolean giveCreativeItem(ItemStack stack)
 	{
-		return setCreativeStack(MC.player.getInventory().getEmptySlot(), stack);
+		return setCreativeStack(MC.player.getInventory().getFreeSlot(), stack);
 	}
 	
 	public static boolean setCreativeStack(int slot, Item item)
@@ -278,12 +277,12 @@ public enum InventoryUtils
 		if(slot < 0)
 			return false;
 		
-		if(!MC.player.isInCreativeMode())
+		if(!MC.player.hasInfiniteMaterials())
 			return false;
 		
-		MC.player.getInventory().setStack(slot, stack);
-		MC.player.networkHandler.sendPacket(
-			new CreativeInventoryActionC2SPacket(toNetworkSlot(slot), stack));
+		MC.player.getInventory().setItem(slot, stack);
+		MC.player.connection.send(new ServerboundSetCreativeModeSlotPacket(
+			toNetworkSlot(slot), stack));
 		return true;
 	}
 }

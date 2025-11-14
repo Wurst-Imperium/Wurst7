@@ -15,15 +15,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.wurstclient.util.MinPriorityThreadFactory;
 
 /**
- * Searches the given {@link Chunk} for blocks matching the given query.
+ * Searches the given {@link ChunkAccess} for blocks matching the given query.
  */
 public final class ChunkSearcher
 {
@@ -31,14 +31,14 @@ public final class ChunkSearcher
 		MinPriorityThreadFactory.newFixedThreadPool();
 	
 	private final BiPredicate<BlockPos, BlockState> query;
-	private final Chunk chunk;
+	private final ChunkAccess chunk;
 	private final DimensionType dimension;
 	
 	private CompletableFuture<ArrayList<Result>> future;
 	private boolean interrupted;
 	
-	public ChunkSearcher(BiPredicate<BlockPos, BlockState> query, Chunk chunk,
-		DimensionType dimension)
+	public ChunkSearcher(BiPredicate<BlockPos, BlockState> query,
+		ChunkAccess chunk, DimensionType dimension)
 	{
 		this.query = query;
 		this.chunk = chunk;
@@ -59,12 +59,12 @@ public final class ChunkSearcher
 		ArrayList<Result> results = new ArrayList<>();
 		ChunkPos chunkPos = chunk.getPos();
 		
-		int minX = chunkPos.getStartX();
-		int minY = chunk.getBottomY();
-		int minZ = chunkPos.getStartZ();
-		int maxX = chunkPos.getEndX();
+		int minX = chunkPos.getMinBlockX();
+		int minY = chunk.getMinY();
+		int minZ = chunkPos.getMinBlockZ();
+		int maxX = chunkPos.getMaxBlockX();
 		int maxY = ChunkUtils.getHighestNonEmptySectionYOffset(chunk) + 16;
-		int maxZ = chunkPos.getEndZ();
+		int maxZ = chunkPos.getMaxBlockZ();
 		
 		for(int x = minX; x <= maxX; x++)
 			for(int y = minY; y <= maxY; y++)

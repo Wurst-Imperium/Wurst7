@@ -20,16 +20,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.UserApiService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+import com.mojang.blaze3d.platform.WindowEventHandler;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.WindowEventHandler;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.session.ProfileKeys;
-import net.minecraft.client.session.Session;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.thread.ReentrantThreadExecutor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.User;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.multiplayer.ProfileKeyPairManager;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.thread.ReentrantBlockableEventLoop;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.HandleBlockBreakingListener.HandleBlockBreakingEvent;
@@ -40,24 +40,24 @@ import net.wurstclient.mixinterface.IClientPlayerEntity;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
-@Mixin(MinecraftClient.class)
+@Mixin(Minecraft.class)
 public abstract class MinecraftClientMixin
-	extends ReentrantThreadExecutor<Runnable>
+	extends ReentrantBlockableEventLoop<Runnable>
 	implements WindowEventHandler, IMinecraftClient
 {
 	@Shadow
 	@Final
-	public File runDirectory;
+	public File gameDirectory;
 	@Shadow
-	public ClientPlayerInteractionManager interactionManager;
+	public MultiPlayerGameMode gameMode;
 	@Shadow
-	public ClientPlayerEntity player;
+	public LocalPlayer player;
 	@Shadow
 	@Final
 	private YggdrasilAuthenticationService authenticationService;
 	
-	private Session wurstSession;
-	private ProfileKeys wurstProfileKeys;
+	private User wurstSession;
+	private ProfileKeyPairManager wurstProfileKeys;
 	
 	private MinecraftClientMixin(WurstClient wurst, String name)
 	{
@@ -65,12 +65,12 @@ public abstract class MinecraftClientMixin
 	}
 	
 	/**
-	 * Runs just before {@link MinecraftClient#handleInputEvents()}, bypassing
+	 * Runs just before {@link Minecraft#handleKeybinds()}, bypassing
 	 * the <code>overlay == null && currentScreen == null</code> check in
-	 * {@link MinecraftClient#tick()}.
+	 * {@link Minecraft#tick()}.
 	 */
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;overlay:Lnet/minecraft/client/gui/screen/Overlay;",
+		target = "Lnet/minecraft/client/Minecraft;overlay:Lnet/minecraft/client/gui/screens/Overlay;",
 		ordinal = 0), method = "tick()V")
 	private void onHandleInputEvents(CallbackInfo ci)
 	{
@@ -82,8 +82,8 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;crosshairTarget:Lnet/minecraft/util/hit/HitResult;",
-		ordinal = 0), method = "doAttack()Z", cancellable = true)
+		target = "Lnet/minecraft/client/Minecraft;hitResult:Lnet/minecraft/world/phys/HitResult;",
+		ordinal = 0), method = "startAttack()Z", cancellable = true)
 	private void onDoAttack(CallbackInfoReturnable<Boolean> cir)
 	{
 		LeftClickEvent event = new LeftClickEvent();
@@ -95,9 +95,9 @@ public abstract class MinecraftClientMixin
 	
 	@Inject(
 		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/MinecraftClient;itemUseCooldown:I",
+			target = "Lnet/minecraft/client/Minecraft;rightClickDelay:I",
 			ordinal = 0),
-		method = "doItemUse()V",
+		method = "startUseItem()V",
 		cancellable = true)
 	private void onDoItemUse(CallbackInfo ci)
 	{
@@ -108,13 +108,13 @@ public abstract class MinecraftClientMixin
 			ci.cancel();
 	}
 	
-	@Inject(at = @At("HEAD"), method = "doItemPick()V")
+	@Inject(at = @At("HEAD"), method = "pickBlock()V")
 	private void onDoItemPick(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		HitResult hitResult = WurstClient.MC.crosshairTarget;
+		HitResult hitResult = WurstClient.MC.hitResult;
 		if(!(hitResult instanceof EntityHitResult eHitResult))
 			return;
 		
@@ -125,9 +125,7 @@ public abstract class MinecraftClientMixin
 	 * Allows hacks to cancel vanilla block breaking and replace it with their
 	 * own. Useful for Nuker-like hacks.
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "handleBlockBreaking(Z)V",
-		cancellable = true)
+	@Inject(at = @At("HEAD"), method = "continueAttack(Z)V", cancellable = true)
 	private void onHandleBlockBreaking(boolean breaking, CallbackInfo ci)
 	{
 		HandleBlockBreakingEvent event = new HandleBlockBreakingEvent();
@@ -138,9 +136,9 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getSession()Lnet/minecraft/client/session/Session;",
+		method = "getUser()Lnet/minecraft/client/User;",
 		cancellable = true)
-	private void onGetSession(CallbackInfoReturnable<Session> cir)
+	private void onGetSession(CallbackInfoReturnable<User> cir)
 	{
 		if(wurstSession != null)
 			cir.setReturnValue(wurstSession);
@@ -155,19 +153,20 @@ public abstract class MinecraftClientMixin
 			return;
 		
 		GameProfile oldProfile = cir.getReturnValue();
-		GameProfile newProfile = new GameProfile(wurstSession.getUuidOrNull(),
-			wurstSession.getUsername());
+		GameProfile newProfile = new GameProfile(wurstSession.getProfileId(),
+			wurstSession.getName());
 		newProfile.getProperties().putAll(oldProfile.getProperties());
 		cir.setReturnValue(newProfile);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getProfileKeys()Lnet/minecraft/client/session/ProfileKeys;",
+		method = "getProfileKeyPairManager()Lnet/minecraft/client/multiplayer/ProfileKeyPairManager;",
 		cancellable = true)
-	private void onGetProfileKeys(CallbackInfoReturnable<ProfileKeys> cir)
+	private void onGetProfileKeys(
+		CallbackInfoReturnable<ProfileKeyPairManager> cir)
 	{
 		if(WurstClient.INSTANCE.getOtfs().noChatReportsOtf.isActive())
-			cir.setReturnValue(ProfileKeys.MISSING);
+			cir.setReturnValue(ProfileKeyPairManager.EMPTY_KEY_MANAGER);
 		
 		if(wurstProfileKeys == null)
 			return;
@@ -175,9 +174,7 @@ public abstract class MinecraftClientMixin
 		cir.setReturnValue(wurstProfileKeys);
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "isTelemetryEnabledByApi()Z",
-		cancellable = true)
+	@Inject(at = @At("HEAD"), method = "allowsTelemetry()Z", cancellable = true)
 	private void onIsTelemetryEnabledByApi(CallbackInfoReturnable<Boolean> cir)
 	{
 		cir.setReturnValue(
@@ -185,7 +182,7 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "isOptionalTelemetryEnabledByApi()Z",
+		method = "extraTelemetryAvailable()Z",
 		cancellable = true)
 	private void onIsOptionalTelemetryEnabledByApi(
 		CallbackInfoReturnable<Boolean> cir)
@@ -203,17 +200,17 @@ public abstract class MinecraftClientMixin
 	@Override
 	public IClientPlayerInteractionManager getInteractionManager()
 	{
-		return (IClientPlayerInteractionManager)interactionManager;
+		return (IClientPlayerInteractionManager)gameMode;
 	}
 	
 	@Override
-	public Session getWurstSession()
+	public User getWurstSession()
 	{
 		return wurstSession;
 	}
 	
 	@Override
-	public void setWurstSession(Session session)
+	public void setWurstSession(User session)
 	{
 		wurstSession = session;
 		if(session == null)
@@ -223,11 +220,10 @@ public abstract class MinecraftClientMixin
 		}
 		
 		UserApiService userApiService =
-			session.getAccountType() == Session.AccountType.MSA
-				? authenticationService.createUserApiService(
-					session.getAccessToken())
+			session.getType() == User.Type.MSA ? authenticationService
+				.createUserApiService(session.getAccessToken())
 				: UserApiService.OFFLINE;
-		wurstProfileKeys =
-			ProfileKeys.create(userApiService, session, runDirectory.toPath());
+		wurstProfileKeys = ProfileKeyPairManager.create(userApiService, session,
+			gameDirectory.toPath());
 	}
 }

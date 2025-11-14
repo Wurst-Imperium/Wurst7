@@ -7,7 +7,7 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.multiplayer.ServerData;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -34,10 +34,10 @@ public final class SvCmd extends Command
 	
 	private String getVersion() throws CmdError
 	{
-		if(MC.isIntegratedServerRunning())
+		if(MC.hasSingleplayerServer())
 			throw new CmdError("Can't check server version in singleplayer.");
 		
-		ServerInfo lastServer = LastServerRememberer.getLastServer();
+		ServerData lastServer = LastServerRememberer.getLastServer();
 		if(lastServer == null)
 			throw new IllegalStateException(
 				"LastServerRememberer doesn't remember the last server!");

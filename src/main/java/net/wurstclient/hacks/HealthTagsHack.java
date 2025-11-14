@@ -7,10 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -24,30 +24,30 @@ public final class HealthTagsHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	public Text addHealth(LivingEntity entity, MutableText nametag)
+	public Component addHealth(LivingEntity entity, MutableComponent nametag)
 	{
 		if(!isEnabled())
 			return nametag;
 		
 		int health = (int)entity.getHealth();
 		
-		MutableText formattedHealth = Text.literal(" ")
-			.append(Integer.toString(health)).formatted(getColor(health));
+		MutableComponent formattedHealth = Component.literal(" ")
+			.append(Integer.toString(health)).withStyle(getColor(health));
 		return nametag.append(formattedHealth);
 	}
 	
-	private Formatting getColor(int health)
+	private ChatFormatting getColor(int health)
 	{
 		if(health <= 5)
-			return Formatting.DARK_RED;
+			return ChatFormatting.DARK_RED;
 		
 		if(health <= 10)
-			return Formatting.GOLD;
+			return ChatFormatting.GOLD;
 		
 		if(health <= 15)
-			return Formatting.YELLOW;
+			return ChatFormatting.YELLOW;
 		
-		return Formatting.GREEN;
+		return ChatFormatting.GREEN;
 	}
 	
 	// See EntityRenderDispatcherMixin

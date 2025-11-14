@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.ZombieVillagerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.ZombieVillager;
 
 public final class FilterZombieVillagersSetting extends EntityFilterCheckbox
 {
@@ -20,7 +20,7 @@ public final class FilterZombieVillagersSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof ZombieVillagerEntity);
+		return !(e instanceof ZombieVillager);
 	}
 	
 	public static FilterZombieVillagersSetting genericCombat(boolean checked)

@@ -11,9 +11,9 @@ import java.util.Objects;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Style;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Style;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.screens.EditTextFieldScreen;
@@ -24,7 +24,7 @@ import net.wurstclient.util.RenderUtils;
 public final class TextFieldEditButton extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	private static final int TEXT_HEIGHT = 11;
 	
 	private final TextFieldSetting setting;
@@ -45,7 +45,7 @@ public final class TextFieldEditButton extends Component
 		switch(mouseButton)
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
-			MC.setScreen(new EditTextFieldScreen(MC.currentScreen, setting));
+			MC.setScreen(new EditTextFieldScreen(MC.screen, setting));
 			break;
 			
 			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
@@ -55,7 +55,7 @@ public final class TextFieldEditButton extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		float[] bgColor = GUI.getBgColor();
@@ -87,22 +87,22 @@ public final class TextFieldEditButton extends Component
 		
 		// text
 		int txtColor = GUI.getTxtColor();
-		context.state.goUpLayer();
-		context.drawText(TR, setting.getName(), x1, y1 + 2, txtColor, false);
+		context.guiRenderState.up();
+		context.drawString(TR, setting.getName(), x1, y1 + 2, txtColor, false);
 		String value = setting.getValue();
-		int maxWidth = getWidth() - TR.getWidth("...") - 2;
-		int maxLength = TR.getTextHandler().getLimitedStringLength(value,
-			maxWidth, Style.EMPTY);
+		int maxWidth = getWidth() - TR.width("...") - 2;
+		int maxLength = TR.getSplitter().formattedIndexByWidth(value, maxWidth,
+			Style.EMPTY);
 		if(maxLength < value.length())
 			value = value.substring(0, maxLength) + "...";
-		context.drawText(TR, value, x1 + 2, y3 + 2, txtColor, false);
-		context.state.goDownLayer();
+		context.drawString(TR, value, x1 + 2, y3 + 2, txtColor, false);
+		context.guiRenderState.down();
 	}
 	
 	@Override
 	public int getDefaultWidth()
 	{
-		return TR.getWidth(setting.getName()) + 4;
+		return TR.width(setting.getName()) + 4;
 	}
 	
 	@Override

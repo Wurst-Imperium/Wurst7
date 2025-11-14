@@ -7,7 +7,7 @@
  */
 package net.wurstclient.mixinterface;
 
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 
 public interface IKeyBinding
 {
@@ -22,7 +22,7 @@ public interface IKeyBinding
 	
 	/**
 	 * Simulates the user pressing this key on their keyboard or mouse. This is
-	 * much more aggressive than using {@link #setPressed(boolean)} and should
+	 * much more aggressive than using {@link #setDown(boolean)} and should
 	 * be used sparingly.
 	 */
 	public default void simulatePress(boolean pressed)
@@ -30,21 +30,21 @@ public interface IKeyBinding
 		wurst_simulatePress(pressed);
 	}
 	
-	public default void setPressed(boolean pressed)
+	public default void setDown(boolean down)
 	{
-		asVanilla().setPressed(pressed);
+		asVanilla().setDown(down);
 	}
 	
-	public default KeyBinding asVanilla()
+	public default KeyMapping asVanilla()
 	{
-		return (KeyBinding)this;
+		return (KeyMapping)this;
 	}
 	
 	/**
 	 * Returns the given KeyBinding object as an IKeyBinding, allowing you to
 	 * access the resetPressedState() method.
 	 */
-	public static IKeyBinding get(KeyBinding kb)
+	public static IKeyBinding get(KeyMapping kb)
 	{
 		return (IKeyBinding)kb;
 	}

@@ -10,15 +10,15 @@ package net.wurstclient.hacks.autolibrarian;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.EnchantmentTags;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.wurstclient.WurstClient;
 import net.wurstclient.WurstTranslator;
 
@@ -27,33 +27,33 @@ public record BookOffer(String id, int level, int price)
 {
 	public static BookOffer create(Enchantment enchantment)
 	{
-		DynamicRegistryManager drm = WurstClient.MC.world.getRegistryManager();
+		RegistryAccess drm = WurstClient.MC.level.registryAccess();
 		Registry<Enchantment> registry =
-			drm.getOrThrow(RegistryKeys.ENCHANTMENT);
-		Identifier id = registry.getId(enchantment);
+			drm.lookupOrThrow(Registries.ENCHANTMENT);
+		ResourceLocation id = registry.getKey(enchantment);
 		return new BookOffer("" + id, enchantment.getMaxLevel(), 64);
 	}
 	
-	public Optional<? extends RegistryEntry<Enchantment>> getEnchantmentEntry()
+	public Optional<? extends Holder<Enchantment>> getEnchantmentEntry()
 	{
-		if(WurstClient.MC.world == null)
+		if(WurstClient.MC.level == null)
 			return Optional.empty();
 		
-		DynamicRegistryManager drm = WurstClient.MC.world.getRegistryManager();
+		RegistryAccess drm = WurstClient.MC.level.registryAccess();
 		Registry<Enchantment> registry =
-			drm.getOrThrow(RegistryKeys.ENCHANTMENT);
-		return registry.getEntry(Identifier.of(id));
+			drm.lookupOrThrow(Registries.ENCHANTMENT);
+		return registry.get(ResourceLocation.parse(id));
 	}
 	
 	public Enchantment getEnchantment()
 	{
-		return getEnchantmentEntry().map(RegistryEntry::value).orElse(null);
+		return getEnchantmentEntry().map(Holder::value).orElse(null);
 	}
 	
 	public String getEnchantmentName()
 	{
-		Text description = getEnchantment().description();
-		if(description.getContent() instanceof TranslatableTextContent tr)
+		Component description = getEnchantment().description();
+		if(description.getContents() instanceof TranslatableContents tr)
 			return WurstClient.INSTANCE.getTranslator()
 				.translateMcEnglish(tr.getKey());
 		
@@ -67,7 +67,7 @@ public record BookOffer(String id, int level, int price)
 		String name;
 		
 		if(enchantment.description()
-			.getContent() instanceof TranslatableTextContent tr)
+			.getContents() instanceof TranslatableContents tr)
 			name = translator.translateMcEnglish(tr.getKey());
 		else
 			name = enchantment.description().getString();
@@ -91,7 +91,7 @@ public record BookOffer(String id, int level, int price)
 	public boolean isFullyValid()
 	{
 		return isMostlyValid() && getEnchantmentEntry()
-			.map(entry -> entry.isIn(EnchantmentTags.TRADEABLE)
+			.map(entry -> entry.is(EnchantmentTags.TRADEABLE)
 				&& level <= entry.value().getMaxLevel())
 			.orElse(false);
 	}
@@ -102,7 +102,7 @@ public record BookOffer(String id, int level, int price)
 	 */
 	public boolean isMostlyValid()
 	{
-		return Identifier.tryParse(id) != null && level >= 1 && price >= 1
+		return ResourceLocation.tryParse(id) != null && level >= 1 && price >= 1
 			&& price <= 64;
 	}
 	

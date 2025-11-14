@@ -9,9 +9,9 @@ package net.wurstclient.hacks.chestesp.groups;
 
 import java.awt.Color;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.entity.TrappedChestBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.TrappedChestBlockEntity;
 import net.wurstclient.hacks.chestesp.ChestEspBlockGroup;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;

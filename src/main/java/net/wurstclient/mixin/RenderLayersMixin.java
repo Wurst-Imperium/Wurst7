@@ -12,42 +12,42 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.WurstClient;
 
-@Mixin(RenderLayers.class)
+@Mixin(ItemBlockRenderTypes.class)
 public abstract class RenderLayersMixin
 {
 	/**
 	 * Puts all blocks on the translucent layer if Opacity X-Ray is enabled.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "getBlockLayer(Lnet/minecraft/block/BlockState;)Lnet/minecraft/client/render/BlockRenderLayer;",
+		method = "getChunkRenderType(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;",
 		cancellable = true)
 	private static void onGetBlockLayer(BlockState state,
-		CallbackInfoReturnable<BlockRenderLayer> cir)
+		CallbackInfoReturnable<ChunkSectionLayer> cir)
 	{
 		if(!WurstClient.INSTANCE.getHax().xRayHack.isOpacityMode())
 			return;
 		
-		cir.setReturnValue(BlockRenderLayer.TRANSLUCENT);
+		cir.setReturnValue(ChunkSectionLayer.TRANSLUCENT);
 	}
 	
 	/**
 	 * Puts all fluids on the translucent layer if Opacity X-Ray is enabled.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "getFluidLayer(Lnet/minecraft/fluid/FluidState;)Lnet/minecraft/client/render/BlockRenderLayer;",
+		method = "getRenderLayer(Lnet/minecraft/world/level/material/FluidState;)Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;",
 		cancellable = true)
 	private static void onGetFluidLayer(FluidState state,
-		CallbackInfoReturnable<BlockRenderLayer> cir)
+		CallbackInfoReturnable<ChunkSectionLayer> cir)
 	{
 		if(!WurstClient.INSTANCE.getHax().xRayHack.isOpacityMode())
 			return;
 		
-		cir.setReturnValue(BlockRenderLayer.TRANSLUCENT);
+		cir.setReturnValue(ChunkSectionLayer.TRANSLUCENT);
 	}
 }

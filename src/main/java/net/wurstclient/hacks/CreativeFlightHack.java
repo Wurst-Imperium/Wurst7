@@ -7,10 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.entity.player.PlayerAbilities;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -67,12 +67,12 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		
-		ClientPlayerEntity player = MC.player;
-		PlayerAbilities abilities = player.getAbilities();
+		LocalPlayer player = MC.player;
+		Abilities abilities = player.getAbilities();
 		
-		boolean creative = player.getAbilities().creativeMode;
-		abilities.flying = creative && !player.isOnGround();
-		abilities.allowFlying = creative;
+		boolean creative = player.getAbilities().instabuild;
+		abilities.flying = creative && !player.onGround();
+		abilities.mayfly = creative;
 		
 		restoreKeyPresses();
 	}
@@ -80,8 +80,8 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		PlayerAbilities abilities = MC.player.getAbilities();
-		abilities.allowFlying = true;
+		Abilities abilities = MC.player.getAbilities();
+		abilities.mayfly = true;
 		
 		if(antiKick.isChecked() && abilities.flying)
 			doAntiKick();
@@ -96,8 +96,7 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 		{
 			case 0 ->
 			{
-				if(MC.options.sneakKey.isPressed()
-					&& !MC.options.jumpKey.isPressed())
+				if(MC.options.keyShift.isDown() && !MC.options.keyJump.isDown())
 					tickCounter = 3;
 				else
 					setMotionY(-antiKickDistance.getValue());
@@ -115,18 +114,18 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 	
 	private void setMotionY(double motionY)
 	{
-		MC.options.sneakKey.setPressed(false);
-		MC.options.jumpKey.setPressed(false);
+		MC.options.keyShift.setDown(false);
+		MC.options.keyJump.setDown(false);
 		
-		Vec3d velocity = MC.player.getVelocity();
-		MC.player.setVelocity(velocity.x, motionY, velocity.z);
+		Vec3 velocity = MC.player.getDeltaMovement();
+		MC.player.setDeltaMovement(velocity.x, motionY, velocity.z);
 	}
 	
 	private void restoreKeyPresses()
 	{
-		KeyBinding[] keys = {MC.options.jumpKey, MC.options.sneakKey};
+		KeyMapping[] keys = {MC.options.keyJump, MC.options.keyShift};
 		
-		for(KeyBinding key : keys)
+		for(KeyMapping key : keys)
 			IKeyBinding.get(key).resetPressedState();
 	}
 }

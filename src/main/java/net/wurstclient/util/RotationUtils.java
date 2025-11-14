@@ -7,11 +7,11 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.RotationFaker;
 import net.wurstclient.WurstClient;
 
@@ -19,31 +19,31 @@ public enum RotationUtils
 {
 	;
 	
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
-	public static Vec3d getEyesPos()
+	public static Vec3 getEyesPos()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		float eyeHeight = player.getEyeHeight(player.getPose());
-		return player.getPos().add(0, eyeHeight, 0);
+		return player.position().add(0, eyeHeight, 0);
 	}
 	
-	public static Vec3d getClientLookVec(float partialTicks)
+	public static Vec3 getClientLookVec(float partialTicks)
 	{
-		float yaw = MC.player.getYaw(partialTicks);
-		float pitch = MC.player.getPitch(partialTicks);
+		float yaw = MC.player.getViewYRot(partialTicks);
+		float pitch = MC.player.getViewXRot(partialTicks);
 		return new Rotation(yaw, pitch).toLookVec();
 	}
 	
-	public static Vec3d getServerLookVec()
+	public static Vec3 getServerLookVec()
 	{
 		RotationFaker rf = WurstClient.INSTANCE.getRotationFaker();
 		return new Rotation(rf.getServerYaw(), rf.getServerPitch()).toLookVec();
 	}
 	
-	public static Rotation getNeededRotations(Vec3d vec)
+	public static Rotation getNeededRotations(Vec3 vec)
 	{
-		Vec3d eyes = getEyesPos();
+		Vec3 eyes = getEyesPos();
 		
 		double diffX = vec.x - eyes.x;
 		double diffZ = vec.z - eyes.z;
@@ -56,19 +56,19 @@ public enum RotationUtils
 		return Rotation.wrapped((float)yaw, (float)pitch);
 	}
 	
-	public static double getAngleToLookVec(Vec3d vec)
+	public static double getAngleToLookVec(Vec3 vec)
 	{
-		ClientPlayerEntity player = MC.player;
-		Rotation current = new Rotation(player.getYaw(), player.getPitch());
+		LocalPlayer player = MC.player;
+		Rotation current = new Rotation(player.getYRot(), player.getXRot());
 		Rotation needed = getNeededRotations(vec);
 		return current.getAngleTo(needed);
 	}
 	
-	public static float getHorizontalAngleToLookVec(Vec3d vec)
+	public static float getHorizontalAngleToLookVec(Vec3 vec)
 	{
-		float currentYaw = MathHelper.wrapDegrees(MC.player.getYaw());
+		float currentYaw = Mth.wrapDegrees(MC.player.getYRot());
 		float neededYaw = getNeededRotations(vec).yaw();
-		return MathHelper.wrapDegrees(currentYaw - neededYaw);
+		return Mth.wrapDegrees(currentYaw - neededYaw);
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public enum RotationUtils
 		return getAngleToLastReportedLookVec(rotation) <= 1.0;
 	}
 	
-	public static double getAngleToLastReportedLookVec(Vec3d vec)
+	public static double getAngleToLastReportedLookVec(Vec3 vec)
 	{
 		Rotation needed = getNeededRotations(vec);
 		return getAngleToLastReportedLookVec(needed);
@@ -88,12 +88,12 @@ public enum RotationUtils
 	
 	public static double getAngleToLastReportedLookVec(Rotation rotation)
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
 		// lastYaw/Pitch do not get updated when the player is in a vehicle
-		Rotation lastReported = player.hasVehicle()
-			? new Rotation(player.getYaw(), player.getPitch())
-			: new Rotation(player.lastYawClient, player.lastPitchClient);
+		Rotation lastReported = player.isPassenger()
+			? new Rotation(player.getYRot(), player.getXRot())
+			: new Rotation(player.yRotLast, player.xRotLast);
 		
 		return lastReported.getAngleTo(rotation);
 	}
@@ -102,11 +102,11 @@ public enum RotationUtils
 	 * Returns true if the player is facing anywhere within the given box
 	 * and is no further away than the given range.
 	 */
-	public static boolean isFacingBox(Box box, double range)
+	public static boolean isFacingBox(AABB box, double range)
 	{
-		Vec3d start = getEyesPos();
-		Vec3d end = start.add(getServerLookVec().multiply(range));
-		return box.raycast(start, end).isPresent();
+		Vec3 start = getEyesPos();
+		Vec3 end = start.add(getServerLookVec().scale(range));
+		return box.clip(start, end).isPresent();
 	}
 	
 	/**
@@ -116,14 +116,13 @@ public enum RotationUtils
 	 */
 	public static Rotation slowlyTurnTowards(Rotation end, float maxChange)
 	{
-		float startYaw = MC.player.lastYawClient;
-		float startPitch = MC.player.lastPitchClient;
+		float startYaw = MC.player.yRotLast;
+		float startPitch = MC.player.xRotLast;
 		float endYaw = end.yaw();
 		float endPitch = end.pitch();
 		
-		float yawChange = Math.abs(MathHelper.wrapDegrees(endYaw - startYaw));
-		float pitchChange =
-			Math.abs(MathHelper.wrapDegrees(endPitch - startPitch));
+		float yawChange = Math.abs(Mth.wrapDegrees(endYaw - startYaw));
+		float pitchChange = Math.abs(Mth.wrapDegrees(endPitch - startPitch));
 		
 		float maxChangeYaw = pitchChange == 0 ? maxChange
 			: Math.min(maxChange, maxChange * yawChange / pitchChange);
@@ -149,11 +148,11 @@ public enum RotationUtils
 	public static float limitAngleChange(float current, float intended,
 		float maxChange)
 	{
-		float currentWrapped = MathHelper.wrapDegrees(current);
-		float intendedWrapped = MathHelper.wrapDegrees(intended);
+		float currentWrapped = Mth.wrapDegrees(current);
+		float intendedWrapped = Mth.wrapDegrees(intended);
 		
-		float change = MathHelper.wrapDegrees(intendedWrapped - currentWrapped);
-		change = MathHelper.clamp(change, -maxChange, maxChange);
+		float change = Mth.wrapDegrees(intendedWrapped - currentWrapped);
+		change = Mth.clamp(change, -maxChange, maxChange);
 		
 		return current + change;
 	}
@@ -173,10 +172,10 @@ public enum RotationUtils
 	 */
 	public static float limitAngleChange(float current, float intended)
 	{
-		float currentWrapped = MathHelper.wrapDegrees(current);
-		float intendedWrapped = MathHelper.wrapDegrees(intended);
+		float currentWrapped = Mth.wrapDegrees(current);
+		float intendedWrapped = Mth.wrapDegrees(intended);
 		
-		float change = MathHelper.wrapDegrees(intendedWrapped - currentWrapped);
+		float change = Mth.wrapDegrees(intendedWrapped - currentWrapped);
 		
 		return current + change;
 	}

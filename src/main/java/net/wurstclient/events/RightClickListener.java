@@ -9,14 +9,14 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 
 public interface RightClickListener extends Listener
 {
 	/**
-	 * Fired in {@link MinecraftClient#doItemUse()} after the
+	 * Fired in {@link Minecraft#startUseItem()} after the
 	 * {@code interactionManager.isBreakingBlock()} check, but before the
 	 * item use cooldown is increased.
 	 */

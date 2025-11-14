@@ -7,8 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.util.Mth;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -59,7 +59,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			@Override
 			public void onUpdate()
 			{
-				double gamma = MC.options.getGamma().getValue();
+				double gamma = MC.options.gamma().get();
 				System.out.println("Brightness started at " + gamma);
 				
 				if(gamma > 1)
@@ -95,9 +95,9 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	{
 		wasGammaChanged = true;
 		
-		SimpleOption<Double> gammaOption = MC.options.getGamma();
+		OptionInstance<Double> gammaOption = MC.options.gamma();
 		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
-		double oldGammaValue = gammaOption.getValue();
+		double oldGammaValue = gammaOption.get();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
 		{
@@ -113,9 +113,9 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	
 	private void resetGamma(double target)
 	{
-		SimpleOption<Double> gammaOption = MC.options.getGamma();
+		OptionInstance<Double> gammaOption = MC.options.gamma();
 		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
-		double oldGammaValue = gammaOption.getValue();
+		double oldGammaValue = gammaOption.get();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
 		{
@@ -142,7 +142,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			else
 				nightVisionStrength -= 0.03125;
 			
-			nightVisionStrength = MathHelper.clamp(nightVisionStrength, 0, 1);
+			nightVisionStrength = Mth.clamp(nightVisionStrength, 0, 1);
 			
 		}else if(shouldGiveNightVision)
 			nightVisionStrength = 1;

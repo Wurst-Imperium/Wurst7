@@ -10,19 +10,19 @@ package net.wurstclient.util;
 import java.util.Comparator;
 import java.util.function.Function;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
 
@@ -31,7 +31,7 @@ public enum BlockBreaker
 	;
 	
 	private static final WurstClient WURST = WurstClient.INSTANCE;
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	public static boolean breakOneBlock(BlockPos pos)
 	{
@@ -48,12 +48,11 @@ public enum BlockBreaker
 		WURST.getRotationFaker().faceVectorPacket(params.hitVec);
 		
 		// damage block
-		if(!MC.interactionManager.updateBlockBreakingProgress(params.pos,
-			params.side))
+		if(!MC.gameMode.continueDestroyBlock(params.pos, params.side))
 			return false;
 		
 		// swing arm
-		SwingHand.SERVER.swing(Hand.MAIN_HAND);
+		SwingHand.SERVER.swing(InteractionHand.MAIN_HAND);
 		return true;
 	}
 	
@@ -74,37 +73,37 @@ public enum BlockBreaker
 	 * squared distance to that hit vector, and whether or not there is line of
 	 * sight to that hit vector.
 	 */
-	public static BlockBreakingParams getBlockBreakingParams(Vec3d eyes,
+	public static BlockBreakingParams getBlockBreakingParams(Vec3 eyes,
 		BlockPos pos)
 	{
 		Direction[] sides = Direction.values();
 		
 		BlockState state = BlockUtils.getState(pos);
-		VoxelShape shape = state.getOutlineShape(MC.world, pos);
+		VoxelShape shape = state.getShape(MC.level, pos);
 		if(shape.isEmpty())
 			return null;
 		
-		Box box = shape.getBoundingBox();
-		Vec3d halfSize = new Vec3d(box.maxX - box.minX, box.maxY - box.minY,
-			box.maxZ - box.minZ).multiply(0.5);
-		Vec3d center = Vec3d.of(pos).add(box.getCenter());
+		AABB box = shape.bounds();
+		Vec3 halfSize = new Vec3(box.maxX - box.minX, box.maxY - box.minY,
+			box.maxZ - box.minZ).scale(0.5);
+		Vec3 center = Vec3.atLowerCornerOf(pos).add(box.getCenter());
 		
-		Vec3d[] hitVecs = new Vec3d[sides.length];
+		Vec3[] hitVecs = new Vec3[sides.length];
 		for(int i = 0; i < sides.length; i++)
 		{
-			Vec3i dirVec = sides[i].getVector();
-			Vec3d relHitVec = new Vec3d(halfSize.x * dirVec.getX(),
+			Vec3i dirVec = sides[i].getUnitVec3i();
+			Vec3 relHitVec = new Vec3(halfSize.x * dirVec.getX(),
 				halfSize.y * dirVec.getY(), halfSize.z * dirVec.getZ());
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
-		double distanceSqToCenter = eyes.squaredDistanceTo(center);
+		double distanceSqToCenter = eyes.distanceToSqr(center);
 		double[] distancesSq = new double[sides.length];
 		boolean[] linesOfSight = new boolean[sides.length];
 		
 		for(int i = 0; i < sides.length; i++)
 		{
-			distancesSq[i] = eyes.squaredDistanceTo(hitVecs[i]);
+			distancesSq[i] = eyes.distanceToSqr(hitVecs[i]);
 			
 			// no need to raytrace the rear sides,
 			// they can't possibly have line of sight
@@ -139,7 +138,7 @@ public enum BlockBreaker
 	}
 	
 	public static record BlockBreakingParams(BlockPos pos, Direction side,
-		Vec3d hitVec, double distanceSq, boolean lineOfSight)
+		Vec3 hitVec, double distanceSq, boolean lineOfSight)
 	{
 		public BlockHitResult toHitResult()
 		{
@@ -170,27 +169,27 @@ public enum BlockBreaker
 	
 	public static void breakBlocksWithPacketSpam(Iterable<BlockPos> blocks)
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		ClientPlayNetworkHandler netHandler = MC.player.networkHandler;
+		Vec3 eyesPos = RotationUtils.getEyesPos();
+		ClientPacketListener netHandler = MC.player.connection;
 		
 		for(BlockPos pos : blocks)
 		{
-			Vec3d posVec = Vec3d.ofCenter(pos);
-			double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+			Vec3 posVec = Vec3.atCenterOf(pos);
+			double distanceSqPosVec = eyesPos.distanceToSqr(posVec);
 			
 			for(Direction side : Direction.values())
 			{
-				Vec3d hitVec =
-					posVec.add(Vec3d.of(side.getVector()).multiply(0.5));
+				Vec3 hitVec = posVec
+					.add(Vec3.atLowerCornerOf(side.getUnitVec3i()).scale(0.5));
 				
 				// check if side is facing towards player
-				if(eyesPos.squaredDistanceTo(hitVec) >= distanceSqPosVec)
+				if(eyesPos.distanceToSqr(hitVec) >= distanceSqPosVec)
 					continue;
 				
 				// break block
-				netHandler.sendPacket(new PlayerActionC2SPacket(
+				netHandler.send(new ServerboundPlayerActionPacket(
 					Action.START_DESTROY_BLOCK, pos, side));
-				netHandler.sendPacket(new PlayerActionC2SPacket(
+				netHandler.send(new ServerboundPlayerActionPacket(
 					Action.STOP_DESTROY_BLOCK, pos, side));
 				
 				break;

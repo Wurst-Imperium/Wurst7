@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hud;
 
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
@@ -20,7 +20,7 @@ public final class IngameHUD implements GUIRenderListener
 	private TabGui tabGui;
 	
 	@Override
-	public void onRenderGUI(DrawContext context, float partialTicks)
+	public void onRenderGUI(GuiGraphics context, float partialTicks)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
@@ -37,7 +37,7 @@ public final class IngameHUD implements GUIRenderListener
 		tabGui.render(context, partialTicks);
 		
 		// pinned windows
-		if(!(WurstClient.MC.currentScreen instanceof ClickGuiScreen))
+		if(!(WurstClient.MC.screen instanceof ClickGuiScreen))
 			clickGui.renderPinnedWindows(context, partialTicks);
 	}
 	

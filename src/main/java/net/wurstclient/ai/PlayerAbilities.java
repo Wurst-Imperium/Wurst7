@@ -7,7 +7,7 @@
  */
 package net.wurstclient.ai;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hack.HackList;
 
@@ -17,16 +17,16 @@ public record PlayerAbilities(boolean invulnerable, boolean creativeFlying,
 {
 	
 	private static final WurstClient WURST = WurstClient.INSTANCE;
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	public static PlayerAbilities get()
 	{
 		HackList hax = WURST.getHax();
-		net.minecraft.entity.player.PlayerAbilities mcAbilities =
+		net.minecraft.world.entity.player.Abilities mcAbilities =
 			MC.player.getAbilities();
 		
 		boolean invulnerable =
-			mcAbilities.invulnerable || mcAbilities.creativeMode;
+			mcAbilities.invulnerable || mcAbilities.instabuild;
 		boolean creativeFlying = mcAbilities.flying;
 		boolean flying = creativeFlying || hax.flightHack.isEnabled();
 		boolean immuneToFallDamage = invulnerable || hax.noFallHack.isEnabled();

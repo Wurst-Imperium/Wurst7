@@ -9,15 +9,15 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -55,14 +55,14 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 	{
 		WURST.getHax().tunnellerHack.setEnabled(false);
 		
-		if(!MC.player.isOnGround())
+		if(!MC.player.onGround())
 		{
 			ChatUtils.error("Can't build this in mid-air.");
 			setEnabled(false);
 			return;
 		}
 		
-		ItemStack stack = MC.player.getInventory().getSelectedStack();
+		ItemStack stack = MC.player.getInventory().getSelectedItem();
 		
 		if(!(stack.getItem() instanceof BlockItem))
 		{
@@ -71,22 +71,22 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(stack.getCount() < 57 && !MC.player.getAbilities().creativeMode)
+		if(stack.getCount() < 57 && !MC.player.getAbilities().instabuild)
 			ChatUtils.warning("Not enough blocks. Bunker may be incomplete.");
 		
 		// get start pos and facings
-		BlockPos startPos = BlockPos.ofFloored(MC.player.getPos());
-		Direction facing = MC.player.getHorizontalFacing();
-		Direction facing2 = facing.rotateYCounterclockwise();
+		BlockPos startPos = BlockPos.containing(MC.player.position());
+		Direction facing = MC.player.getDirection();
+		Direction facing2 = facing.getCounterClockWise();
 		
 		// set positions
 		positions.clear();
 		for(int[] pos : template)
-			positions.add(startPos.up(pos[1]).offset(facing, pos[2])
-				.offset(facing2, pos[0]));
+			positions.add(startPos.above(pos[1]).relative(facing, pos[2])
+				.relative(facing2, pos[0]));
 		
 		startTimer = 2;
-		MC.player.jump();
+		MC.player.jumpFromGround();
 		
 		EVENTS.add(UpdateListener.class, this);
 	}
@@ -110,12 +110,12 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 		if(startTimer <= 0)
 		{
 			for(BlockPos pos : positions)
-				if(BlockUtils.getState(pos).isReplaceable()
-					&& !MC.player.getBoundingBox().intersects(new Box(pos)))
+				if(BlockUtils.getState(pos).canBeReplaced()
+					&& !MC.player.getBoundingBox().intersects(new AABB(pos)))
 					placeBlockSimple(pos);
-			MC.player.swingHand(Hand.MAIN_HAND);
+			MC.player.swing(InteractionHand.MAIN_HAND);
 			
-			if(MC.player.isOnGround())
+			if(MC.player.onGround())
 				setEnabled(false);
 		}
 	}
@@ -125,28 +125,28 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 		Direction side = null;
 		Direction[] sides = Direction.values();
 		
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		Vec3 eyesPos = RotationUtils.getEyesPos();
+		Vec3 posVec = Vec3.atCenterOf(pos);
+		double distanceSqPosVec = eyesPos.distanceToSqr(posVec);
 		
-		Vec3d[] hitVecs = new Vec3d[sides.length];
+		Vec3[] hitVecs = new Vec3[sides.length];
 		for(int i = 0; i < sides.length; i++)
-			hitVecs[i] =
-				posVec.add(Vec3d.of(sides[i].getVector()).multiply(0.5));
+			hitVecs[i] = posVec
+				.add(Vec3.atLowerCornerOf(sides[i].getUnitVec3i()).scale(0.5));
 		
 		for(int i = 0; i < sides.length; i++)
 		{
 			// check if neighbor can be right clicked
-			BlockPos neighbor = pos.offset(sides[i]);
+			BlockPos neighbor = pos.relative(sides[i]);
 			if(!BlockUtils.canBeClicked(neighbor))
 				continue;
 			
 			// check line of sight
 			BlockState neighborState = BlockUtils.getState(neighbor);
 			VoxelShape neighborShape =
-				neighborState.getOutlineShape(MC.world, neighbor);
-			if(MC.world.raycastBlock(eyesPos, hitVecs[i], neighbor,
-				neighborShape, neighborState) != null)
+				neighborState.getShape(MC.level, neighbor);
+			if(MC.level.clipWithInteractionOverride(eyesPos, hitVecs[i],
+				neighbor, neighborShape, neighborState) != null)
 				continue;
 			
 			side = sides[i];
@@ -157,11 +157,11 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 			for(int i = 0; i < sides.length; i++)
 			{
 				// check if neighbor can be right clicked
-				if(!BlockUtils.canBeClicked(pos.offset(sides[i])))
+				if(!BlockUtils.canBeClicked(pos.relative(sides[i])))
 					continue;
 				
 				// check if side is facing away from player
-				if(distanceSqPosVec > eyesPos.squaredDistanceTo(hitVecs[i]))
+				if(distanceSqPosVec > eyesPos.distanceToSqr(hitVecs[i]))
 					continue;
 				
 				side = sides[i];
@@ -171,7 +171,7 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 		if(side == null)
 			return;
 		
-		Vec3d hitVec = hitVecs[side.ordinal()];
+		Vec3 hitVec = hitVecs[side.ordinal()];
 		
 		// face block
 		// WURST.getRotationFaker().faceVectorPacket(hitVec);
@@ -183,13 +183,13 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 		// return;
 		
 		// place block
-		IMC.getInteractionManager().rightClickBlock(pos.offset(side),
+		IMC.getInteractionManager().rightClickBlock(pos.relative(side),
 			side.getOpposite(), hitVec);
 		
 		// swing arm
-		SwingHand.SERVER.swing(Hand.MAIN_HAND);
+		SwingHand.SERVER.swing(InteractionHand.MAIN_HAND);
 		
 		// reset timer
-		MC.itemUseCooldown = 4;
+		MC.rightClickDelay = 4;
 	}
 }

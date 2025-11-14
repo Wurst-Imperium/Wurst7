@@ -9,19 +9,19 @@ package net.wurstclient.hacks;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.CraftingTableBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CraftingTableBlock;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -67,12 +67,12 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		for(int i = 0; i < 36; i++)
 		{
 			// filter out non-bowl items and empty bowl slot
-			ItemStack stack = MC.player.getInventory().getStack(i);
+			ItemStack stack = MC.player.getInventory().getItem(i);
 			if(stack == null || stack.getItem() != Items.BOWL || i == 9)
 				continue;
 			
 			// check if empty bowl slot contains a non-bowl item
-			ItemStack emptyBowlStack = MC.player.getInventory().getStack(9);
+			ItemStack emptyBowlStack = MC.player.getInventory().getItem(9);
 			boolean swap = !emptyBowlStack.isEmpty()
 				&& emptyBowlStack.getItem() != Items.BOWL;
 			
@@ -107,7 +107,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			MC.player.getInventory().setSelectedSlot(soupInHotbar);
 			
 			// eat soup
-			MC.options.useKey.setPressed(true);
+			MC.options.keyUse.setDown(true);
 			IMC.getInteractionManager().rightClickItem();
 			
 			return;
@@ -130,7 +130,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		
 		for(int i = startSlot; i < endSlot; i++)
 		{
-			ItemStack stack = MC.player.getInventory().getStack(i);
+			ItemStack stack = MC.player.getInventory().getItem(i);
 			
 			if(stack != null && stews.contains(stack.getItem()))
 				return i;
@@ -146,7 +146,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			return false;
 		
 		// check for clickable objects
-		if(isClickable(MC.crosshairTarget))
+		if(isClickable(MC.hitResult))
 			return false;
 		
 		return true;
@@ -159,19 +159,19 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		
 		if(hitResult instanceof EntityHitResult)
 		{
-			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
-			return entity instanceof VillagerEntity
-				|| entity instanceof TameableEntity;
+			Entity entity = ((EntityHitResult)MC.hitResult).getEntity();
+			return entity instanceof Villager
+				|| entity instanceof TamableAnimal;
 		}
 		
 		if(hitResult instanceof BlockHitResult)
 		{
-			BlockPos pos = ((BlockHitResult)MC.crosshairTarget).getBlockPos();
+			BlockPos pos = ((BlockHitResult)MC.hitResult).getBlockPos();
 			if(pos == null)
 				return false;
 			
-			Block block = MC.world.getBlockState(pos).getBlock();
-			return block instanceof BlockWithEntity
+			Block block = MC.level.getBlockState(pos).getBlock();
+			return block instanceof BaseEntityBlock
 				|| block instanceof CraftingTableBlock;
 		}
 		
@@ -185,7 +185,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			return;
 		
 		// stop eating
-		MC.options.useKey.setPressed(false);
+		MC.options.keyUse.setDown(false);
 		
 		// reset slot
 		MC.player.getInventory().setSelectedSlot(oldSlot);

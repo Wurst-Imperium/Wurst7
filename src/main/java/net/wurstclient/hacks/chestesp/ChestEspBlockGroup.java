@@ -7,13 +7,13 @@
  */
 package net.wurstclient.hacks.chestesp;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.enums.ChestType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.util.BlockUtils;
 
 public abstract class ChestEspBlockGroup extends ChestEspGroup
@@ -25,16 +25,16 @@ public abstract class ChestEspBlockGroup extends ChestEspGroup
 		if(!matches(be))
 			return;
 		
-		Box box = getBox(be);
+		AABB box = getBox(be);
 		if(box == null)
 			return;
 		
 		boxes.add(box);
 	}
 	
-	private Box getBox(BlockEntity be)
+	private AABB getBox(BlockEntity be)
 	{
-		BlockPos pos = be.getPos();
+		BlockPos pos = be.getBlockPos();
 		
 		if(!BlockUtils.canBeClicked(pos))
 			return null;
@@ -45,30 +45,31 @@ public abstract class ChestEspBlockGroup extends ChestEspGroup
 		return BlockUtils.getBoundingBox(pos);
 	}
 	
-	private Box getChestBox(ChestBlockEntity chestBE)
+	private AABB getChestBox(ChestBlockEntity chestBE)
 	{
-		BlockState state = chestBE.getCachedState();
-		if(!state.contains(ChestBlock.CHEST_TYPE))
+		BlockState state = chestBE.getBlockState();
+		if(!state.hasProperty(ChestBlock.TYPE))
 			return null;
 		
-		ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
+		ChestType chestType = state.getValue(ChestBlock.TYPE);
 		
 		// ignore other block in double chest
 		if(chestType == ChestType.LEFT)
 			return null;
 		
-		BlockPos pos = chestBE.getPos();
-		Box box = BlockUtils.getBoundingBox(pos);
+		BlockPos pos = chestBE.getBlockPos();
+		AABB box = BlockUtils.getBoundingBox(pos);
 		
 		// larger box for double chest
 		if(chestType != ChestType.SINGLE)
 		{
-			BlockPos pos2 = pos.offset(ChestBlock.getFacing(state));
+			BlockPos pos2 =
+				pos.relative(ChestBlock.getConnectedDirection(state));
 			
 			if(BlockUtils.canBeClicked(pos2))
 			{
-				Box box2 = BlockUtils.getBoundingBox(pos2);
-				box = box.union(box2);
+				AABB box2 = BlockUtils.getBoundingBox(pos2);
+				box = box.minmax(box2);
 			}
 		}
 		

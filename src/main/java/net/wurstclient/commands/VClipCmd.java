@@ -7,9 +7,9 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -56,16 +56,16 @@ public final class VClipCmd extends Command
 	
 	private double calculateHeight(Direction direction) throws CmdError
 	{
-		Box box = MC.player.getBoundingBox();
+		AABB box = MC.player.getBoundingBox();
 		
-		Box maxOffsetBox = box.offset(0, direction.getOffsetY() * 10, 0);
-		if(!hasCollisions(box.union(maxOffsetBox)))
+		AABB maxOffsetBox = box.move(0, direction.getStepY() * 10, 0);
+		if(!hasCollisions(box.minmax(maxOffsetBox)))
 			throw new CmdError("There is nothing to clip through!");
 		
 		for(int i = 1; i <= 10; i++)
 		{
-			double height = direction.getOffsetY() * i;
-			Box offsetBox = box.offset(0, height, 0);
+			double height = direction.getStepY() * i;
+			AABB offsetBox = box.move(0, height, 0);
 			
 			if(hasCollisions(offsetBox))
 			{
@@ -73,7 +73,7 @@ public final class VClipCmd extends Command
 				if(subBlockOffset >= 1 || height + subBlockOffset > 10)
 					continue;
 				
-				Box newOffsetBox = offsetBox.offset(0, subBlockOffset, 0);
+				AABB newOffsetBox = offsetBox.move(0, subBlockOffset, 0);
 				if(hasCollisions(newOffsetBox))
 					continue;
 				
@@ -81,7 +81,7 @@ public final class VClipCmd extends Command
 				offsetBox = newOffsetBox;
 			}
 			
-			if(!hasCollisions(box.union(offsetBox)))
+			if(!hasCollisions(box.minmax(offsetBox)))
 				continue;
 			
 			return height;
@@ -90,12 +90,12 @@ public final class VClipCmd extends Command
 		throw new CmdError("There are no free blocks where you can fit!");
 	}
 	
-	private boolean hasCollisions(Box box)
+	private boolean hasCollisions(AABB box)
 	{
 		return BlockUtils.getBlockCollisions(box).findAny().isPresent();
 	}
 	
-	private double getSubBlockOffset(Box offsetBox)
+	private double getSubBlockOffset(AABB offsetBox)
 	{
 		return BlockUtils.getBlockCollisions(offsetBox)
 			.mapToDouble(box -> box.maxY).max().getAsDouble() - offsetBox.minY;
@@ -103,7 +103,7 @@ public final class VClipCmd extends Command
 	
 	private void vclip(double height)
 	{
-		ClientPlayerEntity p = MC.player;
-		p.setPosition(p.getX(), p.getY() + height, p.getZ());
+		LocalPlayer p = MC.player;
+		p.setPos(p.getX(), p.getY() + height, p.getZ());
 	}
 }

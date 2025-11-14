@@ -15,42 +15,42 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 
-import net.minecraft.client.Mouse;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.client.MouseHandler;
+import net.minecraft.world.entity.player.Inventory;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.MouseScrollListener.MouseScrollEvent;
 import net.wurstclient.events.MouseUpdateListener.MouseUpdateEvent;
 
-@Mixin(Mouse.class)
+@Mixin(MouseHandler.class)
 public class MouseMixin
 {
 	@Shadow
-	private double cursorDeltaX;
+	private double accumulatedDX;
 	@Shadow
-	private double cursorDeltaY;
+	private double accumulatedDY;
 	
-	@Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
+	@Inject(at = @At("RETURN"), method = "onScroll(JDD)V")
 	private void onOnMouseScroll(long window, double horizontal,
 		double vertical, CallbackInfo ci)
 	{
 		EventManager.fire(new MouseScrollEvent(vertical));
 	}
 	
-	@Inject(at = @At("HEAD"), method = "tick()V")
+	@Inject(at = @At("HEAD"), method = "handleAccumulatedMovement()V")
 	private void onTick(CallbackInfo ci)
 	{
 		MouseUpdateEvent event =
-			new MouseUpdateEvent(cursorDeltaX, cursorDeltaY);
+			new MouseUpdateEvent(accumulatedDX, accumulatedDY);
 		EventManager.fire(event);
-		cursorDeltaX = event.getDeltaX();
-		cursorDeltaY = event.getDeltaY();
+		accumulatedDX = event.getDeltaX();
+		accumulatedDY = event.getDeltaY();
 	}
 	
 	@WrapWithCondition(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/player/PlayerInventory;setSelectedSlot(I)V"),
-		method = "onMouseScroll(JDD)V")
-	private boolean wrapOnMouseScroll(PlayerInventory inventory, int slot)
+		target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlot(I)V"),
+		method = "onScroll(JDD)V")
+	private boolean wrapOnMouseScroll(Inventory inventory, int slot)
 	{
 		return !WurstClient.INSTANCE.getOtfs().zoomOtf
 			.shouldPreventHotbarScrolling();

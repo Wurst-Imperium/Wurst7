@@ -9,8 +9,8 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.settings.Setting;
@@ -19,10 +19,10 @@ import net.wurstclient.util.RenderUtils;
 public abstract class AbstractListEditButton extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	
 	private final String buttonText = "Edit...";
-	private final int buttonWidth = TR.getWidth(buttonText);
+	private final int buttonWidth = TR.width(buttonText);
 	
 	protected abstract void openScreen();
 	
@@ -43,7 +43,7 @@ public abstract class AbstractListEditButton extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -69,10 +69,10 @@ public abstract class AbstractListEditButton extends Component
 		
 		// text
 		int txtColor = GUI.getTxtColor();
-		context.state.goUpLayer();
-		context.drawText(TR, getText(), x1, y1 + 2, txtColor, false);
-		context.drawText(TR, buttonText, x3 + 2, y1 + 2, txtColor, false);
-		context.state.goDownLayer();
+		context.guiRenderState.up();
+		context.drawString(TR, getText(), x1, y1 + 2, txtColor, false);
+		context.drawString(TR, buttonText, x3 + 2, y1 + 2, txtColor, false);
+		context.guiRenderState.down();
 	}
 	
 	private int getFillColor(boolean hovering)
@@ -84,7 +84,7 @@ public abstract class AbstractListEditButton extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return TR.getWidth(getText()) + buttonWidth + 6;
+		return TR.width(getText()) + buttonWidth + 6;
 	}
 	
 	@Override

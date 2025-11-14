@@ -2,7 +2,7 @@ import argparse
 import re
 
 
-def update_gradle_properties(mc_version, yarn_mappings, fabric_loader, fapi_version):
+def update_gradle_properties(mc_version, fabric_loader, fapi_version):
 	print("Updating gradle.properties...")
 
 	# Read gradle.properties
@@ -12,7 +12,6 @@ def update_gradle_properties(mc_version, yarn_mappings, fabric_loader, fapi_vers
 	# Define replacements
 	replacements = {
 		"minecraft_version": lambda v: mc_version,
-		"yarn_mappings": lambda v: yarn_mappings,
 		"loader_version": lambda v: fabric_loader,
 		"fabric_version": lambda v: fapi_version,
 		"mod_version": lambda v: v[: v.index("MC") + 2] + mc_version,
@@ -70,14 +69,12 @@ def update_mc_version_constant(mc_version):
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("mc_version", help="Minecraft version")
-	parser.add_argument("yarn_mappings", help="Yarn mappings version")
 	parser.add_argument("fabric_loader", help="Fabric Loader version")
 	parser.add_argument("fapi_version", help="Fabric API version")
 	args = parser.parse_args()
 
 	update_gradle_properties(
 		args.mc_version,
-		args.yarn_mappings,
 		args.fabric_loader,
 		args.fapi_version,
 	)

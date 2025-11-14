@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.AllayEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.allay.Allay;
 
 public final class FilterAllaysSetting extends EntityFilterCheckbox
 {
@@ -20,7 +20,7 @@ public final class FilterAllaysSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof AllayEntity);
+		return !(e instanceof Allay);
 	}
 	
 	public static FilterAllaysSetting genericCombat(boolean checked)

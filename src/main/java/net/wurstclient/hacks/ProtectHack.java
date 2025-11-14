@@ -12,12 +12,13 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.ai.PathFinder;
 import net.wurstclient.ai.PathPos;
@@ -135,15 +136,15 @@ public final class ProtectHack extends Hack
 		if(friend == null)
 		{
 			Stream<Entity> stream = StreamSupport
-				.stream(MC.world.getEntities().spliterator(), true)
+				.stream(MC.level.entitiesForRendering().spliterator(), true)
 				.filter(LivingEntity.class::isInstance)
 				.filter(
 					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity));
 			friend = stream
-				.min(Comparator
-					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+				.min(
+					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 				.orElse(null);
 		}
 		
@@ -169,7 +170,7 @@ public final class ProtectHack extends Hack
 		
 		if(friend != null)
 		{
-			MC.options.forwardKey.setPressed(false);
+			MC.options.keyUp.setDown(false);
 			friend = null;
 		}
 	}
@@ -196,19 +197,18 @@ public final class ProtectHack extends Hack
 		
 		// set enemy
 		Stream<Entity> stream = EntityUtils.getAttackableEntities()
-			.filter(e -> MC.player.squaredDistanceTo(e) <= 36)
+			.filter(e -> MC.player.distanceToSqr(e) <= 36)
 			.filter(e -> e != friend);
 		
 		stream = entityFilters.applyTo(stream);
 		
 		enemy = stream
-			.min(
-				Comparator.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+			.min(Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 			.orElse(null);
 		
 		Entity target =
-			enemy == null || MC.player.squaredDistanceTo(friend) >= 24 * 24
-				? friend : enemy;
+			enemy == null || MC.player.distanceToSqr(friend) >= 24 * 24 ? friend
+				: enemy;
 		
 		double distance = target == enemy ? distanceE : distanceF;
 		
@@ -244,35 +244,35 @@ public final class ProtectHack extends Hack
 		}else
 		{
 			// jump if necessary
-			if(MC.player.horizontalCollision && MC.player.isOnGround())
-				MC.player.jump();
+			if(MC.player.horizontalCollision && MC.player.onGround())
+				MC.player.jumpFromGround();
 			
 			// swim up if necessary
-			if(MC.player.isTouchingWater() && MC.player.getY() < target.getY())
-				MC.player.addVelocity(0, 0.04, 0);
+			if(MC.player.isInWater() && MC.player.getY() < target.getY())
+				MC.player.push(0, 0.04, 0);
 			
 			// control height if flying
-			if(!MC.player.isOnGround()
+			if(!MC.player.onGround()
 				&& (MC.player.getAbilities().flying
 					|| WURST.getHax().flightHack.isEnabled())
-				&& MC.player.squaredDistanceTo(target.getX(), MC.player.getY(),
-					target.getZ()) <= MC.player.squaredDistanceTo(
-						MC.player.getX(), target.getY(), MC.player.getZ()))
+				&& MC.player.distanceToSqr(target.getX(), MC.player.getY(),
+					target.getZ()) <= MC.player.distanceToSqr(MC.player.getX(),
+						target.getY(), MC.player.getZ()))
 			{
 				if(MC.player.getY() > target.getY() + 1D)
-					MC.options.sneakKey.setPressed(true);
+					MC.options.keyShift.setDown(true);
 				else if(MC.player.getY() < target.getY() - 1D)
-					MC.options.jumpKey.setPressed(true);
+					MC.options.keyJump.setDown(true);
 			}else
 			{
-				MC.options.sneakKey.setPressed(false);
-				MC.options.jumpKey.setPressed(false);
+				MC.options.keyShift.setDown(false);
+				MC.options.keyJump.setDown(false);
 			}
 			
 			// follow target
 			WURST.getRotationFaker()
 				.faceVectorClient(target.getBoundingBox().getCenter());
-			MC.options.forwardKey.setPressed(MC.player.distanceTo(
+			MC.options.keyUp.setDown(MC.player.distanceTo(
 				target) > (target == friend ? distanceF : distanceE));
 		}
 		
@@ -285,14 +285,14 @@ public final class ProtectHack extends Hack
 				return;
 			
 			// attack enemy
-			MC.interactionManager.attackEntity(MC.player, enemy);
-			swingHand.swing(Hand.MAIN_HAND);
+			MC.gameMode.attack(MC.player, enemy);
+			swingHand.swing(InteractionHand.MAIN_HAND);
 			speed.resetTimer();
 		}
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(!useAi.isChecked())
 			return;
@@ -314,7 +314,7 @@ public final class ProtectHack extends Hack
 		
 		public EntityPathFinder(Entity entity, double distance)
 		{
-			super(BlockPos.ofFloored(entity.getPos()));
+			super(BlockPos.containing(entity.position()));
 			this.entity = entity;
 			distanceSq = distance * distance;
 			setThinkTime(1);
@@ -324,7 +324,7 @@ public final class ProtectHack extends Hack
 		protected boolean checkDone()
 		{
 			return done =
-				entity.squaredDistanceTo(Vec3d.ofCenter(current)) <= distanceSq;
+				entity.distanceToSqr(Vec3.atCenterOf(current)) <= distanceSq;
 		}
 		
 		@Override

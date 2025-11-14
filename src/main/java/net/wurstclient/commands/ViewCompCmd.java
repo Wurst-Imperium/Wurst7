@@ -14,9 +14,9 @@ import com.google.gson.JsonNull;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.component.Component;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.component.TypedDataComponent;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.SearchTags;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
@@ -39,8 +39,8 @@ public final class ViewCompCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		ClientPlayerEntity player = MC.player;
-		ItemStack stack = player.getInventory().getSelectedStack();
+		LocalPlayer player = MC.player;
+		ItemStack stack = player.getInventory().getSelectedItem();
 		if(stack.isEmpty())
 			throw new CmdError("You must hold an item in your main hand.");
 		
@@ -69,7 +69,7 @@ public final class ViewCompCmd extends Command
 		String compString = getComponentString(stack, query);
 		if(copy)
 		{
-			MC.keyboard.setClipboard(compString);
+			MC.keyboardHandler.setClipboard(compString);
 			ChatUtils.message("Component data copied to clipboard.");
 		}else
 			ChatUtils.message("Components: " + compString);
@@ -78,12 +78,12 @@ public final class ViewCompCmd extends Command
 	private String getComponentString(ItemStack stack, String query)
 	{
 		String compString = "";
-		for(Component<?> c : getMatchingComponents(stack, query))
+		for(TypedDataComponent<?> c : getMatchingComponents(stack, query))
 		{
 			compString +=
 				"\n" + c.type().toString().replace("minecraft:", "") + " => ";
-			DataResult<JsonElement> result = c.encode(
-				MC.player.getRegistryManager().getOps(JsonOps.INSTANCE));
+			DataResult<JsonElement> result = c.encodeValue(MC.player
+				.registryAccess().createSerializationContext(JsonOps.INSTANCE));
 			JsonElement json =
 				result.resultOrPartial().orElse(JsonNull.INSTANCE);
 			compString += JsonUtils.GSON.toJson(json).replace("$", "$$")
@@ -92,7 +92,7 @@ public final class ViewCompCmd extends Command
 		return compString;
 	}
 	
-	private List<Component<?>> getMatchingComponents(ItemStack stack,
+	private List<TypedDataComponent<?>> getMatchingComponents(ItemStack stack,
 		String query)
 	{
 		if(query == null)

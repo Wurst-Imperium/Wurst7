@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import net.minecraft.client.session.Session;
+import net.minecraft.client.User;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -102,9 +102,9 @@ public enum MicrosoftLoginManager
 	{
 		MinecraftProfile mcProfile = getAccount(email, password);
 		
-		Session session = new Session(mcProfile.getName(), mcProfile.getUUID(),
+		User session = new User(mcProfile.getName(), mcProfile.getUUID(),
 			mcProfile.getAccessToken(), Optional.empty(), Optional.empty(),
-			Session.AccountType.MSA);
+			User.Type.MSA);
 		
 		WurstClient.IMC.setWurstSession(session);
 	}

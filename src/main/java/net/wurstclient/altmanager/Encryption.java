@@ -38,10 +38,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import net.minecraft.util.Util;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
+import net.minecraft.Util;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonArray;
@@ -77,15 +77,15 @@ public final class Encryption
 			
 		}catch(GeneralSecurityException e)
 		{
-			throw new CrashException(
-				CrashReport.create(e, "Creating AES ciphers"));
+			throw new ReportedException(
+				CrashReport.forThrowable(e, "Creating AES ciphers"));
 		}
 	}
 	
 	private Path createEncryptionFolder(Path encFolder) throws IOException
 	{
 		Files.createDirectories(encFolder);
-		if(Util.getOperatingSystem() == Util.OperatingSystem.WINDOWS)
+		if(Util.getPlatform() == Util.OS.WINDOWS)
 			Files.setAttribute(encFolder, "dos:hidden", true);
 		
 		Path readme = encFolder.resolve("READ ME I AM VERY IMPORTANT.txt");
@@ -144,12 +144,12 @@ public final class Encryption
 			
 		}catch(IOException e)
 		{
-			CrashReport report =
-				CrashReport.create(e, "Migrating Wurst encryption folder");
-			CrashReportSection section = report.addElement("Migration");
-			section.add("Old path", oldFolder);
-			section.add("New path", newFolder);
-			throw new CrashException(report);
+			CrashReport report = CrashReport.forThrowable(e,
+				"Migrating Wurst encryption folder");
+			CrashReportCategory section = report.addCategory("Migration");
+			section.setDetail("Old path", oldFolder);
+			section.setDetail("New path", newFolder);
+			throw new ReportedException(report);
 		}
 	}
 	
@@ -161,7 +161,8 @@ public final class Encryption
 			
 		}catch(IllegalArgumentException | GeneralSecurityException e)
 		{
-			throw new CrashException(CrashReport.create(e, "Decrypting bytes"));
+			throw new ReportedException(
+				CrashReport.forThrowable(e, "Decrypting bytes"));
 		}
 	}
 	
@@ -171,7 +172,7 @@ public final class Encryption
 		{
 			return new String(decrypt(Files.readAllBytes(path)), CHARSET);
 			
-		}catch(CrashException e)
+		}catch(ReportedException e)
 		{
 			throw new IOException(e);
 		}
@@ -219,7 +220,8 @@ public final class Encryption
 			
 		}catch(GeneralSecurityException e)
 		{
-			throw new CrashException(CrashReport.create(e, "Encrypting bytes"));
+			throw new ReportedException(
+				CrashReport.forThrowable(e, "Encrypting bytes"));
 		}
 	}
 	
@@ -229,7 +231,7 @@ public final class Encryption
 		{
 			Files.write(path, encrypt(content.getBytes(CHARSET)));
 			
-		}catch(CrashException e)
+		}catch(ReportedException e)
 		{
 			throw new IOException(e);
 		}
@@ -326,8 +328,8 @@ public final class Encryption
 			
 		}catch(GeneralSecurityException e)
 		{
-			throw new CrashException(
-				CrashReport.create(e, "Creating RSA keypair"));
+			throw new ReportedException(
+				CrashReport.forThrowable(e, "Creating RSA keypair"));
 		}
 	}
 	
@@ -351,7 +353,8 @@ public final class Encryption
 			
 		}catch(GeneralSecurityException e)
 		{
-			throw new CrashException(CrashReport.create(e, "Creating AES key"));
+			throw new ReportedException(
+				CrashReport.forThrowable(e, "Creating AES key"));
 		}
 	}
 	

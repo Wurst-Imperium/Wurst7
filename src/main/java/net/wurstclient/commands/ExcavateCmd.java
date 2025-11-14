@@ -7,7 +7,7 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
@@ -35,7 +35,7 @@ public final class ExcavateCmd extends Command
 	
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
-		BlockPos playerPos = BlockPos.ofFloored(MC.player.getPos());
+		BlockPos playerPos = BlockPos.containing(MC.player.position());
 		int[] player = {playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
 		

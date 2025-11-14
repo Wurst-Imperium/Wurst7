@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
@@ -25,9 +25,9 @@ import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 public abstract class ChatScreenMixin extends Screen
 {
 	@Shadow
-	protected TextFieldWidget chatField;
+	protected EditBox input;
 	
-	private ChatScreenMixin(WurstClient wurst, Text title)
+	private ChatScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}
@@ -36,17 +36,17 @@ public abstract class ChatScreenMixin extends Screen
 	protected void onInit(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().infiniChatHack.isEnabled())
-			chatField.setMaxLength(Integer.MAX_VALUE);
+			input.setMaxLength(Integer.MAX_VALUE);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "sendMessage(Ljava/lang/String;Z)V",
+		method = "handleChatInput(Ljava/lang/String;Z)V",
 		cancellable = true)
 	public void onSendMessage(String message, boolean addToHistory,
 		CallbackInfo ci)
 	{
 		// Ignore empty messages just like vanilla
-		if((message = normalize(message)).isEmpty())
+		if((message = normalizeChatMessage(message)).isEmpty())
 			return;
 		
 		// Create and fire the chat output event
@@ -66,17 +66,17 @@ public abstract class ChatScreenMixin extends Screen
 		// Otherwise the up/down arrows won't work correctly
 		String newMessage = event.getMessage();
 		if(addToHistory)
-			client.inGameHud.getChatHud().addToMessageHistory(newMessage);
+			minecraft.gui.getChat().addRecentChat(newMessage);
 		
 		// If the event isn't cancelled, send the modified message
 		if(!cancelled)
 			if(newMessage.startsWith("/"))
-				client.player.networkHandler
-					.sendChatCommand(newMessage.substring(1));
+				minecraft.player.connection
+					.sendCommand(newMessage.substring(1));
 			else
-				client.player.networkHandler.sendChatMessage(newMessage);
+				minecraft.player.connection.sendChat(newMessage);
 	}
 	
 	@Shadow
-	public abstract String normalize(String chatText);
+	public abstract String normalizeChatMessage(String chatText);
 }

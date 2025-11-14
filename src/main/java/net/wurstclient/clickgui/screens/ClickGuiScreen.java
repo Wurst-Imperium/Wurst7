@@ -7,10 +7,10 @@
  */
 package net.wurstclient.clickgui.screens;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.clickgui.ClickGui;
 
 public final class ClickGuiScreen extends Screen
@@ -19,12 +19,12 @@ public final class ClickGuiScreen extends Screen
 	
 	public ClickGuiScreen(ClickGui gui)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.gui = gui;
 	}
 	
 	@Override
-	public boolean shouldPause()
+	public boolean isPauseScreen()
 	{
 		return false;
 	}
@@ -53,17 +53,17 @@ public final class ClickGuiScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
 		gui.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public void renderBackground(DrawContext context, int mouseX, int mouseY,
+	public void renderBackground(GuiGraphics context, int mouseX, int mouseY,
 		float deltaTicks)
 	{
 		// Don't blur

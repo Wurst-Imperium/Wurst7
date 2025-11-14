@@ -9,11 +9,11 @@ package net.wurstclient.hacks;
 
 import java.util.Optional;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -35,7 +35,8 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 			+ "Doesn't seem to affect performance.",
 		1, 1, 64, 1, ValueDisplay.INTEGER);
 	
-	private final Random random = Random.createLocal();
+	private final RandomSource random =
+		RandomSource.createNewThreadLocalInstance();
 	
 	public ItemGeneratorHack()
 	{
@@ -61,7 +62,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(!MC.player.isInCreativeMode())
+		if(!MC.player.hasInfiniteMaterials())
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
@@ -72,9 +73,9 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 		{
 			// Not sure if it's possible to get an empty optional here,
 			// but if so it will just retry.
-			Optional<RegistryEntry.Reference<Item>> optional = Optional.empty();
+			Optional<Holder.Reference<Item>> optional = Optional.empty();
 			while(optional.isEmpty())
-				optional = Registries.ITEM.getRandom(random);
+				optional = BuiltInRegistries.ITEM.getRandom(random);
 			
 			Item item = optional.get().value();
 			ItemStack stack = new ItemStack(item, stackSize.getValueI());

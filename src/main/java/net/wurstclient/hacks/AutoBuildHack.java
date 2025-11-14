@@ -13,17 +13,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.RightClickListener;
@@ -40,8 +41,8 @@ import net.wurstclient.util.json.JsonException;
 public final class AutoBuildHack extends Hack
 	implements UpdateListener, RightClickListener, RenderListener
 {
-	private static final Box BLOCK_BOX =
-		new Box(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0, 15 / 16.0, 15 / 16.0);
+	private static final AABB BLOCK_BOX =
+		new AABB(1 / 16.0, 1 / 16.0, 1 / 16.0, 15 / 16.0, 15 / 16.0, 15 / 16.0);
 	
 	private final FileSetting templateSetting = new FileSetting("Template",
 		"Determines what to build.\n\n"
@@ -154,7 +155,7 @@ public final class AutoBuildHack extends Hack
 		if(status != Status.IDLE)
 			return;
 		
-		HitResult hitResult = MC.crosshairTarget;
+		HitResult hitResult = MC.hitResult;
 		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
 			|| !(hitResult instanceof BlockHitResult blockHitResult))
 			return;
@@ -163,8 +164,9 @@ public final class AutoBuildHack extends Hack
 		if(!BlockUtils.canBeClicked(hitResultPos))
 			return;
 		
-		BlockPos startPos = hitResultPos.offset(blockHitResult.getSide());
-		Direction direction = MC.player.getHorizontalFacing();
+		BlockPos startPos =
+			hitResultPos.relative(blockHitResult.getDirection());
+		Direction direction = MC.player.getDirection();
 		remainingBlocks = template.getBlocksToPlace(startPos, direction);
 		
 		status = Status.BUILDING;
@@ -194,33 +196,33 @@ public final class AutoBuildHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(status != Status.BUILDING)
 			return;
 		
 		List<BlockPos> blocksToDraw = remainingBlocks.keySet().stream()
-			.filter(pos -> BlockUtils.getState(pos).isReplaceable()).limit(1024)
+			.filter(pos -> BlockUtils.getState(pos).canBeReplaced()).limit(1024)
 			.toList();
 		
 		int black = 0x80000000;
-		List<Box> outlineBoxes =
-			blocksToDraw.stream().map(pos -> BLOCK_BOX.offset(pos)).toList();
+		List<AABB> outlineBoxes =
+			blocksToDraw.stream().map(pos -> BLOCK_BOX.move(pos)).toList();
 		RenderUtils.drawOutlinedBoxes(matrixStack, outlineBoxes, black, true);
 		
 		int green = 0x2600FF00;
-		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3 eyesPos = RotationUtils.getEyesPos();
 		double rangeSq = range.getValueSq();
-		List<Box> greenBoxes = blocksToDraw.stream()
-			.filter(pos -> pos.getSquaredDistance(eyesPos) <= rangeSq)
-			.map(pos -> BLOCK_BOX.offset(pos)).toList();
+		List<AABB> greenBoxes = blocksToDraw.stream()
+			.filter(pos -> pos.distToCenterSqr(eyesPos) <= rangeSq)
+			.map(pos -> BLOCK_BOX.move(pos)).toList();
 		RenderUtils.drawSolidBoxes(matrixStack, greenBoxes, green, true);
 	}
 	
 	private void buildNormally()
 	{
 		remainingBlocks.keySet()
-			.removeIf(pos -> !BlockUtils.getState(pos).isReplaceable());
+			.removeIf(pos -> !BlockUtils.getState(pos).canBeReplaced());
 		
 		if(remainingBlocks.isEmpty())
 		{
@@ -228,7 +230,7 @@ public final class AutoBuildHack extends Hack
 			return;
 		}
 		
-		if(!fastPlace.isChecked() && MC.itemUseCooldown > 0)
+		if(!fastPlace.isChecked() && MC.rightClickDelay > 0)
 			return;
 		
 		double rangeSq = range.getValueSq();
@@ -246,13 +248,13 @@ public final class AutoBuildHack extends Hack
 					continue;
 				
 			if(useSavedBlocks.isChecked() && item != Items.AIR
-				&& !MC.player.getMainHandStack().isOf(item))
+				&& !MC.player.getMainHandItem().is(item))
 			{
 				giveOrSelectItem(item);
 				return;
 			}
 			
-			MC.itemUseCooldown = 4;
+			MC.rightClickDelay = 4;
 			RotationUtils.getNeededRotations(params.hitVec())
 				.sendPlayerLookPacket();
 			InteractionSimulator.rightClickBlock(params.toHitResult());
@@ -265,11 +267,11 @@ public final class AutoBuildHack extends Hack
 		if(InventoryUtils.selectItem(item, 36, true))
 			return;
 		
-		if(!MC.player.isInCreativeMode())
+		if(!MC.player.hasInfiniteMaterials())
 			return;
 		
-		PlayerInventory inventory = MC.player.getInventory();
-		int slot = inventory.getEmptySlot();
+		Inventory inventory = MC.player.getInventory();
+		int slot = inventory.getFreeSlot();
 		if(slot < 0)
 			slot = inventory.getSelectedSlot();
 		

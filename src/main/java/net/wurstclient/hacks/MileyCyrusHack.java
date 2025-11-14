@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -43,7 +43,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		IKeyBinding.get(MC.options.sneakKey).resetPressedState();
+		IKeyBinding.get(MC.options.keyShift).resetPressedState();
 	}
 	
 	@Override
@@ -53,8 +53,8 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 		if(timer < 10 - twerkSpeed.getValueI())
 			return;
 		
-		KeyBinding sneakKey = MC.options.sneakKey;
-		sneakKey.setPressed(!sneakKey.isPressed());
+		KeyMapping sneakKey = MC.options.keyShift;
+		sneakKey.setDown(!sneakKey.isDown());
 		timer = -1;
 	}
 }

@@ -9,11 +9,11 @@ package net.wurstclient.ai;
 
 import java.util.ArrayList;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.util.RotationUtils;
 
 public class FlyPathProcessor extends PathProcessor
@@ -30,11 +30,11 @@ public class FlyPathProcessor extends PathProcessor
 	public void process()
 	{
 		// get positions
-		BlockPos pos = BlockPos.ofFloored(MC.player.getPos());
-		Vec3d posVec = MC.player.getPos();
+		BlockPos pos = BlockPos.containing(MC.player.position());
+		Vec3 posVec = MC.player.position();
 		BlockPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
-		Box nextBox = new Box(nextPos.getX() + 0.3, nextPos.getY(),
+		AABB nextBox = new AABB(nextPos.getX() + 0.3, nextPos.getY(),
 			nextPos.getZ() + 0.3, nextPos.getX() + 0.7, nextPos.getY() + 0.2,
 			nextPos.getZ() + 0.7);
 		
@@ -57,9 +57,10 @@ public class FlyPathProcessor extends PathProcessor
 			// stop when changing directions
 			if(creativeFlying)
 			{
-				Vec3d v = MC.player.getVelocity();
+				Vec3 v = MC.player.getDeltaMovement();
 				
-				MC.player.setVelocity(v.x / Math.max(Math.abs(v.x) * 50, 1),
+				MC.player.setDeltaMovement(
+					v.x / Math.max(Math.abs(v.x) * 50, 1),
 					v.y / Math.max(Math.abs(v.y) * 50, 1),
 					v.z / Math.max(Math.abs(v.z) * 50, 1));
 			}
@@ -81,73 +82,73 @@ public class FlyPathProcessor extends PathProcessor
 		if(horizontal)
 		{
 			facePosition(nextPos);
-			if(Math.abs(MathHelper.wrapDegrees(RotationUtils
-				.getHorizontalAngleToLookVec(Vec3d.ofCenter(nextPos)))) > 1)
+			if(Math.abs(Mth.wrapDegrees(RotationUtils
+				.getHorizontalAngleToLookVec(Vec3.atCenterOf(nextPos)))) > 1)
 				return;
 		}
 		
 		// skip mid-air nodes
 		Vec3i offset = nextPos.subtract(pos);
 		while(index < path.size() - 1
-			&& path.get(index).add(offset).equals(path.get(index + 1)))
+			&& path.get(index).offset(offset).equals(path.get(index + 1)))
 			index++;
 		
 		if(creativeFlying)
 		{
-			Vec3d v = MC.player.getVelocity();
+			Vec3 v = MC.player.getDeltaMovement();
 			
 			if(!x)
-				MC.player.setVelocity(v.x / Math.max(Math.abs(v.x) * 50, 1),
-					v.y, v.z);
+				MC.player.setDeltaMovement(
+					v.x / Math.max(Math.abs(v.x) * 50, 1), v.y, v.z);
 			if(!y)
-				MC.player.setVelocity(v.x,
+				MC.player.setDeltaMovement(v.x,
 					v.y / Math.max(Math.abs(v.y) * 50, 1), v.z);
 			if(!z)
-				MC.player.setVelocity(v.x, v.y,
+				MC.player.setDeltaMovement(v.x, v.y,
 					v.z / Math.max(Math.abs(v.z) * 50, 1));
 		}
 		
-		Vec3d vecInPos = new Vec3d(nextPos.getX() + 0.5, nextPos.getY() + 0.1,
+		Vec3 vecInPos = new Vec3(nextPos.getX() + 0.5, nextPos.getY() + 0.1,
 			nextPos.getZ() + 0.5);
 		
 		// horizontal movement
 		if(horizontal)
 		{
-			if(!creativeFlying && MC.player.getPos().distanceTo(
+			if(!creativeFlying && MC.player.position().distanceTo(
 				vecInPos) <= WURST.getHax().flightHack.horizontalSpeed
 					.getValue())
 			{
-				MC.player.setPosition(vecInPos.x, vecInPos.y, vecInPos.z);
+				MC.player.setPos(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;
 			}
 			
-			MC.options.forwardKey.setPressed(true);
+			MC.options.keyUp.setDown(true);
 			
 			if(MC.player.horizontalCollision)
 				if(posVec.y > nextBox.maxY)
-					MC.options.sneakKey.setPressed(true);
+					MC.options.keyShift.setDown(true);
 				else if(posVec.y < nextBox.minY)
-					MC.options.jumpKey.setPressed(true);
+					MC.options.keyJump.setDown(true);
 				
 			// vertical movement
 		}else if(y)
 		{
-			if(!creativeFlying && MC.player.getPos().distanceTo(
+			if(!creativeFlying && MC.player.position().distanceTo(
 				vecInPos) <= WURST.getHax().flightHack.verticalSpeed.getValue())
 			{
-				MC.player.setPosition(vecInPos.x, vecInPos.y, vecInPos.z);
+				MC.player.setPos(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;
 			}
 			
 			if(posVec.y < nextBox.minY)
-				MC.options.jumpKey.setPressed(true);
+				MC.options.keyJump.setDown(true);
 			else
-				MC.options.sneakKey.setPressed(true);
+				MC.options.keyShift.setDown(true);
 			
 			if(MC.player.verticalCollision)
 			{
-				MC.options.sneakKey.setPressed(false);
-				MC.options.forwardKey.setPressed(true);
+				MC.options.keyShift.setDown(false);
+				MC.options.keyUp.setDown(true);
 			}
 		}
 	}

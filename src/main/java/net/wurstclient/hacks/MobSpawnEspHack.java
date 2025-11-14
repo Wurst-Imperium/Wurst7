@@ -10,18 +10,18 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.Map.Entry;
 
-import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnRestriction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.LightType;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstRenderLayers;
@@ -66,8 +66,8 @@ public final class MobSpawnEspHack extends Hack
 	private final HitboxCheckSetting hitboxCheck = new HitboxCheckSetting();
 	
 	private final ChunkVertexBufferCoordinator coordinator =
-		new ChunkVertexBufferCoordinator(this::isSpawnable, DrawMode.LINES,
-			VertexFormats.POSITION_COLOR_NORMAL, this::buildBuffer,
+		new ChunkVertexBufferCoordinator(this::isSpawnable, Mode.LINES,
+			DefaultVertexFormat.POSITION_COLOR_NORMAL, this::buildBuffer,
 			drawDistance);
 	
 	private int cachedDayColor;
@@ -121,22 +121,22 @@ public final class MobSpawnEspHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
-		RenderLayer.MultiPhase layer =
+		RenderType.CompositeRenderType layer =
 			WurstRenderLayers.getLines(depthTest.isChecked());
 		
 		for(Entry<ChunkPos, EasyVertexBuffer> entry : coordinator.getBuffers())
 		{
 			RegionPos region = RegionPos.of(entry.getKey());
 			
-			matrixStack.push();
+			matrixStack.pushPose();
 			RenderUtils.applyRegionalRenderOffset(matrixStack, region);
 			
 			entry.getValue().draw(matrixStack, layer, 1, 1, 1,
 				opacity.getValueF());
 			
-			matrixStack.pop();
+			matrixStack.popPose();
 		}
 	}
 	
@@ -144,7 +144,7 @@ public final class MobSpawnEspHack extends Hack
 	{
 		// Check for solid blocks, fluids, redstone, prevent_spawning tags, etc.
 		// See SpawnLocationTypes.ON_GROUND
-		if(!SpawnRestriction.isSpawnPosAllowed(EntityType.CREEPER, MC.world,
+		if(!SpawnPlacements.isSpawnPositionOk(EntityType.CREEPER, MC.level,
 			pos))
 			return false;
 		
@@ -153,7 +153,7 @@ public final class MobSpawnEspHack extends Hack
 			return false;
 		
 		// Check block light level
-		return MC.world.getLightLevel(LightType.BLOCK, pos) < 1;
+		return MC.level.getBrightness(LightLayer.BLOCK, pos) < 1;
 	}
 	
 	private void buildBuffer(VertexConsumer buffer, ChunkSearcher searcher,
@@ -179,12 +179,12 @@ public final class MobSpawnEspHack extends Hack
 		float z1 = pos.getZ() - region.z();
 		float z2 = z1 + 1;
 		
-		int color = MC.world.getLightLevel(LightType.SKY, pos) < 8
+		int color = MC.level.getBrightness(LightLayer.SKY, pos) < 8
 			? cachedDayColor : cachedNightColor;
 		
-		buffer.vertex(x1, y, z1).color(color).normal(1, 0, 1);
-		buffer.vertex(x2, y, z2).color(color).normal(1, 0, 1);
-		buffer.vertex(x2, y, z1).color(color).normal(-1, 0, 1);
-		buffer.vertex(x1, y, z2).color(color).normal(-1, 0, 1);
+		buffer.addVertex(x1, y, z1).setColor(color).setNormal(1, 0, 1);
+		buffer.addVertex(x2, y, z2).setColor(color).setNormal(1, 0, 1);
+		buffer.addVertex(x2, y, z1).setColor(color).setNormal(-1, 0, 1);
+		buffer.addVertex(x1, y, z2).setColor(color).setNormal(-1, 0, 1);
 	}
 }

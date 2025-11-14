@@ -7,8 +7,8 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -30,27 +30,27 @@ public final class RepairCmd extends Command
 		if(args.length > 0)
 			throw new CmdSyntaxError();
 		
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
-		if(!player.getAbilities().creativeMode)
+		if(!player.getAbilities().instabuild)
 			throw new CmdError("Creative mode only.");
 		
 		int slot = player.getInventory().getSelectedSlot();
 		ItemStack stack = getHeldStack(player);
-		stack.setDamage(0);
+		stack.setDamageValue(0);
 		InventoryUtils.setCreativeStack(slot, stack);
 		
 		ChatUtils.message("Item repaired.");
 	}
 	
-	private ItemStack getHeldStack(ClientPlayerEntity player) throws CmdError
+	private ItemStack getHeldStack(LocalPlayer player) throws CmdError
 	{
-		ItemStack stack = player.getInventory().getSelectedStack();
+		ItemStack stack = player.getInventory().getSelectedItem();
 		
 		if(stack.isEmpty())
 			throw new CmdError("You need an item in your hand.");
 		
-		if(!stack.isDamageable())
+		if(!stack.isDamageableItem())
 			throw new CmdError("This item can't take damage.");
 		
 		if(!stack.isDamaged())

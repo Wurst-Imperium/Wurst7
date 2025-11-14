@@ -7,9 +7,9 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -28,7 +28,7 @@ public final class RenameCmd extends Command
 	@Override
 	public void call(String[] args) throws CmdException
 	{
-		if(!MC.player.getAbilities().creativeMode)
+		if(!MC.player.getAbilities().instabuild)
 			throw new CmdError("Creative mode only.");
 		
 		if(args.length == 0)
@@ -39,12 +39,12 @@ public final class RenameCmd extends Command
 			message += " " + args[i];
 		
 		message = message.replace("$", "\u00a7").replace("\u00a7\u00a7", "$");
-		ItemStack stack = MC.player.getInventory().getSelectedStack();
+		ItemStack stack = MC.player.getInventory().getSelectedItem();
 		
 		if(stack == null)
 			throw new CmdError("There is no item in your hand.");
 		
-		stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(message));
+		stack.set(DataComponents.CUSTOM_NAME, Component.literal(message));
 		ChatUtils.message("Renamed item to \"\u00a7o" + message + "\u00a7r\".");
 	}
 }

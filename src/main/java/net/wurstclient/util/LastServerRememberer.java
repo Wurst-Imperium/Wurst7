@@ -7,11 +7,11 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.network.ServerAddress;
-import net.minecraft.client.network.ServerInfo;
+import net.minecraft.client.gui.screens.ConnectScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.wurstclient.WurstClient;
 
 /**
@@ -22,24 +22,24 @@ public enum LastServerRememberer
 {
 	;
 	
-	private static ServerInfo lastServer;
+	private static ServerData lastServer;
 	
-	public static ServerInfo getLastServer()
+	public static ServerData getLastServer()
 	{
 		return lastServer;
 	}
 	
-	public static void setLastServer(ServerInfo server)
+	public static void setLastServer(ServerData server)
 	{
 		lastServer = server;
 	}
 	
-	public static void joinLastServer(MultiplayerScreen mpScreen)
+	public static void joinLastServer(JoinMultiplayerScreen mpScreen)
 	{
 		if(lastServer == null)
 			return;
 		
-		mpScreen.connect(lastServer);
+		mpScreen.join(lastServer);
 	}
 	
 	public static void reconnect(Screen prevScreen)
@@ -47,7 +47,7 @@ public enum LastServerRememberer
 		if(lastServer == null)
 			return;
 		
-		ConnectScreen.connect(prevScreen, WurstClient.MC,
-			ServerAddress.parse(lastServer.address), lastServer, false, null);
+		ConnectScreen.startConnecting(prevScreen, WurstClient.MC,
+			ServerAddress.parseString(lastServer.ip), lastServer, false, null);
 	}
 }

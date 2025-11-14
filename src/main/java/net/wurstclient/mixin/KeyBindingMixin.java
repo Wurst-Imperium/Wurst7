@@ -12,30 +12,31 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import com.mojang.blaze3d.platform.InputConstants;
+
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IKeyBinding;
 
-@Mixin(KeyBinding.class)
+@Mixin(KeyMapping.class)
 public abstract class KeyBindingMixin implements IKeyBinding
 {
 	@Shadow
-	private InputUtil.Key boundKey;
+	private InputConstants.Key key;
 	
 	@Override
 	@Unique
 	@Deprecated // use IKeyBinding.resetPressedState() instead
 	public void wurst_resetPressedState()
 	{
-		long handle = WurstClient.MC.getWindow().getHandle();
-		int code = boundKey.getCode();
+		long handle = WurstClient.MC.getWindow().getWindow();
+		int code = key.getValue();
 		
-		if(boundKey.getCategory() == InputUtil.Type.MOUSE)
-			setPressed(GLFW.glfwGetMouseButton(handle, code) == 1);
+		if(key.getType() == InputConstants.Type.MOUSE)
+			setDown(GLFW.glfwGetMouseButton(handle, code) == 1);
 		else
-			setPressed(InputUtil.isKeyPressed(handle, code));
+			setDown(InputConstants.isKeyDown(handle, code));
 	}
 	
 	@Override
@@ -43,33 +44,32 @@ public abstract class KeyBindingMixin implements IKeyBinding
 	@Deprecated // use IKeyBinding.simulatePress() instead
 	public void wurst_simulatePress(boolean pressed)
 	{
-		MinecraftClient mc = WurstClient.MC;
-		long window = mc.getWindow().getHandle();
+		Minecraft mc = WurstClient.MC;
+		long window = mc.getWindow().getWindow();
 		int action = pressed ? 1 : 0;
 		
-		switch(boundKey.getCategory())
+		switch(key.getType())
 		{
 			case KEYSYM:
-			mc.keyboard.onKey(window, boundKey.getCode(), 0, action, 0);
+			mc.keyboardHandler.keyPress(window, key.getValue(), 0, action, 0);
 			break;
 			
 			case SCANCODE:
-			mc.keyboard.onKey(window, GLFW.GLFW_KEY_UNKNOWN, boundKey.getCode(),
-				action, 0);
+			mc.keyboardHandler.keyPress(window, GLFW.GLFW_KEY_UNKNOWN,
+				key.getValue(), action, 0);
 			break;
 			
 			case MOUSE:
-			mc.mouse.onMouseButton(window, boundKey.getCode(), action, 0);
+			mc.mouseHandler.onPress(window, key.getValue(), action, 0);
 			break;
 			
 			default:
-			System.out
-				.println("Unknown keybinding type: " + boundKey.getCategory());
+			System.out.println("Unknown keybinding type: " + key.getType());
 			break;
 		}
 	}
 	
 	@Override
 	@Shadow
-	public abstract void setPressed(boolean pressed);
+	public abstract void setDown(boolean pressed);
 }

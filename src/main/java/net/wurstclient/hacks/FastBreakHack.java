@@ -9,10 +9,10 @@ package net.wurstclient.hacks;
 
 import java.util.Random;
 
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.BlockBreakingProgressListener;
@@ -82,7 +82,7 @@ public final class FastBreakHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		MC.interactionManager.blockBreakingCooldown = 0;
+		MC.gameMode.destroyDelay = 0;
 	}
 	
 	@Override
@@ -91,7 +91,7 @@ public final class FastBreakHack extends Hack
 		if(legitMode.isChecked())
 			return;
 		
-		if(MC.interactionManager.currentBreakingProgress >= 1)
+		if(MC.gameMode.destroyProgress >= 1)
 			return;
 		
 		BlockPos blockPos = event.getBlockPos();
@@ -108,7 +108,7 @@ public final class FastBreakHack extends Hack
 		if(!fastBreakBlock)
 			return;
 		
-		Action action = PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK;
+		Action action = ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK;
 		Direction direction = event.getDirection();
 		IMC.getInteractionManager().sendPlayerActionC2SPacket(action, blockPos,
 			direction);
