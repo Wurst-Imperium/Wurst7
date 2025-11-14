@@ -62,6 +62,7 @@ jobs:
     - name: Migrate mappings
       run: |
         ./gradlew migrateMappings --mappings "net.minecraft:mappings:${{ inputs.mc_version }}" --overrideInputsIHaveABackup
+        ./gradlew migrateTestMappings --mappings "net.minecraft:mappings:${{ inputs.mc_version }}" --overrideInputsIHaveABackup
         ./gradlew migrateGametestMappings --mappings "net.minecraft:mappings:${{ inputs.mc_version }}" --overrideInputsIHaveABackup
         ./gradlew migrateClassTweakerMappings --mappings "net.minecraft:mappings:${{ inputs.mc_version }}" --overrideInputsIHaveABackup
 
