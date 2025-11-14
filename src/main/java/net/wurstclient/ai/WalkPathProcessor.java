@@ -9,12 +9,12 @@ package net.wurstclient.ai;
 
 import java.util.ArrayList;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.LadderBlock;
-import net.minecraft.block.VineBlock;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.VineBlock;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RotationUtils;
@@ -31,12 +31,12 @@ public class WalkPathProcessor extends PathProcessor
 	{
 		// get positions
 		BlockPos pos;
-		if(WurstClient.MC.player.isOnGround())
-			pos = BlockPos.ofFloored(WurstClient.MC.player.getX(),
+		if(WurstClient.MC.player.onGround())
+			pos = BlockPos.containing(WurstClient.MC.player.getX(),
 				WurstClient.MC.player.getY() + 0.5,
 				WurstClient.MC.player.getZ());
 		else
-			pos = BlockPos.ofFloored(WurstClient.MC.player.getPos());
+			pos = BlockPos.containing(WurstClient.MC.player.position());
 		PathPos nextPos = path.get(index);
 		int posIndex = path.indexOf(pos);
 		
@@ -70,34 +70,34 @@ public class WalkPathProcessor extends PathProcessor
 		
 		// face next position
 		facePosition(nextPos);
-		if(MathHelper.wrapDegrees(Math.abs(RotationUtils
-			.getHorizontalAngleToLookVec(Vec3d.ofCenter(nextPos)))) > 90)
+		if(Mth.wrapDegrees(Math.abs(RotationUtils
+			.getHorizontalAngleToLookVec(Vec3.atCenterOf(nextPos)))) > 90)
 			return;
 		
 		if(WURST.getHax().jesusHack.isEnabled())
 		{
 			// wait for Jesus to swim up
 			if(WurstClient.MC.player.getY() < nextPos.getY()
-				&& (WurstClient.MC.player.isTouchingWater()
+				&& (WurstClient.MC.player.isInWater()
 					|| WurstClient.MC.player.isInLava()))
 				return;
 			
 			// manually swim down if using Jesus
 			if(WurstClient.MC.player.getY() - nextPos.getY() > 0.5
-				&& (WurstClient.MC.player.isTouchingWater()
+				&& (WurstClient.MC.player.isInWater()
 					|| WurstClient.MC.player.isInLava()
 					|| WURST.getHax().jesusHack.isOverLiquid()))
-				MC.options.sneakKey.setPressed(true);
+				MC.options.keyShift.setDown(true);
 		}
 		
 		// horizontal movement
 		if(pos.getX() != nextPos.getX() || pos.getZ() != nextPos.getZ())
 		{
-			MC.options.forwardKey.setPressed(true);
+			MC.options.keyUp.setDown(true);
 			
 			if(index > 0 && path.get(index - 1).isJumping()
 				|| pos.getY() < nextPos.getY())
-				MC.options.jumpKey.setPressed(true);
+				MC.options.keyJump.setDown(true);
 			
 			// vertical movement
 		}else if(pos.getY() != nextPos.getY())
@@ -112,17 +112,17 @@ public class WalkPathProcessor extends PathProcessor
 					WURST.getRotationFaker().faceVectorClientIgnorePitch(
 						BlockUtils.getBoundingBox(pos).getCenter());
 					
-					MC.options.forwardKey.setPressed(true);
+					MC.options.keyUp.setDown(true);
 					
 				}else
 				{
 					// directional jump
 					if(index < path.size() - 1
-						&& !nextPos.up().equals(path.get(index + 1)))
+						&& !nextPos.above().equals(path.get(index + 1)))
 						index++;
 					
 					// jump up
-					MC.options.jumpKey.setPressed(true);
+					MC.options.keyJump.setDown(true);
 				}
 				
 				// go down
@@ -130,18 +130,18 @@ public class WalkPathProcessor extends PathProcessor
 			{
 				// skip mid-air nodes and go straight to the bottom
 				while(index < path.size() - 1
-					&& path.get(index).down().equals(path.get(index + 1)))
+					&& path.get(index).below().equals(path.get(index + 1)))
 					index++;
 				
 				// walk off the edge
-				if(WurstClient.MC.player.isOnGround())
-					MC.options.forwardKey.setPressed(true);
+				if(WurstClient.MC.player.onGround())
+					MC.options.keyUp.setDown(true);
 			}
 	}
 	
 	@Override
 	public boolean canBreakBlocks()
 	{
-		return MC.player.isOnGround();
+		return MC.player.onGround();
 	}
 }

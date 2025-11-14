@@ -9,16 +9,16 @@ package net.wurstclient.settings;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.wurstclient.WurstClient;
 
 public final class ChunkAreaSetting
 	extends EnumSetting<ChunkAreaSetting.ChunkArea>
 {
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	public ChunkAreaSetting(String name, String description)
 	{
@@ -30,7 +30,7 @@ public final class ChunkAreaSetting
 		super(name, description, ChunkArea.values(), selected);
 	}
 	
-	public ArrayList<Chunk> getChunksInRange()
+	public ArrayList<ChunkAccess> getChunksInRange()
 	{
 		return getSelected().getChunksInRange();
 	}
@@ -68,17 +68,17 @@ public final class ChunkAreaSetting
 			this.chunkRange = chunkRange;
 		}
 		
-		public ArrayList<Chunk> getChunksInRange()
+		public ArrayList<ChunkAccess> getChunksInRange()
 		{
-			ChunkPos center = MC.player.getChunkPos();
-			ArrayList<Chunk> chunksInRange = new ArrayList<>();
+			ChunkPos center = MC.player.chunkPosition();
+			ArrayList<ChunkAccess> chunksInRange = new ArrayList<>();
 			
 			for(int x = center.x - chunkRange; x <= center.x + chunkRange; x++)
 				for(int z = center.z - chunkRange; z <= center.z
 					+ chunkRange; z++)
 				{
-					Chunk chunk = MC.world.getChunk(x, z);
-					if(chunk instanceof EmptyChunk)
+					ChunkAccess chunk = MC.level.getChunk(x, z);
+					if(chunk instanceof EmptyLevelChunk)
 						continue;
 					
 					chunksInRange.add(chunk);
@@ -89,7 +89,7 @@ public final class ChunkAreaSetting
 		
 		public boolean isInRange(ChunkPos pos)
 		{
-			ChunkPos center = MC.player.getChunkPos();
+			ChunkPos center = MC.player.chunkPosition();
 			return Math.abs(pos.x - center.x) <= chunkRange
 				&& Math.abs(pos.z - center.z) <= chunkRange;
 		}

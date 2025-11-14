@@ -7,9 +7,9 @@
  */
 package net.wurstclient.hacks.treebot;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.util.BlockUtils;
 
 public enum TreeBotUtils
@@ -18,13 +18,12 @@ public enum TreeBotUtils
 	
 	public static boolean isLog(BlockPos pos)
 	{
-		return BlockUtils.getState(pos).isIn(BlockTags.LOGS);
+		return BlockUtils.getState(pos).is(BlockTags.LOGS);
 	}
 	
 	public static boolean isLeaves(BlockPos pos)
 	{
 		BlockState state = BlockUtils.getState(pos);
-		return state.isIn(BlockTags.LEAVES)
-			|| state.isIn(BlockTags.WART_BLOCKS);
+		return state.is(BlockTags.LEAVES) || state.is(BlockTags.WART_BLOCKS);
 	}
 }

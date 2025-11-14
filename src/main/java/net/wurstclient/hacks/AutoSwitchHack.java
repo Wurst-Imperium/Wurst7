@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -37,11 +37,11 @@ public final class AutoSwitchHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		PlayerInventory inventory = MC.player.getInventory();
+		Inventory inventory = MC.player.getInventory();
 		
-		if(inventory.selectedSlot == 8)
-			inventory.selectedSlot = 0;
+		if(inventory.selected == 8)
+			inventory.selected = 0;
 		else
-			inventory.selectedSlot++;
+			inventory.selected++;
 	}
 }

@@ -11,25 +11,25 @@ import java.util.function.Consumer;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public final class EnterProfileNameScreen extends Screen
 {
 	private final Screen prevScreen;
 	private final Consumer<String> callback;
 	
-	private TextFieldWidget valueField;
-	private ButtonWidget doneButton;
+	private EditBox valueField;
+	private Button doneButton;
 	
 	public EnterProfileNameScreen(Screen prevScreen, Consumer<String> callback)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.prevScreen = prevScreen;
 		this.callback = callback;
 	}
@@ -41,28 +41,28 @@ public final class EnterProfileNameScreen extends Screen
 		int y1 = 60;
 		int y2 = height / 3 * 2;
 		
-		TextRenderer tr = client.textRenderer;
+		Font tr = minecraft.font;
 		
-		valueField = new TextFieldWidget(tr, x1, y1, 200, 20, Text.literal(""));
-		valueField.setText("");
-		valueField.setSelectionStart(0);
+		valueField = new EditBox(tr, x1, y1, 200, 20, Component.literal(""));
+		valueField.setValue("");
+		valueField.setCursorPosition(0);
 		
-		addSelectableChild(valueField);
+		addWidget(valueField);
 		setFocused(valueField);
 		valueField.setFocused(true);
 		
-		doneButton = ButtonWidget.builder(Text.literal("Done"), b -> done())
-			.dimensions(x1, y2, 200, 20).build();
-		addDrawableChild(doneButton);
+		doneButton = Button.builder(Component.literal("Done"), b -> done())
+			.bounds(x1, y2, 200, 20).build();
+		addRenderableWidget(doneButton);
 	}
 	
 	private void done()
 	{
-		String value = valueField.getText();
+		String value = valueField.getValue();
 		if(!value.isEmpty())
 			callback.accept(value);
 		
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -75,7 +75,7 @@ public final class EnterProfileNameScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			client.setScreen(prevScreen);
+			minecraft.setScreen(prevScreen);
 			break;
 		}
 		
@@ -83,21 +83,21 @@ public final class EnterProfileNameScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		renderBackground(context, mouseX, mouseY, partialTicks);
-		context.drawCenteredTextWithShadow(client.textRenderer,
-			"Name your new profile", width / 2, 20, 0xFFFFFF);
+		context.drawCenteredString(minecraft.font, "Name your new profile",
+			width / 2, 20, 0xFFFFFF);
 		
 		valueField.render(context, mouseX, mouseY, partialTicks);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public boolean shouldPause()
+	public boolean isPauseScreen()
 	{
 		return false;
 	}

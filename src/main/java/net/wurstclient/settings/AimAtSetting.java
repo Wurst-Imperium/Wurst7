@@ -9,10 +9,10 @@ package net.wurstclient.settings;
 
 import java.util.function.Function;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.util.RotationUtils;
 
 public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
@@ -42,7 +42,7 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 		this(description, AimAt.AUTO);
 	}
 	
-	public Vec3d getAimPoint(Entity e)
+	public Vec3 getAimPoint(Entity e)
 	{
 		return getSelected().aimFunction.apply(e);
 	}
@@ -59,35 +59,35 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 		return builder.toString();
 	}
 	
-	private static Vec3d aimAtClosestPoint(Entity e)
+	private static Vec3 aimAtClosestPoint(Entity e)
 	{
-		Box box = e.getBoundingBox();
-		Vec3d eyes = RotationUtils.getEyesPos();
+		AABB box = e.getBoundingBox();
+		Vec3 eyes = RotationUtils.getEyesPos();
 		
 		if(box.contains(eyes))
 			return eyes;
 		
-		double clampedX = MathHelper.clamp(eyes.x, box.minX, box.maxX);
-		double clampedY = MathHelper.clamp(eyes.y, box.minY, box.maxY);
-		double clampedZ = MathHelper.clamp(eyes.z, box.minZ, box.maxZ);
+		double clampedX = Mth.clamp(eyes.x, box.minX, box.maxX);
+		double clampedY = Mth.clamp(eyes.y, box.minY, box.maxY);
+		double clampedZ = Mth.clamp(eyes.z, box.minZ, box.maxZ);
 		
-		return new Vec3d(clampedX, clampedY, clampedZ);
+		return new Vec3(clampedX, clampedY, clampedZ);
 	}
 	
-	private static Vec3d aimAtHead(Entity e)
+	private static Vec3 aimAtHead(Entity e)
 	{
 		float eyeHeight = e.getEyeHeight(e.getPose());
-		return e.getPos().add(0, eyeHeight, 0);
+		return e.position().add(0, eyeHeight, 0);
 	}
 	
-	private static Vec3d aimAtCenter(Entity e)
+	private static Vec3 aimAtCenter(Entity e)
 	{
 		return e.getBoundingBox().getCenter();
 	}
 	
-	private static Vec3d aimAtFeet(Entity e)
+	private static Vec3 aimAtFeet(Entity e)
 	{
-		return e.getPos().add(0, 0.001, 0);
+		return e.position().add(0, 0.001, 0);
 	}
 	
 	public enum AimAt
@@ -106,17 +106,17 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 		
 		private final String name;
 		private final String description;
-		private final Function<Entity, Vec3d> aimFunction;
+		private final Function<Entity, Vec3> aimFunction;
 		
 		private AimAt(String name, String description,
-			Function<Entity, Vec3d> aimFunction)
+			Function<Entity, Vec3> aimFunction)
 		{
 			this.name = name;
 			this.description = description;
 			this.aimFunction = aimFunction;
 		}
 		
-		public Vec3d getAimPoint(Entity e)
+		public Vec3 getAimPoint(Entity e)
 		{
 			return aimFunction.apply(e);
 		}

@@ -7,12 +7,12 @@
  */
 package net.wurstclient.hacks.autofarm.plants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
@@ -25,19 +25,19 @@ public final class BambooPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean isReplantingSpot(BlockPos pos, BlockState state)
 	{
-		if(!state.isOf(Blocks.BAMBOO) && !state.isOf(Blocks.BAMBOO_SAPLING))
+		if(!state.is(Blocks.BAMBOO) && !state.is(Blocks.BAMBOO_SAPLING))
 			return false;
 		
-		BlockState floor = BlockUtils.getState(pos.down());
-		return !floor.isOf(Blocks.BAMBOO) && !floor.isOf(Blocks.BAMBOO_SAPLING)
-			&& floor.isIn(BlockTags.BAMBOO_PLANTABLE_ON);
+		BlockState floor = BlockUtils.getState(pos.below());
+		return !floor.is(Blocks.BAMBOO) && !floor.is(Blocks.BAMBOO_SAPLING)
+			&& floor.is(BlockTags.BAMBOO_PLANTABLE_ON);
 	}
 	
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.down())
-			.isIn(BlockTags.BAMBOO_PLANTABLE_ON);
+		return BlockUtils.getState(pos.below())
+			.is(BlockTags.BAMBOO_PLANTABLE_ON);
 	}
 	
 	@Override
@@ -49,10 +49,10 @@ public final class BambooPlantType extends AutoFarmPlantType
 	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
-		if(!state.isOf(Blocks.BAMBOO))
+		if(!state.is(Blocks.BAMBOO))
 			return false;
 		
-		BlockPos below = pos.down();
+		BlockPos below = pos.below();
 		return isReplantingSpot(below, BlockUtils.getState(below));
 	}
 	

@@ -9,7 +9,7 @@ package net.wurstclient.events;
 
 import java.util.ArrayList;
 
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;
 

@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -30,7 +30,7 @@ import net.wurstclient.util.InventoryUtils;
 @SearchTags({"AutoRestock", "auto-restock", "auto restock"})
 public final class RestockHack extends Hack implements UpdateListener
 {
-	public static final int OFFHAND_ID = PlayerInventory.OFF_HAND_SLOT;
+	public static final int OFFHAND_ID = Inventory.SLOT_OFFHAND;
 	public static final int OFFHAND_PKT_ID = 45;
 	
 	private static final List<Integer> SEARCH_SLOTS =
@@ -82,26 +82,26 @@ public final class RestockHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// Don't mess with the inventory while it's open.
-		if(MC.currentScreen instanceof HandledScreen)
+		if(MC.screen instanceof AbstractContainerScreen)
 			return;
 		
-		PlayerInventory inv = MC.player.getInventory();
+		Inventory inv = MC.player.getInventory();
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		
 		int hotbarSlot = restockSlot.getValueI();
 		if(hotbarSlot == -1)
-			hotbarSlot = inv.selectedSlot;
+			hotbarSlot = inv.selected;
 		else if(hotbarSlot == 9)
 			hotbarSlot = OFFHAND_ID;
 		
 		for(String itemName : items.getItemNames())
 		{
-			ItemStack hotbarStack = inv.getStack(hotbarSlot);
+			ItemStack hotbarStack = inv.getItem(hotbarSlot);
 			
 			boolean wrongItem =
 				hotbarStack.isEmpty() || !itemEqual(itemName, hotbarStack);
 			if(!wrongItem && hotbarStack.getCount() >= Math
-				.min(restockAmount.getValueI(), hotbarStack.getMaxCount()))
+				.min(restockAmount.getValueI(), hotbarStack.getMaxStackSize()))
 				return;
 			
 			List<Integer> searchResult =
@@ -112,10 +112,10 @@ public final class RestockHack extends Hack implements UpdateListener
 				
 				im.windowClick_PICKUP(pickupIndex);
 				im.windowClick_PICKUP(InventoryUtils.toNetworkSlot(hotbarSlot));
-				if(!MC.player.playerScreenHandler.getCursorStack().isEmpty())
+				if(!MC.player.inventoryMenu.getCarried().isEmpty())
 					im.windowClick_PICKUP(pickupIndex);
 				
-				if(hotbarStack.getCount() >= hotbarStack.getMaxCount())
+				if(hotbarStack.getCount() >= hotbarStack.getMaxStackSize())
 					break;
 			}
 			
@@ -125,16 +125,16 @@ public final class RestockHack extends Hack implements UpdateListener
 			break;
 		}
 		
-		ItemStack restockStack = inv.getStack(hotbarSlot);
-		if(repairMode.getValueI() > 0 && restockStack.isDamageable()
+		ItemStack restockStack = inv.getItem(hotbarSlot);
+		if(repairMode.getValueI() > 0 && restockStack.isDamageableItem()
 			&& isTooDamaged(restockStack))
 			for(int i : SEARCH_SLOTS)
 			{
 				if(i == hotbarSlot || i == OFFHAND_ID)
 					continue;
 				
-				ItemStack stack = inv.getStack(i);
-				if(stack.isEmpty() || !stack.isDamageable())
+				ItemStack stack = inv.getItem(i);
+				if(stack.isEmpty() || !stack.isDamageableItem())
 				{
 					IMC.getInteractionManager().windowClick_SWAP(i,
 						InventoryUtils.toNetworkSlot(hotbarSlot));
@@ -145,7 +145,7 @@ public final class RestockHack extends Hack implements UpdateListener
 	
 	private boolean isTooDamaged(ItemStack stack)
 	{
-		return stack.getMaxDamage() - stack.getDamage() <= repairMode
+		return stack.getMaxDamage() - stack.getDamageValue() <= repairMode
 			.getValueI();
 	}
 	
@@ -158,7 +158,7 @@ public final class RestockHack extends Hack implements UpdateListener
 			if(i == slotToSkip)
 				continue;
 			
-			ItemStack stack = MC.player.getInventory().getStack(i);
+			ItemStack stack = MC.player.getInventory().getItem(i);
 			if(stack.isEmpty())
 				continue;
 			
@@ -171,11 +171,11 @@ public final class RestockHack extends Hack implements UpdateListener
 	
 	private boolean itemEqual(String itemName, ItemStack stack)
 	{
-		if(repairMode.getValueI() > 0 && stack.isDamageable()
+		if(repairMode.getValueI() > 0 && stack.isDamageableItem()
 			&& isTooDamaged(stack))
 			return false;
 		
-		return Registries.ITEM.getId(stack.getItem()).toString()
+		return BuiltInRegistries.ITEM.getKey(stack.getItem()).toString()
 			.equals(itemName);
 	}
 }

@@ -7,8 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -27,12 +27,12 @@ public final class NameProtectHack extends Hack
 		if(!isEnabled() || MC.player == null)
 			return string;
 		
-		String me = MC.getSession().getUsername();
+		String me = MC.getUser().getName();
 		if(string.contains(me))
 			return string.replace(me, "\u00a7oMe\u00a7r");
 		
 		int i = 0;
-		for(PlayerListEntry info : MC.player.networkHandler.getPlayerList())
+		for(PlayerInfo info : MC.player.connection.getOnlinePlayers())
 		{
 			i++;
 			String name =
@@ -42,7 +42,7 @@ public final class NameProtectHack extends Hack
 				return string.replace(name, "\u00a7oPlayer" + i + "\u00a7r");
 		}
 		
-		for(AbstractClientPlayerEntity player : MC.world.getPlayers())
+		for(AbstractClientPlayer player : MC.level.players())
 		{
 			i++;
 			String name = player.getName().getString();

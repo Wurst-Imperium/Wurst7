@@ -7,10 +7,10 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.passive.AxolotlEntity;
-import net.minecraft.entity.passive.PufferfishEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.Pufferfish;
+import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.animal.axolotl.Axolotl;
 
 public final class FilterPassiveWaterSetting extends EntityFilterCheckbox
 {
@@ -27,11 +27,10 @@ public final class FilterPassiveWaterSetting extends EntityFilterCheckbox
 	public boolean test(Entity e)
 	{
 		// never filter out pufferfish
-		if(e instanceof PufferfishEntity)
+		if(e instanceof Pufferfish)
 			return true;
 		
-		return !(e instanceof WaterCreatureEntity
-			|| e instanceof AxolotlEntity);
+		return !(e instanceof WaterAnimal || e instanceof Axolotl);
 	}
 	
 	public static FilterPassiveWaterSetting genericCombat(boolean checked)

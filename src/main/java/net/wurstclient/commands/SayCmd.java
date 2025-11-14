@@ -30,8 +30,8 @@ public final class SayCmd extends Command
 		
 		String message = String.join(" ", args);
 		if(message.startsWith("/"))
-			MC.getNetworkHandler().sendChatCommand(message.substring(1));
+			MC.getConnection().sendCommand(message.substring(1));
 		else
-			MC.getNetworkHandler().sendChatMessage(message);
+			MC.getConnection().sendChat(message);
 	}
 }

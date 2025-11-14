@@ -9,7 +9,7 @@ package net.wurstclient.test;
 
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Items;
 
 public enum GiveCmdTest
 {

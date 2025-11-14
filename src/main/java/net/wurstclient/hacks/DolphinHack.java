@@ -7,8 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -39,11 +39,11 @@ public final class DolphinHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
-		if(!player.isTouchingWater() || player.isSneaking())
+		LocalPlayer player = MC.player;
+		if(!player.isInWater() || player.isShiftKeyDown())
 			return;
 		
-		Vec3d velocity = player.getVelocity();
-		player.setVelocity(velocity.x, velocity.y + 0.04, velocity.z);
+		Vec3 velocity = player.getDeltaMovement();
+		player.setDeltaMovement(velocity.x, velocity.y + 0.04, velocity.z);
 	}
 }

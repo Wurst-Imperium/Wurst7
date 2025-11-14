@@ -18,14 +18,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.PacketCallbacks;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Connection;
+import net.minecraft.network.PacketSendListener;
+import net.minecraft.network.protocol.Packet;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ConnectionPacketOutputListener.ConnectionPacketOutputEvent;
 import net.wurstclient.events.PacketInputListener.PacketInputEvent;
 
-@Mixin(ClientConnection.class)
+@Mixin(Connection.class)
 public abstract class ClientConnectionMixin
 	extends SimpleChannelInboundHandler<Packet<?>>
 {
@@ -33,9 +33,9 @@ public abstract class ClientConnectionMixin
 		new ConcurrentLinkedQueue<>();
 	
 	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/network/ClientConnection;handlePacket(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;)V",
+		target = "Lnet/minecraft/network/Connection;genericsFtw(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;)V",
 		ordinal = 0),
-		method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V",
+		method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/protocol/Packet;)V",
 		cancellable = true)
 	private void onChannelRead0(ChannelHandlerContext context, Packet<?> packet,
 		CallbackInfo ci)
@@ -48,7 +48,7 @@ public abstract class ClientConnectionMixin
 	}
 	
 	@ModifyVariable(at = @At("HEAD"),
-		method = "send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;)V")
+		method = "send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;)V")
 	public Packet<?> modifyPacket(Packet<?> packet)
 	{
 		ConnectionPacketOutputEvent event =
@@ -59,9 +59,9 @@ public abstract class ClientConnectionMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;)V",
+		method = "send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;)V",
 		cancellable = true)
-	private void onSend(Packet<?> packet, @Nullable PacketCallbacks callback,
+	private void onSend(Packet<?> packet, @Nullable PacketSendListener callback,
 		CallbackInfo ci)
 	{
 		ConnectionPacketOutputEvent event = getEvent(packet);

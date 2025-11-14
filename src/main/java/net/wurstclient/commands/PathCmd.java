@@ -11,9 +11,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.BlockPos;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.ai.PathFinder;
 import net.wurstclient.ai.PathPos;
 import net.wurstclient.command.CmdError;
@@ -128,25 +129,24 @@ public final class PathCmd extends Command
 	private BlockPos argsToEntityPos(String name) throws CmdError
 	{
 		LivingEntity entity = StreamSupport
-			.stream(MC.world.getEntities().spliterator(), true)
+			.stream(MC.level.entitiesForRendering().spliterator(), true)
 			.filter(LivingEntity.class::isInstance).map(e -> (LivingEntity)e)
 			.filter(e -> !e.isRemoved() && e.getHealth() > 0)
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> name.equalsIgnoreCase(e.getDisplayName().getString()))
-			.min(
-				Comparator.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+			.min(Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 			.orElse(null);
 		
 		if(entity == null)
 			throw new CmdError("Entity \"" + name + "\" could not be found.");
 		
-		return BlockPos.ofFloored(entity.getPos());
+		return BlockPos.containing(entity.position());
 	}
 	
 	private BlockPos argsToXyzPos(String... xyz) throws CmdSyntaxError
 	{
-		BlockPos playerPos = BlockPos.ofFloored(MC.player.getPos());
+		BlockPos playerPos = BlockPos.containing(MC.player.position());
 		int[] player = {playerPos.getX(), playerPos.getY(), playerPos.getZ()};
 		int[] pos = new int[3];
 		
@@ -192,7 +192,7 @@ public final class PathCmd extends Command
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		pathFinder.renderPath(matrixStack, debugMode.isChecked(),
 			depthTest.isChecked());

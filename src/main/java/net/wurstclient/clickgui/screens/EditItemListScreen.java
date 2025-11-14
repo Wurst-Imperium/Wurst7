@@ -12,21 +12,22 @@ import java.util.Objects;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.util.ItemUtils;
 import net.wurstclient.util.RenderUtils;
@@ -37,16 +38,16 @@ public final class EditItemListScreen extends Screen
 	private final ItemListSetting itemList;
 	
 	private ListGui listGui;
-	private TextFieldWidget itemNameField;
-	private ButtonWidget addButton;
-	private ButtonWidget removeButton;
-	private ButtonWidget doneButton;
+	private EditBox itemNameField;
+	private Button addButton;
+	private Button removeButton;
+	private Button doneButton;
 	
 	private Item itemToAdd;
 	
 	public EditItemListScreen(Screen prevScreen, ItemListSetting itemList)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.prevScreen = prevScreen;
 		this.itemList = itemList;
 	}
@@ -54,39 +55,41 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public void init()
 	{
-		listGui = new ListGui(client, this, itemList.getItemNames());
-		addSelectableChild(listGui);
+		listGui = new ListGui(minecraft, this, itemList.getItemNames());
+		addWidget(listGui);
 		
-		itemNameField = new TextFieldWidget(client.textRenderer,
-			width / 2 - 152, height - 56, 150, 20, Text.literal(""));
-		addSelectableChild(itemNameField);
+		itemNameField = new EditBox(minecraft.font, width / 2 - 152,
+			height - 56, 150, 20, Component.literal(""));
+		addWidget(itemNameField);
 		itemNameField.setMaxLength(256);
 		
-		addDrawableChild(
-			addButton = ButtonWidget.builder(Text.literal("Add"), b -> {
+		addRenderableWidget(
+			addButton = Button.builder(Component.literal("Add"), b -> {
 				itemList.add(itemToAdd);
-				client.setScreen(EditItemListScreen.this);
-			}).dimensions(width / 2 - 2, height - 56, 30, 20).build());
+				minecraft.setScreen(EditItemListScreen.this);
+			}).bounds(width / 2 - 2, height - 56, 30, 20).build());
 		
-		addDrawableChild(removeButton =
-			ButtonWidget.builder(Text.literal("Remove Selected"), b -> {
+		addRenderableWidget(removeButton =
+			Button.builder(Component.literal("Remove Selected"), b -> {
 				itemList.remove(itemList.getItemNames()
 					.indexOf(listGui.getSelectedBlockName()));
-				client.setScreen(EditItemListScreen.this);
-			}).dimensions(width / 2 + 52, height - 56, 100, 20).build());
+				minecraft.setScreen(EditItemListScreen.this);
+			}).bounds(width / 2 + 52, height - 56, 100, 20).build());
 		
-		addDrawableChild(ButtonWidget.builder(Text.literal("Reset to Defaults"),
-			b -> client.setScreen(new ConfirmScreen(b2 -> {
-				if(b2)
-					itemList.resetToDefaults();
-				client.setScreen(EditItemListScreen.this);
-			}, Text.literal("Reset to Defaults"),
-				Text.literal("Are you sure?"))))
-			.dimensions(width - 108, 8, 100, 20).build());
+		addRenderableWidget(
+			Button.builder(Component.literal("Reset to Defaults"),
+				b -> minecraft.setScreen(new ConfirmScreen(b2 -> {
+					if(b2)
+						itemList.resetToDefaults();
+					minecraft.setScreen(EditItemListScreen.this);
+				}, Component.literal("Reset to Defaults"),
+					Component.literal("Are you sure?"))))
+				.bounds(width - 108, 8, 100, 20).build());
 		
-		addDrawableChild(doneButton = ButtonWidget
-			.builder(Text.literal("Done"), b -> client.setScreen(prevScreen))
-			.dimensions(width / 2 - 100, height - 28, 200, 20).build());
+		addRenderableWidget(doneButton = Button
+			.builder(Component.literal("Done"),
+				b -> minecraft.setScreen(prevScreen))
+			.bounds(width / 2 - 100, height - 28, 200, 20).build());
 	}
 	
 	@Override
@@ -125,44 +128,44 @@ public final class EditItemListScreen extends Screen
 	@Override
 	public void tick()
 	{
-		String nameOrId = itemNameField.getText().toLowerCase();
+		String nameOrId = itemNameField.getValue().toLowerCase();
 		itemToAdd = ItemUtils.getItemFromNameOrID(nameOrId);
 		addButton.active = itemToAdd != null;
 		
-		removeButton.active = listGui.getSelectedOrNull() != null;
+		removeButton.active = listGui.getSelected() != null;
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		MatrixStack matrixStack = context.getMatrices();
+		PoseStack matrixStack = context.pose();
 		renderBackground(context, mouseX, mouseY, partialTicks);
 		
 		listGui.render(context, mouseX, mouseY, partialTicks);
 		
-		context.drawCenteredTextWithShadow(client.textRenderer,
+		context.drawCenteredString(minecraft.font,
 			itemList.getName() + " (" + itemList.getItemNames().size() + ")",
 			width / 2, 12, 0xFFFFFF);
 		
-		matrixStack.push();
+		matrixStack.pushPose();
 		matrixStack.translate(0, 0, 300);
 		
 		itemNameField.render(context, mouseX, mouseY, partialTicks);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
-		matrixStack.push();
+		matrixStack.pushPose();
 		matrixStack.translate(-64 + width / 2 - 152, 0, 0);
 		
-		if(itemNameField.getText().isEmpty() && !itemNameField.isFocused())
+		if(itemNameField.getValue().isEmpty() && !itemNameField.isFocused())
 		{
-			matrixStack.push();
+			matrixStack.pushPose();
 			matrixStack.translate(0, 0, 300);
-			context.drawTextWithShadow(client.textRenderer, "item name or ID",
-				68, height - 50, 0x808080);
-			matrixStack.pop();
+			context.drawString(minecraft.font, "item name or ID", 68,
+				height - 50, 0x808080);
+			matrixStack.popPose();
 		}
 		
 		int border = itemNameField.isFocused() ? 0xFFFFFFFF : 0xFFA0A0A0;
@@ -178,17 +181,17 @@ public final class EditItemListScreen extends Screen
 		context.fill(213, height - 55, 216, height - 37, black);
 		context.fill(242, height - 55, 245, height - 37, black);
 		
-		matrixStack.pop();
+		matrixStack.popPose();
 		
 		RenderUtils.drawItem(context,
 			itemToAdd == null ? ItemStack.EMPTY : new ItemStack(itemToAdd),
 			width / 2 - 164, height - 52, false);
 		
-		matrixStack.pop();
+		matrixStack.popPose();
 	}
 	
 	@Override
-	public boolean shouldPause()
+	public boolean isPauseScreen()
 	{
 		return false;
 	}
@@ -200,7 +203,7 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	private final class Entry
-		extends AlwaysSelectedEntryListWidget.Entry<EditItemListScreen.Entry>
+		extends ObjectSelectionList.Entry<EditItemListScreen.Entry>
 	{
 		private final String itemName;
 		
@@ -210,49 +213,51 @@ public final class EditItemListScreen extends Screen
 		}
 		
 		@Override
-		public Text getNarration()
+		public Component getNarration()
 		{
-			Item item = Registries.ITEM.get(Identifier.of(itemName));
+			Item item =
+				BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemName));
 			ItemStack stack = new ItemStack(item);
 			
-			return Text.translatable("narrator.select",
+			return Component.translatable("narrator.select",
 				"Item " + getDisplayName(stack) + ", " + itemName + ", "
 					+ getIdText(item));
 		}
 		
 		@Override
-		public void render(DrawContext context, int index, int y, int x,
+		public void render(GuiGraphics context, int index, int y, int x,
 			int entryWidth, int entryHeight, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
-			Item item = Registries.ITEM.get(Identifier.of(itemName));
+			Item item =
+				BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemName));
 			ItemStack stack = new ItemStack(item);
-			TextRenderer tr = client.textRenderer;
+			Font tr = minecraft.font;
 			
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
-			context.drawText(tr, getDisplayName(stack), x + 28, y, 0xF0F0F0,
+			context.drawString(tr, getDisplayName(stack), x + 28, y, 0xF0F0F0,
 				false);
-			context.drawText(tr, itemName, x + 28, y + 9, 0xA0A0A0, false);
-			context.drawText(tr, getIdText(item), x + 28, y + 18, 0xA0A0A0,
+			context.drawString(tr, itemName, x + 28, y + 9, 0xA0A0A0, false);
+			context.drawString(tr, getIdText(item), x + 28, y + 18, 0xA0A0A0,
 				false);
 		}
 		
 		private String getDisplayName(ItemStack stack)
 		{
 			return stack.isEmpty() ? "\u00a7ounknown item\u00a7r"
-				: stack.getName().getString();
+				: stack.getHoverName().getString();
 		}
 		
 		private String getIdText(Item item)
 		{
-			return "ID: " + Registries.ITEM.getRawId(item);
+			return "ID: " + BuiltInRegistries.ITEM.getId(item);
 		}
 	}
 	
 	private final class ListGui
-		extends AlwaysSelectedEntryListWidget<EditItemListScreen.Entry>
+		extends ObjectSelectionList<EditItemListScreen.Entry>
 	{
-		public ListGui(MinecraftClient minecraft, EditItemListScreen screen,
+		public ListGui(Minecraft minecraft, EditItemListScreen screen,
 			List<String> list)
 		{
 			super(minecraft, screen.width, screen.height - 96, 36, 30);
@@ -263,7 +268,7 @@ public final class EditItemListScreen extends Screen
 		
 		public String getSelectedBlockName()
 		{
-			EditItemListScreen.Entry selected = getSelectedOrNull();
+			EditItemListScreen.Entry selected = getSelected();
 			return selected != null ? selected.itemName : null;
 		}
 	}

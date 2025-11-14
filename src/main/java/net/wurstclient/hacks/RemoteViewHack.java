@@ -11,10 +11,10 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -53,7 +53,7 @@ public final class RemoteViewHack extends Hack
 		if(entity == null)
 		{
 			Stream<Entity> stream = StreamSupport
-				.stream(MC.world.getEntities().spliterator(), true)
+				.stream(MC.level.entitiesForRendering().spliterator(), true)
 				.filter(LivingEntity.class::isInstance)
 				.filter(
 					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
@@ -63,8 +63,8 @@ public final class RemoteViewHack extends Hack
 			stream = entityFilters.applyTo(stream);
 			
 			entity = stream
-				.min(Comparator
-					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+				.min(
+					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 				.orElse(null);
 			
 			// check if entity was found
@@ -80,7 +80,7 @@ public final class RemoteViewHack extends Hack
 		wasInvisible = entity.isInvisible();
 		
 		// enable NoClip
-		MC.player.noClip = true;
+		MC.player.noPhysics = true;
 		
 		// spawn fake player
 		fakePlayer = new FakePlayerEntity();
@@ -110,7 +110,7 @@ public final class RemoteViewHack extends Hack
 		}
 		
 		// disable NoClip
-		MC.player.noClip = false;
+		MC.player.noPhysics = false;
 		
 		// remove fake player
 		if(fakePlayer != null)
@@ -126,15 +126,15 @@ public final class RemoteViewHack extends Hack
 		if(!isEnabled() && viewName != null && !viewName.isEmpty())
 		{
 			entity = StreamSupport
-				.stream(MC.world.getEntities().spliterator(), false)
+				.stream(MC.level.entitiesForRendering().spliterator(), false)
 				.filter(LivingEntity.class::isInstance)
 				.filter(
 					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
 				.filter(e -> e != MC.player)
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> viewName.equalsIgnoreCase(e.getName().getString()))
-				.min(Comparator
-					.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+				.min(
+					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 				.orElse(null);
 			
 			if(entity == null)
@@ -160,13 +160,13 @@ public final class RemoteViewHack extends Hack
 		}
 		
 		// update position, rotation, etc.
-		MC.player.copyPositionAndRotation(entity);
-		MC.player.setPos(entity.getX(),
+		MC.player.copyPosition(entity);
+		MC.player.setPosRaw(entity.getX(),
 			entity.getY() - MC.player.getEyeHeight(MC.player.getPose())
 				+ entity.getEyeHeight(entity.getPose()),
 			entity.getZ());
-		MC.player.resetPosition();
-		MC.player.setVelocity(Vec3d.ZERO);
+		MC.player.setOldPosAndRot();
+		MC.player.setDeltaMovement(Vec3.ZERO);
 		
 		// set entity invisible
 		entity.setInvisible(true);
@@ -175,7 +175,7 @@ public final class RemoteViewHack extends Hack
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
-		if(event.getPacket() instanceof PlayerMoveC2SPacket)
+		if(event.getPacket() instanceof ServerboundMovePlayerPacket)
 			event.cancel();
 	}
 }

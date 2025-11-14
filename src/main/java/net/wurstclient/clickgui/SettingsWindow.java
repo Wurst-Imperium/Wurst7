@@ -9,7 +9,7 @@ package net.wurstclient.clickgui;
 
 import java.util.stream.Stream;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.Setting;
@@ -37,14 +37,15 @@ public final class SettingsWindow extends Window
 		int x = parent.getX() + parent.getWidth() + 5;
 		int y = parent.getY() + 12 + buttonY + scroll;
 		
-		net.minecraft.client.util.Window mcWindow = WurstClient.MC.getWindow();
-		if(x + getWidth() > mcWindow.getScaledWidth())
+		com.mojang.blaze3d.platform.Window mcWindow =
+			WurstClient.MC.getWindow();
+		if(x + getWidth() > mcWindow.getGuiScaledWidth())
 			x = parent.getX() - getWidth() - 5;
-		if(y + getHeight() > mcWindow.getScaledHeight())
+		if(y + getHeight() > mcWindow.getGuiScaledHeight())
 			y -= getHeight() - 14;
 		
-		x = MathHelper.clamp(x, 0, mcWindow.getScaledWidth());
-		y = MathHelper.clamp(y, 0, mcWindow.getScaledHeight());
+		x = Mth.clamp(x, 0, mcWindow.getGuiScaledWidth());
+		y = Mth.clamp(y, 0, mcWindow.getGuiScaledHeight());
 		
 		setX(x);
 		setY(y);

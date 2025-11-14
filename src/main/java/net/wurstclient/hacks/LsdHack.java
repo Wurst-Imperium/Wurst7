@@ -7,8 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.wurstclient.Category;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
@@ -25,23 +25,23 @@ public final class LsdHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		if(!(MC.getCameraEntity() instanceof PlayerEntity))
+		if(!(MC.getCameraEntity() instanceof Player))
 		{
 			setEnabled(false);
 			return;
 		}
 		
-		if(MC.gameRenderer.getPostProcessor() != null)
-			MC.gameRenderer.disablePostProcessor();
+		if(MC.gameRenderer.currentEffect() != null)
+			MC.gameRenderer.shutdownEffect();
 		
 		MC.gameRenderer
-			.loadPostProcessor(Identifier.of("shaders/post/lsd.json"));
+			.loadEffect(ResourceLocation.parse("shaders/post/lsd.json"));
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		if(MC.gameRenderer.getPostProcessor() != null)
-			MC.gameRenderer.disablePostProcessor();
+		if(MC.gameRenderer.currentEffect() != null)
+			MC.gameRenderer.shutdownEffect();
 	}
 }

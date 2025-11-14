@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -40,14 +40,15 @@ public final class PotionSaverHack extends Hack implements PacketOutputListener
 		if(!isFrozen())
 			return;
 		
-		if(event.getPacket() instanceof PlayerMoveC2SPacket)
+		if(event.getPacket() instanceof ServerboundMovePlayerPacket)
 			event.cancel();
 	}
 	
 	public boolean isFrozen()
 	{
 		return isEnabled() && MC.player != null
-			&& !MC.player.getActiveStatusEffects().isEmpty()
-			&& MC.player.getVelocity().x == 0 && MC.player.getVelocity().z == 0;
+			&& !MC.player.getActiveEffectsMap().isEmpty()
+			&& MC.player.getDeltaMovement().x == 0
+			&& MC.player.getDeltaMovement().z == 0;
 	}
 }

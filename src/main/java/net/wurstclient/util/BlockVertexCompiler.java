@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.wurstclient.hacks.SearchHack;
 
 /**
@@ -52,7 +52,7 @@ public enum BlockVertexCompiler
 	{
 		Builder<int[]> builder = Stream.<int[]> builder();
 		
-		if(!matchingBlocks.contains(pos.down()))
+		if(!matchingBlocks.contains(pos.below()))
 		{
 			builder.accept(getVertex(pos, 0, 0, 0));
 			builder.accept(getVertex(pos, 1, 0, 0));
@@ -60,7 +60,7 @@ public enum BlockVertexCompiler
 			builder.accept(getVertex(pos, 0, 0, 1));
 		}
 		
-		if(!matchingBlocks.contains(pos.up()))
+		if(!matchingBlocks.contains(pos.above()))
 		{
 			builder.accept(getVertex(pos, 0, 1, 0));
 			builder.accept(getVertex(pos, 0, 1, 1));

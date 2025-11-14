@@ -15,16 +15,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.BasicBakedModel;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.SimpleBakedModel;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
-@Mixin(BasicBakedModel.class)
+@Mixin(SimpleBakedModel.class)
 public class BasicBakedModelMixin
 {
 	/**
@@ -33,7 +33,7 @@ public class BasicBakedModelMixin
 	 */
 	@Inject(at = @At("HEAD"), method = "getQuads", cancellable = true)
 	private void getQuads(@Nullable BlockState state, @Nullable Direction face,
-		Random random, CallbackInfoReturnable<List<BakedQuad>> cir)
+		RandomSource random, CallbackInfoReturnable<List<BakedQuad>> cir)
 	{
 		if(face != null || state == null
 			|| !WurstClient.INSTANCE.getHax().xRayHack.isEnabled())

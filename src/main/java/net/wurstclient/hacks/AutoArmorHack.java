@@ -12,22 +12,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.AnimalArmorItem;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorItem.Type;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry.Reference;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.Holder.Reference;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.AnimalArmorItem;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorItem.Type;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
@@ -94,15 +94,15 @@ public final class AutoArmorHack extends Hack
 		}
 		
 		// check screen
-		if(MC.currentScreen instanceof HandledScreen
-			&& !(MC.currentScreen instanceof InventoryScreen))
+		if(MC.screen instanceof AbstractContainerScreen
+			&& !(MC.screen instanceof InventoryScreen))
 			return;
 		
-		ClientPlayerEntity player = MC.player;
-		PlayerInventory inventory = player.getInventory();
+		LocalPlayer player = MC.player;
+		Inventory inventory = player.getInventory();
 		
-		if(!swapWhileMoving.isChecked() && (player.input.movementForward != 0
-			|| player.input.movementSideways != 0))
+		if(!swapWhileMoving.isChecked() && (player.input.forwardImpulse != 0
+			|| player.input.leftImpulse != 0))
 			return;
 		
 		// store slots and values of best armor pieces
@@ -114,7 +114,7 @@ public final class AutoArmorHack extends Hack
 		{
 			bestArmorSlots[type] = -1;
 			
-			ItemStack stack = inventory.getArmorStack(type);
+			ItemStack stack = inventory.getArmor(type);
 			if(!(stack.getItem() instanceof ArmorItem item)
 				|| item instanceof AnimalArmorItem)
 				continue;
@@ -125,13 +125,13 @@ public final class AutoArmorHack extends Hack
 		// search inventory for better armor
 		for(int slot = 0; slot < 36; slot++)
 		{
-			ItemStack stack = inventory.getStack(slot);
+			ItemStack stack = inventory.getItem(slot);
 			
 			if(!(stack.getItem() instanceof ArmorItem item)
 				|| item instanceof AnimalArmorItem)
 				continue;
 			
-			int armorType = item.getSlotType().getEntitySlotId();
+			int armorType = item.getEquipmentSlot().getIndex();
 			int armorValue = getArmorValue(item, stack);
 			
 			if(armorValue > bestArmorValues[armorType])
@@ -153,8 +153,8 @@ public final class AutoArmorHack extends Hack
 				
 			// check if armor can be swapped
 			// needs 1 free slot where it can put the old armor
-			ItemStack oldArmor = inventory.getArmorStack(type);
-			if(!oldArmor.isEmpty() && inventory.getEmptySlot() == -1)
+			ItemStack oldArmor = inventory.getArmor(type);
+			if(!oldArmor.isEmpty() && inventory.getFreeSlot() == -1)
 				continue;
 			
 			// hotbar fix
@@ -173,28 +173,27 @@ public final class AutoArmorHack extends Hack
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
-		if(event.getPacket() instanceof ClickSlotC2SPacket)
+		if(event.getPacket() instanceof ServerboundContainerClickPacket)
 			timer = delay.getValueI();
 	}
 	
 	private int getArmorValue(ArmorItem item, ItemStack stack)
 	{
-		int armorPoints = item.getProtection();
+		int armorPoints = item.getDefense();
 		int prtPoints = 0;
 		int armorToughness = (int)item.getToughness();
-		int armorType = item.getMaterial().value().getProtection(Type.LEGGINGS);
+		int armorType = item.getMaterial().value().getDefense(Type.LEGGINGS);
 		
 		if(useEnchantments.isChecked())
 		{
-			DynamicRegistryManager drm =
-				WurstClient.MC.world.getRegistryManager();
-			Registry<Enchantment> registry = drm.get(RegistryKeys.ENCHANTMENT);
+			RegistryAccess drm = WurstClient.MC.level.registryAccess();
+			Registry<Enchantment> registry =
+				drm.registryOrThrow(Registries.ENCHANTMENT);
 			
 			Optional<Reference<Enchantment>> protection =
-				registry.getEntry(Enchantments.PROTECTION);
-			int prtLvl = protection
-				.map(entry -> EnchantmentHelper.getLevel(entry, stack))
-				.orElse(0);
+				registry.getHolder(Enchantments.PROTECTION);
+			int prtLvl = protection.map(entry -> EnchantmentHelper
+				.getItemEnchantmentLevel(entry, stack)).orElse(0);
 			
 			// ClientPlayerEntity player = MC.player;
 			// DamageSource dmgSource =

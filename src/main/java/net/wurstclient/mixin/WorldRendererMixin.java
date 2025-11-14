@@ -12,15 +12,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.wurstclient.WurstClient;
 
-@Mixin(WorldRenderer.class)
+@Mixin(LevelRenderer.class)
 public class WorldRendererMixin
 {
 	@Inject(at = @At("HEAD"),
-		method = "hasBlindnessOrDarkness(Lnet/minecraft/client/render/Camera;)Z",
+		method = "doesMobEffectBlockSky(Lnet/minecraft/client/Camera;)Z",
 		cancellable = true)
 	private void onHasBlindnessOrDarkness(Camera camera,
 		CallbackInfoReturnable<Boolean> ci)

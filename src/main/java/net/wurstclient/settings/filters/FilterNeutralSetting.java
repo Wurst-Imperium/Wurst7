@@ -7,11 +7,11 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.Angerable;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.PiglinEntity;
-import net.minecraft.entity.passive.PufferfishEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.animal.Pufferfish;
+import net.minecraft.world.entity.monster.piglin.Piglin;
 
 public final class FilterNeutralSetting extends AttackDetectingEntityFilter
 {
@@ -29,20 +29,20 @@ public final class FilterNeutralSetting extends AttackDetectingEntityFilter
 	@Override
 	public boolean onTest(Entity e)
 	{
-		return !(e instanceof Angerable || e instanceof PufferfishEntity
-			|| e instanceof PiglinEntity);
+		return !(e instanceof NeutralMob || e instanceof Pufferfish
+			|| e instanceof Piglin);
 	}
 	
 	@Override
 	public boolean ifCalmTest(Entity e)
 	{
 		// special case for pufferfish
-		if(e instanceof PufferfishEntity pfe)
+		if(e instanceof Pufferfish pfe)
 			return pfe.getPuffState() > 0;
 		
-		if(e instanceof Angerable || e instanceof PiglinEntity)
-			if(e instanceof MobEntity me)
-				return me.isAttacking();
+		if(e instanceof NeutralMob || e instanceof Piglin)
+			if(e instanceof Mob me)
+				return me.isAggressive();
 			
 		return true;
 	}

@@ -7,8 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -38,16 +38,15 @@ public final class FastLadderHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
-		if(!player.isClimbing() || !player.horizontalCollision)
+		if(!player.onClimbable() || !player.horizontalCollision)
 			return;
 		
-		if(player.input.movementForward == 0
-			&& player.input.movementSideways == 0)
+		if(player.input.forwardImpulse == 0 && player.input.leftImpulse == 0)
 			return;
 		
-		Vec3d velocity = player.getVelocity();
-		player.setVelocity(velocity.x, 0.2872, velocity.z);
+		Vec3 velocity = player.getDeltaMovement();
+		player.setDeltaMovement(velocity.x, 0.2872, velocity.z);
 	}
 }

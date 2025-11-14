@@ -12,25 +12,26 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.HeldItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.wurstclient.WurstClient;
 
-@Mixin(HeldItemRenderer.class)
+@Mixin(ItemInHandRenderer.class)
 public abstract class HeldItemRendererMixin
 {
 	@Inject(at = {@At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/item/HeldItemRenderer;applyEquipOffset(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Arm;F)V",
-		ordinal = 4)}, method = "renderFirstPersonItem")
-	private void onApplyEquipOffsetBlocking(AbstractClientPlayerEntity player,
-		float tickDelta, float pitch, Hand hand, float swingProgress,
-		ItemStack item, float equipProgress, MatrixStack matrices,
-		VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci)
+		target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;applyItemArmTransform(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/entity/HumanoidArm;F)V",
+		ordinal = 4)}, method = "renderArmWithItem")
+	private void onApplyEquipOffsetBlocking(AbstractClientPlayer player,
+		float tickDelta, float pitch, InteractionHand hand, float swingProgress,
+		ItemStack item, float equipProgress, PoseStack matrices,
+		MultiBufferSource vertexConsumers, int light, CallbackInfo ci)
 	{
 		// lower shield when blocking
 		if(item.getItem() == Items.SHIELD)
@@ -39,13 +40,12 @@ public abstract class HeldItemRendererMixin
 	}
 	
 	@Inject(at = {@At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/item/HeldItemRenderer;applySwingOffset(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Arm;F)V",
-		ordinal = 1)}, method = "renderFirstPersonItem")
-	private void onApplySwingOffsetNotBlocking(
-		AbstractClientPlayerEntity player, float tickDelta, float pitch,
-		Hand hand, float swingProgress, ItemStack item, float equipProgress,
-		MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light,
-		CallbackInfo ci)
+		target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;applyItemArmAttackTransform(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/entity/HumanoidArm;F)V",
+		ordinal = 1)}, method = "renderArmWithItem")
+	private void onApplySwingOffsetNotBlocking(AbstractClientPlayer player,
+		float tickDelta, float pitch, InteractionHand hand, float swingProgress,
+		ItemStack item, float equipProgress, PoseStack matrices,
+		MultiBufferSource vertexConsumers, int light, CallbackInfo ci)
 	{
 		// lower shield when not blocking
 		if(item.getItem() == Items.SHIELD)

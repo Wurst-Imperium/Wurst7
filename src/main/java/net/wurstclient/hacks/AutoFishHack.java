@@ -7,14 +7,15 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.projectile.FishingBobberEntity;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketInputListener;
@@ -153,7 +154,7 @@ public final class AutoFishHack extends Hack
 			if(!fishingSpots.onCast())
 				return;
 			
-			MC.doItemUse();
+			MC.startUseItem();
 			castRodTimer = retryDelay.getValueI();
 			return;
 		}
@@ -163,17 +164,17 @@ public final class AutoFishHack extends Hack
 		{
 			shallowWaterWarning.checkWaterType();
 			reelInTimer = catchDelay.getValueI();
-			fishingSpots.onBite(MC.player.fishHook);
+			fishingSpots.onBite(MC.player.fishing);
 			biteDetected = false;
 			
 			// also reel in if an entity was hooked
-		}else if(MC.player.fishHook.getHookedEntity() != null)
+		}else if(MC.player.fishing.getHookedIn() != null)
 			reelInTimer = catchDelay.getValueI();
 		
 		// otherwise, reel in when the timer runs out
 		if(reelInTimer == 0)
 		{
-			MC.doItemUse();
+			MC.startUseItem();
 			reelInTimer = retryDelay.getValueI();
 			castRodTimer = retryDelay.getValueI();
 		}
@@ -192,12 +193,11 @@ public final class AutoFishHack extends Hack
 	private void processSoundUpdate(PacketInputEvent event)
 	{
 		// check packet type
-		if(!(event.getPacket() instanceof PlaySoundS2CPacket sound))
+		if(!(event.getPacket() instanceof ClientboundSoundPacket sound))
 			return;
 		
 		// check sound type
-		if(!SoundEvents.ENTITY_FISHING_BOBBER_SPLASH
-			.equals(sound.getSound().value()))
+		if(!SoundEvents.FISHING_BOBBER_SPLASH.equals(sound.getSound().value()))
 			return;
 		
 		// check if player is fishing
@@ -208,9 +208,9 @@ public final class AutoFishHack extends Hack
 		debugDraw.updateSoundPos(sound);
 		
 		// check sound position (Chebyshev distance)
-		Vec3d bobber = MC.player.fishHook.getPos();
-		double dx = Math.abs(sound.getX() - bobber.getX());
-		double dz = Math.abs(sound.getZ() - bobber.getZ());
+		Vec3 bobber = MC.player.fishing.position();
+		double dx = Math.abs(sound.getX() - bobber.x());
+		double dz = Math.abs(sound.getZ() - bobber.z());
 		if(Math.max(dx, dz) > validRange.getValue())
 			return;
 		
@@ -220,16 +220,16 @@ public final class AutoFishHack extends Hack
 	private void processEntityUpdate(PacketInputEvent event)
 	{
 		// check packet type
-		if(!(event.getPacket() instanceof EntityTrackerUpdateS2CPacket update))
+		if(!(event
+			.getPacket() instanceof ClientboundSetEntityDataPacket update))
 			return;
 		
 		// check if the entity is a bobber
-		if(!(MC.world
-			.getEntityById(update.id()) instanceof FishingBobberEntity bobber))
+		if(!(MC.level.getEntity(update.id()) instanceof FishingHook bobber))
 			return;
 		
 		// check if it's our bobber
-		if(bobber != MC.player.fishHook)
+		if(bobber != MC.player.fishing)
 			return;
 		
 		// check if player is fishing
@@ -240,17 +240,17 @@ public final class AutoFishHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		debugDraw.render(matrixStack, partialTicks);
 	}
 	
 	private boolean isFishing()
 	{
-		ClientPlayerEntity player = MC.player;
-		return player != null && player.fishHook != null
-			&& !player.fishHook.isRemoved()
-			&& player.getMainHandStack().isOf(Items.FISHING_ROD);
+		LocalPlayer player = MC.player;
+		return player != null && player.fishing != null
+			&& !player.fishing.isRemoved()
+			&& player.getMainHandItem().is(Items.FISHING_ROD);
 	}
 	
 	private enum BiteMode

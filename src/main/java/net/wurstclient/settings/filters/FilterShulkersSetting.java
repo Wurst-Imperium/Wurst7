@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.ShulkerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Shulker;
 
 public final class FilterShulkersSetting extends EntityFilterCheckbox
 {
@@ -20,7 +20,7 @@ public final class FilterShulkersSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof ShulkerEntity);
+		return !(e instanceof Shulker);
 	}
 	
 	public static FilterShulkersSetting genericCombat(boolean checked)

@@ -15,12 +15,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormat.DrawMode;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat.Mode;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.settings.ChunkAreaSetting;
 import net.wurstclient.util.EasyVertexBuffer;
 import net.wurstclient.util.chunk.ChunkSearcher.Result;
@@ -29,11 +30,11 @@ public final class ChunkVertexBufferCoordinator extends AbstractChunkCoordinator
 {
 	private final HashMap<ChunkPos, EasyVertexBuffer> buffers = new HashMap<>();
 	private final Renderer renderer;
-	private final DrawMode drawMode;
+	private final Mode drawMode;
 	private final VertexFormat format;
 	
 	public ChunkVertexBufferCoordinator(BiPredicate<BlockPos, BlockState> query,
-		DrawMode drawMode, VertexFormat format, Renderer renderer,
+		Mode drawMode, VertexFormat format, Renderer renderer,
 		ChunkAreaSetting area)
 	{
 		super(query, area);

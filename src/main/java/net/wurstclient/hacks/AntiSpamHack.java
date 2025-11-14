@@ -9,12 +9,12 @@ package net.wurstclient.hacks;
 
 import java.util.List;
 
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.client.util.ChatMessages;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.GuiMessage;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.gui.components.ComponentRenderUtils;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatInputListener;
@@ -46,15 +46,14 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 	@Override
 	public void onReceivedMessage(ChatInputEvent event)
 	{
-		List<ChatHudLine.Visible> chatLines = event.getChatLines();
+		List<GuiMessage.Line> chatLines = event.getChatLines();
 		if(chatLines.isEmpty())
 			return;
 		
-		ChatHud chat = MC.inGameHud.getChatHud();
-		int maxTextLength =
-			MathHelper.floor(chat.getWidth() / chat.getChatScale());
-		List<OrderedText> newLines = ChatMessages.breakRenderedChatMessageLines(
-			event.getComponent(), maxTextLength, MC.textRenderer);
+		ChatComponent chat = MC.gui.getChat();
+		int maxTextLength = Mth.floor(chat.getWidth() / chat.getScale());
+		List<FormattedCharSequence> newLines = ComponentRenderUtils
+			.wrapComponents(event.getComponent(), maxTextLength, MC.font);
 		
 		int spamCounter = 1;
 		int matchingLines = 0;
@@ -140,8 +139,9 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 			// immutable List<Text> siblings parameter, which causes the game to
 			// crash when calling append(). So we always have to create a new
 			// MutableText object to avoid that.
-			MutableText oldText = (MutableText)event.getComponent();
-			MutableText newText = MutableText.of(oldText.getContent());
+			MutableComponent oldText = (MutableComponent)event.getComponent();
+			MutableComponent newText =
+				MutableComponent.create(oldText.getContents());
 			newText.setStyle(oldText.getStyle());
 			oldText.getSiblings().forEach(newText::append);
 			

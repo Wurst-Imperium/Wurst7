@@ -11,7 +11,7 @@ import java.util.function.BiConsumer;
 
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ChatOutputListener;
@@ -97,7 +97,7 @@ public final class AutoCompleteHack extends Hack
 			return;
 		
 		// check if the chat is open
-		if(!(MC.currentScreen instanceof ChatScreen))
+		if(!(MC.screen instanceof ChatScreen))
 			return;
 		
 		// check if we have a draft message and suggestions updater

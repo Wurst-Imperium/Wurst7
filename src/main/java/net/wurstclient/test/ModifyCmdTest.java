@@ -9,10 +9,10 @@ package net.wurstclient.test;
 
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public enum ModifyCmdTest
 {
@@ -30,9 +30,9 @@ public enum ModifyCmdTest
 		runWurstCommand("modify set custom_name \"\\\"$cRed Name\\\"\"");
 		assertOneItemInSlot(0, Items.DIAMOND);
 		submitAndWait(mc -> {
-			ItemStack stack = mc.player.getInventory().getMainHandStack();
+			ItemStack stack = mc.player.getInventory().getSelected();
 			String name = stack.getComponents()
-				.getOrDefault(DataComponentTypes.CUSTOM_NAME, Text.empty())
+				.getOrDefault(DataComponents.CUSTOM_NAME, Component.empty())
 				.getString();
 			if(!name.equals("\u00a7cRed Name"))
 				throw new RuntimeException("Custom name is wrong: " + name);

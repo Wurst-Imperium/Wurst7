@@ -7,9 +7,9 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.OnGroundOnly;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.StatusOnly;
+import net.minecraft.world.item.Items;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -37,7 +37,7 @@ public final class NoFallHack extends Hack implements UpdateListener
 	@Override
 	public String getRenderName()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		if(player == null)
 			return getName();
 		
@@ -70,7 +70,7 @@ public final class NoFallHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// do nothing in creative mode, since there is no fall damage anyway
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		if(player.isCreative())
 			return;
 		
@@ -84,21 +84,21 @@ public final class NoFallHack extends Hack implements UpdateListener
 			return;
 		
 		// attempt to fix elytra weirdness, if allowed
-		if(fallFlying && player.isSneaking()
+		if(fallFlying && player.isShiftKeyDown()
 			&& !isFallingFastEnoughToCauseDamage(player))
 			return;
 		
 		// send packet to stop fall damage
-		player.networkHandler.sendPacket(new OnGroundOnly(true));
+		player.connection.send(new StatusOnly(true));
 	}
 	
-	private boolean isHoldingMace(ClientPlayerEntity player)
+	private boolean isHoldingMace(LocalPlayer player)
 	{
-		return player.getMainHandStack().isOf(Items.MACE);
+		return player.getMainHandItem().is(Items.MACE);
 	}
 	
-	private boolean isFallingFastEnoughToCauseDamage(ClientPlayerEntity player)
+	private boolean isFallingFastEnoughToCauseDamage(LocalPlayer player)
 	{
-		return player.getVelocity().y < -0.5;
+		return player.getDeltaMovement().y < -0.5;
 	}
 }

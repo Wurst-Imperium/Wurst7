@@ -9,9 +9,9 @@ package net.wurstclient.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.WurstLogoOtf;
 import net.wurstclient.util.RenderUtils;
@@ -19,17 +19,17 @@ import net.wurstclient.util.RenderUtils;
 public final class WurstLogo
 {
 	private static final WurstClient WURST = WurstClient.INSTANCE;
-	private static final Identifier LOGO_TEXTURE =
-		Identifier.of("wurst", "wurst_128.png");
+	private static final ResourceLocation LOGO_TEXTURE =
+		ResourceLocation.fromNamespaceAndPath("wurst", "wurst_128.png");
 	
-	public void render(DrawContext context)
+	public void render(GuiGraphics context)
 	{
 		WurstLogoOtf otf = WURST.getOtfs().wurstLogoOtf;
 		if(!otf.isVisible())
 			return;
 		
 		String version = getVersionString();
-		TextRenderer tr = WurstClient.MC.textRenderer;
+		Font tr = WurstClient.MC.font;
 		
 		// background
 		int bgColor;
@@ -37,14 +37,14 @@ public final class WurstLogo
 			bgColor = RenderUtils.toIntColor(WURST.getGui().getAcColor(), 0.5F);
 		else
 			bgColor = otf.getBackgroundColor();
-		context.fill(0, 6, tr.getWidth(version) + 76, 17, bgColor);
+		context.fill(0, 6, tr.width(version) + 76, 17, bgColor);
 		
 		// version string
-		context.drawText(tr, version, 74, 8, otf.getTextColor(), false);
+		context.drawString(tr, version, 74, 8, otf.getTextColor(), false);
 		
 		// Wurst logo
 		RenderSystem.enableBlend();
-		context.drawTexture(LOGO_TEXTURE, 0, 3, 0, 0, 72, 18, 72, 18);
+		context.blit(LOGO_TEXTURE, 0, 3, 0, 0, 72, 18, 72, 18);
 	}
 	
 	private String getVersionString()

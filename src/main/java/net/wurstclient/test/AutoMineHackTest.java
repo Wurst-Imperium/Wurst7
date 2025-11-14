@@ -9,7 +9,7 @@ package net.wurstclient.test;
 
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Blocks;
 
 public enum AutoMineHackTest
 {

@@ -9,8 +9,8 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
 import net.wurstclient.clickgui.Component;
@@ -20,7 +20,7 @@ import net.wurstclient.util.RenderUtils;
 public final class CheckboxComponent extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	private static final int BOX_SIZE = 11;
 	
 	private final CheckboxSetting setting;
@@ -48,7 +48,7 @@ public final class CheckboxComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -81,7 +81,7 @@ public final class CheckboxComponent extends Component
 		
 		// text
 		String name = setting.getName();
-		context.drawText(TR, name, x3 + 2, y1 + 2, GUI.getTxtColor(), false);
+		context.drawString(TR, name, x3 + 2, y1 + 2, GUI.getTxtColor(), false);
 	}
 	
 	private int getFillColor(boolean hovering)
@@ -105,7 +105,7 @@ public final class CheckboxComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return BOX_SIZE + TR.getWidth(setting.getName()) + 2;
+		return BOX_SIZE + TR.width(setting.getName()) + 2;
 	}
 	
 	@Override

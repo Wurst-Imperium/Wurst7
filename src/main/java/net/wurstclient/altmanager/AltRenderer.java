@@ -18,13 +18,13 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.yggdrasil.ProfileResult;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.util.DefaultSkinHelper;
-import net.minecraft.client.util.SkinTextures;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Uuids;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.resources.ResourceLocation;
 import net.wurstclient.WurstClient;
 
 public final class AltRenderer
@@ -32,47 +32,47 @@ public final class AltRenderer
 	private static final ExecutorService BACKGROUND_THREAD =
 		Executors.newSingleThreadExecutor();
 	
-	private static final ConcurrentHashMap<String, Identifier> onlineSkins =
+	private static final ConcurrentHashMap<String, ResourceLocation> onlineSkins =
 		new ConcurrentHashMap<>();
 	
-	private static final HashMap<String, Identifier> offlineSkins =
+	private static final HashMap<String, ResourceLocation> offlineSkins =
 		new HashMap<>();
 	
-	private static Identifier getSkinTexture(String name)
+	private static ResourceLocation getSkinTexture(String name)
 	{
 		if(name.isEmpty())
 			name = "Steve";
 		
-		Identifier offlineSkin = offlineSkins.get(name);
+		ResourceLocation offlineSkin = offlineSkins.get(name);
 		if(offlineSkin == null)
 		{
 			queueOnlineSkinLoading(name);
 			offlineSkin = loadOfflineSkin(name);
 		}
 		
-		Identifier onlineSkin = onlineSkins.get(name);
+		ResourceLocation onlineSkin = onlineSkins.get(name);
 		return onlineSkin != null ? onlineSkin : offlineSkin;
 	}
 	
-	private static Identifier loadOfflineSkin(String name)
+	private static ResourceLocation loadOfflineSkin(String name)
 	{
-		UUID uuid = Uuids.getOfflinePlayerUuid(name);
+		UUID uuid = UUIDUtil.createOfflinePlayerUUID(name);
 		GameProfile profile = new GameProfile(uuid, name);
-		PlayerListEntry entry = new PlayerListEntry(profile, false);
-		Identifier texture = entry.getSkinTextures().texture();
+		PlayerInfo entry = new PlayerInfo(profile, false);
+		ResourceLocation texture = entry.getSkin().texture();
 		offlineSkins.put(name, texture);
 		return texture;
 	}
 	
 	private static void queueOnlineSkinLoading(String name)
 	{
-		MinecraftClient mc = WurstClient.MC;
+		Minecraft mc = WurstClient.MC;
 		
 		CompletableFuture.supplyAsync(() -> {
 			
 			UUID uuid = SkinStealer.getUUIDOrNull(name);
 			ProfileResult result =
-				mc.getSessionService().fetchProfile(uuid, false);
+				mc.getMinecraftSessionService().fetchProfile(uuid, false);
 			
 			return result == null ? null : result.profile();
 			
@@ -81,8 +81,8 @@ public final class AltRenderer
 			if(profile == null)
 				return CompletableFuture.completedFuture(null);
 			
-			CompletableFuture<SkinTextures> skinFuture =
-				mc.getSkinProvider().fetchSkinTextures(profile);
+			CompletableFuture<PlayerSkin> skinFuture =
+				mc.getSkinManager().getOrLoad(profile);
 			
 			return skinFuture;
 			
@@ -94,12 +94,12 @@ public final class AltRenderer
 		}, BACKGROUND_THREAD);
 	}
 	
-	public static void drawAltFace(DrawContext context, String name, int x,
+	public static void drawAltFace(GuiGraphics context, String name, int x,
 		int y, int w, int h, boolean selected)
 	{
 		try
 		{
-			Identifier texture = getSkinTexture(name);
+			ResourceLocation texture = getSkinTexture(name);
 			
 			if(selected)
 				RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -111,14 +111,14 @@ public final class AltRenderer
 			int fh = 192;
 			float u = 24;
 			float v = 24;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Hat
 			fw = 192;
 			fh = 192;
 			u = 120;
 			v = 24;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
@@ -128,17 +128,17 @@ public final class AltRenderer
 		}
 	}
 	
-	public static void drawAltBody(DrawContext context, String name, int x,
+	public static void drawAltBody(GuiGraphics context, String name, int x,
 		int y, int width, int height)
 	{
 		try
 		{
-			Identifier texture = getSkinTexture(name);
+			ResourceLocation texture = getSkinTexture(name);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
-			boolean slim = DefaultSkinHelper
-				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
-				.model() == SkinTextures.Model.SLIM;
+			boolean slim =
+				DefaultPlayerSkin.get(UUIDUtil.createOfflinePlayerUUID(name))
+					.model() == PlayerSkin.Model.SLIM;
 			
 			// Face
 			x = x + width / 4;
@@ -149,7 +149,7 @@ public final class AltRenderer
 			int fh = height * 2;
 			float u = height / 4;
 			float v = height / 4;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Hat
 			x = x + 0;
@@ -158,7 +158,7 @@ public final class AltRenderer
 			h = height / 4;
 			u = height / 4 * 5;
 			v = height / 4;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Chest
 			x = x + 0;
@@ -167,7 +167,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 2.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Jacket
 			x = x + 0;
@@ -176,7 +176,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 2.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Left Arm
 			x = x - width / 16 * (slim ? 3 : 4);
@@ -185,7 +185,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Left Sleeve
 			x = x + 0;
@@ -194,7 +194,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Right Arm
 			x = x + width / 16 * (slim ? 11 : 12);
@@ -203,7 +203,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Right Sleeve
 			x = x + 0;
@@ -212,7 +212,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Left Leg
 			x = x - width / 2;
@@ -221,7 +221,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Left Pants
 			x = x + 0;
@@ -230,7 +230,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Right Leg
 			x = x + width / 4;
@@ -239,7 +239,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Right Pants
 			x = x + 0;
@@ -248,7 +248,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 		}catch(Exception e)
 		{
@@ -256,17 +256,17 @@ public final class AltRenderer
 		}
 	}
 	
-	public static void drawAltBack(DrawContext context, String name, int x,
+	public static void drawAltBack(GuiGraphics context, String name, int x,
 		int y, int width, int height)
 	{
 		try
 		{
-			Identifier texture = getSkinTexture(name);
+			ResourceLocation texture = getSkinTexture(name);
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 			
-			boolean slim = DefaultSkinHelper
-				.getSkinTextures(Uuids.getOfflinePlayerUuid(name))
-				.model() == SkinTextures.Model.SLIM;
+			boolean slim =
+				DefaultPlayerSkin.get(UUIDUtil.createOfflinePlayerUUID(name))
+					.model() == PlayerSkin.Model.SLIM;
 			
 			// Face
 			x = x + width / 4;
@@ -277,7 +277,7 @@ public final class AltRenderer
 			int fh = height * 2;
 			float u = height / 4 * 3;
 			float v = height / 4;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Hat
 			x = x + 0;
@@ -286,7 +286,7 @@ public final class AltRenderer
 			h = height / 4;
 			u = height / 4 * 7;
 			v = height / 4;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Chest
 			x = x + 0;
@@ -295,7 +295,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 4;
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Jacket
 			x = x + 0;
@@ -304,7 +304,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 4;
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Left Arm
 			x = x - width / 16 * (slim ? 3 : 4);
@@ -313,7 +313,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Left Sleeve
 			x = x + 0;
@@ -322,7 +322,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Right Arm
 			x = x + width / 16 * (slim ? 11 : 12);
@@ -331,7 +331,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Right Sleeve
 			x = x + 0;
@@ -340,7 +340,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Left Leg
 			x = x - width / 2;
@@ -349,7 +349,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Left Pants
 			x = x + 0;
@@ -358,7 +358,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Right Leg
 			x = x + width / 4;
@@ -367,7 +367,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 2.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 			// Right Pants
 			x = x + 0;
@@ -376,7 +376,7 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 4.5F;
-			context.drawTexture(texture, x, y, u, v, w, h, fw, fh);
+			context.blit(texture, x, y, u, v, w, h, fw, fh);
 			
 		}catch(Exception e)
 		{

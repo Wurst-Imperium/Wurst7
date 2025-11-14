@@ -15,14 +15,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.block.enums.CameraSubmersionType;
-import net.minecraft.client.render.BackgroundRenderer;
-import net.minecraft.client.render.BackgroundRenderer.StatusEffectFogModifier;
-import net.minecraft.client.render.Camera;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.renderer.FogRenderer.MobEffectFogFunction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.material.FogType;
 import net.wurstclient.WurstClient;
 
-@Mixin(BackgroundRenderer.class)
+@Mixin(FogRenderer.class)
 public abstract class BackgroundRendererMixin
 {
 	/**
@@ -30,31 +30,30 @@ public abstract class BackgroundRendererMixin
 	 * effectively removing it.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "applyFog(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/BackgroundRenderer$FogType;FZF)V")
-	private static void onApplyFog(Camera camera,
-		BackgroundRenderer.FogType fogType, float viewDistance,
-		boolean thickFog, float tickDelta, CallbackInfo ci)
+		method = "setupFog(Lnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/FogRenderer$FogMode;FZF)V")
+	private static void onApplyFog(Camera camera, FogRenderer.FogMode fogType,
+		float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled()
-			|| fogType != BackgroundRenderer.FogType.FOG_TERRAIN)
+			|| fogType != FogRenderer.FogMode.FOG_TERRAIN)
 			return;
 		
-		CameraSubmersionType cameraSubmersionType = camera.getSubmersionType();
-		if(cameraSubmersionType != CameraSubmersionType.NONE)
+		FogType cameraSubmersionType = camera.getFluidInCamera();
+		if(cameraSubmersionType != FogType.NONE)
 			return;
 		
-		Entity entity = camera.getFocusedEntity();
-		if(BackgroundRenderer.getFogModifier(entity, tickDelta) != null)
+		Entity entity = camera.getEntity();
+		if(FogRenderer.getPriorityFogFunction(entity, tickDelta) != null)
 			return;
 		
 		RenderSystem.setShaderFogColor(0, 0, 0, 0);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier;",
+		method = "getPriorityFogFunction(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/client/renderer/FogRenderer$MobEffectFogFunction;",
 		cancellable = true)
 	private static void onGetFogModifier(Entity entity, float tickDelta,
-		CallbackInfoReturnable<StatusEffectFogModifier> ci)
+		CallbackInfoReturnable<MobEffectFogFunction> ci)
 	{
 		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
 			ci.setReturnValue(null);

@@ -19,34 +19,34 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.GameMenuScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.wurstclient.WurstClient;
 import net.wurstclient.options.WurstOptionsScreen;
 
-@Mixin(GameMenuScreen.class)
+@Mixin(PauseScreen.class)
 public abstract class GameMenuScreenMixin extends Screen
 {
 	@Unique
-	private static final Identifier WURST_TEXTURE =
-		Identifier.of("wurst", "wurst_128.png");
+	private static final ResourceLocation WURST_TEXTURE =
+		ResourceLocation.fromNamespaceAndPath("wurst", "wurst_128.png");
 	
 	@Unique
-	private ButtonWidget wurstOptionsButton;
+	private Button wurstOptionsButton;
 	
-	private GameMenuScreenMixin(WurstClient wurst, Text title)
+	private GameMenuScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "initWidgets()V")
+	@Inject(at = @At("TAIL"), method = "createPauseMenu()V")
 	private void onInitWidgets(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -56,8 +56,8 @@ public abstract class GameMenuScreenMixin extends Screen
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "render(Lnet/minecraft/client/gui/DrawContext;IIF)V")
-	private void onRender(DrawContext context, int mouseX, int mouseY,
+		method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V")
+	private void onRender(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)
@@ -72,13 +72,13 @@ public abstract class GameMenuScreenMixin extends Screen
 		float u = 0;
 		float v = 0;
 		RenderSystem.enableBlend();
-		context.drawTexture(WURST_TEXTURE, x, y, u, v, w, h, fw, fh);
+		context.blit(WURST_TEXTURE, x, y, u, v, w, h, fw, fh);
 	}
 	
 	@Unique
 	private void addWurstOptionsButton()
 	{
-		List<ClickableWidget> buttons = Screens.getButtons(this);
+		List<AbstractWidget> buttons = Screens.getButtons(this);
 		
 		// Fallback position
 		int buttonX = width / 2 - 102;
@@ -86,7 +86,7 @@ public abstract class GameMenuScreenMixin extends Screen
 		int buttonWidth = 204;
 		int buttonHeight = 20;
 		
-		for(ClickableWidget button : buttons)
+		for(AbstractWidget button : buttons)
 		{
 			// If feedback button exists, use its position
 			if(isTrKey(button, "menu.sendFeedback")
@@ -109,17 +109,16 @@ public abstract class GameMenuScreenMixin extends Screen
 		ensureSpaceAvailable(buttonX, buttonY, buttonWidth, buttonHeight);
 		
 		// Create Wurst Options button
-		MutableText buttonText = Text.literal("            Options");
-		wurstOptionsButton = ButtonWidget
-			.builder(buttonText, b -> openWurstOptions())
-			.dimensions(buttonX, buttonY, buttonWidth, buttonHeight).build();
+		MutableComponent buttonText = Component.literal("            Options");
+		wurstOptionsButton = Button.builder(buttonText, b -> openWurstOptions())
+			.bounds(buttonX, buttonY, buttonWidth, buttonHeight).build();
 		buttons.add(wurstOptionsButton);
 	}
 	
 	@Unique
 	private void hideFeedbackReportAndServerLinksButtons()
 	{
-		for(ClickableWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getButtons(this))
 			if(isTrKey(button, "menu.sendFeedback")
 				|| isTrKey(button, "menu.reportBugs")
 				|| isTrKey(button, "menu.feedback")
@@ -131,8 +130,8 @@ public abstract class GameMenuScreenMixin extends Screen
 	private void ensureSpaceAvailable(int x, int y, int width, int height)
 	{
 		// Check if there are any buttons in the way
-		ArrayList<ClickableWidget> buttonsInTheWay = new ArrayList<>();
-		for(ClickableWidget button : Screens.getButtons(this))
+		ArrayList<AbstractWidget> buttonsInTheWay = new ArrayList<>();
+		for(AbstractWidget button : Screens.getButtons(this))
 		{
 			if(button.getRight() < x || button.getX() > x + width
 				|| button.getBottom() < y || button.getY() > y + height)
@@ -150,20 +149,20 @@ public abstract class GameMenuScreenMixin extends Screen
 		
 		// If yes, clear space below and move the buttons there
 		ensureSpaceAvailable(x, y + 24, width, height);
-		for(ClickableWidget button : buttonsInTheWay)
+		for(AbstractWidget button : buttonsInTheWay)
 			button.setY(button.getY() + 24);
 	}
 	
 	@Unique
 	private void openWurstOptions()
 	{
-		client.setScreen(new WurstOptionsScreen(this));
+		minecraft.setScreen(new WurstOptionsScreen(this));
 	}
 	
 	@Unique
-	private boolean isTrKey(ClickableWidget button, String key)
+	private boolean isTrKey(AbstractWidget button, String key)
 	{
 		String message = button.getMessage().getString();
-		return message != null && message.equals(I18n.translate(key));
+		return message != null && message.equals(I18n.get(key));
 	}
 }

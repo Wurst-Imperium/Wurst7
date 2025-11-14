@@ -7,13 +7,13 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ElytraItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ElytraItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -71,13 +71,13 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		if(jumpTimer > 0)
 			jumpTimer--;
 		
-		ItemStack chest = MC.player.getEquippedStack(EquipmentSlot.CHEST);
+		ItemStack chest = MC.player.getItemBySlot(EquipmentSlot.CHEST);
 		if(chest.getItem() != Items.ELYTRA)
 			return;
 		
 		if(MC.player.isFallFlying())
 		{
-			if(stopInWater.isChecked() && MC.player.isTouchingWater())
+			if(stopInWater.isChecked() && MC.player.isInWater())
 			{
 				sendStartStopPacket();
 				return;
@@ -88,15 +88,16 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		if(ElytraItem.isUsable(chest) && MC.options.jumpKey.isPressed())
+		if(ElytraItem.isFlyEnabled(chest) && MC.options.keyJump.isDown())
 			doInstantFly();
 	}
 	
 	private void sendStartStopPacket()
 	{
-		ClientCommandC2SPacket packet = new ClientCommandC2SPacket(MC.player,
-			ClientCommandC2SPacket.Mode.START_FALL_FLYING);
-		MC.player.networkHandler.sendPacket(packet);
+		ServerboundPlayerCommandPacket packet =
+			new ServerboundPlayerCommandPacket(MC.player,
+				ServerboundPlayerCommandPacket.Action.START_FALL_FLYING);
+		MC.player.connection.send(packet);
 	}
 	
 	private void controlHeight()
@@ -104,12 +105,12 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		if(!heightCtrl.isChecked())
 			return;
 		
-		Vec3d v = MC.player.getVelocity();
+		Vec3 v = MC.player.getDeltaMovement();
 		
-		if(MC.options.jumpKey.isPressed())
-			MC.player.setVelocity(v.x, v.y + 0.08, v.z);
-		else if(MC.options.sneakKey.isPressed())
-			MC.player.setVelocity(v.x, v.y - 0.04, v.z);
+		if(MC.options.keyJump.isDown())
+			MC.player.setDeltaMovement(v.x, v.y + 0.08, v.z);
+		else if(MC.options.keyShift.isDown())
+			MC.player.setDeltaMovement(v.x, v.y - 0.04, v.z);
 	}
 	
 	private void controlSpeed()
@@ -117,16 +118,15 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		if(!speedCtrl.isChecked())
 			return;
 		
-		float yaw = (float)Math.toRadians(MC.player.getYaw());
-		Vec3d forward = new Vec3d(-MathHelper.sin(yaw) * 0.05, 0,
-			MathHelper.cos(yaw) * 0.05);
+		float yaw = (float)Math.toRadians(MC.player.getYRot());
+		Vec3 forward = new Vec3(-Mth.sin(yaw) * 0.05, 0, Mth.cos(yaw) * 0.05);
 		
-		Vec3d v = MC.player.getVelocity();
+		Vec3 v = MC.player.getDeltaMovement();
 		
-		if(MC.options.forwardKey.isPressed())
-			MC.player.setVelocity(v.add(forward));
-		else if(MC.options.backKey.isPressed())
-			MC.player.setVelocity(v.subtract(forward));
+		if(MC.options.keyUp.isDown())
+			MC.player.setDeltaMovement(v.add(forward));
+		else if(MC.options.keyDown.isDown())
+			MC.player.setDeltaMovement(v.subtract(forward));
 	}
 	
 	private void doInstantFly()
@@ -139,7 +139,7 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 			jumpTimer = 20;
 			MC.player.setJumping(false);
 			MC.player.setSprinting(true);
-			MC.player.jump();
+			MC.player.jumpFromGround();
 		}
 		
 		sendStartStopPacket();

@@ -12,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.screen.DeathScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.DeathScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.DeathListener.DeathEvent;
@@ -24,7 +24,7 @@ import net.wurstclient.hacks.AutoRespawnHack;
 @Mixin(DeathScreen.class)
 public abstract class DeathScreenMixin extends Screen
 {
-	private DeathScreenMixin(WurstClient wurst, Text title)
+	private DeathScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}
@@ -47,10 +47,10 @@ public abstract class DeathScreenMixin extends Screen
 		int backButtonX = width / 2 - 100;
 		int backButtonY = height / 4;
 		
-		addDrawableChild(
-			ButtonWidget.builder(Text.literal("AutoRespawn: OFF"), b -> {
+		addRenderableWidget(
+			Button.builder(Component.literal("AutoRespawn: OFF"), b -> {
 				autoRespawn.setEnabled(true);
 				autoRespawn.onDeath();
-			}).dimensions(backButtonX, backButtonY + 48, 200, 20).build());
+			}).bounds(backButtonX, backButtonY + 48, 200, 20).build());
 	}
 }

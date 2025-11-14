@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
 
 public final class FilterZombiePiglinsSetting
 	extends AttackDetectingEntityFilter
@@ -27,13 +27,13 @@ public final class FilterZombiePiglinsSetting
 	@Override
 	public boolean onTest(Entity e)
 	{
-		return !(e instanceof ZombifiedPiglinEntity);
+		return !(e instanceof ZombifiedPiglin);
 	}
 	
 	@Override
 	public boolean ifCalmTest(Entity e)
 	{
-		return !(e instanceof ZombifiedPiglinEntity zpe) || zpe.isAttacking();
+		return !(e instanceof ZombifiedPiglin zpe) || zpe.isAggressive();
 	}
 	
 	public static FilterZombiePiglinsSetting genericCombat(Mode selected)

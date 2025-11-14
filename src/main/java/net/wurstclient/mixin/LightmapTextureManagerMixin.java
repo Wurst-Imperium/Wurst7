@@ -12,17 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.renderer.LightTexture;
 import net.wurstclient.WurstClient;
 
-@Mixin(LightmapTextureManager.class)
+@Mixin(LightTexture.class)
 public class LightmapTextureManagerMixin
 {
 	/**
 	 * Stops the other darkness effect in caves when AntiBlind is enabled.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "getDarknessFactor(F)F",
+		method = "getDarknessGamma(F)F",
 		cancellable = true)
 	private void onGetDarknessFactor(float delta,
 		CallbackInfoReturnable<Float> cir)

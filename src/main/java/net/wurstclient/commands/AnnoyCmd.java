@@ -9,7 +9,7 @@ package net.wurstclient.commands;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.player.LocalPlayer;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -63,7 +63,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		target = String.join(" ", args);
 		ChatUtils.message("Now annoying " + target + ".");
 		
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		if(player != null && target.equals(player.getName().getString()))
 			ChatUtils.warning("Annoying yourself is a bad idea!");
 		
@@ -112,6 +112,6 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		if(rcMode.isChecked() && repeated.startsWith("."))
 			WURST.getCmdProcessor().process(repeated.substring(1));
 		else
-			MC.getNetworkHandler().sendChatMessage(repeated);
+			MC.getConnection().sendChat(repeated);
 	}
 }

@@ -12,24 +12,24 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.FluidRenderer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.client.renderer.block.LiquidBlockRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
-@Mixin(FluidRenderer.class)
+@Mixin(LiquidBlockRenderer.class)
 public class FluidRendererMixin
 {
 	/**
 	 * Shows and hides fluids when using X-Ray without Sodium installed.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z",
+		method = "isFaceOccludedByNeighbor(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;FLnet/minecraft/world/level/block/state/BlockState;)Z",
 		cancellable = true)
-	private static void onIsSideCovered(BlockView world, BlockPos pos,
+	private static void onIsSideCovered(BlockGetter world, BlockPos pos,
 		Direction side, float maxDeviation, BlockState neighboringBlockState,
 		CallbackInfoReturnable<Boolean> cir)
 	{

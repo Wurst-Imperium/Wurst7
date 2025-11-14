@@ -13,33 +13,33 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.Mouse;
+import net.minecraft.client.MouseHandler;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.MouseScrollListener.MouseScrollEvent;
 import net.wurstclient.events.MouseUpdateListener.MouseUpdateEvent;
 
-@Mixin(Mouse.class)
+@Mixin(MouseHandler.class)
 public class MouseMixin
 {
 	@Shadow
-	private double cursorDeltaX;
+	private double accumulatedDX;
 	@Shadow
-	private double cursorDeltaY;
+	private double accumulatedDY;
 	
-	@Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
+	@Inject(at = @At("RETURN"), method = "onScroll(JDD)V")
 	private void onOnMouseScroll(long window, double horizontal,
 		double vertical, CallbackInfo ci)
 	{
 		EventManager.fire(new MouseScrollEvent(vertical));
 	}
 	
-	@Inject(at = @At("HEAD"), method = "tick()V")
+	@Inject(at = @At("HEAD"), method = "handleAccumulatedMovement()V")
 	private void onTick(CallbackInfo ci)
 	{
 		MouseUpdateEvent event =
-			new MouseUpdateEvent(cursorDeltaX, cursorDeltaY);
+			new MouseUpdateEvent(accumulatedDX, accumulatedDY);
 		EventManager.fire(event);
-		cursorDeltaX = event.getDeltaX();
-		cursorDeltaY = event.getDeltaY();
+		accumulatedDX = event.getDeltaX();
+		accumulatedDY = event.getDeltaY();
 	}
 }

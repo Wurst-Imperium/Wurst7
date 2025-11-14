@@ -7,16 +7,16 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.MaceItem;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.TridentItem;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MaceItem;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -76,10 +76,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(MC.crosshairTarget != null
-			&& MC.crosshairTarget.getType() == HitResult.Type.ENTITY)
+		if(MC.hitResult != null
+			&& MC.hitResult.getType() == HitResult.Type.ENTITY)
 		{
-			Entity entity = ((EntityHitResult)MC.crosshairTarget).getEntity();
+			Entity entity = ((EntityHitResult)MC.hitResult).getEntity();
 			
 			if(entity instanceof LivingEntity
 				&& EntityUtils.IS_ATTACKABLE.test(entity))
@@ -112,11 +112,11 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		for(int i = 0; i < 9; i++)
 		{
 			// skip empty slots
-			if(MC.player.getInventory().getStack(i).isEmpty())
+			if(MC.player.getInventory().getItem(i).isEmpty())
 				continue;
 			
 			// get weapon value
-			ItemStack stack = MC.player.getInventory().getStack(i);
+			ItemStack stack = MC.player.getInventory().getItem(i);
 			float value = getValue(stack, entity);
 			
 			// compare with previous best weapon
@@ -133,10 +133,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		// save old slot
 		if(oldSlot == -1)
-			oldSlot = MC.player.getInventory().selectedSlot;
+			oldSlot = MC.player.getInventory().selected;
 		
 		// set slot
-		MC.player.getInventory().selectedSlot = bestSlot;
+		MC.player.getInventory().selected = bestSlot;
 		
 		// start timer
 		timer = releaseTime.getValueI();
@@ -145,29 +145,28 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	private float getValue(ItemStack stack, Entity entity)
 	{
 		Item item = stack.getItem();
-		if(!(item instanceof ToolItem || item instanceof TridentItem
+		if(!(item instanceof TieredItem || item instanceof TridentItem
 			|| item instanceof MaceItem))
 			return Integer.MIN_VALUE;
 		
 		switch(priority.getSelected())
 		{
 			case SPEED:
-			return (float)ItemUtils
-				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_SPEED)
+			return (float)ItemUtils.getAttribute(item, Attributes.ATTACK_SPEED)
 				.orElse(Integer.MIN_VALUE);
 			
 			// Client-side item-specific attack damage calculation no
 			// longer exists as of 24w18a (1.21). Related bug: MC-196250
 			case DAMAGE:
 			// EntityType<?> group = entity.getType();
-			float dmg = (float)ItemUtils
-				.getAttribute(item, EntityAttributes.GENERIC_ATTACK_DAMAGE)
-				.orElse(Integer.MIN_VALUE);
+			float dmg =
+				(float)ItemUtils.getAttribute(item, Attributes.ATTACK_DAMAGE)
+					.orElse(Integer.MIN_VALUE);
 			
 			// Check for mace, get bonus damage from fall
 			if(item instanceof MaceItem mace)
-				dmg = mace.getBonusAttackDamage(MC.player, dmg,
-					entity.getDamageSources().playerAttack(MC.player));
+				dmg = mace.getAttackDamageBonus(MC.player, dmg,
+					entity.damageSources().playerAttack(MC.player));
 			// dmg += EnchantmentHelper.getAttackDamage(stack, group);
 			return dmg;
 		}
@@ -185,7 +184,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		
 		if(oldSlot != -1)
 		{
-			MC.player.getInventory().selectedSlot = oldSlot;
+			MC.player.getInventory().selected = oldSlot;
 			oldSlot = -1;
 		}
 	}

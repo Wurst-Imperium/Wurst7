@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import net.minecraft.util.math.Box;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.Setting;
 
 public abstract class ChestEspGroup
 {
-	protected final ArrayList<Box> boxes = new ArrayList<>();
+	protected final ArrayList<AABB> boxes = new ArrayList<>();
 	private final ColorSetting color;
 	private final CheckboxSetting enabled;
 	
@@ -54,7 +54,7 @@ public abstract class ChestEspGroup
 		return color.getColorI(alpha);
 	}
 	
-	public final List<Box> getBoxes()
+	public final List<AABB> getBoxes()
 	{
 		return Collections.unmodifiableList(boxes);
 	}

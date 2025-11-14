@@ -29,10 +29,10 @@ public enum FreecamHackTest
 		
 		// Press shift to fly down a bit
 		submitAndWait(
-			mc -> IKeyBinding.get(mc.options.sneakKey).simulatePress(true));
+			mc -> IKeyBinding.get(mc.options.keyShift).simulatePress(true));
 		waitForWorldTicks(5);
 		submitAndWait(
-			mc -> IKeyBinding.get(mc.options.sneakKey).simulatePress(false));
+			mc -> IKeyBinding.get(mc.options.keyShift).simulatePress(false));
 		takeScreenshot("freecam_down", Duration.ofMillis(300));
 		clearChat();
 		

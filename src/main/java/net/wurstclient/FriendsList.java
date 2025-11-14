@@ -15,8 +15,8 @@ import java.util.TreeSet;
 
 import com.google.gson.JsonArray;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.wurstclient.commands.FriendsCmd;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.json.JsonException;
@@ -52,7 +52,7 @@ public class FriendsList
 	
 	public void middleClick(Entity entity)
 	{
-		if(entity == null || !(entity instanceof PlayerEntity))
+		if(entity == null || !(entity instanceof Player))
 			return;
 		
 		FriendsCmd friendsCmd = WurstClient.INSTANCE.getCmds().friendsCmd;

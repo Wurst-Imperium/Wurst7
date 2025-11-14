@@ -13,11 +13,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.TreeSet;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.hacks.TemplateToolHack;
 import net.wurstclient.hacks.templatetool.TemplateToolState;
 import net.wurstclient.util.RenderUtils;
@@ -34,14 +35,14 @@ public final class CreatingTemplateState extends TemplateToolState
 	public void onEnter(TemplateToolHack hack)
 	{
 		totalBlocks = hack.getNonEmptyBlocks().size();
-		blocksPerTick = MathHelper.clamp(totalBlocks / 15, 1, 1024);
+		blocksPerTick = Mth.clamp(totalBlocks / 15, 1, 1024);
 		
 		unsortedBlocks = new ArrayDeque<>(hack.getNonEmptyBlocks().keySet());
 		
 		BlockPos origin = hack.getOriginPos();
-		sortingHelper = new TreeSet<>(Comparator
-			.<BlockPos> comparingDouble(pos -> pos.getSquaredDistance(origin))
-			.thenComparing(pos -> pos));
+		sortingHelper = new TreeSet<>(
+			Comparator.<BlockPos> comparingDouble(pos -> pos.distSqr(origin))
+				.thenComparing(pos -> pos));
 	}
 	
 	@Override
@@ -74,13 +75,13 @@ public final class CreatingTemplateState extends TemplateToolState
 			
 			for(BlockPos pos : sortingHelper)
 			{
-				double dPos = sortedBlocks.getLast().getSquaredDistance(pos);
+				double dPos = sortedBlocks.getLast().distSqr(pos);
 				if(dPos >= dCurrent)
 					continue;
 				
 				for(Direction side : Direction.values())
 				{
-					BlockPos next = pos.offset(side);
+					BlockPos next = pos.relative(side);
 					if(!sortedBlocks.contains(next))
 						continue;
 					
@@ -99,7 +100,7 @@ public final class CreatingTemplateState extends TemplateToolState
 	}
 	
 	@Override
-	public void onRender(TemplateToolHack hack, MatrixStack matrixStack,
+	public void onRender(TemplateToolHack hack, PoseStack matrixStack,
 		float partialTicks)
 	{
 		int black = 0x80000000;
@@ -107,17 +108,18 @@ public final class CreatingTemplateState extends TemplateToolState
 		
 		BlockPos start = hack.getStartPos();
 		BlockPos end = hack.getEndPos();
-		Box bounds = Box.enclosing(start, end).contract(1 / 16.0);
+		AABB bounds =
+			AABB.encapsulatingFullBlocks(start, end).deflate(1 / 16.0);
 		
 		// Draw scanner
-		double scannerX = MathHelper.lerp(progress, bounds.minX, bounds.maxX);
-		Box scanner = bounds.withMinX(scannerX).withMaxX(scannerX);
+		double scannerX = Mth.lerp(progress, bounds.minX, bounds.maxX);
+		AABB scanner = bounds.setMinX(scannerX).setMaxX(scannerX);
 		RenderUtils.drawOutlinedBox(matrixStack, scanner, black, true);
 		RenderUtils.drawSolidBox(matrixStack, scanner, green30, true);
 		
 		// Draw recently sorted blocks
-		List<Box> boxes = hack.getSortedBlocks().reversed().stream()
-			.map(pos -> new Box(pos).contract(1 / 16.0)).limit(1024).toList();
+		List<AABB> boxes = hack.getSortedBlocks().reversed().stream()
+			.map(pos -> new AABB(pos).deflate(1 / 16.0)).limit(1024).toList();
 		RenderUtils.drawOutlinedBoxes(matrixStack, boxes, black, false);
 	}
 	

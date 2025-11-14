@@ -8,18 +8,18 @@
 package net.wurstclient.other_features;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.MessageIndicator;
-import net.minecraft.client.gui.hud.MessageIndicator.Icon;
-import net.minecraft.client.network.ClientLoginNetworkHandler;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.encryption.ClientPlayerSession;
-import net.minecraft.network.message.MessageChain;
-import net.minecraft.network.message.MessageSignatureData;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.client.GuiMessageTag;
+import net.minecraft.client.GuiMessageTag.Icon;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.LocalChatSession;
+import net.minecraft.network.chat.MessageSignature;
+import net.minecraft.network.chat.SignedMessageChain;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.wurstclient.Category;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
@@ -57,20 +57,21 @@ public final class NoChatReportsOtf extends OtherFeature
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayNetworkHandler netHandler = MC.getNetworkHandler();
+		ClientPacketListener netHandler = MC.getConnection();
 		if(netHandler == null)
 			return;
 		
 		if(isActive())
 		{
-			netHandler.session = null;
-			netHandler.messagePacker = MessageChain.Packer.NONE;
+			netHandler.chatSession = null;
+			netHandler.signedMessageEncoder =
+				SignedMessageChain.Encoder.UNSIGNED;
 			
-		}else if(netHandler.session == null)
-			MC.getProfileKeys().fetchKeyPair()
+		}else if(netHandler.chatSession == null)
+			MC.getProfileKeyPairManager().prepareKeyPair()
 				.thenAcceptAsync(optional -> optional
-					.ifPresent(profileKeys -> netHandler.session =
-						ClientPlayerSession.create(profileKeys)),
+					.ifPresent(profileKeys -> netHandler.chatSession =
+						LocalChatSession.create(profileKeys)),
 					MC);
 		
 		EVENTS.remove(UpdateListener.class, this);
@@ -82,9 +83,9 @@ public final class NoChatReportsOtf extends OtherFeature
 		if(!isActive())
 			return;
 		
-		Text originalText = event.getComponent();
+		Component originalText = event.getComponent();
 		if(!(originalText
-			.getContent() instanceof TranslatableTextContent trContent))
+			.getContents() instanceof TranslatableContents trContent))
 			return;
 		
 		if(!trContent.getKey().equals("chat.disabled.missingProfileKey"))
@@ -95,31 +96,32 @@ public final class NoChatReportsOtf extends OtherFeature
 		ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL,
 			"https://www.wurstclient.net/chat-disabled-mpk/");
 		HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-			Text.literal("Original message: ").append(originalText));
+			Component.literal("Original message: ").append(originalText));
 		
-		ChatUtils.component(Text.literal(
+		ChatUtils.component(Component.literal(
 			"The server is refusing to let you chat without enabling chat reports. Click \u00a7nhere\u00a7r to learn more.")
-			.styled(
+			.withStyle(
 				s -> s.withClickEvent(clickEvent).withHoverEvent(hoverEvent)));
 	}
 	
-	private void onLoginStart(ClientLoginNetworkHandler handler,
-		MinecraftClient client)
+	private void onLoginStart(ClientHandshakePacketListenerImpl handler,
+		Minecraft client)
 	{
 		EVENTS.add(UpdateListener.class, NoChatReportsOtf.this);
 	}
 	
-	public MessageIndicator modifyIndicator(Text message,
-		MessageSignatureData signature, MessageIndicator indicator)
+	public GuiMessageTag modifyIndicator(Component message,
+		MessageSignature signature, GuiMessageTag indicator)
 	{
-		if(!WURST.isEnabled() || MC.isInSingleplayer())
+		if(!WURST.isEnabled() || MC.isLocalServer())
 			return indicator;
 		
 		if(indicator != null || signature == null)
 			return indicator;
 		
-		return new MessageIndicator(0xE84F58, Icon.CHAT_MODIFIED,
-			Text.literal(ChatUtils.WURST_PREFIX + "\u00a7cReportable\u00a7r - "
+		return new GuiMessageTag(0xE84F58, Icon.CHAT_MODIFIED,
+			Component.literal(ChatUtils.WURST_PREFIX
+				+ "\u00a7cReportable\u00a7r - "
 				+ WURST.translate(
 					"description.wurst.nochatreports.message_is_reportable")),
 			"Reportable");
@@ -133,7 +135,7 @@ public final class NoChatReportsOtf extends OtherFeature
 	
 	public boolean isActive()
 	{
-		return isEnabled() && WURST.isEnabled() && !MC.isInSingleplayer();
+		return isEnabled() && WURST.isEnabled() && !MC.isLocalServer();
 	}
 	
 	@Override

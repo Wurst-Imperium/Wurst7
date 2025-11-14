@@ -12,12 +12,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.DimensionType;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -118,7 +119,7 @@ public final class NewChunksHack extends Hack
 		oldChunkReasons.clear();
 		newChunkReasons.clear();
 		lastRegion = null;
-		lastDimension = MC.world.getDimension();
+		lastDimension = MC.level.dimensionType();
 	}
 	
 	@Override
@@ -177,24 +178,24 @@ public final class NewChunksHack extends Hack
 		if(!isEnabled())
 			return;
 		
-		WorldChunk chunk = MC.world.getChunk(x, z);
+		LevelChunk chunk = MC.level.getChunk(x, z);
 		new Thread(() -> checkLoadedChunk(chunk), "NewChunks " + chunk.getPos())
 			.start();
 	}
 	
-	private void checkLoadedChunk(WorldChunk chunk)
+	private void checkLoadedChunk(LevelChunk chunk)
 	{
 		ChunkPos chunkPos = chunk.getPos();
 		if(newChunks.contains(chunkPos) || oldChunks.contains(chunkPos)
 			|| dontCheckAgain.contains(chunkPos))
 			return;
 		
-		int minX = chunkPos.getStartX();
-		int minY = chunk.getBottomY();
-		int minZ = chunkPos.getStartZ();
-		int maxX = chunkPos.getEndX();
+		int minX = chunkPos.getMinBlockX();
+		int minY = chunk.getMinBuildHeight();
+		int minZ = chunkPos.getMinBlockZ();
+		int maxX = chunkPos.getMaxBlockX();
 		int maxY = ChunkUtils.getHighestNonEmptySectionYOffset(chunk) + 16;
-		int maxZ = chunkPos.getEndZ();
+		int maxZ = chunkPos.getMaxBlockZ();
 		
 		for(int x = minX; x <= maxX; x++)
 			for(int y = minY; y <= maxY; y++)
@@ -203,7 +204,7 @@ public final class NewChunksHack extends Hack
 					BlockPos pos = new BlockPos(x, y, z);
 					FluidState fluidState = chunk.getFluidState(pos);
 					
-					if(fluidState.isEmpty() || fluidState.isStill())
+					if(fluidState.isEmpty() || fluidState.isSource())
 						continue;
 						
 					// Liquid always generates still, the flowing happens later
@@ -229,7 +230,7 @@ public final class NewChunksHack extends Hack
 		
 		// Liquid starts flowing -> probably a new chunk
 		FluidState fluidState = BlockUtils.getState(pos).getFluidState();
-		if(fluidState.isEmpty() || fluidState.isStill())
+		if(fluidState.isEmpty() || fluidState.isSource())
 			return;
 		
 		ChunkPos chunkPos = new ChunkPos(pos);
@@ -243,9 +244,9 @@ public final class NewChunksHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
-		if(MC.world.getDimension() != lastDimension)
+		if(MC.level.dimensionType() != lastDimension)
 			reset();
 		
 		RegionPos region = RenderUtils.getCameraRegion();

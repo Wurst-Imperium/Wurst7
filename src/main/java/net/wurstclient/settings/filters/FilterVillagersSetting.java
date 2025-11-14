@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.MerchantEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.AbstractVillager;
 
 public final class FilterVillagersSetting extends EntityFilterCheckbox
 {
@@ -20,7 +20,7 @@ public final class FilterVillagersSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof MerchantEntity);
+		return !(e instanceof AbstractVillager);
 	}
 	
 	public static FilterVillagersSetting genericCombat(boolean checked)

@@ -7,9 +7,9 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket.Action;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
@@ -66,11 +66,11 @@ public final class SneakHack extends Hack
 		switch(mode.getSelected())
 		{
 			case LEGIT:
-			IKeyBinding.get(MC.options.sneakKey).resetPressedState();
+			IKeyBinding.get(MC.options.keyShift).resetPressedState();
 			break;
 			
 			case PACKET:
-			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
+			sendSneakPacket(Action.RELEASE_SHIFT_KEY);
 			break;
 		}
 	}
@@ -78,7 +78,7 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPreMotion()
 	{
-		IKeyBinding sneakKey = IKeyBinding.get(MC.options.sneakKey);
+		IKeyBinding sneakKey = IKeyBinding.get(MC.options.keyShift);
 		
 		switch(mode.getSelected())
 		{
@@ -86,13 +86,13 @@ public final class SneakHack extends Hack
 			if(offWhileFlying.isChecked() && isFlying())
 				sneakKey.resetPressedState();
 			else
-				sneakKey.setPressed(true);
+				sneakKey.setDown(true);
 			break;
 			
 			case PACKET:
 			sneakKey.resetPressedState();
-			sendSneakPacket(Mode.PRESS_SHIFT_KEY);
-			sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
+			sendSneakPacket(Action.PRESS_SHIFT_KEY);
+			sendSneakPacket(Action.RELEASE_SHIFT_KEY);
 			break;
 		}
 	}
@@ -103,8 +103,8 @@ public final class SneakHack extends Hack
 		if(mode.getSelected() != SneakMode.PACKET)
 			return;
 		
-		sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
-		sendSneakPacket(Mode.PRESS_SHIFT_KEY);
+		sendSneakPacket(Action.RELEASE_SHIFT_KEY);
+		sendSneakPacket(Action.PRESS_SHIFT_KEY);
 	}
 	
 	private boolean isFlying()
@@ -121,12 +121,12 @@ public final class SneakHack extends Hack
 		return false;
 	}
 	
-	private void sendSneakPacket(Mode mode)
+	private void sendSneakPacket(Action mode)
 	{
-		ClientPlayerEntity player = MC.player;
-		ClientCommandC2SPacket packet =
-			new ClientCommandC2SPacket(player, mode);
-		player.networkHandler.sendPacket(packet);
+		LocalPlayer player = MC.player;
+		ServerboundPlayerCommandPacket packet =
+			new ServerboundPlayerCommandPacket(player, mode);
+		player.connection.send(packet);
 	}
 	
 	private enum SneakMode

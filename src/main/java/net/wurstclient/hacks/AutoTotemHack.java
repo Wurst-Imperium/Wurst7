@@ -7,10 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -86,7 +86,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		
 		int nextTotemSlot = searchForTotems();
 		
-		if(isTotem(MC.player.getOffHandStack()))
+		if(isTotem(MC.player.getOffhandItem()))
 		{
 			wasTotemInOffhand = true;
 			return;
@@ -106,8 +106,8 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			return;
 		
 		// don't move items while a container is open
-		if(MC.currentScreen instanceof HandledScreen
-			&& !(MC.currentScreen instanceof AbstractInventoryScreen))
+		if(MC.screen instanceof AbstractContainerScreen
+			&& !(MC.screen instanceof EffectRenderingInventoryScreen))
 			return;
 		
 		if(timer > 0)
@@ -121,7 +121,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	
 	private void moveToOffhand(int itemSlot)
 	{
-		boolean offhandEmpty = MC.player.getOffHandStack().isEmpty();
+		boolean offhandEmpty = MC.player.getOffhandItem().isEmpty();
 		
 		IClientPlayerInteractionManager im = IMC.getInteractionManager();
 		im.windowClick_PICKUP(itemSlot);
@@ -153,6 +153,6 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	
 	private boolean isTotem(ItemStack stack)
 	{
-		return stack.isOf(Items.TOTEM_OF_UNDYING);
+		return stack.is(Items.TOTEM_OF_UNDYING);
 	}
 }

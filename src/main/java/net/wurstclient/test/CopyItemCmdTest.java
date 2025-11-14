@@ -9,8 +9,8 @@ package net.wurstclient.test;
 
 import static net.wurstclient.test.WurstClientTestHelper.*;
 
-import net.minecraft.client.option.Perspective;
-import net.minecraft.item.Items;
+import net.minecraft.client.CameraType;
+import net.minecraft.world.item.Items;
 
 public enum CopyItemCmdTest
 {
@@ -19,7 +19,7 @@ public enum CopyItemCmdTest
 	public static void testCopyItemCmd()
 	{
 		System.out.println("Testing .copyitem command");
-		setPerspective(Perspective.THIRD_PERSON_FRONT);
+		setPerspective(CameraType.THIRD_PERSON_FRONT);
 		runChatCommand("clear");
 		clearChat();
 		
@@ -43,7 +43,7 @@ public enum CopyItemCmdTest
 		assertOneItemInSlot(39, Items.GOLDEN_HELMET);
 		
 		// Clean up
-		setPerspective(Perspective.FIRST_PERSON);
+		setPerspective(CameraType.FIRST_PERSON);
 		runChatCommand("clear");
 		clearChat();
 	}

@@ -9,68 +9,73 @@ package net.wurstclient;
 
 import java.util.OptionalDouble;
 
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormat.DrawMode;
-import net.minecraft.client.render.VertexFormats;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat.Mode;
+
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
 
 public enum WurstRenderLayers
 {
 	;
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but as a
+	 * Similar to {@link RenderType#debugLineStrip(double)}, but as a
 	 * non-srip version with support for transparency.
 	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
+	 * @implNote Just like {@link RenderType#debugLineStrip(double)}, this
 	 *           layer doesn't support any other line width than 1px. Changing
 	 *           the line width number does nothing.
 	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINES =
-		RenderLayer.of("wurst:1px_lines", VertexFormats.POSITION_COLOR,
-			DrawMode.DEBUG_LINES, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.COLOR_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	public static final RenderType.CompositeRenderType ONE_PIXEL_LINES =
+		RenderType.create("wurst:1px_lines", DefaultVertexFormat.POSITION_COLOR,
+			Mode.DEBUG_LINES, 1536, false, true,
+			RenderType.CompositeState.builder()
+				.setShaderState(RenderType.POSITION_COLOR_SHADER)
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(1)))
+				.setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+				.setCullState(RenderType.NO_CULL).createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but with
+	 * Similar to {@link RenderType#debugLineStrip(double)}, but with
 	 * support for transparency.
 	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
+	 * @implNote Just like {@link RenderType#debugLineStrip(double)}, this
 	 *           layer doesn't support any other line width than 1px. Changing
 	 *           the line width number does nothing.
 	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
-		RenderLayer.of("wurst:1px_line_strip", VertexFormats.POSITION_COLOR,
-			DrawMode.DEBUG_LINE_STRIP, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.COLOR_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	public static final RenderType.CompositeRenderType ONE_PIXEL_LINE_STRIP =
+		RenderType.create("wurst:1px_line_strip",
+			DefaultVertexFormat.POSITION_COLOR, Mode.DEBUG_LINE_STRIP, 1536,
+			false, true,
+			RenderType.CompositeState.builder()
+				.setShaderState(RenderType.POSITION_COLOR_SHADER)
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(1)))
+				.setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+				.setCullState(RenderType.NO_CULL).createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getLines()}, but with line width 2.
+	 * Similar to {@link RenderType#lines()}, but with line width 2.
 	 */
-	public static final RenderLayer.MultiPhase LINES =
-		RenderLayer.of("wurst:lines", VertexFormats.LINES,
-			VertexFormat.DrawMode.LINES, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.LINES_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.target(RenderLayer.ITEM_ENTITY_TARGET)
-				.writeMaskState(RenderLayer.ALL_MASK)
-				.depthTest(RenderLayer.LEQUAL_DEPTH_TEST)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	public static final RenderType.CompositeRenderType LINES = RenderType
+		.create("wurst:lines", DefaultVertexFormat.POSITION_COLOR_NORMAL,
+			VertexFormat.Mode.LINES, 1536, false, true,
+			RenderType.CompositeState.builder()
+				.setShaderState(RenderType.RENDERTYPE_LINES_SHADER)
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(2)))
+				.setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
+				.setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+				.setOutputState(RenderType.ITEM_ENTITY_TARGET)
+				.setWriteMaskState(RenderType.COLOR_DEPTH_WRITE)
+				.setDepthTestState(RenderType.LEQUAL_DEPTH_TEST)
+				.setCullState(RenderType.NO_CULL).createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
+	 * Similar to {@link RenderType#lines()}, but with line width 2 and no
 	 * depth test.
 	 *
 	 * @apiNote Until 25w08a (1.21.5), turning off depth test has to be done
@@ -80,21 +85,22 @@ public enum WurstRenderLayers
 	 *          drawn with depth test set to LEQUALS (only visible if not
 	 *          obstructed).
 	 */
-	public static final RenderLayer.MultiPhase ESP_LINES =
-		RenderLayer.of("wurst:esp_lines", VertexFormats.LINES,
-			VertexFormat.DrawMode.LINES, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.LINES_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.target(RenderLayer.ITEM_ENTITY_TARGET)
-				.writeMaskState(RenderLayer.ALL_MASK)
-				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	public static final RenderType.CompositeRenderType ESP_LINES = RenderType
+		.create("wurst:esp_lines", DefaultVertexFormat.POSITION_COLOR_NORMAL,
+			VertexFormat.Mode.LINES, 1536, false, true,
+			RenderType.CompositeState.builder()
+				.setShaderState(RenderType.RENDERTYPE_LINES_SHADER)
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(2)))
+				.setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
+				.setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+				.setOutputState(RenderType.ITEM_ENTITY_TARGET)
+				.setWriteMaskState(RenderType.COLOR_DEPTH_WRITE)
+				.setDepthTestState(RenderType.NO_DEPTH_TEST)
+				.setCullState(RenderType.NO_CULL).createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2.
+	 * Similar to {@link RenderType#lineStrip()}, but with line width 2.
 	 *
 	 * @apiNote Until 25w08a (1.21.5), turning off depth test has to be done
 	 *          manually, by calling
@@ -103,21 +109,22 @@ public enum WurstRenderLayers
 	 *          drawn with depth test set to LEQUALS (only visible if not
 	 *          obstructed).
 	 */
-	public static final RenderLayer.MultiPhase LINE_STRIP =
-		RenderLayer.of("wurst:line_strip", VertexFormats.LINES,
-			VertexFormat.DrawMode.LINE_STRIP, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.LINES_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.target(RenderLayer.ITEM_ENTITY_TARGET)
-				.writeMaskState(RenderLayer.ALL_MASK)
-				.depthTest(RenderLayer.LEQUAL_DEPTH_TEST)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	public static final RenderType.CompositeRenderType LINE_STRIP = RenderType
+		.create("wurst:line_strip", DefaultVertexFormat.POSITION_COLOR_NORMAL,
+			VertexFormat.Mode.LINE_STRIP, 1536, false, true,
+			RenderType.CompositeState.builder()
+				.setShaderState(RenderType.RENDERTYPE_LINES_SHADER)
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(2)))
+				.setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
+				.setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+				.setOutputState(RenderType.ITEM_ENTITY_TARGET)
+				.setWriteMaskState(RenderType.COLOR_DEPTH_WRITE)
+				.setDepthTestState(RenderType.LEQUAL_DEPTH_TEST)
+				.setCullState(RenderType.NO_CULL).createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getLineStrip()}, but with line width 2 and
+	 * Similar to {@link RenderType#lineStrip()}, but with line width 2 and
 	 * no depth test.
 	 *
 	 * @apiNote Until 25w08a (1.21.5), turning off depth test has to be done
@@ -127,32 +134,35 @@ public enum WurstRenderLayers
 	 *          drawn with depth test set to LEQUALS (only visible if not
 	 *          obstructed).
 	 */
-	public static final RenderLayer.MultiPhase ESP_LINE_STRIP =
-		RenderLayer.of("wurst:esp_line_strip", VertexFormats.LINES,
-			VertexFormat.DrawMode.LINE_STRIP, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.LINES_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.target(RenderLayer.ITEM_ENTITY_TARGET)
-				.writeMaskState(RenderLayer.ALL_MASK)
-				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	public static final RenderType.CompositeRenderType ESP_LINE_STRIP =
+		RenderType.create("wurst:esp_line_strip",
+			DefaultVertexFormat.POSITION_COLOR_NORMAL,
+			VertexFormat.Mode.LINE_STRIP, 1536, false, true,
+			RenderType.CompositeState.builder()
+				.setShaderState(RenderType.RENDERTYPE_LINES_SHADER)
+				.setLineState(
+					new RenderStateShard.LineStateShard(OptionalDouble.of(2)))
+				.setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING)
+				.setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+				.setOutputState(RenderType.ITEM_ENTITY_TARGET)
+				.setWriteMaskState(RenderType.COLOR_DEPTH_WRITE)
+				.setDepthTestState(RenderType.NO_DEPTH_TEST)
+				.setCullState(RenderType.NO_CULL).createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled.
+	 * Similar to {@link RenderType#debugQuads()}, but with culling enabled.
 	 */
-	public static final RenderLayer.MultiPhase QUADS =
-		RenderLayer.of("wurst:quads", VertexFormats.POSITION_COLOR,
-			VertexFormat.DrawMode.QUADS, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.COLOR_PROGRAM)
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.depthTest(RenderLayer.LEQUAL_DEPTH_TEST).build(false));
+	public static final RenderType.CompositeRenderType QUADS =
+		RenderType.create("wurst:quads", DefaultVertexFormat.POSITION_COLOR,
+			VertexFormat.Mode.QUADS, 1536, false, true,
+			RenderType.CompositeState.builder()
+				.setShaderState(RenderType.POSITION_COLOR_SHADER)
+				.setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+				.setDepthTestState(RenderType.LEQUAL_DEPTH_TEST)
+				.createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugQuads()}, but with culling enabled
+	 * Similar to {@link RenderType#debugQuads()}, but with culling enabled
 	 * and no depth test.
 	 *
 	 * @apiNote Until 25w08a (1.21.5), turning off depth test has to be done
@@ -162,16 +172,17 @@ public enum WurstRenderLayers
 	 *          drawn with depth test set to LEQUALS (only visible if not
 	 *          obstructed).
 	 */
-	public static final RenderLayer.MultiPhase ESP_QUADS =
-		RenderLayer.of("wurst:esp_quads", VertexFormats.POSITION_COLOR,
-			VertexFormat.DrawMode.QUADS, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.COLOR_PROGRAM)
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST).build(false));
+	public static final RenderType.CompositeRenderType ESP_QUADS =
+		RenderType.create("wurst:esp_quads", DefaultVertexFormat.POSITION_COLOR,
+			VertexFormat.Mode.QUADS, 1536, false, true,
+			RenderType.CompositeState.builder()
+				.setShaderState(RenderType.POSITION_COLOR_SHADER)
+				.setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+				.setDepthTestState(RenderType.NO_DEPTH_TEST)
+				.createCompositeState(false));
 	
 	/**
-	 * Similar to {@link RenderLayer#getDebugQuads()}, but with no depth test.
+	 * Similar to {@link RenderType#debugQuads()}, but with no depth test.
 	 *
 	 * @apiNote Until 25w08a (1.21.5), turning off depth test has to be done
 	 *          manually, by calling
@@ -180,15 +191,16 @@ public enum WurstRenderLayers
 	 *          drawn with depth test set to LEQUALS (only visible if not
 	 *          obstructed).
 	 */
-	public static final RenderLayer.MultiPhase ESP_QUADS_NO_CULLING =
-		RenderLayer.of("wurst:esp_quads_no_culling",
-			VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS, 1536,
+	public static final RenderType.CompositeRenderType ESP_QUADS_NO_CULLING =
+		RenderType.create("wurst:esp_quads_no_culling",
+			DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 1536,
 			false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.COLOR_PROGRAM)
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.cull(RenderLayer.DISABLE_CULLING)
-				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST).build(false));
+			RenderType.CompositeState.builder()
+				.setShaderState(RenderType.POSITION_COLOR_SHADER)
+				.setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+				.setCullState(RenderType.NO_CULL)
+				.setDepthTestState(RenderType.NO_DEPTH_TEST)
+				.createCompositeState(false));
 	
 	/**
 	 * Returns either {@link #QUADS} or {@link #ESP_QUADS} depending on the
@@ -201,7 +213,7 @@ public enum WurstRenderLayers
 	 *          drawn with depth test set to LEQUALS (only visible if not
 	 *          obstructed).
 	 */
-	public static RenderLayer getQuads(boolean depthTest)
+	public static RenderType getQuads(boolean depthTest)
 	{
 		return depthTest ? QUADS : ESP_QUADS;
 	}
@@ -217,7 +229,7 @@ public enum WurstRenderLayers
 	 *          drawn with depth test set to LEQUALS (only visible if not
 	 *          obstructed).
 	 */
-	public static RenderLayer getLines(boolean depthTest)
+	public static RenderType getLines(boolean depthTest)
 	{
 		return depthTest ? LINES : ESP_LINES;
 	}
@@ -233,7 +245,7 @@ public enum WurstRenderLayers
 	 *          drawn with depth test set to LEQUALS (only visible if not
 	 *          obstructed).
 	 */
-	public static RenderLayer getLineStrip(boolean depthTest)
+	public static RenderType getLineStrip(boolean depthTest)
 	{
 		return depthTest ? LINE_STRIP : ESP_LINE_STRIP;
 	}

@@ -15,19 +15,19 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.BlockModelRenderer;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.hacks.XRayHack;
 
-@Mixin(BlockModelRenderer.class)
-public abstract class BlockModelRendererMixin implements ItemConvertible
+@Mixin(ModelBlockRenderer.class)
+public abstract class BlockModelRendererMixin implements ItemLike
 {
 	private static ThreadLocal<Float> currentOpacity =
 		ThreadLocal.withInitial(() -> 1F);
@@ -38,12 +38,12 @@ public abstract class BlockModelRendererMixin implements ItemConvertible
 	 * seeing a piston retract.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/block/Block;shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/BlockPos;)Z"),
+		target = "Lnet/minecraft/world/level/block/Block;shouldRenderFace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos;)Z"),
 		method = {
-			"renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V",
-			"renderFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V"})
+			"tesselateWithAO(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZLnet/minecraft/util/RandomSource;JI)V",
+			"tesselateWithoutAO(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZLnet/minecraft/util/RandomSource;JI)V"})
 	private static boolean onRenderSmoothOrFlat(BlockState state,
-		BlockView world, BlockPos pos, Direction side, BlockPos otherPos,
+		BlockGetter world, BlockPos pos, Direction side, BlockPos otherPos,
 		Operation<Boolean> original)
 	{
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
@@ -66,7 +66,7 @@ public abstract class BlockModelRendererMixin implements ItemConvertible
 	 * coloring and shading is done, if neither Sodium nor Indigo are running.
 	 */
 	@ModifyConstant(
-		method = "renderQuad(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/util/math/MatrixStack$Entry;Lnet/minecraft/client/render/model/BakedQuad;FFFFIIIII)V",
+		method = "putQuadData(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;FFFFIIIII)V",
 		constant = @Constant(floatValue = 1F))
 	private float modifyOpacity(float original)
 	{

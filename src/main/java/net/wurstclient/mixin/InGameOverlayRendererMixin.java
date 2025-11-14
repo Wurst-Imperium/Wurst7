@@ -14,16 +14,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.InGameOverlayRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.wurstclient.WurstClient;
 
-@Mixin(InGameOverlayRenderer.class)
+@Mixin(ScreenEffectRenderer.class)
 public class InGameOverlayRendererMixin
 {
 	@ModifyConstant(
-		method = "renderFireOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V",
+		method = "renderFire(Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
 		constant = @Constant(floatValue = -0.3F))
 	private static float getFireOffset(float original)
 	{
@@ -32,10 +33,10 @@ public class InGameOverlayRendererMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "renderUnderwaterOverlay(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;)V",
+		method = "renderWater(Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
 		cancellable = true)
-	private static void onRenderUnderwaterOverlay(MinecraftClient client,
-		MatrixStack matrices, CallbackInfo ci)
+	private static void onRenderUnderwaterOverlay(Minecraft client,
+		PoseStack matrices, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
 			ci.cancel();

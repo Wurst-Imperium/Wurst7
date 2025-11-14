@@ -16,23 +16,23 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.network.Address;
-import net.minecraft.client.network.AddressResolver;
-import net.minecraft.client.network.AllowedAddressResolver;
-import net.minecraft.client.network.RedirectResolver;
-import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.multiplayer.resolver.ResolvedServerAddress;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
+import net.minecraft.client.multiplayer.resolver.ServerAddressResolver;
+import net.minecraft.client.multiplayer.resolver.ServerNameResolver;
+import net.minecraft.client.multiplayer.resolver.ServerRedirectHandler;
 import net.wurstclient.WurstClient;
 
-@Mixin(AllowedAddressResolver.class)
+@Mixin(ServerNameResolver.class)
 public class AllowedAddressResolverMixin
 {
 	@Shadow
 	@Final
-	private AddressResolver addressResolver;
+	private ServerAddressResolver resolver;
 	
 	@Shadow
 	@Final
-	private RedirectResolver redirectResolver;
+	private ServerRedirectHandler redirectHandler;
 	
 	/**
 	 * This mixin allows users to connect to servers that have been shadowbanned
@@ -40,20 +40,21 @@ public class AllowedAddressResolverMixin
 	 * adult-oriented" for having pixelated guns.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "resolve(Lnet/minecraft/client/network/ServerAddress;)Ljava/util/Optional;",
+		method = "resolveAddress(Lnet/minecraft/client/multiplayer/resolver/ServerAddress;)Ljava/util/Optional;",
 		cancellable = true)
 	public void resolve(ServerAddress address,
-		CallbackInfoReturnable<Optional<Address>> cir)
+		CallbackInfoReturnable<Optional<ResolvedServerAddress>> cir)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		Optional<Address> optionalAddress = addressResolver.resolve(address);
+		Optional<ResolvedServerAddress> optionalAddress =
+			resolver.resolve(address);
 		Optional<ServerAddress> optionalRedirect =
-			redirectResolver.lookupRedirect(address);
+			redirectHandler.lookupRedirect(address);
 		
 		if(optionalRedirect.isPresent())
-			optionalAddress = addressResolver.resolve(optionalRedirect.get());
+			optionalAddress = resolver.resolve(optionalRedirect.get());
 		
 		cir.setReturnValue(optionalAddress);
 	}

@@ -13,17 +13,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.wurstclient.WurstClient;
 
-@Mixin(StatusEffectInstance.class)
+@Mixin(MobEffectInstance.class)
 public abstract class StatusEffectInstanceMixin
-	implements Comparable<StatusEffectInstance>
+	implements Comparable<MobEffectInstance>
 {
 	@Shadow
 	private int duration;
 	
-	@Inject(at = @At("HEAD"), method = "updateDuration()I", cancellable = true)
+	@Inject(at = @At("HEAD"),
+		method = "tickDownDuration()I",
+		cancellable = true)
 	private void onUpdateDuration(CallbackInfoReturnable<Integer> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().potionSaverHack.isFrozen())

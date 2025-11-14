@@ -7,12 +7,12 @@
  */
 package net.wurstclient.options;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 
 public final class KeybindEditorScreen extends Screen
@@ -24,11 +24,11 @@ public final class KeybindEditorScreen extends Screen
 	private final String oldKey;
 	private final String oldCommands;
 	
-	private TextFieldWidget commandField;
+	private EditBox commandField;
 	
 	public KeybindEditorScreen(Screen prevScreen)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.prevScreen = prevScreen;
 		
 		key = "NONE";
@@ -38,7 +38,7 @@ public final class KeybindEditorScreen extends Screen
 	
 	public KeybindEditorScreen(Screen prevScreen, String key, String commands)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.prevScreen = prevScreen;
 		
 		this.key = key;
@@ -49,27 +49,29 @@ public final class KeybindEditorScreen extends Screen
 	@Override
 	public void init()
 	{
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Change Key"),
-				b -> client.setScreen(new PressAKeyScreen(this)))
-			.dimensions(width / 2 - 100, 60, 200, 20).build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Change Key"),
+				b -> minecraft.setScreen(new PressAKeyScreen(this)))
+			.bounds(width / 2 - 100, 60, 200, 20).build());
 		
-		addDrawableChild(ButtonWidget.builder(Text.literal("Save"), b -> save())
-			.dimensions(width / 2 - 100, height / 4 + 72, 200, 20).build());
+		addRenderableWidget(
+			Button.builder(Component.literal("Save"), b -> save())
+				.bounds(width / 2 - 100, height / 4 + 72, 200, 20).build());
 		
-		addDrawableChild(ButtonWidget
-			.builder(Text.literal("Cancel"), b -> client.setScreen(prevScreen))
-			.dimensions(width / 2 - 100, height / 4 + 96, 200, 20).build());
+		addRenderableWidget(Button
+			.builder(Component.literal("Cancel"),
+				b -> minecraft.setScreen(prevScreen))
+			.bounds(width / 2 - 100, height / 4 + 96, 200, 20).build());
 		
-		commandField = new TextFieldWidget(textRenderer, width / 2 - 100, 100,
-			200, 20, Text.literal(""));
+		commandField = new EditBox(font, width / 2 - 100, 100, 200, 20,
+			Component.literal(""));
 		commandField.setMaxLength(65536);
-		addSelectableChild(commandField);
+		addWidget(commandField);
 		setFocused(commandField);
 		commandField.setFocused(true);
 		
 		if(oldCommands != null)
-			commandField.setText(oldCommands);
+			commandField.setValue(oldCommands);
 	}
 	
 	private void save()
@@ -77,8 +79,8 @@ public final class KeybindEditorScreen extends Screen
 		if(oldKey != null)
 			WurstClient.INSTANCE.getKeybinds().remove(oldKey);
 		
-		WurstClient.INSTANCE.getKeybinds().add(key, commandField.getText());
-		client.setScreen(prevScreen);
+		WurstClient.INSTANCE.getKeybinds().add(key, commandField.getValue());
+		minecraft.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -89,31 +91,30 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		renderBackground(context, mouseX, mouseY, partialTicks);
 		
-		context.drawCenteredTextWithShadow(textRenderer,
+		context.drawCenteredString(font,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			0xffffff);
 		
-		context.drawTextWithShadow(textRenderer,
-			"Key: " + key.replace("key.keyboard.", ""), width / 2 - 100, 47,
-			0xa0a0a0);
-		context.drawTextWithShadow(textRenderer, "Commands (separated by ';')",
-			width / 2 - 100, 87, 0xa0a0a0);
+		context.drawString(font, "Key: " + key.replace("key.keyboard.", ""),
+			width / 2 - 100, 47, 0xa0a0a0);
+		context.drawString(font, "Commands (separated by ';')", width / 2 - 100,
+			87, 0xa0a0a0);
 		
 		commandField.render(context, mouseX, mouseY, partialTicks);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public void close()
+	public void onClose()
 	{
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 	
 	@Override

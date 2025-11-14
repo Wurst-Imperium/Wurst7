@@ -13,7 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.keybinds.PossibleKeybind;
 import net.wurstclient.mixinterface.IMinecraftClient;
@@ -24,7 +24,7 @@ public abstract class Feature
 {
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
 	protected static final EventManager EVENTS = WURST.getEventManager();
-	protected static final MinecraftClient MC = WurstClient.MC;
+	protected static final Minecraft MC = WurstClient.MC;
 	protected static final IMinecraftClient IMC = WurstClient.IMC;
 	
 	private final LinkedHashMap<String, Setting> settings =

@@ -12,7 +12,7 @@ import static net.wurstclient.test.WurstClientTestHelper.*;
 import java.time.Duration;
 import java.util.function.Predicate;
 
-import net.minecraft.client.option.Perspective;
+import net.minecraft.client.CameraType;
 
 public enum NoFallHackTest
 {
@@ -21,7 +21,7 @@ public enum NoFallHackTest
 	public static void testNoFallHack()
 	{
 		System.out.println("Testing NoFall hack");
-		setPerspective(Perspective.THIRD_PERSON_BACK);
+		setPerspective(CameraType.THIRD_PERSON_BACK);
 		runChatCommand("gamemode survival");
 		assertOnGround();
 		assertPlayerHealth(health -> health == 20);
@@ -30,7 +30,7 @@ public enum NoFallHackTest
 		runWurstCommand("t NoFall on");
 		runChatCommand("tp ~ ~10 ~");
 		waitForWorldTicks(5);
-		waitUntil("player is on ground", mc -> mc.player.isOnGround());
+		waitUntil("player is on ground", mc -> mc.player.onGround());
 		waitForWorldTicks(5);
 		takeScreenshot("nofall_on_10_blocks", Duration.ZERO);
 		assertPlayerHealth(health -> health == 20);
@@ -39,7 +39,7 @@ public enum NoFallHackTest
 		runWurstCommand("t NoFall off");
 		runChatCommand("tp ~ ~10 ~");
 		waitForWorldTicks(5);
-		waitUntil("player is on ground", mc -> mc.player.isOnGround());
+		waitUntil("player is on ground", mc -> mc.player.onGround());
 		waitForWorldTicks(5);
 		takeScreenshot("nofall_off_10_blocks", Duration.ZERO);
 		assertPlayerHealth(health -> Math.abs(health - 13) <= 1);
@@ -47,12 +47,12 @@ public enum NoFallHackTest
 		// Clean up
 		submitAndWait(mc -> mc.player.heal(20));
 		runChatCommand("gamemode creative");
-		setPerspective(Perspective.FIRST_PERSON);
+		setPerspective(CameraType.FIRST_PERSON);
 	}
 	
 	private static void assertOnGround()
 	{
-		if(!submitAndGet(mc -> mc.player.isOnGround()))
+		if(!submitAndGet(mc -> mc.player.onGround()))
 			throw new RuntimeException("Player is not on ground");
 	}
 	
