@@ -7,12 +7,12 @@
  */
 package net.wurstclient.hacks.autofarm.plants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
@@ -23,19 +23,17 @@ public final class WeepingVinesPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean isReplantingSpot(BlockPos pos, BlockState state)
 	{
-		return (state.isOf(Blocks.WEEPING_VINES)
-			|| state.isOf(Blocks.WEEPING_VINES_PLANT))
-			&& hasPlantingSurface(pos);
+		return (state.is(Blocks.WEEPING_VINES)
+			|| state.is(Blocks.WEEPING_VINES_PLANT)) && hasPlantingSurface(pos);
 	}
 	
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		BlockState ceiling = BlockUtils.getState(pos.up());
-		return !ceiling.isOf(Blocks.WEEPING_VINES)
-			&& !ceiling.isOf(Blocks.WEEPING_VINES_PLANT)
-			&& ceiling.isSideSolidFullSquare(WurstClient.MC.world, pos,
-				Direction.DOWN);
+		BlockState ceiling = BlockUtils.getState(pos.above());
+		return !ceiling.is(Blocks.WEEPING_VINES)
+			&& !ceiling.is(Blocks.WEEPING_VINES_PLANT)
+			&& ceiling.isFaceSturdy(WurstClient.MC.level, pos, Direction.DOWN);
 	}
 	
 	@Override
@@ -47,8 +45,8 @@ public final class WeepingVinesPlantType extends AutoFarmPlantType
 	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
-		return (state.isOf(Blocks.WEEPING_VINES)
-			|| state.isOf(Blocks.WEEPING_VINES_PLANT))
+		return (state.is(Blocks.WEEPING_VINES)
+			|| state.is(Blocks.WEEPING_VINES_PLANT))
 			&& !isReplantingSpot(pos, state);
 	}
 	

@@ -9,11 +9,11 @@ package net.wurstclient.hacks.nukers;
 
 import java.util.stream.Stream;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.WurstClient;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.hacks.nukers.NukerModeSetting.NukerMode;
@@ -25,7 +25,7 @@ import net.wurstclient.util.BlockUtils;
 
 public final class CommonNukerSettings implements LeftClickListener
 {
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	private final NukerShapeSetting shape = new NukerShapeSetting();
 	
@@ -106,7 +106,7 @@ public final class CommonNukerSettings implements LeftClickListener
 		if(lockId.isChecked() || mode.getSelected() != NukerMode.ID)
 			return;
 		
-		if(!(MC.crosshairTarget instanceof BlockHitResult bHitResult)
+		if(!(MC.hitResult instanceof BlockHitResult bHitResult)
 			|| bHitResult.getType() != HitResult.Type.BLOCK)
 			return;
 		

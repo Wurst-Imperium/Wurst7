@@ -10,21 +10,21 @@ package net.wurstclient.util;
 import java.util.List;
 import java.util.StringJoiner;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.client.GuiMessage;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
 import net.wurstclient.WurstClient;
 
 public enum ChatUtils
 {
 	;
 	
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	
 	public static final String WURST_PREFIX =
 		"\u00a7c[\u00a76Wurst\u00a7c]\u00a7r ";
@@ -42,19 +42,19 @@ public enum ChatUtils
 		ChatUtils.enabled = enabled;
 	}
 	
-	public static void component(Text component)
+	public static void component(Component component)
 	{
 		if(!enabled)
 			return;
 		
-		ChatHud chatHud = MC.inGameHud.getChatHud();
-		MutableText prefix = Text.literal(WURST_PREFIX);
+		ChatComponent chatHud = MC.gui.getChat();
+		MutableComponent prefix = Component.literal(WURST_PREFIX);
 		chatHud.addMessage(prefix.append(component));
 	}
 	
 	public static void message(String message)
 	{
-		component(Text.literal(message));
+		component(Component.literal(message));
 	}
 	
 	public static void warning(String message)
@@ -72,12 +72,12 @@ public enum ChatUtils
 		message(SYNTAX_ERROR_PREFIX + message);
 	}
 	
-	public static String getAsString(ChatHudLine.Visible visible)
+	public static String getAsString(GuiMessage.Line visible)
 	{
 		return getAsString(visible.content());
 	}
 	
-	public static String getAsString(OrderedText text)
+	public static String getAsString(FormattedCharSequence text)
 	{
 		JustGiveMeTheStringVisitor visitor = new JustGiveMeTheStringVisitor();
 		text.accept(visitor);
@@ -91,11 +91,11 @@ public enum ChatUtils
 	
 	public static final String wrapText(String text, int width, Style style)
 	{
-		List<StringVisitable> lines = MC.textRenderer.getTextHandler()
-			.wrapLines(text, width, Style.EMPTY);
+		List<FormattedText> lines =
+			MC.font.getSplitter().splitLines(text, width, Style.EMPTY);
 		
 		StringJoiner joiner = new StringJoiner("\n");
-		lines.stream().map(StringVisitable::getString)
+		lines.stream().map(FormattedText::getString)
 			.forEach(s -> joiner.add(s));
 		
 		return joiner.toString();

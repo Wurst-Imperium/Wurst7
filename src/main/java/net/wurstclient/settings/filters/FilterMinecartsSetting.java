@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 
 public final class FilterMinecartsSetting extends EntityFilterCheckbox
 {
@@ -20,6 +20,6 @@ public final class FilterMinecartsSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof AbstractMinecartEntity);
+		return !(e instanceof AbstractMinecart);
 	}
 }

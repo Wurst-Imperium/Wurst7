@@ -7,10 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.PositionAndOnGround;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Items;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
@@ -59,13 +59,13 @@ public final class CriticalsHack extends Hack
 			return;
 		
 		if(WURST.getHax().maceDmgHack.isEnabled()
-			&& MC.player.getMainHandStack().isOf(Items.MACE))
+			&& MC.player.getMainHandItem().is(Items.MACE))
 			return;
 		
-		if(!MC.player.isOnGround())
+		if(!MC.player.onGround())
 			return;
 		
-		if(MC.player.isTouchingWater() || MC.player.isInLava())
+		if(MC.player.isInWater() || MC.player.isInLava())
 			return;
 		
 		switch(mode.getSelected())
@@ -94,21 +94,21 @@ public final class CriticalsHack extends Hack
 	
 	private void sendFakeY(double offset, boolean onGround)
 	{
-		MC.player.networkHandler.sendPacket(
-			new PositionAndOnGround(MC.player.getX(), MC.player.getY() + offset,
+		MC.player.connection
+			.send(new Pos(MC.player.getX(), MC.player.getY() + offset,
 				MC.player.getZ(), onGround, MC.player.horizontalCollision));
 	}
 	
 	private void doMiniJump()
 	{
-		MC.player.addVelocity(0, 0.1, 0);
+		MC.player.push(0, 0.1, 0);
 		MC.player.fallDistance = 0.1F;
 		MC.player.setOnGround(false);
 	}
 	
 	private void doFullJump()
 	{
-		MC.player.jump();
+		MC.player.jumpFromGround();
 	}
 	
 	private enum Mode

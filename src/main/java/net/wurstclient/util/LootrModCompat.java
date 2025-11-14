@@ -7,7 +7,7 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * Detects block entities from the Lootr mod for use in ChestESP.

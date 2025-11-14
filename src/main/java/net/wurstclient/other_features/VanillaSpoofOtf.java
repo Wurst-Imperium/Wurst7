@@ -7,8 +7,8 @@
  */
 package net.wurstclient.other_features;
 
-import net.minecraft.network.packet.BrandCustomPayload;
-import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ConnectionPacketOutputListener;
@@ -39,13 +39,14 @@ public final class VanillaSpoofOtf extends OtherFeature
 		if(!spoof.isChecked())
 			return;
 		
-		if(!(event.getPacket() instanceof CustomPayloadC2SPacket packet))
+		if(!(event
+			.getPacket() instanceof ServerboundCustomPayloadPacket packet))
 			return;
 		
 		// change client brand "fabric" back to "vanilla"
-		if(packet.payload() instanceof BrandCustomPayload)
-			event.setPacket(
-				new CustomPayloadC2SPacket(new BrandCustomPayload("vanilla")));
+		if(packet.payload() instanceof BrandPayload)
+			event.setPacket(new ServerboundCustomPayloadPacket(
+				new BrandPayload("vanilla")));
 			
 		// cancel Fabric's "c:version", "c:register" and
 		// "fabric:custom_ingredient_sync" packets

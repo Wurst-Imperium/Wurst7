@@ -9,7 +9,7 @@ package net.wurstclient.settings;
 
 import java.util.function.Consumer;
 
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.util.RotationUtils;
@@ -65,7 +65,7 @@ public final class FaceTargetSetting
 			+ hack.getName().toLowerCase() + ".face_target");
 	}
 	
-	public void face(Vec3d v)
+	public void face(Vec3 v)
 	{
 		getSelected().face(v);
 	}
@@ -102,9 +102,9 @@ public final class FaceTargetSetting
 		
 		private final String name;
 		private final WText description;
-		private final Consumer<Vec3d> face;
+		private final Consumer<Vec3> face;
 		
-		private FaceTarget(String name, Consumer<Vec3d> face)
+		private FaceTarget(String name, Consumer<Vec3> face)
 		{
 			this.name = name;
 			description =
@@ -112,7 +112,7 @@ public final class FaceTargetSetting
 			this.face = face;
 		}
 		
-		public void face(Vec3d v)
+		public void face(Vec3 v)
 		{
 			face.accept(v);
 		}

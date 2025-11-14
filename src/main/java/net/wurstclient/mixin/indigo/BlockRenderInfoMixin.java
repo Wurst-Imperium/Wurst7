@@ -5,22 +5,25 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.indigo;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.fabricmc.fabric.impl.client.indigo.renderer.render.BlockRenderInfo;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
-@Mixin(value = BlockRenderInfo.class, remap = false)
+@Pseudo
+@Mixin(
+	targets = "net.fabricmc.fabric.impl.client.indigo.renderer.render.BlockRenderInfo",
+	remap = false)
 public abstract class BlockRenderInfoMixin
 {
 	@Shadow
@@ -32,7 +35,10 @@ public abstract class BlockRenderInfoMixin
 	 * This mixin hides and shows regular blocks when using X-Ray, if Indigo
 	 * is running and Sodium is not installed.
 	 */
-	@Inject(at = @At("HEAD"), method = "shouldDrawSide", cancellable = true)
+	@Inject(at = @At("HEAD"),
+		method = "shouldDrawSide",
+		require = 0,
+		cancellable = true)
 	private void onShouldDrawSide(Direction face,
 		CallbackInfoReturnable<Boolean> cir)
 	{

@@ -15,24 +15,24 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.input.AbstractInput;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
 
 public class CleanUpScreen extends Screen
 {
-	private MultiplayerScreen prevScreen;
-	private ButtonWidget cleanUpButton;
+	private JoinMultiplayerScreen prevScreen;
+	private Button cleanUpButton;
 	
 	private boolean removeAll;
 	private boolean cleanupFailed = true;
@@ -41,37 +41,39 @@ public class CleanUpScreen extends Screen
 	private boolean cleanupUnknown = true;
 	private boolean cleanupGriefMe;
 	
-	public CleanUpScreen(MultiplayerScreen prevScreen)
+	public CleanUpScreen(JoinMultiplayerScreen prevScreen)
 	{
-		super(Text.literal(""));
+		super(Component.literal(""));
 		this.prevScreen = prevScreen;
 	}
 	
 	@Override
 	public void init()
 	{
-		addDrawableChild(new CleanUpButton(width / 2 - 100,
-			height / 4 + 168 + 12, () -> "Cancel", "", b -> close()));
+		addRenderableWidget(new CleanUpButton(width / 2 - 100,
+			height / 4 + 168 + 12, () -> "Cancel", "", b -> onClose()));
 		
-		addDrawableChild(cleanUpButton = new CleanUpButton(width / 2 - 100,
+		addRenderableWidget(cleanUpButton = new CleanUpButton(width / 2 - 100,
 			height / 4 + 144 + 12, () -> "Clean Up",
 			"Start the Clean Up with the settings\n" + "you specified above.\n"
 				+ "It might look like the game is not\n"
 				+ "responding for a couple of seconds.",
 			b -> cleanUp()));
 		
-		addDrawableChild(
+		addRenderableWidget(
 			new CleanUpButton(width / 2 - 100, height / 4 - 24 + 12,
 				() -> "Unknown Hosts: " + removeOrKeep(cleanupUnknown),
 				"Servers that clearly don't exist.",
 				b -> cleanupUnknown = !cleanupUnknown));
 		
-		addDrawableChild(new CleanUpButton(width / 2 - 100, height / 4 + 0 + 12,
-			() -> "Outdated Servers: " + removeOrKeep(cleanupOutdated),
-			"Servers that run a different Minecraft\n" + "version than you.",
-			b -> cleanupOutdated = !cleanupOutdated));
+		addRenderableWidget(
+			new CleanUpButton(width / 2 - 100, height / 4 + 0 + 12,
+				() -> "Outdated Servers: " + removeOrKeep(cleanupOutdated),
+				"Servers that run a different Minecraft\n"
+					+ "version than you.",
+				b -> cleanupOutdated = !cleanupOutdated));
 		
-		addDrawableChild(
+		addRenderableWidget(
 			new CleanUpButton(width / 2 - 100, height / 4 + 24 + 12,
 				() -> "Failed Ping: " + removeOrKeep(cleanupFailed),
 				"All servers that failed the last ping.\n"
@@ -81,21 +83,21 @@ public class CleanUpScreen extends Screen
 					+ "all servers are done refreshing.",
 				b -> cleanupFailed = !cleanupFailed));
 		
-		addDrawableChild(
+		addRenderableWidget(
 			new CleanUpButton(width / 2 - 100, height / 4 + 48 + 12,
 				() -> "\"Grief me\" Servers: " + removeOrKeep(cleanupGriefMe),
 				"All servers where the name starts with \"Grief me\"\n"
 					+ "Useful for removing servers found by ServerFinder.",
 				b -> cleanupGriefMe = !cleanupGriefMe));
 		
-		addDrawableChild(
+		addRenderableWidget(
 			new CleanUpButton(width / 2 - 100, height / 4 + 72 + 12,
 				() -> "\u00a7cRemove all Servers: " + yesOrNo(removeAll),
 				"This will completely clear your server\n"
 					+ "list. \u00a7cUse with caution!\u00a7r",
 				b -> removeAll = !removeAll));
 		
-		addDrawableChild(
+		addRenderableWidget(
 			new CleanUpButton(width / 2 - 100, height / 4 + 96 + 12,
 				() -> "Rename all Servers: " + yesOrNo(cleanupRename),
 				"Renames your servers to \"Grief me #1\",\n"
@@ -115,26 +117,26 @@ public class CleanUpScreen extends Screen
 	
 	private void cleanUp()
 	{
-		for(int i = prevScreen.getServerList().size() - 1; i >= 0; i--)
+		for(int i = prevScreen.getServers().size() - 1; i >= 0; i--)
 		{
-			ServerInfo server = prevScreen.getServerList().get(i);
+			ServerData server = prevScreen.getServers().get(i);
 			
 			if(removeAll || shouldRemove(server))
-				prevScreen.getServerList().remove(server);
+				prevScreen.getServers().remove(server);
 		}
 		
 		if(cleanupRename)
-			for(int i = 0; i < prevScreen.getServerList().size(); i++)
+			for(int i = 0; i < prevScreen.getServers().size(); i++)
 			{
-				ServerInfo server = prevScreen.getServerList().get(i);
+				ServerData server = prevScreen.getServers().get(i);
 				server.name = "Grief me #" + (i + 1);
 			}
 		
 		saveServerList();
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 	
-	private boolean shouldRemove(ServerInfo server)
+	private boolean shouldRemove(ServerData server)
 	{
 		if(server == null)
 			return false;
@@ -154,45 +156,44 @@ public class CleanUpScreen extends Screen
 		return false;
 	}
 	
-	private boolean isUnknownHost(ServerInfo server)
+	private boolean isUnknownHost(ServerData server)
 	{
-		if(server.label == null)
+		if(server.motd == null)
 			return false;
 		
-		if(server.label.getString() == null)
+		if(server.motd.getString() == null)
 			return false;
 		
-		return server.label.getString()
-			.equals("\u00a74Can\'t resolve hostname");
+		return server.motd.getString().equals("\u00a74Can\'t resolve hostname");
 	}
 	
-	private boolean isSameProtocol(ServerInfo server)
+	private boolean isSameProtocol(ServerData server)
 	{
-		return server.protocolVersion == SharedConstants.getGameVersion()
+		return server.protocol == SharedConstants.getCurrentVersion()
 			.protocolVersion();
 	}
 	
-	private boolean isFailedPing(ServerInfo server)
+	private boolean isFailedPing(ServerData server)
 	{
 		return server.ping != -2L && server.ping < 0L;
 	}
 	
-	private boolean isGriefMeServer(ServerInfo server)
+	private boolean isGriefMeServer(ServerData server)
 	{
 		return server.name != null && server.name.startsWith("Grief me");
 	}
 	
 	private void saveServerList()
 	{
-		prevScreen.getServerList().saveFile();
+		prevScreen.getServers().save();
 		
-		MultiplayerServerListWidget listWidget = prevScreen.serverListWidget;
+		ServerSelectionList listWidget = prevScreen.serverSelectionList;
 		listWidget.setSelected(null);
-		listWidget.setServers(prevScreen.getServerList());
+		listWidget.updateOnlineServers(prevScreen.getServers());
 	}
 	
 	@Override
-	public boolean keyPressed(KeyInput context)
+	public boolean keyPressed(KeyEvent context)
 	{
 		if(context.key() == GLFW.GLFW_KEY_ENTER)
 			cleanUpButton.onPress(context);
@@ -201,11 +202,11 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public boolean mouseClicked(Click context, boolean doubleClick)
+	public boolean mouseClicked(MouseButtonEvent context, boolean doubleClick)
 	{
 		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
-			close();
+			onClose();
 			return true;
 		}
 		
@@ -213,27 +214,28 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		context.drawCenteredTextWithShadow(textRenderer, "Clean Up", width / 2,
-			20, Colors.WHITE);
-		context.drawCenteredTextWithShadow(textRenderer,
+		context.drawCenteredString(font, "Clean Up", width / 2, 20,
+			CommonColors.WHITE);
+		context.drawCenteredString(font,
 			"Please select the servers you want to remove:", width / 2, 36,
-			Colors.LIGHT_GRAY);
+			CommonColors.LIGHT_GRAY);
 		
-		for(Drawable drawable : drawables)
+		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);
 		
 		renderButtonTooltip(context, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(DrawContext context, int mouseX,
+	private void renderButtonTooltip(GuiGraphics context, int mouseX,
 		int mouseY)
 	{
-		for(ClickableWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getButtons(this))
 		{
-			if(!button.isSelected() || !(button instanceof CleanUpButton))
+			if(!button.isHoveredOrFocused()
+				|| !(button instanceof CleanUpButton))
 				continue;
 			
 			CleanUpButton cuButton = (CleanUpButton)button;
@@ -241,27 +243,28 @@ public class CleanUpScreen extends Screen
 			if(cuButton.tooltip.isEmpty())
 				continue;
 			
-			context.drawTooltip(textRenderer, cuButton.tooltip, mouseX, mouseY);
+			context.setComponentTooltipForNextFrame(font, cuButton.tooltip,
+				mouseX, mouseY);
 			break;
 		}
 	}
 	
 	@Override
-	public void close()
+	public void onClose()
 	{
-		client.setScreen(prevScreen);
+		minecraft.setScreen(prevScreen);
 	}
 	
-	private final class CleanUpButton extends ButtonWidget
+	private final class CleanUpButton extends Button
 	{
 		private final Supplier<String> messageSupplier;
-		private final List<Text> tooltip;
+		private final List<Component> tooltip;
 		
 		public CleanUpButton(int x, int y, Supplier<String> messageSupplier,
-			String tooltip, PressAction pressAction)
+			String tooltip, OnPress pressAction)
 		{
-			super(x, y, 200, 20, Text.literal(messageSupplier.get()),
-				pressAction, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
+			super(x, y, 200, 20, Component.literal(messageSupplier.get()),
+				pressAction, Button.DEFAULT_NARRATION);
 			this.messageSupplier = messageSupplier;
 			
 			if(tooltip.isEmpty())
@@ -270,19 +273,19 @@ public class CleanUpScreen extends Screen
 			{
 				String[] lines = tooltip.split("\n");
 				
-				Text[] lines2 = new Text[lines.length];
+				Component[] lines2 = new Component[lines.length];
 				for(int i = 0; i < lines.length; i++)
-					lines2[i] = Text.literal(lines[i]);
+					lines2[i] = Component.literal(lines[i]);
 				
 				this.tooltip = Arrays.asList(lines2);
 			}
 		}
 		
 		@Override
-		public void onPress(AbstractInput context)
+		public void onPress(InputWithModifiers context)
 		{
 			super.onPress(context);
-			setMessage(Text.literal(messageSupplier.get()));
+			setMessage(Component.literal(messageSupplier.get()));
 		}
 	}
 }

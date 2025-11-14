@@ -12,38 +12,37 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientCommonNetworkHandler;
-import net.minecraft.client.network.ClientConnectionState;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.listener.TickablePacketListener;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ChunkData;
-import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.CommonListenerCookie;
+import net.minecraft.network.Connection;
+import net.minecraft.network.TickablePacketListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import net.minecraft.network.protocol.game.ClientboundLoginPacket;
+import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.ChatUtils;
 
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(ClientPacketListener.class)
 public abstract class ClientPlayNetworkHandlerMixin
-	extends ClientCommonNetworkHandler
-	implements TickablePacketListener, ClientPlayPacketListener
+	extends ClientCommonPacketListenerImpl
+	implements TickablePacketListener, ClientGamePacketListener
 {
-	private ClientPlayNetworkHandlerMixin(WurstClient wurst,
-		MinecraftClient client, ClientConnection connection,
-		ClientConnectionState connectionState)
+	private ClientPlayNetworkHandlerMixin(WurstClient wurst, Minecraft client,
+		Connection connection, CommonListenerCookie connectionState)
 	{
 		super(client, connection, connectionState);
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "onGameJoin(Lnet/minecraft/network/packet/s2c/play/GameJoinS2CPacket;)V")
-	public void onOnGameJoin(GameJoinS2CPacket packet, CallbackInfo ci)
+		method = "handleLogin(Lnet/minecraft/network/protocol/game/ClientboundLoginPacket;)V")
+	public void onOnGameJoin(ClientboundLoginPacket packet, CallbackInfo ci)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
 		if(!wurst.isEnabled())
@@ -52,43 +51,45 @@ public abstract class ClientPlayNetworkHandlerMixin
 		// Remove Mojang's dishonest warning toast on safe servers
 		if(!packet.enforcesSecureChat())
 		{
-			client.getToastManager().toastQueue.removeIf(toast -> toast
-				.getType() == SystemToast.Type.UNSECURE_SERVER_WARNING);
+			minecraft.getToastManager().queued.removeIf(toast -> toast
+				.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING);
 			return;
 		}
 		
 		// Add an honest warning toast on unsafe servers
-		MutableText title = Text.literal(ChatUtils.WURST_PREFIX
+		MutableComponent title = Component.literal(ChatUtils.WURST_PREFIX
 			+ wurst.translate("toast.wurst.nochatreports.unsafe_server.title"));
-		MutableText message = Text.literal(
+		MutableComponent message = Component.literal(
 			wurst.translate("toast.wurst.nochatreports.unsafe_server.message"));
 		
-		SystemToast systemToast = SystemToast.create(client,
-			SystemToast.Type.UNSECURE_SERVER_WARNING, title, message);
-		client.getToastManager().add(systemToast);
+		SystemToast systemToast = SystemToast.multiline(minecraft,
+			SystemToast.SystemToastId.UNSECURE_SERVER_WARNING, title, message);
+		minecraft.getToastManager().addToast(systemToast);
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "loadChunk(IILnet/minecraft/network/packet/s2c/play/ChunkData;)V")
-	private void onLoadChunk(int x, int z, ChunkData chunkData, CallbackInfo ci)
+		method = "updateLevelChunk(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)V")
+	private void onLoadChunk(int x, int z,
+		ClientboundLevelChunkPacketData chunkData, CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getHax().newChunksHack.afterLoadChunk(x, z);
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "onBlockUpdate(Lnet/minecraft/network/packet/s2c/play/BlockUpdateS2CPacket;)V")
-	private void onOnBlockUpdate(BlockUpdateS2CPacket packet, CallbackInfo ci)
+		method = "handleBlockUpdate(Lnet/minecraft/network/protocol/game/ClientboundBlockUpdatePacket;)V")
+	private void onOnBlockUpdate(ClientboundBlockUpdatePacket packet,
+		CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getHax().newChunksHack
 			.afterUpdateBlock(packet.getPos());
 	}
 	
 	@Inject(at = @At("TAIL"),
-		method = "onChunkDeltaUpdate(Lnet/minecraft/network/packet/s2c/play/ChunkDeltaUpdateS2CPacket;)V")
-	private void onOnChunkDeltaUpdate(ChunkDeltaUpdateS2CPacket packet,
-		CallbackInfo ci)
+		method = "handleChunkBlocksUpdate(Lnet/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket;)V")
+	private void onOnChunkDeltaUpdate(
+		ClientboundSectionBlocksUpdatePacket packet, CallbackInfo ci)
 	{
-		packet.visitUpdates(
+		packet.runUpdates(
 			(pos, state) -> WurstClient.INSTANCE.getHax().newChunksHack
 				.afterUpdateBlock(pos));
 	}

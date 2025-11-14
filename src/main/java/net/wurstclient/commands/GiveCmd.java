@@ -11,12 +11,12 @@ import java.util.Arrays;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -42,7 +42,7 @@ public final class GiveCmd extends Command
 		if(args.length < 1)
 			throw new CmdSyntaxError();
 		
-		if(!MC.player.getAbilities().creativeMode)
+		if(!MC.player.getAbilities().instabuild)
 			throw new CmdError("Creative mode only.");
 		
 		// id/name
@@ -74,8 +74,8 @@ public final class GiveCmd extends Command
 		if(nbt != null)
 			try
 			{
-				NbtCompound tag = StringNbtReader.readCompound(nbt);
-				NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, tag);
+				CompoundTag tag = TagParser.parseCompoundFully(nbt);
+				CustomData.set(DataComponents.CUSTOM_DATA, stack, tag);
 				
 			}catch(CommandSyntaxException e)
 			{

@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.sodium;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -16,11 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
@@ -34,17 +34,18 @@ import net.wurstclient.hacks.XRayHack;
 @Pseudo
 @Mixin(targets = {
 	"net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.DefaultFluidRenderer"})
-public class SodiumDefaultFluidRendererMixin
+public class DefaultFluidRendererMixin
 {
 	/**
 	 * Hides and shows fluids when using X-Ray with Sodium installed.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "isFullBlockFluidOccluded(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/block/BlockState;Lnet/minecraft/fluid/FluidState;)Z",
+		method = "isFullBlockFluidOccluded(Lnet/minecraft/class_1920;Lnet/minecraft/class_2338;Lnet/minecraft/class_2350;Lnet/minecraft/class_2680;Lnet/minecraft/class_3610;)Z",
 		cancellable = true,
+		remap = false,
 		require = 0)
-	private void onIsFullBlockFluidOccluded(BlockRenderView world, BlockPos pos,
-		Direction dir, BlockState state, FluidState fluid,
+	private void onIsFullBlockFluidOccluded(BlockAndTintGetter world,
+		BlockPos pos, Direction dir, BlockState state, FluidState fluid,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
@@ -67,7 +68,7 @@ public class SodiumDefaultFluidRendererMixin
 	{
 		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
 		if(!xray.isOpacityMode()
-			|| xray.isVisible(state.getBlockState().getBlock(), pos))
+			|| xray.isVisible(state.createLegacyBlock().getBlock(), pos))
 			return original;
 		
 		return original & xray.getOpacityColorMask();

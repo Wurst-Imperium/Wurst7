@@ -7,9 +7,9 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.OnGroundOnly;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.StatusOnly;
+import net.minecraft.world.item.Items;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -37,14 +37,14 @@ public final class NoFallHack extends Hack implements UpdateListener
 	@Override
 	public String getRenderName()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		if(player == null)
 			return getName();
 		
-		if(player.isGliding() && !allowElytra.isChecked())
+		if(player.isFallFlying() && !allowElytra.isChecked())
 			return getName() + " (paused)";
 		
-		if(player.getAbilities().creativeMode)
+		if(player.getAbilities().instabuild)
 			return getName() + " (paused)";
 		
 		if(pauseForMace.isChecked() && isHoldingMace(player))
@@ -70,12 +70,12 @@ public final class NoFallHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// do nothing in creative mode, since there is no fall damage anyway
-		ClientPlayerEntity player = MC.player;
-		if(player.getAbilities().creativeMode)
+		LocalPlayer player = MC.player;
+		if(player.getAbilities().instabuild)
 			return;
 		
 		// pause when flying with elytra, unless allowed
-		boolean fallFlying = player.isGliding();
+		boolean fallFlying = player.isFallFlying();
 		if(fallFlying && !allowElytra.isChecked())
 			return;
 		
@@ -84,22 +84,22 @@ public final class NoFallHack extends Hack implements UpdateListener
 			return;
 		
 		// attempt to fix elytra weirdness, if allowed
-		if(fallFlying && player.isSneaking()
+		if(fallFlying && player.isShiftKeyDown()
 			&& !isFallingFastEnoughToCauseDamage(player))
 			return;
 		
 		// send packet to stop fall damage
-		player.networkHandler
-			.sendPacket(new OnGroundOnly(true, MC.player.horizontalCollision));
+		player.connection
+			.send(new StatusOnly(true, MC.player.horizontalCollision));
 	}
 	
-	private boolean isHoldingMace(ClientPlayerEntity player)
+	private boolean isHoldingMace(LocalPlayer player)
 	{
-		return player.getMainHandStack().isOf(Items.MACE);
+		return player.getMainHandItem().is(Items.MACE);
 	}
 	
-	private boolean isFallingFastEnoughToCauseDamage(ClientPlayerEntity player)
+	private boolean isFallingFastEnoughToCauseDamage(LocalPlayer player)
 	{
-		return player.getVelocity().y < -0.5;
+		return player.getDeltaMovement().y < -0.5;
 	}
 }

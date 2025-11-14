@@ -12,16 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.HeldItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.wurstclient.WurstClient;
 
-@Mixin(HeldItemRenderer.class)
+@Mixin(ItemInHandRenderer.class)
 public abstract class HeldItemRendererMixin
 {
 	/**
@@ -29,14 +30,14 @@ public abstract class HeldItemRendererMixin
 	 * switch.
 	 */
 	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/item/HeldItemRenderer;applyEquipOffset(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/Arm;F)V",
+		target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;applyItemArmTransform(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/entity/HumanoidArm;F)V",
 		ordinal = 3),
-		method = "renderFirstPersonItem(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/util/Hand;FLnet/minecraft/item/ItemStack;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;I)V")
-	private void onApplyEquipOffsetBlocking(AbstractClientPlayerEntity player,
-		float tickProgress, float pitch, Hand hand, float swingProgress,
-		ItemStack item, float equipProgress, MatrixStack matrices,
-		OrderedRenderCommandQueue entityRenderCommandQueue, int light,
-		CallbackInfo ci)
+		method = "renderArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V")
+	private void onApplyEquipOffsetBlocking(AbstractClientPlayer player,
+		float tickProgress, float pitch, InteractionHand hand,
+		float swingProgress, ItemStack item, float equipProgress,
+		PoseStack matrices, SubmitNodeCollector entityRenderCommandQueue,
+		int light, CallbackInfo ci)
 	{
 		// lower shield when blocking
 		if(item.getItem() == Items.SHIELD)
@@ -49,15 +50,14 @@ public abstract class HeldItemRendererMixin
 	 * renderFirstPersonItem(), right after `else if(player.isUsingRiptide())`.
 	 */
 	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/render/item/HeldItemRenderer;swingArm(FFLnet/minecraft/client/util/math/MatrixStack;ILnet/minecraft/util/Arm;)V",
+		target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;swingArm(FFLcom/mojang/blaze3d/vertex/PoseStack;ILnet/minecraft/world/entity/HumanoidArm;)V",
 		ordinal = 2),
-		method = "renderFirstPersonItem(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/util/Hand;FLnet/minecraft/item/ItemStack;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;I)V")
-	private void onApplySwingOffsetNotBlocking(
-		AbstractClientPlayerEntity player, float tickProgress, float pitch,
-		Hand hand, float swingProgress, ItemStack item, float equipProgress,
-		MatrixStack matrices,
-		OrderedRenderCommandQueue entityRenderCommandQueue, int light,
-		CallbackInfo ci)
+		method = "renderArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V")
+	private void onApplySwingOffsetNotBlocking(AbstractClientPlayer player,
+		float tickProgress, float pitch, InteractionHand hand,
+		float swingProgress, ItemStack item, float equipProgress,
+		PoseStack matrices, SubmitNodeCollector entityRenderCommandQueue,
+		int light, CallbackInfo ci)
 	{
 		// lower shield when not blocking
 		if(item.getItem() == Items.SHIELD)

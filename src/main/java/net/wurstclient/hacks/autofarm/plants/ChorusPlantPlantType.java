@@ -14,15 +14,15 @@ import java.util.Map.Entry;
 
 import com.google.common.collect.Maps;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ChorusFlowerBlock;
-import net.minecraft.block.ConnectingBlock;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChorusFlowerBlock;
+import net.minecraft.world.level.block.PipeBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
@@ -30,22 +30,21 @@ import net.wurstclient.util.BlockUtils;
 public final class ChorusPlantPlantType extends AutoFarmPlantType
 {
 	private static final EnumMap<Direction, BooleanProperty> CHORUS_GROWING_DIRECTIONS =
-		Maps.newEnumMap(Map.of(Direction.NORTH, ConnectingBlock.NORTH,
-			Direction.SOUTH, ConnectingBlock.SOUTH, Direction.WEST,
-			ConnectingBlock.WEST, Direction.EAST, ConnectingBlock.EAST,
-			Direction.UP, ConnectingBlock.UP));
+		Maps.newEnumMap(Map.of(Direction.NORTH, PipeBlock.NORTH,
+			Direction.SOUTH, PipeBlock.SOUTH, Direction.WEST, PipeBlock.WEST,
+			Direction.EAST, PipeBlock.EAST, Direction.UP, PipeBlock.UP));
 	
 	@Override
 	public final boolean isReplantingSpot(BlockPos pos, BlockState state)
 	{
-		return (state.isOf(Blocks.CHORUS_FLOWER)
-			|| state.isOf(Blocks.CHORUS_PLANT)) && hasPlantingSurface(pos);
+		return (state.is(Blocks.CHORUS_FLOWER) || state.is(Blocks.CHORUS_PLANT))
+			&& hasPlantingSurface(pos);
 	}
 	
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.down()).isOf(Blocks.END_STONE);
+		return BlockUtils.getState(pos.below()).is(Blocks.END_STONE);
 	}
 	
 	@Override
@@ -57,14 +56,20 @@ public final class ChorusPlantPlantType extends AutoFarmPlantType
 	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
-		if(state.isOf(Blocks.CHORUS_FLOWER)
-			&& state.get(ChorusFlowerBlock.AGE, 0) == ChorusFlowerBlock.MAX_AGE)
-			return true;
+		if(state.is(Blocks.CHORUS_FLOWER))
+			return isFlowerFullyGrown(pos, state);
 		
-		if(!state.isOf(Blocks.CHORUS_PLANT))
-			return false;
+		if(state.is(Blocks.CHORUS_PLANT))
+			return !hasAttachedFlowers(pos, state, new HashSet<>());
 		
-		return !hasAttachedFlowers(pos, state, new HashSet<>());
+		return false;
+	}
+	
+	private boolean isFlowerFullyGrown(BlockPos pos, BlockState state)
+	{
+		return state.getValueOrElse(ChorusFlowerBlock.AGE,
+			0) == ChorusFlowerBlock.DEAD_AGE
+			|| !BlockUtils.getState(pos.above()).isAir();
 	}
 	
 	private boolean hasAttachedFlowers(BlockPos pos, BlockState state,
@@ -81,23 +86,23 @@ public final class ChorusPlantPlantType extends AutoFarmPlantType
 		for(Entry<Direction, BooleanProperty> entry : CHORUS_GROWING_DIRECTIONS
 			.entrySet())
 		{
-			if(!state.get(entry.getValue(), false))
+			if(!state.getValueOrElse(entry.getValue(), false))
 				continue;
 			
 			Direction direction = entry.getKey();
-			BlockPos neighborPos = pos.offset(direction);
+			BlockPos neighborPos = pos.relative(direction);
 			BlockState neighborState = BlockUtils.getState(neighborPos);
-			if(neighborState.isOf(Blocks.CHORUS_FLOWER))
+			if(neighborState.is(Blocks.CHORUS_FLOWER))
 				return true;
 			
-			if(!neighborState.isOf(Blocks.CHORUS_PLANT))
+			if(!neighborState.is(Blocks.CHORUS_PLANT))
 				continue;
 				
 			// A horizontally adjacent neighbor that connects down is probably
 			// connected to the stem, so we can ignore any flowers that it
 			// supports.
 			if(direction.getAxis().isHorizontal()
-				&& neighborState.get(ConnectingBlock.DOWN, false))
+				&& neighborState.getValueOrElse(PipeBlock.DOWN, false))
 				continue;
 			
 			if(hasAttachedFlowers(neighborPos, neighborState, visited))

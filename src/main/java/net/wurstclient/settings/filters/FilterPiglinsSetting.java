@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.PiglinEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.piglin.Piglin;
 
 public final class FilterPiglinsSetting extends AttackDetectingEntityFilter
 {
@@ -30,13 +30,13 @@ public final class FilterPiglinsSetting extends AttackDetectingEntityFilter
 	@Override
 	public boolean onTest(Entity e)
 	{
-		return !(e instanceof PiglinEntity);
+		return !(e instanceof Piglin);
 	}
 	
 	@Override
 	public boolean ifCalmTest(Entity e)
 	{
-		return !(e instanceof PiglinEntity pe) || pe.isAttacking();
+		return !(e instanceof Piglin pe) || pe.isAggressive();
 	}
 	
 	public static FilterPiglinsSetting genericCombat(Mode selected)

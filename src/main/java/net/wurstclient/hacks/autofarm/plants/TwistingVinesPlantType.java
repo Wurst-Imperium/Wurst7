@@ -7,12 +7,12 @@
  */
 package net.wurstclient.hacks.autofarm.plants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
@@ -23,18 +23,18 @@ public final class TwistingVinesPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean isReplantingSpot(BlockPos pos, BlockState state)
 	{
-		return (state.isOf(Blocks.TWISTING_VINES)
-			|| state.isOf(Blocks.TWISTING_VINES_PLANT))
+		return (state.is(Blocks.TWISTING_VINES)
+			|| state.is(Blocks.TWISTING_VINES_PLANT))
 			&& hasPlantingSurface(pos);
 	}
 	
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		BlockState floor = BlockUtils.getState(pos.down());
-		return !floor.isOf(Blocks.TWISTING_VINES)
-			&& !floor.isOf(Blocks.TWISTING_VINES_PLANT) && floor
-				.isSideSolidFullSquare(WurstClient.MC.world, pos, Direction.UP);
+		BlockState floor = BlockUtils.getState(pos.below());
+		return !floor.is(Blocks.TWISTING_VINES)
+			&& !floor.is(Blocks.TWISTING_VINES_PLANT)
+			&& floor.isFaceSturdy(WurstClient.MC.level, pos, Direction.UP);
 	}
 	
 	@Override
@@ -46,8 +46,8 @@ public final class TwistingVinesPlantType extends AutoFarmPlantType
 	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
-		return (state.isOf(Blocks.TWISTING_VINES)
-			|| state.isOf(Blocks.TWISTING_VINES_PLANT))
+		return (state.is(Blocks.TWISTING_VINES)
+			|| state.is(Blocks.TWISTING_VINES_PLANT))
 			&& !isReplantingSpot(pos, state);
 	}
 	

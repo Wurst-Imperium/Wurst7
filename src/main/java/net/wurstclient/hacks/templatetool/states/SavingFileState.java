@@ -14,12 +14,12 @@ import java.io.PrintWriter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.hacks.TemplateToolHack;
 import net.wurstclient.hacks.templatetool.TemplateToolState;
 import net.wurstclient.util.BlockUtils;
@@ -54,11 +54,11 @@ public final class SavingFileState extends TemplateToolState
 		}
 		
 		// Show success message
-		MutableText message = Text.literal("Saved template as ");
+		MutableComponent message = Component.literal("Saved template as ");
 		ClickEvent event = new ClickEvent.OpenFile(
 			hack.getFile().getParentFile().getAbsolutePath());
-		MutableText link = Text.literal(hack.getFile().getName())
-			.styled(s -> s.withUnderline(true).withClickEvent(event));
+		MutableComponent link = Component.literal(hack.getFile().getName())
+			.withStyle(s -> s.withUnderlined(true).withClickEvent(event));
 		message.append(link);
 		ChatUtils.component(message);
 		
@@ -70,7 +70,7 @@ public final class SavingFileState extends TemplateToolState
 		JsonObject json = new JsonObject();
 		json.addProperty("version", 2);
 		
-		Direction front = MC.player.getHorizontalFacing();
+		Direction front = MC.player.getDirection();
 		BlockPos origin = hack.getOriginPos();
 		
 		JsonArray jsonBlocks = new JsonArray();
@@ -103,7 +103,7 @@ public final class SavingFileState extends TemplateToolState
 		JsonObject json = new JsonObject();
 		json.addProperty("version", 1);
 		
-		Direction front = MC.player.getHorizontalFacing();
+		Direction front = MC.player.getDirection();
 		BlockPos origin = hack.getOriginPos();
 		
 		JsonArray jsonBlocks = new JsonArray();
@@ -124,13 +124,13 @@ public final class SavingFileState extends TemplateToolState
 		Direction front)
 	{
 		BlockPos translated = pos.subtract(origin);
-		Direction left = front.rotateYCounterclockwise();
+		Direction left = front.getCounterClockWise();
 		
-		int leftDist = translated.getX() * left.getOffsetX()
-			+ translated.getZ() * left.getOffsetZ();
+		int leftDist = translated.getX() * left.getStepX()
+			+ translated.getZ() * left.getStepZ();
 		int upDist = translated.getY();
-		int frontDist = translated.getX() * front.getOffsetX()
-			+ translated.getZ() * front.getOffsetZ();
+		int frontDist = translated.getX() * front.getStepX()
+			+ translated.getZ() * front.getStepZ();
 		
 		return new BlockPos(leftDist, upDist, frontDist);
 	}

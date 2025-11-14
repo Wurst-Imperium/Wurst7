@@ -16,12 +16,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.screen.DisconnectedScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.network.DisconnectionInfo;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.screens.DisconnectedScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.DisconnectionDetails;
+import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoReconnectHack;
 import net.wurstclient.nochatreports.ForcedChatReportsScreen;
@@ -32,19 +32,19 @@ import net.wurstclient.util.LastServerRememberer;
 public class DisconnectedScreenMixin extends Screen
 {
 	private int autoReconnectTimer;
-	private ButtonWidget autoReconnectButton;
+	private Button autoReconnectButton;
 	
 	@Shadow
 	@Final
-	private DisconnectionInfo info;
+	private DisconnectionDetails details;
 	@Shadow
 	@Final
 	private Screen parent;
 	@Shadow
 	@Final
-	private DirectionalLayoutWidget grid;
+	private LinearLayout layout;
 	
-	private DisconnectedScreenMixin(WurstClient wurst, Text title)
+	private DisconnectedScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}
@@ -55,18 +55,18 @@ public class DisconnectedScreenMixin extends Screen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		Text reason = info.reason();
+		Component reason = details.reason();
 		System.out.println("Disconnected: " + reason);
 		
 		if(ForcedChatReportsScreen.isCausedByNoChatReports(reason))
 		{
-			client.setScreen(new ForcedChatReportsScreen(parent));
+			minecraft.setScreen(new ForcedChatReportsScreen(parent));
 			return;
 		}
 		
 		if(NcrModRequiredScreen.isCausedByLackOfNCR(reason))
 		{
-			client.setScreen(new NcrModRequiredScreen(parent));
+			minecraft.setScreen(new NcrModRequiredScreen(parent));
 			return;
 		}
 		
@@ -75,18 +75,18 @@ public class DisconnectedScreenMixin extends Screen
 	
 	private void addReconnectButtons()
 	{
-		ButtonWidget reconnectButton = grid.add(ButtonWidget
-			.builder(Text.literal("Reconnect"),
+		Button reconnectButton = layout.addChild(Button
+			.builder(Component.literal("Reconnect"),
 				b -> LastServerRememberer.reconnect(parent))
 			.width(200).build());
 		
-		autoReconnectButton = grid.add(ButtonWidget
-			.builder(Text.literal("AutoReconnect"), b -> pressAutoReconnect())
-			.width(200).build());
+		autoReconnectButton =
+			layout.addChild(Button.builder(Component.literal("AutoReconnect"),
+				b -> pressAutoReconnect()).width(200).build());
 		
-		grid.refreshPositions();
+		layout.arrangeElements();
 		Stream.of(reconnectButton, autoReconnectButton)
-			.forEach(this::addDrawableChild);
+			.forEach(this::addRenderableWidget);
 		
 		AutoReconnectHack autoReconnect =
 			WurstClient.INSTANCE.getHax().autoReconnectHack;
@@ -117,11 +117,11 @@ public class DisconnectedScreenMixin extends Screen
 		
 		if(!autoReconnect.isEnabled())
 		{
-			autoReconnectButton.setMessage(Text.literal("AutoReconnect"));
+			autoReconnectButton.setMessage(Component.literal("AutoReconnect"));
 			return;
 		}
 		
-		autoReconnectButton.setMessage(Text.literal("AutoReconnect ("
+		autoReconnectButton.setMessage(Component.literal("AutoReconnect ("
 			+ (int)Math.ceil(autoReconnectTimer / 20.0) + ")"));
 		
 		if(autoReconnectTimer > 0)

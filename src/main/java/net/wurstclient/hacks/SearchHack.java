@@ -14,12 +14,12 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
-import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstRenderLayers;
@@ -170,19 +170,19 @@ public final class SearchHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		if(vertexBuffer == null || bufferRegion == null)
 			return;
 		
-		matrixStack.push();
+		matrixStack.pushPose();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, bufferRegion);
 		
 		float[] rainbow = RenderUtils.getRainbowColor();
 		vertexBuffer.draw(matrixStack, WurstRenderLayers.ESP_QUADS, rainbow,
 			0.5F);
 		
-		matrixStack.pop();
+		matrixStack.popPose();
 	}
 	
 	private void stopBuildingBuffer()
@@ -200,9 +200,9 @@ public final class SearchHack extends Hack
 	
 	private void startGetMatchingBlocksTask()
 	{
-		BlockPos eyesPos = BlockPos.ofFloored(RotationUtils.getEyesPos());
+		BlockPos eyesPos = BlockPos.containing(RotationUtils.getEyesPos());
 		Comparator<BlockPos> comparator =
-			Comparator.comparingInt(pos -> eyesPos.getManhattanDistance(pos));
+			Comparator.comparingInt(pos -> eyesPos.distManhattan(pos));
 		
 		getMatchingBlocksTask = forkJoinPool.submit(() -> coordinator
 			.getMatches().parallel().map(ChunkSearcher.Result::pos)
@@ -236,11 +236,11 @@ public final class SearchHack extends Hack
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		
-		vertexBuffer = EasyVertexBuffer.createAndUpload(DrawMode.QUADS,
-			VertexFormats.POSITION_COLOR, buffer -> {
+		vertexBuffer = EasyVertexBuffer.createAndUpload(Mode.QUADS,
+			DefaultVertexFormat.POSITION_COLOR, buffer -> {
 				for(int[] vertex : vertices)
-					buffer.vertex(vertex[0] - region.x(), vertex[1],
-						vertex[2] - region.z()).color(0xFFFFFFFF);
+					buffer.addVertex(vertex[0] - region.x(), vertex[1],
+						vertex[2] - region.z()).setColor(0xFFFFFFFF);
 			});
 		
 		bufferUpToDate = true;

@@ -32,6 +32,6 @@ public final class KeybindManagerOtf extends OtherFeature
 	@Override
 	public void doPrimaryAction()
 	{
-		MC.setScreen(new KeybindManagerScreen(MC.currentScreen));
+		MC.setScreen(new KeybindManagerScreen(MC.screen));
 	}
 }

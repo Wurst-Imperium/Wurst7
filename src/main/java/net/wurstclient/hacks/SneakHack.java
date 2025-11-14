@@ -63,7 +63,7 @@ public final class SneakHack extends Hack
 		switch(mode.getSelected())
 		{
 			case LEGIT:
-			IKeyBinding.get(MC.options.sneakKey).resetPressedState();
+			IKeyBinding.get(MC.options.keyShift).resetPressedState();
 			break;
 			
 			case PACKET:
@@ -75,7 +75,7 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPreMotion()
 	{
-		IKeyBinding sneakKey = IKeyBinding.get(MC.options.sneakKey);
+		IKeyBinding sneakKey = IKeyBinding.get(MC.options.keyShift);
 		
 		switch(mode.getSelected())
 		{
@@ -83,7 +83,7 @@ public final class SneakHack extends Hack
 			if(offWhileFlying.isChecked() && isFlying())
 				sneakKey.resetPressedState();
 			else
-				sneakKey.setPressed(true);
+				sneakKey.setDown(true);
 			break;
 			
 			case PACKET:

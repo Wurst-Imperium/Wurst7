@@ -9,11 +9,12 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
@@ -23,8 +24,8 @@ import net.wurstclient.util.RenderUtils;
 @SearchTags({"prophunt esp"})
 public final class ProphuntEspHack extends Hack implements RenderListener
 {
-	private static final Box FAKE_BLOCK_BOX =
-		new Box(-0.5, 0, -0.5, 0.5, 1, 0.5);
+	private static final AABB FAKE_BLOCK_BOX =
+		new AABB(-0.5, 0, -0.5, 0.5, 1, 0.5);
 	
 	public ProphuntEspHack()
 	{
@@ -45,27 +46,27 @@ public final class ProphuntEspHack extends Hack implements RenderListener
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		// set color
-		float alpha = 0.5F + 0.25F * MathHelper
-			.sin(System.currentTimeMillis() % 1000 / 500F * MathHelper.PI);
+		float alpha = 0.5F + 0.25F
+			* Mth.sin(System.currentTimeMillis() % 1000 / 500F * Mth.PI);
 		int color = RenderUtils.toIntColor(new float[]{1, 0, 0}, alpha);
 		
 		// draw boxes
-		ArrayList<Box> boxes = new ArrayList<>();
-		for(Entity entity : MC.world.getEntities())
+		ArrayList<AABB> boxes = new ArrayList<>();
+		for(Entity entity : MC.level.entitiesForRendering())
 		{
-			if(!(entity instanceof MobEntity))
+			if(!(entity instanceof Mob))
 				continue;
 			
 			if(!entity.isInvisible())
 				continue;
 			
-			if(MC.player.squaredDistanceTo(entity) < 0.25)
+			if(MC.player.distanceToSqr(entity) < 0.25)
 				continue;
 			
-			boxes.add(FAKE_BLOCK_BOX.offset(entity.getEntityPos()));
+			boxes.add(FAKE_BLOCK_BOX.move(entity.position()));
 		}
 		
 		RenderUtils.drawSolidBoxes(matrixStack, boxes, color, false);

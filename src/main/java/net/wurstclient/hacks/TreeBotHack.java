@@ -15,11 +15,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
@@ -114,8 +115,8 @@ public final class TreeBotHack extends Hack
 		
 		if(currentBlock != null)
 		{
-			MC.interactionManager.breakingBlock = true;
-			MC.interactionManager.cancelBlockBreaking();
+			MC.gameMode.isDestroying = true;
+			MC.gameMode.stopDestroyBlock();
 			currentBlock = null;
 		}
 		
@@ -226,9 +227,8 @@ public final class TreeBotHack extends Hack
 		faceTarget.face(params.hitVec());
 		
 		// damage block and swing hand
-		if(MC.interactionManager.updateBlockBreakingProgress(pos,
-			params.side()))
-			swingHand.swing(Hand.MAIN_HAND);
+		if(MC.gameMode.continueDestroyBlock(pos, params.side()))
+			swingHand.swing(InteractionHand.MAIN_HAND);
 		
 		// update progress
 		overlay.updateProgress();
@@ -237,7 +237,7 @@ public final class TreeBotHack extends Hack
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		
@@ -258,7 +258,7 @@ public final class TreeBotHack extends Hack
 	private ArrayList<BlockPos> getNeighbors(BlockPos pos)
 	{
 		return BlockUtils
-			.getAllInBoxStream(pos.add(-1, -1, -1), pos.add(1, 1, 1))
+			.getAllInBoxStream(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))
 			.filter(TreeBotUtils::isLog)
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
@@ -326,7 +326,7 @@ public final class TreeBotHack extends Hack
 			List<PathPos> path = pathFinder.getPath();
 			path = path.subList(processor.getIndex(), path.size());
 			
-			return path.stream().flatMap(pos -> Stream.of(pos, pos.up()))
+			return path.stream().flatMap(pos -> Stream.of(pos, pos.above()))
 				.distinct().filter(TreeBotUtils::isLeaves)
 				.collect(Collectors.toCollection(ArrayList::new));
 		}
@@ -341,7 +341,7 @@ public final class TreeBotHack extends Hack
 	{
 		public TreeFinder()
 		{
-			super(BlockPos.ofFloored(WurstClient.MC.player.getEntityPos()));
+			super(BlockPos.containing(WurstClient.MC.player.position()));
 		}
 		
 		public TreeFinder(TreeBotPathFinder pathFinder)
@@ -372,7 +372,7 @@ public final class TreeBotHack extends Hack
 			if(!TreeBotUtils.isLog(pos))
 				return false;
 			
-			if(TreeBotUtils.isLog(pos.down()))
+			if(TreeBotUtils.isLog(pos.below()))
 				return false;
 			
 			analyzeTree(pos);
@@ -420,7 +420,7 @@ public final class TreeBotHack extends Hack
 	{
 		public AngleFinder()
 		{
-			super(BlockPos.ofFloored(WurstClient.MC.player.getEntityPos()));
+			super(BlockPos.containing(WurstClient.MC.player.position()));
 			setThinkSpeed(512);
 			setThinkTime(1);
 		}
@@ -445,8 +445,8 @@ public final class TreeBotHack extends Hack
 		private boolean hasAngle(PathPos pos)
 		{
 			double rangeSq = range.getValueSq();
-			ClientPlayerEntity player = WurstClient.MC.player;
-			Vec3d eyes = Vec3d.ofBottomCenter(pos).add(0,
+			LocalPlayer player = WurstClient.MC.player;
+			Vec3 eyes = Vec3.atBottomCenterOf(pos).add(0,
 				player.getEyeHeight(player.getPose()), 0);
 			
 			for(BlockPos log : tree.getLogs())

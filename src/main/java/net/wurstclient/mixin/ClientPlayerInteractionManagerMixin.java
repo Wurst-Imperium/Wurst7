@@ -15,41 +15,42 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.network.SequencedPacketCreator;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.multiplayer.prediction.PredictiveAction;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action;
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
 import net.wurstclient.events.PlayerAttacksEntityListener.PlayerAttacksEntityEvent;
 import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
-@Mixin(ClientPlayerInteractionManager.class)
+@Mixin(MultiPlayerGameMode.class)
 public abstract class ClientPlayerInteractionManagerMixin
 	implements IClientPlayerInteractionManager
 {
 	@Shadow
 	@Final
-	private MinecraftClient client;
+	private Minecraft minecraft;
 	
-	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;getId()I",
-		ordinal = 0),
-		method = "updateBlockBreakingProgress(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z")
+	@Inject(
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;getId()I",
+			ordinal = 0),
+		method = "continueDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z")
 	private void onPlayerDamageBlock(BlockPos pos, Direction direction,
 		CallbackInfoReturnable<Boolean> cir)
 	{
@@ -57,18 +58,17 @@ public abstract class ClientPlayerInteractionManagerMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "stopUsingItem(Lnet/minecraft/entity/player/PlayerEntity;)V")
-	private void onStopUsingItem(PlayerEntity player, CallbackInfo ci)
+		method = "releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V")
+	private void onStopUsingItem(Player player, CallbackInfo ci)
 	{
 		EventManager.fire(StopUsingItemEvent.INSTANCE);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "attackEntity(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/entity/Entity;)V")
-	private void onAttackEntity(PlayerEntity player, Entity target,
-		CallbackInfo ci)
+		method = "attack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V")
+	private void onAttackEntity(Player player, Entity target, CallbackInfo ci)
 	{
-		if(player != client.player)
+		if(player != minecraft.player)
 			return;
 		
 		EventManager.fire(new PlayerAttacksEntityEvent(target));
@@ -77,73 +77,79 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Override
 	public void windowClick_PICKUP(int slot)
 	{
-		clickSlot(0, slot, 0, SlotActionType.PICKUP, client.player);
+		handleInventoryMouseClick(0, slot, 0, ClickType.PICKUP,
+			minecraft.player);
 	}
 	
 	@Override
 	public void windowClick_QUICK_MOVE(int slot)
 	{
-		clickSlot(0, slot, 0, SlotActionType.QUICK_MOVE, client.player);
+		handleInventoryMouseClick(0, slot, 0, ClickType.QUICK_MOVE,
+			minecraft.player);
 	}
 	
 	@Override
 	public void windowClick_THROW(int slot)
 	{
-		clickSlot(0, slot, 1, SlotActionType.THROW, client.player);
+		handleInventoryMouseClick(0, slot, 1, ClickType.THROW,
+			minecraft.player);
 	}
 	
 	@Override
 	public void windowClick_SWAP(int from, int to)
 	{
-		clickSlot(0, from, to, SlotActionType.SWAP, client.player);
+		handleInventoryMouseClick(0, from, to, ClickType.SWAP,
+			minecraft.player);
 	}
 	
 	@Override
 	public void rightClickItem()
 	{
-		interactItem(client.player, Hand.MAIN_HAND);
+		useItem(minecraft.player, InteractionHand.MAIN_HAND);
 	}
 	
 	@Override
-	public void rightClickBlock(BlockPos pos, Direction side, Vec3d hitVec)
+	public void rightClickBlock(BlockPos pos, Direction side, Vec3 hitVec)
 	{
 		BlockHitResult hitResult = new BlockHitResult(hitVec, side, pos, false);
-		Hand hand = Hand.MAIN_HAND;
-		interactBlock(client.player, hand, hitResult);
-		interactItem(client.player, hand);
+		InteractionHand hand = InteractionHand.MAIN_HAND;
+		useItemOn(minecraft.player, hand, hitResult);
+		useItem(minecraft.player, hand);
 	}
 	
 	@Override
 	public void sendPlayerActionC2SPacket(Action action, BlockPos blockPos,
 		Direction direction)
 	{
-		sendSequencedPacket(client.world,
-			i -> new PlayerActionC2SPacket(action, blockPos, direction, i));
+		startPrediction(minecraft.level,
+			i -> new ServerboundPlayerActionPacket(action, blockPos, direction,
+				i));
 	}
 	
 	@Override
-	public void sendPlayerInteractBlockPacket(Hand hand,
+	public void sendPlayerInteractBlockPacket(InteractionHand hand,
 		BlockHitResult blockHitResult)
 	{
-		sendSequencedPacket(client.world,
-			i -> new PlayerInteractBlockC2SPacket(hand, blockHitResult, i));
+		startPrediction(minecraft.level,
+			i -> new ServerboundUseItemOnPacket(hand, blockHitResult, i));
 	}
 	
 	@Shadow
-	private void sendSequencedPacket(ClientWorld world,
-		SequencedPacketCreator packetCreator)
+	private void startPrediction(ClientLevel world,
+		PredictiveAction packetCreator)
 	{
 		
 	}
 	
 	@Shadow
-	public abstract ActionResult interactBlock(ClientPlayerEntity player,
-		Hand hand, BlockHitResult hitResult);
+	public abstract InteractionResult useItemOn(LocalPlayer player,
+		InteractionHand hand, BlockHitResult hitResult);
 	
 	@Shadow
-	public abstract ActionResult interactItem(PlayerEntity player, Hand hand);
+	public abstract InteractionResult useItem(Player player,
+		InteractionHand hand);
 	
 	@Shadow
-	public abstract void clickSlot(int syncId, int slotId, int button,
-		SlotActionType actionType, PlayerEntity player);
+	public abstract void handleInventoryMouseClick(int syncId, int slotId,
+		int button, ClickType actionType, Player player);
 }

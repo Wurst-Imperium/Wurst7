@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.sodium;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,9 +15,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
@@ -29,7 +29,7 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 @Pseudo
 @Mixin(targets = {
 	"net.caffeinemc.mods.sodium.client.render.frapi.render.AbstractBlockRenderContext"})
-public class SodiumAbstractBlockRenderContextMixin
+public class AbstractBlockRenderContextMixin
 {
 	@Shadow
 	protected BlockState state;
@@ -41,8 +41,9 @@ public class SodiumAbstractBlockRenderContextMixin
 	 * Hides and shows blocks when using X-Ray with Sodium installed.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "isFaceCulled(Lnet/minecraft/util/math/Direction;)Z",
+		method = "isFaceCulled(Lnet/minecraft/class_2350;)Z",
 		cancellable = true,
+		remap = false,
 		require = 0)
 	private void onIsFaceCulled(@Nullable Direction face,
 		CallbackInfoReturnable<Boolean> cir)

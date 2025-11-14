@@ -10,25 +10,25 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.ShulkerBoxScreenHandler;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
 
 @Mixin(ShulkerBoxScreen.class)
 public abstract class ShulkerBoxScreenMixin
-	extends HandledScreen<ShulkerBoxScreenHandler>
+	extends AbstractContainerScreen<ShulkerBoxMenu>
 {
 	@Unique
 	private final AutoStealHack autoSteal =
 		WurstClient.INSTANCE.getHax().autoStealHack;
 	
-	private ShulkerBoxScreenMixin(WurstClient wurst,
-		ShulkerBoxScreenHandler handler, PlayerInventory inventory, Text title)
+	private ShulkerBoxScreenMixin(WurstClient wurst, ShulkerBoxMenu handler,
+		Inventory inventory, Component title)
 	{
 		super(handler, inventory, title);
 	}
@@ -43,13 +43,16 @@ public abstract class ShulkerBoxScreenMixin
 		
 		if(autoSteal.areButtonsVisible())
 		{
-			addDrawableChild(ButtonWidget
-				.builder(Text.literal("Steal"), b -> autoSteal.steal(this, 3))
-				.dimensions(x + backgroundWidth - 108, y + 4, 50, 12).build());
+			addRenderableWidget(Button
+				.builder(Component.literal("Steal"),
+					b -> autoSteal.steal(this, 3))
+				.bounds(leftPos + imageWidth - 108, topPos + 4, 50, 12)
+				.build());
 			
-			addDrawableChild(ButtonWidget
-				.builder(Text.literal("Store"), b -> autoSteal.store(this, 3))
-				.dimensions(x + backgroundWidth - 56, y + 4, 50, 12).build());
+			addRenderableWidget(Button
+				.builder(Component.literal("Store"),
+					b -> autoSteal.store(this, 3))
+				.bounds(leftPos + imageWidth - 56, topPos + 4, 50, 12).build());
 		}
 		
 		if(autoSteal.isEnabled())

@@ -9,17 +9,17 @@ package net.wurstclient.clickgui.components;
 
 import org.joml.Matrix3x2fStack;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.WaterAnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ambient.AmbientCreature;
+import net.minecraft.world.entity.animal.AgeableWaterCreature;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
 import net.wurstclient.clickgui.Component;
@@ -39,7 +39,7 @@ public final class RadarComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		// Can't make this a field because RadarComponent is initialized earlier
@@ -61,25 +61,24 @@ public final class RadarComponent extends Component
 		context.fill(x1, y1, x2, y2,
 			RenderUtils.toIntColor(gui.getBgColor(), gui.getOpacity()));
 		
-		Matrix3x2fStack matrixStack = context.getMatrices();
+		Matrix3x2fStack matrixStack = context.pose();
 		matrixStack.pushMatrix();
 		matrixStack.translate(middleX, middleY);
 		
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		if(!hack.isRotateEnabled())
-			matrixStack.rotate(
-				(180 + player.getYaw()) * MathHelper.RADIANS_PER_DEGREE);
+			matrixStack.rotate((180 + player.getYRot()) * Mth.DEG_TO_RAD);
 		
 		// arrow
 		ClickGuiIcons.drawRadarArrow(context, -2, -2, 2, 2);
 		
 		matrixStack.popMatrix();
-		Vec3d lerpedPlayerPos = EntityUtils.getLerpedPos(player, partialTicks);
+		Vec3 lerpedPlayerPos = EntityUtils.getLerpedPos(player, partialTicks);
 		
 		// points
 		for(Entity e : hack.getEntities())
 		{
-			Vec3d lerpedEntityPos = EntityUtils.getLerpedPos(e, partialTicks);
+			Vec3 lerpedEntityPos = EntityUtils.getLerpedPos(e, partialTicks);
 			double diffX = lerpedEntityPos.x - lerpedPlayerPos.x;
 			double diffZ = lerpedEntityPos.z - lerpedPlayerPos.z;
 			double distance = Math.sqrt(diffX * diffX + diffZ * diffZ)
@@ -87,7 +86,7 @@ public final class RadarComponent extends Component
 			double neededRotation = Math.toDegrees(Math.atan2(diffZ, diffX));
 			double angle;
 			if(hack.isRotateEnabled())
-				angle = Math.toRadians(player.getYaw() - neededRotation - 90);
+				angle = Math.toRadians(player.getYRot() - neededRotation - 90);
 			else
 				angle = Math.toRadians(180 - neededRotation - 90);
 			double renderX = Math.sin(angle) * distance;
@@ -109,13 +108,12 @@ public final class RadarComponent extends Component
 	{
 		if(WURST.getFriends().isFriend(e))
 			return 0xFF0000FF;
-		if(e instanceof PlayerEntity)
+		if(e instanceof Player)
 			return 0xFFFF0000;
-		if(e instanceof Monster)
+		if(e instanceof Enemy)
 			return 0xFFFF8000;
-		if(e instanceof AnimalEntity || e instanceof AmbientEntity
-			|| e instanceof WaterCreatureEntity
-			|| e instanceof WaterAnimalEntity)
+		if(e instanceof Animal || e instanceof AmbientCreature
+			|| e instanceof WaterAnimal || e instanceof AgeableWaterCreature)
 			return 0xFF00FF00;
 		return 0xFF808080;
 	}

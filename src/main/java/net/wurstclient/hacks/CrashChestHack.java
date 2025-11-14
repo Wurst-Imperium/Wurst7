@@ -7,14 +7,14 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.text.Text;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.block.Blocks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -33,14 +33,14 @@ public final class CrashChestHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		if(!MC.player.getAbilities().creativeMode)
+		if(!MC.player.getAbilities().instabuild)
 		{
 			ChatUtils.error("Creative mode only.");
 			setEnabled(false);
 			return;
 		}
 		
-		if(!MC.player.getEquippedStack(EquipmentSlot.FEET).isEmpty())
+		if(!MC.player.getItemBySlot(EquipmentSlot.FEET).isEmpty())
 		{
 			ChatUtils.error("Please clear your shoes slot.");
 			setEnabled(false);
@@ -49,16 +49,16 @@ public final class CrashChestHack extends Hack
 		
 		// generate item
 		ItemStack stack = new ItemStack(Blocks.CHEST);
-		NbtCompound nbtCompound = new NbtCompound();
-		NbtList nbtList = new NbtList();
+		CompoundTag nbtCompound = new CompoundTag();
+		ListTag nbtList = new ListTag();
 		for(int i = 0; i < 40000; i++)
-			nbtList.add(new NbtList());
+			nbtList.add(new ListTag());
 		nbtCompound.put("www.wurstclient.net", nbtList);
-		stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbtCompound));
-		stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal("Copy Me"));
+		stack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbtCompound));
+		stack.set(DataComponents.CUSTOM_NAME, Component.literal("Copy Me"));
 		
 		// give item
-		MC.player.equipment.put(EquipmentSlot.FEET, stack);
+		MC.player.equipment.set(EquipmentSlot.FEET, stack);
 		ChatUtils.message("Item has been placed in your shoes slot.");
 		setEnabled(false);
 	}

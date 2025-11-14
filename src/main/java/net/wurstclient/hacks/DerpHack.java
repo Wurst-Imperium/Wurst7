@@ -45,7 +45,7 @@ public final class DerpHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		float yaw = MC.player.getYaw() + random.nextFloat() * 360F - 180F;
+		float yaw = MC.player.getYRot() + random.nextFloat() * 360F - 180F;
 		float pitch = random.nextFloat() * 180F - 90F;
 		
 		new Rotation(yaw, pitch).sendPlayerLookPacket();

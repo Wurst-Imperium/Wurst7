@@ -9,8 +9,8 @@ package net.wurstclient.hacks.chestesp.groups;
 
 import java.awt.Color;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.wurstclient.hacks.chestesp.ChestEspBlockGroup;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;

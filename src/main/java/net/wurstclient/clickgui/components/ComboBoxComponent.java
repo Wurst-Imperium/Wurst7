@@ -11,9 +11,9 @@ import java.util.Arrays;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
 import net.wurstclient.clickgui.ComboBoxPopup;
@@ -24,7 +24,7 @@ import net.wurstclient.util.RenderUtils;
 public final class ComboBoxComponent<T extends Enum<T>> extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	private static final int ARROW_SIZE = 11;
 	
 	private final EnumSetting<T> setting;
@@ -36,7 +36,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	{
 		this.setting = setting;
 		popupWidth = Arrays.stream(setting.getValues()).map(T::toString)
-			.mapToInt(s -> TR.getWidth(s)).max().getAsInt();
+			.mapToInt(s -> TR.width(s)).max().getAsInt();
 		
 		setWidth(getDefaultWidth());
 		setHeight(getDefaultHeight());
@@ -44,7 +44,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	
 	@Override
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
-		Click context)
+		MouseButtonEvent context)
 	{
 		if(mouseX < getX() + getWidth() - popupWidth - ARROW_SIZE - 4)
 			return;
@@ -88,7 +88,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -112,7 +112,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		// box
 		context.fill(x4, y1, x2, y2, getFillColor(hBox));
 		
-		context.state.goUpLayer();
+		context.guiRenderState.up();
 		
 		// outlines
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
@@ -127,8 +127,8 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		String name = setting.getName();
 		String value = "" + setting.getSelected();
 		int txtColor = GUI.getTxtColor();
-		context.drawText(TR, name, x1, y1 + 2, txtColor, false);
-		context.drawText(TR, value, x4 + 2, y1 + 2, txtColor, false);
+		context.drawString(TR, name, x1, y1 + 2, txtColor, false);
+		context.drawString(TR, value, x4 + 2, y1 + 2, txtColor, false);
 	}
 	
 	private int getFillColor(boolean hovering)
@@ -140,7 +140,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		return TR.getWidth(setting.getName()) + popupWidth + ARROW_SIZE + 6;
+		return TR.width(setting.getName()) + popupWidth + ARROW_SIZE + 6;
 	}
 	
 	@Override

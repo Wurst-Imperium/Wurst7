@@ -11,30 +11,30 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.CraftingTableBlock;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ConsumableComponent;
-import net.minecraft.component.type.FoodComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.entity.player.HungerManager;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.consume.ApplyEffectsConsumeEffect;
-import net.minecraft.item.consume.ConsumeEffect;
-import net.minecraft.item.consume.TeleportRandomlyConsumeEffect;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.food.FoodData;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
+import net.minecraft.world.item.consume_effects.ConsumeEffect;
+import net.minecraft.world.item.consume_effects.TeleportRandomlyConsumeEffect;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CraftingTableBlock;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -129,7 +129,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
 		if(!shouldEat())
 		{
@@ -139,7 +139,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		HungerManager hungerManager = player.getHungerManager();
+		FoodData hungerManager = player.getFoodData();
 		int foodLevel = hungerManager.getFoodLevel();
 		int targetHungerI = (int)(targetHunger.getValue() * 2);
 		int minHungerI = (int)(minHunger.getValue() * 2);
@@ -166,7 +166,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	private void eat(int maxPoints)
 	{
-		PlayerInventory inventory = MC.player.getInventory();
+		Inventory inventory = MC.player.getInventory();
 		int foodSlot = findBestFoodSlot(maxPoints);
 		
 		if(foodSlot == -1)
@@ -199,14 +199,14 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		}
 		
 		// eat food
-		MC.options.useKey.setPressed(true);
+		MC.options.keyUse.setDown(true);
 		IMC.getInteractionManager().rightClickItem();
 	}
 	
 	private int findBestFoodSlot(int maxPoints)
 	{
-		PlayerInventory inventory = MC.player.getInventory();
-		FoodComponent bestFood = null;
+		Inventory inventory = MC.player.getInventory();
+		FoodProperties bestFood = null;
 		int bestSlot = -1;
 		
 		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
@@ -219,21 +219,21 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		Stream.iterate(0, i -> i < maxInvSlot, i -> i + 1)
 			.forEach(i -> slots.add(i));
 		
-		Comparator<FoodComponent> comparator =
-			Comparator.comparingDouble(FoodComponent::saturation);
+		Comparator<FoodProperties> comparator =
+			Comparator.comparingDouble(FoodProperties::saturation);
 		
 		for(int slot : slots)
 		{
-			ItemStack stack = inventory.getStack(slot);
+			ItemStack stack = inventory.getItem(slot);
 			
 			// filter out non-food items
-			if(!stack.contains(DataComponentTypes.FOOD))
+			if(!stack.has(DataComponents.FOOD))
 				continue;
 			
-			if(!isAllowedFood(stack.get(DataComponentTypes.CONSUMABLE)))
+			if(!isAllowedFood(stack.get(DataComponents.CONSUMABLE)))
 				continue;
 			
-			FoodComponent food = stack.get(DataComponentTypes.FOOD);
+			FoodProperties food = stack.get(DataComponents.FOOD);
 			if(maxPoints >= 0 && food.nutrition() > maxPoints)
 				continue;
 			
@@ -250,17 +250,17 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	private boolean shouldEat()
 	{
-		if(MC.player.getAbilities().creativeMode)
+		if(MC.player.getAbilities().instabuild)
 			return false;
 		
-		if(!MC.player.canConsume(false))
+		if(!MC.player.canEat(false))
 			return false;
 		
 		if(!eatWhileWalking.isChecked()
-			&& (MC.player.forwardSpeed != 0 || MC.player.sidewaysSpeed != 0))
+			&& (MC.player.zza != 0 || MC.player.xxa != 0))
 			return false;
 		
-		if(isClickable(MC.crosshairTarget))
+		if(isClickable(MC.hitResult))
 			return false;
 		
 		return true;
@@ -268,12 +268,12 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	
 	private void stopEating()
 	{
-		MC.options.useKey.setPressed(false);
+		MC.options.keyUse.setDown(false);
 		MC.player.getInventory().setSelectedSlot(oldSlot);
 		oldSlot = -1;
 	}
 	
-	private boolean isAllowedFood(ConsumableComponent consumable)
+	private boolean isAllowedFood(Consumable consumable)
 	{
 		for(ConsumeEffect consumeEffect : consumable.onConsumeEffects())
 		{
@@ -281,18 +281,17 @@ public final class AutoEatHack extends Hack implements UpdateListener
 				&& consumeEffect instanceof TeleportRandomlyConsumeEffect)
 				return false;
 			
-			if(!(consumeEffect instanceof ApplyEffectsConsumeEffect applyEffectsConsumeEffect))
+			if(!(consumeEffect instanceof ApplyStatusEffectsConsumeEffect applyEffectsConsumeEffect))
 				continue;
 			
-			for(StatusEffectInstance effect : applyEffectsConsumeEffect
-				.effects())
+			for(MobEffectInstance effect : applyEffectsConsumeEffect.effects())
 			{
-				RegistryEntry<StatusEffect> entry = effect.getEffectType();
+				Holder<MobEffect> entry = effect.getEffect();
 				
-				if(!allowHunger.isChecked() && entry == StatusEffects.HUNGER)
+				if(!allowHunger.isChecked() && entry == MobEffects.HUNGER)
 					return false;
 				
-				if(!allowPoison.isChecked() && entry == StatusEffects.POISON)
+				if(!allowPoison.isChecked() && entry == MobEffects.POISON)
 					return false;
 			}
 		}
@@ -313,8 +312,8 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		if(hitResult instanceof EntityHitResult)
 		{
 			Entity entity = ((EntityHitResult)hitResult).getEntity();
-			return entity instanceof VillagerEntity
-				|| entity instanceof TameableEntity;
+			return entity instanceof Villager
+				|| entity instanceof TamableAnimal;
 		}
 		
 		if(hitResult instanceof BlockHitResult)
@@ -323,15 +322,15 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			if(pos == null)
 				return false;
 			
-			Block block = MC.world.getBlockState(pos).getBlock();
-			return block instanceof BlockWithEntity
+			Block block = MC.level.getBlockState(pos).getBlock();
+			return block instanceof BaseEntityBlock
 				|| block instanceof CraftingTableBlock;
 		}
 		
 		return false;
 	}
 	
-	private boolean isInjured(ClientPlayerEntity player)
+	private boolean isInjured(LocalPlayer player)
 	{
 		int injuryThresholdI = (int)(injuryThreshold.getValue() * 2);
 		return player.getHealth() < player.getMaxHealth() - injuryThresholdI;

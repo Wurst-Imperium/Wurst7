@@ -7,13 +7,13 @@
  */
 package net.wurstclient.hacks.autofarm.plants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.PitcherCropBlock;
-import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.PitcherCropBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
 import net.wurstclient.util.BlockUtils;
@@ -23,15 +23,15 @@ public final class PitcherPlantPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean isReplantingSpot(BlockPos pos, BlockState state)
 	{
-		return state.isOf(Blocks.PITCHER_CROP)
-			&& state.get(PitcherCropBlock.HALF) == DoubleBlockHalf.LOWER
+		return state.is(Blocks.PITCHER_CROP)
+			&& state.getValue(PitcherCropBlock.HALF) == DoubleBlockHalf.LOWER
 			&& hasPlantingSurface(pos);
 	}
 	
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.down()).isOf(Blocks.FARMLAND);
+		return BlockUtils.getState(pos.below()).is(Blocks.FARMLAND);
 	}
 	
 	@Override
@@ -44,8 +44,8 @@ public final class PitcherPlantPlantType extends AutoFarmPlantType
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
 		// field_43240 is MAX_AGE
-		return state.isOf(Blocks.PITCHER_CROP)
-			&& state.get(PitcherCropBlock.AGE) >= PitcherCropBlock.field_43240;
+		return state.is(Blocks.PITCHER_CROP)
+			&& state.getValue(PitcherCropBlock.AGE) >= PitcherCropBlock.MAX_AGE;
 	}
 	
 	@Override

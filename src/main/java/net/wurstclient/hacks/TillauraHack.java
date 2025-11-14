@@ -12,12 +12,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.HoeItem;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleInputListener;
@@ -80,11 +80,11 @@ public final class TillauraHack extends Hack implements HandleInputListener
 	public void onHandleInput()
 	{
 		// wait for right click timer
-		if(MC.itemUseCooldown > 0)
+		if(MC.rightClickDelay > 0)
 			return;
 		
 		// don't till while breaking or riding
-		if(MC.interactionManager.isBreakingBlock() || MC.player.isRiding())
+		if(MC.gameMode.isDestroying() || MC.player.isHandsBusy())
 			return;
 		
 		// check held item
@@ -105,7 +105,7 @@ public final class TillauraHack extends Hack implements HandleInputListener
 				
 			// swing arm
 			if(shouldSwing)
-				MC.player.swingHand(Hand.MAIN_HAND);
+				MC.player.swing(InteractionHand.MAIN_HAND);
 		}else
 			// till next valid block
 			for(BlockPos pos : validBlocks)
@@ -115,16 +115,16 @@ public final class TillauraHack extends Hack implements HandleInputListener
 	
 	private ArrayList<BlockPos> getValidBlocks()
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.ofFloored(eyesVec);
+		Vec3 eyesVec = RotationUtils.getEyesPos();
+		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
 		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(pos -> pos.getSquaredDistance(eyesVec) <= rangeSq)
+			.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
 			.filter(this::isCorrectBlock)
-			.sorted(Comparator
-				.comparingDouble(pos -> pos.getSquaredDistance(eyesVec)))
+			.sorted(
+				Comparator.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
@@ -133,7 +133,7 @@ public final class TillauraHack extends Hack implements HandleInputListener
 		if(!tillableBlocks.contains(BlockUtils.getBlock(pos)))
 			return false;
 		
-		if(!BlockUtils.getState(pos.up()).isAir())
+		if(!BlockUtils.getState(pos.above()).isAir())
 			return false;
 		
 		return true;
@@ -149,7 +149,7 @@ public final class TillauraHack extends Hack implements HandleInputListener
 			return false;
 		
 		// face and right click the block
-		MC.itemUseCooldown = 4;
+		MC.rightClickDelay = 4;
 		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
 		InteractionSimulator.rightClickBlock(params.toHitResult());
 		return true;

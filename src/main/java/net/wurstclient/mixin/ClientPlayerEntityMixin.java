@@ -20,18 +20,18 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.input.Input;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.MovementType;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.Holder;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.AirStrafingSpeedListener.AirStrafingSpeedEvent;
@@ -45,24 +45,24 @@ import net.wurstclient.events.UpdateListener.UpdateEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 
-@Mixin(ClientPlayerEntity.class)
-public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
+@Mixin(LocalPlayer.class)
+public class ClientPlayerEntityMixin extends AbstractClientPlayer
 	implements IClientPlayerEntity
 {
 	@Shadow
 	@Final
-	protected MinecraftClient client;
+	protected Minecraft minecraft;
 	
 	private Screen tempCurrentScreen;
 	
-	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
+	public ClientPlayerEntityMixin(WurstClient wurst, ClientLevel world,
 		GameProfile profile)
 	{
 		super(world, profile);
 	}
 	
 	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V",
+		target = "Lnet/minecraft/client/player/AbstractClientPlayer;tick()V",
 		ordinal = 0), method = "tick()V")
 	private void onTick(CallbackInfo ci)
 	{
@@ -72,16 +72,14 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	/**
 	 * This mixin makes AutoSprint's "Omnidirectional Sprint" setting work.
 	 */
-	@WrapOperation(
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/input/Input;hasForwardMovement()Z",
-			ordinal = 0),
-		method = "tickMovement()V")
-	private boolean wrapHasForwardMovement(Input input,
+	@WrapOperation(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/player/ClientInput;hasForwardImpulse()Z",
+		ordinal = 0), method = "aiStep()V")
+	private boolean wrapHasForwardMovement(ClientInput input,
 		Operation<Boolean> original)
 	{
 		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldOmniSprint())
-			return input.getMovementInput().length() > 1e-5F;
+			return input.getMoveVector().length() > 1e-5F;
 		
 		return original.call(input);
 	}
@@ -90,10 +88,12 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	 * Allows NoSlowdown to intercept the isUsingItem() call in
 	 * tickMovement().
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z",
-		ordinal = 0), method = "tickMovement()V")
-	private boolean wrapTickMovementItemUse(ClientPlayerEntity instance,
+	@WrapOperation(
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z",
+			ordinal = 0),
+		method = "aiStep()V")
+	private boolean wrapTickMovementItemUse(LocalPlayer instance,
 		Operation<Boolean> original)
 	{
 		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
@@ -102,21 +102,21 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 		return original.call(instance);
 	}
 	
-	@Inject(at = @At("HEAD"), method = "sendMovementPackets()V")
+	@Inject(at = @At("HEAD"), method = "sendPosition()V")
 	private void onSendMovementPacketsHEAD(CallbackInfo ci)
 	{
 		EventManager.fire(PreMotionEvent.INSTANCE);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "sendMovementPackets()V")
+	@Inject(at = @At("TAIL"), method = "sendPosition()V")
 	private void onSendMovementPacketsTAIL(CallbackInfo ci)
 	{
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V")
-	private void onMove(MovementType type, Vec3d offset, CallbackInfo ci)
+		method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V")
+	private void onMove(MoverType type, Vec3 offset, CallbackInfo ci)
 	{
 		EventManager.fire(PlayerMoveEvent.INSTANCE);
 	}
@@ -135,16 +135,16 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	 * to null to prevent the updateNausea() method from closing it.
 	 */
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;",
+		target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 0), method = "tickNausea(Z)V")
+		ordinal = 0), method = "handlePortalTransitionEffect(Z)V")
 	private void beforeTickNausea(boolean fromPortalEffect, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
 			return;
 		
-		tempCurrentScreen = client.currentScreen;
-		client.currentScreen = null;
+		tempCurrentScreen = minecraft.screen;
+		minecraft.screen = null;
 	}
 	
 	/**
@@ -152,15 +152,15 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	 * method is done looking at it.
 	 */
 	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/network/ClientPlayerEntity;nauseaIntensity:F",
+		target = "Lnet/minecraft/client/player/LocalPlayer;portalEffectIntensity:F",
 		opcode = Opcodes.GETFIELD,
-		ordinal = 1), method = "tickNausea(Z)V")
+		ordinal = 1), method = "handlePortalTransitionEffect(Z)V")
 	private void afterTickNausea(boolean fromPortalEffect, CallbackInfo ci)
 	{
 		if(tempCurrentScreen == null)
 			return;
 		
-		client.currentScreen = tempCurrentScreen;
+		minecraft.screen = tempCurrentScreen;
 		tempCurrentScreen = null;
 	}
 	
@@ -168,7 +168,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	 * This mixin allows AutoSprint to enable sprinting even when the player is
 	 * too hungry.
 	 */
-	@Inject(at = @At("HEAD"), method = "canSprint()Z", cancellable = true)
+	@Inject(at = @At("HEAD"),
+		method = "hasEnoughFoodToSprint()Z",
+		cancellable = true)
 	private void onCanSprint(CallbackInfoReturnable<Boolean> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintHungry())
@@ -180,27 +182,26 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	 * Overridden to allow for the speed to be modified by hacks.
 	 */
 	@Override
-	protected float getOffGroundSpeed()
+	protected float getFlyingSpeed()
 	{
 		AirStrafingSpeedEvent event =
-			new AirStrafingSpeedEvent(super.getOffGroundSpeed());
+			new AirStrafingSpeedEvent(super.getFlyingSpeed());
 		EventManager.fire(event);
 		return event.getSpeed();
 	}
 	
 	@Override
-	public void setVelocityClient(Vec3d vec)
+	public void lerpMotion(Vec3 vec)
 	{
 		KnockbackEvent event = new KnockbackEvent(vec.x, vec.y, vec.z);
 		EventManager.fire(event);
-		super.setVelocityClient(
-			new Vec3d(event.getX(), event.getY(), event.getZ()));
+		super.lerpMotion(new Vec3(event.getX(), event.getY(), event.getZ()));
 	}
 	
 	@Override
-	public boolean isTouchingWater()
+	public boolean isInWater()
 	{
-		boolean inWater = super.isTouchingWater();
+		boolean inWater = super.isInWater();
 		IsPlayerInWaterEvent event = new IsPlayerInWaterEvent(inWater);
 		EventManager.fire(event);
 		
@@ -227,24 +228,23 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Override
 	public boolean isTouchingWaterBypass()
 	{
-		return super.isTouchingWater();
+		return super.isInWater();
 	}
 	
 	@Override
-	protected float getJumpVelocity()
+	protected float getJumpPower()
 	{
-		return super.getJumpVelocity()
-			+ WurstClient.INSTANCE.getHax().highJumpHack
-				.getAdditionalJumpMotion();
+		return super.getJumpPower() + WurstClient.INSTANCE.getHax().highJumpHack
+			.getAdditionalJumpMotion();
 	}
 	
 	/**
 	 * This is the part that makes SafeWalk work.
 	 */
 	@Override
-	protected boolean clipAtLedge()
+	protected boolean isStayingOnGroundSurface()
 	{
-		return super.clipAtLedge()
+		return super.isStayingOnGroundSurface()
 			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
 	}
 	
@@ -253,9 +253,9 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	 * near a ledge.
 	 */
 	@Override
-	protected Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type)
+	protected Vec3 maybeBackOffFromEdge(Vec3 movement, MoverType type)
 	{
-		Vec3d result = super.adjustMovementForSneaking(movement, type);
+		Vec3 result = super.maybeBackOffFromEdge(movement, type);
 		
 		if(movement != null)
 			WurstClient.INSTANCE.getHax().safeWalkHack
@@ -265,63 +265,60 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	}
 	
 	@Override
-	public boolean hasStatusEffect(RegistryEntry<StatusEffect> effect)
+	public boolean hasEffect(Holder<MobEffect> effect)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		
-		if(effect == StatusEffects.NIGHT_VISION
+		if(effect == MobEffects.NIGHT_VISION
 			&& hax.fullbrightHack.isNightVisionActive())
 			return true;
 		
-		if(effect == StatusEffects.LEVITATION
-			&& hax.noLevitationHack.isEnabled())
+		if(effect == MobEffects.LEVITATION && hax.noLevitationHack.isEnabled())
 			return false;
 		
-		if(effect == StatusEffects.BLINDNESS && hax.antiBlindHack.isEnabled())
+		if(effect == MobEffects.BLINDNESS && hax.antiBlindHack.isEnabled())
 			return false;
 		
-		if(effect == StatusEffects.DARKNESS && hax.antiBlindHack.isEnabled())
+		if(effect == MobEffects.DARKNESS && hax.antiBlindHack.isEnabled())
 			return false;
 		
-		return super.hasStatusEffect(effect);
+		return super.hasEffect(effect);
 	}
 	
 	@Override
-	public StatusEffectInstance getStatusEffect(
-		RegistryEntry<StatusEffect> effect)
+	public MobEffectInstance getEffect(Holder<MobEffect> effect)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		
-		if(effect == StatusEffects.LEVITATION
-			&& hax.noLevitationHack.isEnabled())
+		if(effect == MobEffects.LEVITATION && hax.noLevitationHack.isEnabled())
 			return null;
 		
-		return super.getStatusEffect(effect);
+		return super.getEffect(effect);
 	}
 	
 	@Override
-	public float getStepHeight()
+	public float maxUpStep()
 	{
 		return WurstClient.INSTANCE.getHax().stepHack
-			.adjustStepHeight(super.getStepHeight());
+			.adjustStepHeight(super.maxUpStep());
 	}
 	
 	@Override
-	public double getBlockInteractionRange()
+	public double blockInteractionRange()
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax == null || !hax.reachHack.isEnabled())
-			return super.getBlockInteractionRange();
+			return super.blockInteractionRange();
 		
 		return hax.reachHack.getReachDistance();
 	}
 	
 	@Override
-	public double getEntityInteractionRange()
+	public double entityInteractionRange()
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax == null || !hax.reachHack.isEnabled())
-			return super.getEntityInteractionRange();
+			return super.entityInteractionRange();
 		
 		return hax.reachHack.getReachDistance();
 	}

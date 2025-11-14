@@ -9,9 +9,9 @@ package net.wurstclient.clickgui.components;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
 import net.wurstclient.clickgui.Component;
@@ -22,7 +22,7 @@ import net.wurstclient.util.text.WText;
 public final class PlantTypeComponent extends Component
 {
 	private static final ClickGui GUI = WURST.getGui();
-	private static final TextRenderer TR = MC.textRenderer;
+	private static final Font TR = MC.font;
 	private static final int BOX_SIZE = 11;
 	private static final int ICON_SIZE = 24;
 	private static final String HARVEST = "Harvest";
@@ -39,7 +39,7 @@ public final class PlantTypeComponent extends Component
 	
 	@Override
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
-		Click context)
+		MouseButtonEvent context)
 	{
 		if(mouseX < getX() + ICON_SIZE)
 			return;
@@ -48,7 +48,7 @@ public final class PlantTypeComponent extends Component
 			return;
 		
 		boolean hHarvest =
-			mouseX < getX() + ICON_SIZE + BOX_SIZE + TR.getWidth(HARVEST) + 4;
+			mouseX < getX() + ICON_SIZE + BOX_SIZE + TR.width(HARVEST) + 4;
 		
 		switch(mouseButton)
 		{
@@ -69,10 +69,10 @@ public final class PlantTypeComponent extends Component
 	}
 	
 	@Override
-	public void render(DrawContext context, int mouseX, int mouseY,
+	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		int harvestWidth = TR.getWidth(HARVEST);
+		int harvestWidth = TR.width(HARVEST);
 		
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -92,7 +92,7 @@ public final class PlantTypeComponent extends Component
 		boolean hReplant = hovering && mouseX >= x5 && mouseY >= y3;
 		
 		if(hIcon)
-			GUI.setTooltip(setting.getIcon().getName().getString());
+			GUI.setTooltip(setting.getIcon().getHoverName().getString());
 		else if(hName)
 			GUI.setTooltip(setting.getWrappedDescription(200));
 		else if(hHarvest)
@@ -125,9 +125,11 @@ public final class PlantTypeComponent extends Component
 		
 		// text
 		String name = setting.getName();
-		context.drawText(TR, name, x3 + 2, y1 + 3, GUI.getTxtColor(), false);
-		context.drawText(TR, HARVEST, x4 + 2, y3 + 2, GUI.getTxtColor(), false);
-		context.drawText(TR, REPLANT, x6 + 2, y3 + 2, GUI.getTxtColor(), false);
+		context.drawString(TR, name, x3 + 2, y1 + 3, GUI.getTxtColor(), false);
+		context.drawString(TR, HARVEST, x4 + 2, y3 + 2, GUI.getTxtColor(),
+			false);
+		context.drawString(TR, REPLANT, x6 + 2, y3 + 2, GUI.getTxtColor(),
+			false);
 	}
 	
 	private int getFillColor(boolean hovering)
@@ -139,9 +141,9 @@ public final class PlantTypeComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		int nameWidth = TR.getWidth(setting.getName());
+		int nameWidth = TR.width(setting.getName());
 		int boxesWidth =
-			2 * BOX_SIZE + TR.getWidth(HARVEST) + TR.getWidth(REPLANT) + 6;
+			2 * BOX_SIZE + TR.width(HARVEST) + TR.width(REPLANT) + 6;
 		return ICON_SIZE + Math.max(nameWidth, boxesWidth);
 	}
 	

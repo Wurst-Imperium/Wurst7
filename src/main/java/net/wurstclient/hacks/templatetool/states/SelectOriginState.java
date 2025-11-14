@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks.templatetool.states;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.wurstclient.hacks.TemplateToolHack;
 import net.wurstclient.hacks.templatetool.SelectPositionState;
 import net.wurstclient.hacks.templatetool.TemplateToolState;

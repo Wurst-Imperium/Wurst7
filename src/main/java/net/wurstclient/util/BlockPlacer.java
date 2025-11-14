@@ -7,15 +7,15 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
@@ -25,7 +25,7 @@ public enum BlockPlacer
 	;
 	
 	private static final WurstClient WURST = WurstClient.INSTANCE;
-	private static final MinecraftClient MC = WurstClient.MC;
+	private static final Minecraft MC = WurstClient.MC;
 	private static final IMinecraftClient IMC = WurstClient.IMC;
 	
 	public static boolean placeOneBlock(BlockPos pos)
@@ -56,7 +56,7 @@ public enum BlockPlacer
 		// if there is a replaceable block at the position, we need to place
 		// against the block itself instead of a neighbor
 		if(BlockUtils.canBeClicked(pos)
-			&& BlockUtils.getState(pos).isReplaceable())
+			&& BlockUtils.getState(pos).canBeReplaced())
 		{
 			// the parameters for this happen to be the same as for breaking
 			// the block, so we can just use BlockBreaker to get them
@@ -73,34 +73,34 @@ public enum BlockPlacer
 		}
 		
 		Direction[] sides = Direction.values();
-		Vec3d[] hitVecs = new Vec3d[sides.length];
+		Vec3[] hitVecs = new Vec3[sides.length];
 		
 		// get hit vectors for all usable sides
 		for(int i = 0; i < sides.length; i++)
 		{
-			BlockPos neighbor = pos.offset(sides[i]);
+			BlockPos neighbor = pos.relative(sides[i]);
 			BlockState state = BlockUtils.getState(neighbor);
-			VoxelShape shape = state.getOutlineShape(MC.world, neighbor);
+			VoxelShape shape = state.getShape(MC.level, neighbor);
 			
 			// if neighbor has no shape or is replaceable, it can't be used
-			if(shape.isEmpty() || state.isReplaceable())
+			if(shape.isEmpty() || state.canBeReplaced())
 				continue;
 			
-			Box box = shape.getBoundingBox();
-			Vec3d halfSize = new Vec3d(box.maxX - box.minX, box.maxY - box.minY,
-				box.maxZ - box.minZ).multiply(0.5);
-			Vec3d center = Vec3d.of(neighbor).add(box.getCenter());
+			AABB box = shape.bounds();
+			Vec3 halfSize = new Vec3(box.maxX - box.minX, box.maxY - box.minY,
+				box.maxZ - box.minZ).scale(0.5);
+			Vec3 center = Vec3.atLowerCornerOf(neighbor).add(box.getCenter());
 			
-			Vec3i dirVec = sides[i].getOpposite().getVector();
-			Vec3d relHitVec = new Vec3d(halfSize.x * dirVec.getX(),
+			Vec3i dirVec = sides[i].getOpposite().getUnitVec3i();
+			Vec3 relHitVec = new Vec3(halfSize.x * dirVec.getX(),
 				halfSize.y * dirVec.getY(), halfSize.z * dirVec.getZ());
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
-		Vec3d eyesPos = RotationUtils.getEyesPos();
-		Vec3d posVec = Vec3d.ofCenter(pos);
+		Vec3 eyesPos = RotationUtils.getEyesPos();
+		Vec3 posVec = Vec3.atCenterOf(pos);
 		
-		double distanceSqToPosVec = eyesPos.squaredDistanceTo(posVec);
+		double distanceSqToPosVec = eyesPos.distanceToSqr(posVec);
 		double[] distancesSq = new double[sides.length];
 		boolean[] linesOfSight = new boolean[sides.length];
 		
@@ -114,7 +114,7 @@ public enum BlockPlacer
 				continue;
 			}
 			
-			distancesSq[i] = eyesPos.squaredDistanceTo(hitVecs[i]);
+			distancesSq[i] = eyesPos.distanceToSqr(hitVecs[i]);
 			
 			// to place against a neighbor in front of the block, we would
 			// have to place against that neighbor's rear face, which can't
@@ -154,13 +154,13 @@ public enum BlockPlacer
 		if(hitVecs[side.ordinal()] == null)
 			return null;
 		
-		return new BlockPlacingParams(pos.offset(side), side.getOpposite(),
+		return new BlockPlacingParams(pos.relative(side), side.getOpposite(),
 			hitVecs[side.ordinal()], distancesSq[side.ordinal()],
 			linesOfSight[side.ordinal()]);
 	}
 	
 	public static record BlockPlacingParams(BlockPos neighbor, Direction side,
-		Vec3d hitVec, double distanceSq, boolean lineOfSight)
+		Vec3 hitVec, double distanceSq, boolean lineOfSight)
 	{
 		public BlockHitResult toHitResult()
 		{

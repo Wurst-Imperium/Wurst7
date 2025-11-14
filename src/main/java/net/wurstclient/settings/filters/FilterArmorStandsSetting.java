@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ArmorStand;
 
 public final class FilterArmorStandsSetting extends EntityFilterCheckbox
 {
@@ -20,7 +20,7 @@ public final class FilterArmorStandsSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof ArmorStandEntity);
+		return !(e instanceof ArmorStand);
 	}
 	
 	public static FilterArmorStandsSetting genericCombat(boolean checked)

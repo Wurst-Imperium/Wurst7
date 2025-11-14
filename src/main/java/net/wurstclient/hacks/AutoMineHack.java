@@ -7,13 +7,13 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleBlockBreakingListener;
@@ -59,38 +59,38 @@ public final class AutoMineHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(HandleBlockBreakingListener.class, this);
-		IKeyBinding.get(MC.options.attackKey).resetPressedState();
-		MC.interactionManager.cancelBlockBreaking();
+		IKeyBinding.get(MC.options.keyAttack).resetPressedState();
+		MC.gameMode.stopDestroyBlock();
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerInteractionManager im = MC.interactionManager;
+		MultiPlayerGameMode im = MC.gameMode;
 		
 		// Ignore the attack cooldown because opening any screen
 		// will set it to 10k ticks.
 		
-		if(MC.player.isRiding())
+		if(MC.player.isHandsBusy())
 		{
-			im.cancelBlockBreaking();
+			im.stopDestroyBlock();
 			return;
 		}
 		
-		HitResult hitResult = MC.crosshairTarget;
+		HitResult hitResult = MC.hitResult;
 		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
 			|| !(hitResult instanceof BlockHitResult bHitResult))
 		{
-			im.cancelBlockBreaking();
+			im.stopDestroyBlock();
 			return;
 		}
 		
 		BlockPos pos = bHitResult.getBlockPos();
-		BlockState state = MC.world.getBlockState(pos);
-		Direction side = bHitResult.getSide();
+		BlockState state = MC.level.getBlockState(pos);
+		Direction side = bHitResult.getDirection();
 		if(state.isAir())
 		{
-			im.cancelBlockBreaking();
+			im.stopDestroyBlock();
 			return;
 		}
 		
@@ -100,14 +100,14 @@ public final class AutoMineHack extends Hack
 			// This case doesn't cancel block breaking in vanilla Minecraft.
 			return;
 		
-		if(!im.isBreakingBlock())
-			im.attackBlock(pos, side);
+		if(!im.isDestroying())
+			im.startDestroyBlock(pos, side);
 		
-		if(im.updateBlockBreakingProgress(pos, side))
+		if(im.continueDestroyBlock(pos, side))
 		{
-			MC.world.spawnBlockBreakingParticle(pos, side);
-			MC.player.swingHand(Hand.MAIN_HAND);
-			MC.options.attackKey.setPressed(true);
+			MC.level.addBreakingBlockEffect(pos, side);
+			MC.player.swing(InteractionHand.MAIN_HAND);
+			MC.options.keyAttack.setDown(true);
 		}
 	}
 	

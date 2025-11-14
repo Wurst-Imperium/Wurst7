@@ -12,20 +12,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.AbstractParentElement;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.screens.Screen;
 import net.wurstclient.WurstClient;
 
 @Mixin(Screen.class)
-public abstract class ScreenMixin extends AbstractParentElement
-	implements Drawable
+public abstract class ScreenMixin extends AbstractContainerEventHandler
+	implements Renderable
 {
 	@Inject(at = @At("HEAD"),
-		method = "renderInGameBackground(Lnet/minecraft/client/gui/DrawContext;)V",
+		method = "renderTransparentBackground(Lnet/minecraft/client/gui/GuiGraphics;)V",
 		cancellable = true)
-	public void onRenderInGameBackground(DrawContext context, CallbackInfo ci)
+	public void onRenderInGameBackground(GuiGraphics context, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noBackgroundHack
 			.shouldCancelBackground((Screen)(Object)this))

@@ -7,10 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.PositionAndOnGround;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
@@ -41,11 +41,11 @@ public final class MaceDmgHack extends Hack
 	@Override
 	public void onPlayerAttacksEntity(Entity target)
 	{
-		if(MC.crosshairTarget == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.ENTITY)
+		if(MC.hitResult == null
+			|| MC.hitResult.getType() != HitResult.Type.ENTITY)
 			return;
 		
-		if(!MC.player.getMainHandStack().isOf(Items.MACE))
+		if(!MC.player.getMainHandItem().is(Items.MACE))
 			return;
 			
 		// See ServerPlayNetworkHandler.onPlayerMove()
@@ -59,8 +59,8 @@ public final class MaceDmgHack extends Hack
 	
 	private void sendFakeY(double offset)
 	{
-		MC.player.networkHandler.sendPacket(
-			new PositionAndOnGround(MC.player.getX(), MC.player.getY() + offset,
+		MC.player.connection
+			.send(new Pos(MC.player.getX(), MC.player.getY() + offset,
 				MC.player.getZ(), false, MC.player.horizontalCollision));
 	}
 }

@@ -7,8 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -33,10 +33,10 @@ public final class NoBackgroundHack extends Hack
 		if(!isEnabled())
 			return false;
 		
-		if(MC.world == null)
+		if(MC.level == null)
 			return false;
 		
-		if(!allGuis.isChecked() && !(screen instanceof HandledScreen))
+		if(!allGuis.isChecked() && !(screen instanceof AbstractContainerScreen))
 			return false;
 		
 		return true;

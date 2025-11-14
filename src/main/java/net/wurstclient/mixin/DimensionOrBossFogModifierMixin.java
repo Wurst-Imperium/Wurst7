@@ -12,27 +12,25 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.render.fog.DimensionOrBossFogModifier;
-import net.minecraft.client.render.fog.FogData;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.client.renderer.fog.environment.DimensionOrBossFogEnvironment;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.wurstclient.WurstClient;
 
-@Mixin(DimensionOrBossFogModifier.class)
+@Mixin(DimensionOrBossFogEnvironment.class)
 public class DimensionOrBossFogModifierMixin
 {
 	/**
 	 * Removes the thick fog in the Nether and during the Ender Dragon fight,
 	 * if NoFog is enabled.
 	 */
-	@Inject(method = "applyStartEndModifier",
-		at = @At("TAIL"),
-		cancellable = true)
+	@Inject(method = "setupFog", at = @At("TAIL"), cancellable = true)
 	private void onApplyStartEndModifier(FogData data, Entity cameraEntity,
-		BlockPos cameraPos, ClientWorld world, float viewDistance,
-		RenderTickCounter tickCounter, CallbackInfo ci)
+		BlockPos cameraPos, ClientLevel world, float viewDistance,
+		DeltaTracker tickCounter, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
 			return;

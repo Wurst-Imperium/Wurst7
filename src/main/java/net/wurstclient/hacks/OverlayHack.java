@@ -7,9 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -45,19 +46,19 @@ public final class OverlayHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		if(MC.interactionManager.isBreakingBlock())
+		if(MC.gameMode.isDestroying())
 			renderer.updateProgress();
 		else
 			renderer.resetProgress();
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
-		if(!MC.interactionManager.isBreakingBlock())
+		if(!MC.gameMode.isDestroying())
 			return;
 		
-		if(!(MC.crosshairTarget instanceof BlockHitResult blockHitResult)
+		if(!(MC.hitResult instanceof BlockHitResult blockHitResult)
 			|| blockHitResult.getType() != HitResult.Type.BLOCK)
 			return;
 		

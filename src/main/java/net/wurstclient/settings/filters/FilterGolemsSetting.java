@@ -7,9 +7,9 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.entity.passive.GolemEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.AbstractGolem;
+import net.minecraft.world.entity.monster.Shulker;
 
 public final class FilterGolemsSetting extends EntityFilterCheckbox
 {
@@ -21,7 +21,7 @@ public final class FilterGolemsSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof GolemEntity) || e instanceof ShulkerEntity;
+		return !(e instanceof AbstractGolem) || e instanceof Shulker;
 	}
 	
 	public static FilterGolemsSetting genericCombat(boolean checked)

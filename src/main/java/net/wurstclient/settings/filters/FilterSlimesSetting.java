@@ -7,9 +7,9 @@
  */
 package net.wurstclient.settings.filters;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.MagmaCubeEntity;
-import net.minecraft.entity.mob.SlimeEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.entity.monster.Slime;
 
 public final class FilterSlimesSetting extends EntityFilterCheckbox
 {
@@ -24,7 +24,7 @@ public final class FilterSlimesSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof SlimeEntity) || e instanceof MagmaCubeEntity;
+		return !(e instanceof Slime) || e instanceof MagmaCube;
 	}
 	
 	public static FilterSlimesSetting genericCombat(boolean checked)

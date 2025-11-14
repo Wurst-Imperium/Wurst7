@@ -7,8 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.AirStrafingSpeedListener;
@@ -91,19 +91,19 @@ public final class FlightHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		
 		player.getAbilities().flying = false;
 		
-		player.setVelocity(0, 0, 0);
-		Vec3d velocity = player.getVelocity();
+		player.setDeltaMovement(0, 0, 0);
+		Vec3 velocity = player.getDeltaMovement();
 		
-		if(MC.options.jumpKey.isPressed())
-			player.setVelocity(velocity.x, verticalSpeed.getValue(),
+		if(MC.options.keyJump.isDown())
+			player.setDeltaMovement(velocity.x, verticalSpeed.getValue(),
 				velocity.z);
 		
-		if(MC.options.sneakKey.isPressed())
-			player.setVelocity(velocity.x, -verticalSpeed.getValue(),
+		if(MC.options.keyShift.isDown())
+			player.setDeltaMovement(velocity.x, -verticalSpeed.getValue(),
 				velocity.z);
 		
 		if(antiKick.isChecked())
@@ -115,13 +115,13 @@ public final class FlightHack extends Hack
 	{
 		float speed = horizontalSpeed.getValueF();
 		
-		if(MC.options.sneakKey.isPressed() && slowSneaking.isChecked())
+		if(MC.options.keyShift.isDown() && slowSneaking.isChecked())
 			speed = Math.min(speed, 0.85F);
 		
 		event.setSpeed(speed);
 	}
 	
-	private void doAntiKick(Vec3d velocity)
+	private void doAntiKick(Vec3 velocity)
 	{
 		if(tickCounter > antiKickInterval.getValueI() + 1)
 			tickCounter = 0;
@@ -130,14 +130,14 @@ public final class FlightHack extends Hack
 		{
 			case 0 ->
 			{
-				if(MC.options.sneakKey.isPressed())
+				if(MC.options.keyShift.isDown())
 					tickCounter = 2;
 				else
-					MC.player.setVelocity(velocity.x,
+					MC.player.setDeltaMovement(velocity.x,
 						-antiKickDistance.getValue(), velocity.z);
 			}
 			
-			case 1 -> MC.player.setVelocity(velocity.x,
+			case 1 -> MC.player.setDeltaMovement(velocity.x,
 				antiKickDistance.getValue(), velocity.z);
 		}
 		

@@ -11,11 +11,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.ai.PathFinder;
@@ -131,8 +132,7 @@ public final class FightBotHack extends Hack
 		stream = entityFilters.applyTo(stream);
 		
 		Entity entity = stream
-			.min(
-				Comparator.comparingDouble(e -> MC.player.squaredDistanceTo(e)))
+			.min(Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
 			.orElse(null);
 		if(entity == null)
 			return;
@@ -171,34 +171,34 @@ public final class FightBotHack extends Hack
 		}else
 		{
 			// jump if necessary
-			if(MC.player.horizontalCollision && MC.player.isOnGround())
-				MC.player.jump();
+			if(MC.player.horizontalCollision && MC.player.onGround())
+				MC.player.jumpFromGround();
 			
 			// swim up if necessary
-			if(MC.player.isTouchingWater() && MC.player.getY() < entity.getY())
-				MC.player.addVelocity(0, 0.04, 0);
+			if(MC.player.isInWater() && MC.player.getY() < entity.getY())
+				MC.player.push(0, 0.04, 0);
 			
 			// control height if flying
-			if(!MC.player.isOnGround()
+			if(!MC.player.onGround()
 				&& (MC.player.getAbilities().flying
 					|| WURST.getHax().flightHack.isEnabled())
-				&& MC.player.squaredDistanceTo(entity.getX(), MC.player.getY(),
-					entity.getZ()) <= MC.player.squaredDistanceTo(
-						MC.player.getX(), entity.getY(), MC.player.getZ()))
+				&& MC.player.distanceToSqr(entity.getX(), MC.player.getY(),
+					entity.getZ()) <= MC.player.distanceToSqr(MC.player.getX(),
+						entity.getY(), MC.player.getZ()))
 			{
 				if(MC.player.getY() > entity.getY() + 1D)
-					MC.options.sneakKey.setPressed(true);
+					MC.options.keyShift.setDown(true);
 				else if(MC.player.getY() < entity.getY() - 1D)
-					MC.options.jumpKey.setPressed(true);
+					MC.options.keyJump.setDown(true);
 			}else
 			{
-				MC.options.sneakKey.setPressed(false);
-				MC.options.jumpKey.setPressed(false);
+				MC.options.keyShift.setDown(false);
+				MC.options.keyJump.setDown(false);
 			}
 			
 			// follow entity
-			MC.options.forwardKey.setPressed(
-				MC.player.distanceTo(entity) > distance.getValueF());
+			MC.options.keyUp
+				.setDown(MC.player.distanceTo(entity) > distance.getValueF());
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
 		}
@@ -208,17 +208,17 @@ public final class FightBotHack extends Hack
 			return;
 		
 		// check range
-		if(MC.player.squaredDistanceTo(entity) > Math.pow(range.getValue(), 2))
+		if(MC.player.distanceToSqr(entity) > Math.pow(range.getValue(), 2))
 			return;
 		
 		// attack entity
-		MC.interactionManager.attackEntity(MC.player, entity);
-		swingHand.swing(Hand.MAIN_HAND);
+		MC.gameMode.attack(MC.player, entity);
+		swingHand.swing(InteractionHand.MAIN_HAND);
 		speed.resetTimer();
 	}
 	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
+	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
 		PathCmd pathCmd = WURST.getCmds().pathCmd;
 		pathFinder.renderPath(matrixStack, pathCmd.isDebugMode(),
@@ -231,7 +231,7 @@ public final class FightBotHack extends Hack
 		
 		public EntityPathFinder(Entity entity)
 		{
-			super(BlockPos.ofFloored(entity.getEntityPos()));
+			super(BlockPos.containing(entity.position()));
 			this.entity = entity;
 			setThinkTime(1);
 		}
@@ -239,9 +239,8 @@ public final class FightBotHack extends Hack
 		@Override
 		protected boolean checkDone()
 		{
-			return done =
-				entity.squaredDistanceTo(Vec3d.ofCenter(current)) <= Math
-					.pow(distance.getValue(), 2);
+			return done = entity.distanceToSqr(Vec3.atCenterOf(current)) <= Math
+				.pow(distance.getValue(), 2);
 		}
 		
 		@Override

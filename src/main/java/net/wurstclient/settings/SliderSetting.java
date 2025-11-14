@@ -14,7 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.clickgui.components.SliderComponent;
@@ -76,7 +76,7 @@ public class SliderSetting extends Setting implements SliderLock
 	
 	public final double getValueSq()
 	{
-		return MathHelper.square(getValue());
+		return Mth.square(getValue());
 	}
 	
 	public final float getValueF()
@@ -91,7 +91,7 @@ public class SliderSetting extends Setting implements SliderLock
 	
 	public final int getValueCeil()
 	{
-		return MathHelper.ceil(getValue());
+		return Mth.ceil(getValue());
 	}
 	
 	/**

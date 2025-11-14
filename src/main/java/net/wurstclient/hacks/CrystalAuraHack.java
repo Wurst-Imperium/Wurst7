@@ -13,18 +13,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -157,7 +157,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 		}
 		
 		if(shouldSwing)
-			swingHand.swing(Hand.MAIN_HAND);
+			swingHand.swing(InteractionHand.MAIN_HAND);
 		
 		return newCrystals;
 	}
@@ -167,37 +167,37 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 		for(Entity e : crystals)
 		{
 			faceTarget.face(e.getBoundingBox().getCenter());
-			MC.interactionManager.attackEntity(MC.player, e);
+			MC.gameMode.attack(MC.player, e);
 		}
 		
 		if(!crystals.isEmpty())
-			swingHand.swing(Hand.MAIN_HAND);
+			swingHand.swing(InteractionHand.MAIN_HAND);
 	}
 	
 	private boolean placeCrystal(BlockPos pos)
 	{
-		Vec3d eyesPos = RotationUtils.getEyesPos();
+		Vec3 eyesPos = RotationUtils.getEyesPos();
 		double rangeSq = Math.pow(range.getValue(), 2);
-		Vec3d posVec = Vec3d.ofCenter(pos);
-		double distanceSqPosVec = eyesPos.squaredDistanceTo(posVec);
+		Vec3 posVec = Vec3.atCenterOf(pos);
+		double distanceSqPosVec = eyesPos.distanceToSqr(posVec);
 		
 		for(Direction side : Direction.values())
 		{
-			BlockPos neighbor = pos.offset(side);
+			BlockPos neighbor = pos.relative(side);
 			
 			// check if neighbor can be right clicked
 			if(!isClickableNeighbor(neighbor))
 				continue;
 			
-			Vec3d dirVec = Vec3d.of(side.getVector());
-			Vec3d hitVec = posVec.add(dirVec.multiply(0.5));
+			Vec3 dirVec = Vec3.atLowerCornerOf(side.getUnitVec3i());
+			Vec3 hitVec = posVec.add(dirVec.scale(0.5));
 			
 			// check if hitVec is within range
-			if(eyesPos.squaredDistanceTo(hitVec) > rangeSq)
+			if(eyesPos.distanceToSqr(hitVec) > rangeSq)
 				continue;
 			
 			// check if side is visible (facing away from player)
-			if(distanceSqPosVec > eyesPos.squaredDistanceTo(posVec.add(dirVec)))
+			if(distanceSqPosVec > eyesPos.distanceToSqr(posVec.add(dirVec)))
 				continue;
 			
 			if(checkLOS.isChecked()
@@ -223,17 +223,17 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	
 	private ArrayList<Entity> getNearbyCrystals()
 	{
-		ClientPlayerEntity player = MC.player;
+		LocalPlayer player = MC.player;
 		double rangeSq = Math.pow(range.getValue(), 2);
 		
-		Comparator<Entity> furthestFromPlayer = Comparator
-			.<Entity> comparingDouble(e -> MC.player.squaredDistanceTo(e))
-			.reversed();
+		Comparator<Entity> furthestFromPlayer =
+			Comparator.<Entity> comparingDouble(e -> MC.player.distanceToSqr(e))
+				.reversed();
 		
-		return StreamSupport.stream(MC.world.getEntities().spliterator(), true)
-			.filter(EndCrystalEntity.class::isInstance)
-			.filter(e -> !e.isRemoved())
-			.filter(e -> player.squaredDistanceTo(e) <= rangeSq)
+		return StreamSupport
+			.stream(MC.level.entitiesForRendering().spliterator(), true)
+			.filter(EndCrystal.class::isInstance).filter(e -> !e.isRemoved())
+			.filter(e -> player.distanceToSqr(e) <= rangeSq)
 			.sorted(furthestFromPlayer)
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
@@ -242,20 +242,19 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	{
 		double rangeSq = Math.pow(range.getValue(), 2);
 		
-		Comparator<Entity> furthestFromPlayer = Comparator
-			.<Entity> comparingDouble(e -> MC.player.squaredDistanceTo(e))
-			.reversed();
+		Comparator<Entity> furthestFromPlayer =
+			Comparator.<Entity> comparingDouble(e -> MC.player.distanceToSqr(e))
+				.reversed();
 		
-		Stream<Entity> stream =
-			StreamSupport.stream(MC.world.getEntities().spliterator(), false)
-				.filter(e -> !e.isRemoved())
-				.filter(e -> e instanceof LivingEntity
-					&& ((LivingEntity)e).getHealth() > 0)
-				.filter(e -> e != MC.player)
-				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(
-					e -> !WURST.getFriends().contains(e.getName().getString()))
-				.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
+		Stream<Entity> stream = StreamSupport
+			.stream(MC.level.entitiesForRendering().spliterator(), false)
+			.filter(e -> !e.isRemoved())
+			.filter(e -> e instanceof LivingEntity
+				&& ((LivingEntity)e).getHealth() > 0)
+			.filter(e -> e != MC.player)
+			.filter(e -> !(e instanceof FakePlayerEntity))
+			.filter(e -> !WURST.getFriends().contains(e.getName().getString()))
+			.filter(e -> MC.player.distanceToSqr(e) <= rangeSq);
 		
 		stream = entityFilters.applyTo(stream);
 		
@@ -265,46 +264,46 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	
 	private ArrayList<BlockPos> getFreeBlocksNear(Entity target)
 	{
-		Vec3d eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
+		Vec3 eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
 		double rangeD = range.getValue();
 		double rangeSq = Math.pow(rangeD + 0.5, 2);
 		int rangeI = 2;
 		
-		BlockPos center = target.getBlockPos();
-		BlockPos min = center.add(-rangeI, -rangeI, -rangeI);
-		BlockPos max = center.add(rangeI, rangeI, rangeI);
-		Box targetBB = target.getBoundingBox();
+		BlockPos center = target.blockPosition();
+		BlockPos min = center.offset(-rangeI, -rangeI, -rangeI);
+		BlockPos max = center.offset(rangeI, rangeI, rangeI);
+		AABB targetBB = target.getBoundingBox();
 		
-		Vec3d targetEyesVec = target.getEntityPos().add(0,
-			target.getEyeHeight(target.getPose()), 0);
+		Vec3 targetEyesVec =
+			target.position().add(0, target.getEyeHeight(target.getPose()), 0);
 		
 		Comparator<BlockPos> closestToTarget =
 			Comparator.<BlockPos> comparingDouble(
-				pos -> targetEyesVec.squaredDistanceTo(Vec3d.ofCenter(pos)));
+				pos -> targetEyesVec.distanceToSqr(Vec3.atCenterOf(pos)));
 		
-		return BlockUtils.getAllInBoxStream(min, max)
-			.filter(pos -> eyesVec.squaredDistanceTo(Vec3d.of(pos)) <= rangeSq)
+		return BlockUtils.getAllInBoxStream(min, max).filter(
+			pos -> eyesVec.distanceToSqr(Vec3.atLowerCornerOf(pos)) <= rangeSq)
 			.filter(this::isReplaceable).filter(this::hasCrystalBase)
-			.filter(pos -> !targetBB.intersects(new Box(pos)))
+			.filter(pos -> !targetBB.intersects(new AABB(pos)))
 			.sorted(closestToTarget)
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private boolean isReplaceable(BlockPos pos)
 	{
-		return BlockUtils.getState(pos).isReplaceable();
+		return BlockUtils.getState(pos).canBeReplaced();
 	}
 	
 	private boolean hasCrystalBase(BlockPos pos)
 	{
-		Block block = BlockUtils.getBlock(pos.down());
+		Block block = BlockUtils.getBlock(pos.below());
 		return block == Blocks.BEDROCK || block == Blocks.OBSIDIAN;
 	}
 	
 	private boolean isClickableNeighbor(BlockPos pos)
 	{
 		return BlockUtils.canBeClicked(pos)
-			&& !BlockUtils.getState(pos).isReplaceable();
+			&& !BlockUtils.getState(pos).canBeReplaced();
 	}
 	
 	private enum TakeItemsFrom
