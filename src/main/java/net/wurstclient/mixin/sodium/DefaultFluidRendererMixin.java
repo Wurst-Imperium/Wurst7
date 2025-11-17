@@ -55,14 +55,38 @@ public class DefaultFluidRendererMixin
 			cir.setReturnValue(!event.isRendered());
 	}
 	
+	@Inject(at = @At("HEAD"),
+		method = "isSideExposed(Lnet/minecraft/class_1920;IIILnet/minecraft/class_2350;F)Z",
+		cancellable = true,
+		remap = false,
+		require = 0)
+	private void onIsSideExposed(BlockAndTintGetter world, int x, int y, int z,
+		Direction dir, float height, CallbackInfoReturnable<Boolean> cir)
+	{
+		BlockPos pos = new BlockPos(x, y, z);
+		BlockState state = world.getBlockState(pos);
+		
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		EventManager.fire(event);
+		
+		if(event.isRendered() == null)
+			return;
+		
+		BlockPos nPos = pos.offset(dir.getUnitVec3i());
+		BlockState neighborState = world.getBlockState(nPos);
+		
+		cir.setReturnValue(!neighborState.getFluidState().getType()
+			.isSame(state.getFluidState().getType()) && event.isRendered());
+	}
+	
 	/**
 	 * Modifies opacity of fluids when using X-Ray with Sodium installed.
 	 */
 	@ModifyExpressionValue(at = @At(value = "INVOKE",
 		target = "Lnet/caffeinemc/mods/sodium/api/util/ColorARGB;toABGR(I)I"),
 		method = "updateQuad",
-		require = 0,
-		remap = false)
+		remap = false,
+		require = 0)
 	private int onUpdateQuad(int original, @Local(argsOnly = true) BlockPos pos,
 		@Local(argsOnly = true) FluidState state)
 	{
