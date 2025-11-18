@@ -37,7 +37,8 @@ import net.wurstclient.hacks.XRayHack;
 public class DefaultFluidRendererMixin
 {
 	/**
-	 * Hides and shows fluids when using X-Ray with Sodium installed.
+	 * Hides and shows the top side of fluids when using X-Ray with Sodium
+	 * installed.
 	 */
 	@Inject(at = @At("HEAD"),
 		method = "isFullBlockFluidOccluded(Lnet/minecraft/class_1920;Lnet/minecraft/class_2338;Lnet/minecraft/class_2350;Lnet/minecraft/class_2680;Lnet/minecraft/class_3610;)Z",
@@ -55,6 +56,10 @@ public class DefaultFluidRendererMixin
 			cir.setReturnValue(!event.isRendered());
 	}
 	
+	/**
+	 * Hides and shows all other sides of fluids when using X-Ray with Sodium
+	 * installed.
+	 */
 	@Inject(at = @At("HEAD"),
 		method = "isSideExposed(Lnet/minecraft/class_1920;IIILnet/minecraft/class_2350;F)Z",
 		cancellable = true,
