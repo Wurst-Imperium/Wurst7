@@ -49,7 +49,8 @@ public class DefaultFluidRendererMixin
 		BlockPos pos, Direction dir, BlockState state, FluidState fluid,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		// Note: the null BlockPos is here to skip the "exposed only" check
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
@@ -71,7 +72,8 @@ public class DefaultFluidRendererMixin
 		BlockPos pos = new BlockPos(x, y, z);
 		BlockState state = world.getBlockState(pos);
 		
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		// Note: the null BlockPos is here to skip the "exposed only" check
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
 		EventManager.fire(event);
 		
 		if(event.isRendered() == null)
