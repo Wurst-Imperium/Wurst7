@@ -15,7 +15,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -126,6 +126,6 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 		KeyMapping[] keys = {MC.options.keyJump, MC.options.keyShift};
 		
 		for(KeyMapping key : keys)
-			IKeyBinding.get(key).resetPressedState();
+			IKeyMapping.get(key).resetPressedState();
 	}
 }

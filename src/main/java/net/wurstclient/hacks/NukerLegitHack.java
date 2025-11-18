@@ -29,7 +29,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.nukers.CommonNukerSettings;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting;
@@ -97,7 +97,7 @@ public final class NukerLegitHack extends Hack
 		EVENTS.remove(RenderListener.class, this);
 		
 		// resets
-		IKeyBinding.get(MC.options.keyAttack).resetPressedState();
+		IKeyMapping.get(MC.options.keyAttack).resetPressedState();
 		MC.gameMode.stopDestroyBlock();
 		overlay.resetProgress();
 		currentBlock = null;
@@ -147,7 +147,7 @@ public final class NukerLegitHack extends Hack
 		// reset if no block was found
 		if(currentBlock == null)
 		{
-			IKeyBinding.get(MC.options.keyAttack).resetPressedState();
+			IKeyMapping.get(MC.options.keyAttack).resetPressedState();
 			overlay.resetProgress();
 		}
 		

@@ -34,7 +34,7 @@ import net.wurstclient.hack.HackList;
 import net.wurstclient.hud.IngameHUD;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
-import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.mixinterface.IMinecraft;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
@@ -48,7 +48,7 @@ public enum WurstClient
 	INSTANCE;
 	
 	public static Minecraft MC;
-	public static IMinecraftClient IMC;
+	public static IMinecraft IMC;
 	
 	public static final String VERSION = "7.51.1";
 	public static final String MC_VERSION = "1.21.10";
@@ -81,7 +81,7 @@ public enum WurstClient
 		System.out.println("Starting Wurst Client...");
 		
 		MC = Minecraft.getInstance();
-		IMC = (IMinecraftClient)MC;
+		IMC = (IMinecraft)MC;
 		wurstFolder = createWurstFolder();
 		
 		Path analyticsFile = wurstFolder.resolve("analytics.json");

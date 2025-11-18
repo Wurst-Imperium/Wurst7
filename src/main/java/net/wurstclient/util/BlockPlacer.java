@@ -17,7 +17,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.mixinterface.IMinecraft;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 
 public enum BlockPlacer
@@ -26,7 +26,7 @@ public enum BlockPlacer
 	
 	private static final WurstClient WURST = WurstClient.INSTANCE;
 	private static final Minecraft MC = WurstClient.MC;
-	private static final IMinecraftClient IMC = WurstClient.IMC;
+	private static final IMinecraft IMC = WurstClient.IMC;
 	
 	public static boolean placeOneBlock(BlockPos pos)
 	{

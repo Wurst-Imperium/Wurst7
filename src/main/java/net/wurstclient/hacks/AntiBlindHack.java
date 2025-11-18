@@ -24,5 +24,5 @@ public final class AntiBlindHack extends Hack
 	}
 	
 	// See BackgroundRendererMixin, LightmapTextureManagerMixin,
-	// WorldRendererMixin, ClientPlayerEntityMixin.hasStatusEffect()
+	// LevelRendererMixin, LocalPlayerMixin.hasEffect()
 }

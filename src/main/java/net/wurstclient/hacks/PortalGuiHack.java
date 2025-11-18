@@ -20,5 +20,5 @@ public final class PortalGuiHack extends Hack
 		setCategory(Category.OTHER);
 	}
 	
-	// See ClientPlayerEntityMixin.beforeUpdateNausea()
+	// See LocalPlayerMixin.beforeTickNausea()
 }

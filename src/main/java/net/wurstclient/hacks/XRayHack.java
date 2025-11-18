@@ -28,7 +28,7 @@ import net.wurstclient.events.SetOpaqueCubeListener;
 import net.wurstclient.events.ShouldDrawSideListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.ISimpleOption;
+import net.wurstclient.mixinterface.IOptionInstance;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -150,7 +150,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		// reset gamma
 		FullbrightHack fullbright = WURST.getHax().fullbrightHack;
 		if(!fullbright.isChangingGamma())
-			ISimpleOption.get(MC.options.gamma())
+			IOptionInstance.get(MC.options.gamma())
 				.forceSetValue(fullbright.getDefaultGamma());
 	}
 	
@@ -158,7 +158,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	public void onUpdate()
 	{
 		// force gamma to 16 so that ores are bright enough to see
-		ISimpleOption.get(MC.options.gamma()).forceSetValue(16.0);
+		IOptionInstance.get(MC.options.gamma()).forceSetValue(16.0);
 	}
 	
 	@Override
@@ -253,5 +253,5 @@ public final class XRayHack extends Hack implements UpdateListener,
 		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
 	
-	// See AbstractBlockRenderContextMixin, RenderLayersMixin
+	// See AbstractBlockRenderContextMixin, ItemBlockRenderTypesMixin
 }

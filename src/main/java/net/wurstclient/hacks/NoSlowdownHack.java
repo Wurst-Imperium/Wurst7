@@ -21,5 +21,5 @@ public final class NoSlowdownHack extends Hack
 	}
 	
 	// See BlockMixin.onGetVelocityMultiplier() and
-	// ClientPlayerEntityMixin.wurstIsUsingItem()
+	// LocalPlayerMixin.wurstIsUsingItem()
 }

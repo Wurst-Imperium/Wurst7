@@ -79,5 +79,5 @@ public final class NameTagsHack extends Hack
 	}
 	
 	// See EntityRenderCommandQueueImpl, EntityRendererMixin,
-	// LivingEntityRendererMixin, MobEntityRendererMixin
+	// LivingEntityRendererMixin, MobRendererMixin
 }

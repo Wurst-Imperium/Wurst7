@@ -22,7 +22,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"inv walk", "inventory walk", "InvMove", "inv move",
@@ -93,7 +93,7 @@ public final class InvWalkHack extends Hack implements UpdateListener
 			keys.add(MC.options.keyJump);
 		
 		for(KeyMapping key : keys)
-			IKeyBinding.get(key).resetPressedState();
+			IKeyMapping.get(key).resetPressedState();
 	}
 	
 	private boolean isAllowedScreen(Screen screen)

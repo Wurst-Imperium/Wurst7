@@ -21,7 +21,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -86,7 +86,7 @@ public final class RestockHack extends Hack implements UpdateListener
 			return;
 		
 		Inventory inv = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		IMultiPlayerGameMode im = IMC.getInteractionManager();
 		
 		int hotbarSlot = restockSlot.getValueI();
 		if(hotbarSlot == -1)

@@ -13,7 +13,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.ISimpleOption;
+import net.wurstclient.mixinterface.IOptionInstance;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -96,7 +96,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		wasGammaChanged = true;
 		
 		OptionInstance<Double> gammaOption = MC.options.gamma();
-		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
+		IOptionInstance<Double> gammaOption2 = IOptionInstance.get(gammaOption);
 		double oldGammaValue = gammaOption.get();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
@@ -114,7 +114,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	private void resetGamma(double target)
 	{
 		OptionInstance<Double> gammaOption = MC.options.gamma();
-		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
+		IOptionInstance<Double> gammaOption2 = IOptionInstance.get(gammaOption);
 		double oldGammaValue = gammaOption.get();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
@@ -193,5 +193,5 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		}
 	}
 	
-	// See ClientPlayerEntityMixin.hasStatusEffect()
+	// See LocalPlayerMixin.hasEffect()
 }

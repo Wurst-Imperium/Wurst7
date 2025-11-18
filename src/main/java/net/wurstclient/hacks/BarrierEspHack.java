@@ -20,5 +20,5 @@ public class BarrierEspHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See ClientWorldMixin
+	// See ClientLevelMixin
 }
