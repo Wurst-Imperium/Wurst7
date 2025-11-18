@@ -38,7 +38,7 @@ public enum XRayHackTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_default",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/02KZHLm.png"
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/erO3kia.png"
 				: "https://i.imgur.com/Dftamqv.png");
 		
 		// Exposed only
@@ -48,7 +48,7 @@ public enum XRayHackTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_exposed_only",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/xplrJwM.png"
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/yjCT7jI.png"
 				: "https://i.imgur.com/QlEpQTu.png");
 		
 		// Opacity mode
@@ -58,7 +58,7 @@ public enum XRayHackTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_opacity",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/MFc821z.png"
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/LKaCXNd.png"
 				: "https://i.imgur.com/0nLulJn.png");
 		
 		// Exposed only + opacity
@@ -68,7 +68,7 @@ public enum XRayHackTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_exposed_only_opacity",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/GRHgW6P.png"
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/0OmJCsi.png"
 				: "https://i.imgur.com/noPWDUl.png");
 		
 		// Clean up
