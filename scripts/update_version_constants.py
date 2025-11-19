@@ -56,7 +56,7 @@ def update_mc_version_constant(mc_version):
 			break
 
 	# Save modified WurstClient.java
-	with open("src/main/java/net/wurstclient/WurstClient.java", "w") as f:
+	with open("src/main/java/net/wurstclient/WurstClient.java", "w", newline='\r\n') as f:
 		f.writelines(lines)
 
 	if found:
