@@ -10,7 +10,7 @@ package net.wurstclient.hacks.chestesp.groups;
 import java.awt.Color;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.vehicle.AbstractChestBoat;
+import net.minecraft.world.entity.vehicle.boat.AbstractChestBoat;
 import net.wurstclient.hacks.chestesp.ChestEspEntityGroup;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
