@@ -47,6 +47,7 @@
     "LanguageManagerMixin",
     "LivingEntityMixin",
     "LivingEntityRendererMixin",
+    "LocalPlayerMixin",
     "MinecraftClientMixin",
     "MobEntityRendererMixin",
     "MouseMixin",

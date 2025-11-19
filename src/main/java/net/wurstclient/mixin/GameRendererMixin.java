@@ -19,9 +19,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.HitResult;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
@@ -51,23 +49,6 @@ public abstract class GameRendererMixin implements AutoCloseable
 	{
 		return WurstClient.INSTANCE.getOtfs().zoomOtf
 			.changeFovBasedOnZoom(original);
-	}
-	
-	/**
-	 * This is the part that makes Liquids work.
-	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;",
-		ordinal = 0),
-		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;")
-	private HitResult liquidsRaycast(Entity instance, double maxDistance,
-		float tickDelta, boolean includeFluids, Operation<HitResult> original)
-	{
-		if(!WurstClient.INSTANCE.getHax().liquidsHack.isEnabled())
-			return original.call(instance, maxDistance, tickDelta,
-				includeFluids);
-		
-		return original.call(instance, maxDistance, tickDelta, true);
 	}
 	
 	@WrapOperation(
