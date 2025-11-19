@@ -68,6 +68,10 @@ loom {
 	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
 	
 	runs {
+		clientWithMods {
+			inherit client
+		}
+
 		clientGameTestWithMods {
 			inherit client
 			source = sourceSets.gametest
@@ -87,6 +91,20 @@ configurations {
 
 dependencies {
 	testMods "maven.modrinth:sodium:${project.sodium_version}"
+}
+
+def cleanClientWithMods = tasks.register("cleanClientWithMods", Delete) {
+	delete "run/mods"
+}
+
+def prepareClientWithMods = tasks.register("prepareClientWithMods", Sync) {
+	from configurations.testMods
+	into "run/mods"
+}
+
+tasks.named("runClientWithMods") {
+	dependsOn prepareClientWithMods
+	finalizedBy cleanClientWithMods
 }
 
 def cleanClientGameTestWithMods = tasks.register("cleanClientGameTestWithMods", Delete) {
