@@ -37,7 +37,8 @@ import net.wurstclient.hacks.XRayHack;
 public class DefaultFluidRendererMixin
 {
 	/**
-	 * Hides and shows fluids when using X-Ray with Sodium installed.
+	 * Hides and shows the top side of fluids when using X-Ray with Sodium
+	 * installed.
 	 */
 	@Inject(at = @At("HEAD"),
 		method = "isFullBlockFluidOccluded(Lnet/minecraft/class_1920;Lnet/minecraft/class_2338;Lnet/minecraft/class_2350;Lnet/minecraft/class_2680;Lnet/minecraft/class_3610;)Z",
@@ -48,11 +49,41 @@ public class DefaultFluidRendererMixin
 		BlockPos pos, Direction dir, BlockState state, FluidState fluid,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		// Note: the null BlockPos is here to skip the "exposed only" check
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
 			cir.setReturnValue(!event.isRendered());
+	}
+	
+	/**
+	 * Hides and shows all other sides of fluids when using X-Ray with Sodium
+	 * installed.
+	 */
+	@Inject(at = @At("HEAD"),
+		method = "isSideExposed(Lnet/minecraft/class_1920;IIILnet/minecraft/class_2350;F)Z",
+		cancellable = true,
+		remap = false,
+		require = 0)
+	private void onIsSideExposed(BlockAndTintGetter world, int x, int y, int z,
+		Direction dir, float height, CallbackInfoReturnable<Boolean> cir)
+	{
+		BlockPos pos = new BlockPos(x, y, z);
+		BlockState state = world.getBlockState(pos);
+		
+		// Note: the null BlockPos is here to skip the "exposed only" check
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
+		EventManager.fire(event);
+		
+		if(event.isRendered() == null)
+			return;
+		
+		BlockPos nPos = pos.offset(dir.getUnitVec3i());
+		BlockState neighborState = world.getBlockState(nPos);
+		
+		cir.setReturnValue(!neighborState.getFluidState().getType()
+			.isSame(state.getFluidState().getType()) && event.isRendered());
 	}
 	
 	/**
@@ -61,8 +92,8 @@ public class DefaultFluidRendererMixin
 	@ModifyExpressionValue(at = @At(value = "INVOKE",
 		target = "Lnet/caffeinemc/mods/sodium/api/util/ColorARGB;toABGR(I)I"),
 		method = "updateQuad",
-		require = 0,
-		remap = false)
+		remap = false,
+		require = 0)
 	private int onUpdateQuad(int original, @Local(argsOnly = true) BlockPos pos,
 		@Local(argsOnly = true) FluidState state)
 	{
