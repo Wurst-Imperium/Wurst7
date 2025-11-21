@@ -48,7 +48,7 @@ public class WurstTest implements FabricClientGameTest
 		
 		LOGGER.info("Reached title screen");
 		assertScreenshotEquals(context, "title_screen",
-			"https://i.imgur.com/4fSJRpd.png");
+			"https://i.imgur.com/xSAHDXr.png");
 		
 		AltManagerTest.testAltManagerButton(context);
 		
