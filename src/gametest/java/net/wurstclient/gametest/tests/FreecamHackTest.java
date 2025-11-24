@@ -41,16 +41,14 @@ public enum FreecamHackTest
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
 		assertScreenshotEquals(context, "freecam_moved",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/oZUpI8c.png"
-				: "https://i.imgur.com/pZDlYfH.png");
+			"https://i.imgur.com/pZDlYfH.png");
 		clearChat(context);
 		
 		// Enable tracer
 		runWurstCommand(context, "setcheckbox Freecam tracer on");
 		context.waitTick();
 		assertScreenshotEquals(context, "freecam_tracer",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/teKaxAK.png"
-				: "https://i.imgur.com/jYqDFzE.png");
+			"https://i.imgur.com/jYqDFzE.png");
 		clearChat(context);
 		
 		// Clean up
