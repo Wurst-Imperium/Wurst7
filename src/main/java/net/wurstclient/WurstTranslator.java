@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import com.google.common.collect.Lists;
@@ -25,6 +26,7 @@ import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -192,9 +194,11 @@ public class WurstTranslator implements ResourceManagerReloadListener
 			// be caught to prevent mod detection vulnerabilities using
 			// intentionally corrupted resource packs.
 			for(Resource resource : manager.getResourceStack(langId))
+			{
 				try(InputStream stream = resource.open())
 				{
-					Language.loadFromJson(stream, entryConsumer);
+					if(isBuiltInWurstResourcePack(resource))
+						Language.loadFromJson(stream, entryConsumer);
 					
 				}catch(IOException | JsonParseException e)
 				{
@@ -209,6 +213,27 @@ public class WurstTranslator implements ResourceManagerReloadListener
 							+ langCode);
 					e.printStackTrace();
 				}
+			}
 		}
+	}
+	
+	/**
+	 * Ensures that the given resource is from Wurst's built-in resource pack,
+	 * or at least from another client-side mod pretending to be Wurst, as it
+	 * should be impossible for server-provided resource packs to obtain a
+	 * KnownPack of <code>fabric:wurst</code>.
+	 *
+	 * <p>
+	 * ASSUME THEY CAN BYPASS THIS. CATCH EXCEPTIONS ANYWAY.
+	 */
+	private boolean isBuiltInWurstResourcePack(Resource resource)
+	{
+		KnownPack knownPack = Optional.ofNullable(resource)
+			.flatMap(Resource::knownPackInfo).orElse(null);
+		if(knownPack == null)
+			return false;
+		
+		return "fabric".equals(knownPack.namespace())
+			&& "wurst".equals(knownPack.id());
 	}
 }
