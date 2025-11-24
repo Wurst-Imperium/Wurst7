@@ -46,6 +46,7 @@ public class FluidRendererMixin
 		BlockAndTintGetter world, BlockPos pos, VertexConsumer vertexConsumer,
 		BlockState blockState, FluidState fluidState)
 	{
+		// Note: the null BlockPos is here to skip the "exposed only" check
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(blockState, null);
 		EventManager.fire(event);
 		
