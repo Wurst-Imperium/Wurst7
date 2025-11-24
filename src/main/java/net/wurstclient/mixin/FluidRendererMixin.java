@@ -34,7 +34,8 @@ public class FluidRendererMixin
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		BlockState state = world.getBlockState(pos);
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		// Note: the null BlockPos is here to skip the "exposed only" check
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)

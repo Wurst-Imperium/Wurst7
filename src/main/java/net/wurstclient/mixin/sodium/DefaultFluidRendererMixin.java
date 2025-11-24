@@ -55,7 +55,7 @@ public class DefaultFluidRendererMixin
 	{
 		BlockPos.MutableBlockPos pos = mutablePosForExposedCheck.get();
 		pos.set(x, y, z);
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
@@ -79,7 +79,7 @@ public class DefaultFluidRendererMixin
 	{
 		BlockPos.MutableBlockPos pos = mutablePosForExposedCheck.get();
 		pos.set(x, y, z);
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
@@ -101,7 +101,8 @@ public class DefaultFluidRendererMixin
 		BlockPos pos, Direction dir, BlockState state, FluidState fluid,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		// Note: the null BlockPos is here to skip the "exposed only" check
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
 		EventManager.fire(event);
 		
 		if(event.isRendered() != null)
@@ -117,8 +118,8 @@ public class DefaultFluidRendererMixin
 	@ModifyExpressionValue(at = @At(value = "INVOKE",
 		target = "Lnet/caffeinemc/mods/sodium/api/util/ColorARGB;toABGR(I)I"),
 		method = "updateQuad",
-		require = 0,
-		remap = false)
+		remap = false,
+		require = 0)
 	private int onUpdateQuad(int original, @Local(argsOnly = true) BlockPos pos,
 		@Local(argsOnly = true) FluidState state)
 	{
