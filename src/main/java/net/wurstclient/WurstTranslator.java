@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonParseException;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
@@ -187,15 +188,25 @@ public class WurstTranslator implements ResourceManagerReloadListener
 			ResourceLocation langId =
 				ResourceLocation.fromNamespaceAndPath("wurst", langFilePath);
 			
+			// IMPORTANT: Exceptions thrown by Language.loadFromJson() must
+			// be caught to prevent mod detection vulnerabilities using
+			// intentionally corrupted resource packs.
 			for(Resource resource : manager.getResourceStack(langId))
 				try(InputStream stream = resource.open())
 				{
 					Language.loadFromJson(stream, entryConsumer);
 					
-				}catch(IOException e)
+				}catch(IOException | JsonParseException e)
 				{
-					System.out.println("Failed to load translations for "
-						+ langCode + " from pack " + resource.sourcePackId());
+					System.out.println(
+						"Failed to load Wurst translations for " + langCode);
+					e.printStackTrace();
+					
+				}catch(Exception e)
+				{
+					System.out.println(
+						"Unexpected exception while loading Wurst translations for "
+							+ langCode);
 					e.printStackTrace();
 				}
 		}
