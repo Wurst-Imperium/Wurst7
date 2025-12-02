@@ -42,7 +42,7 @@ jobs:
       run: echo ${{ inputs.distinct_id }}
 
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         # Include all tags in case the new tag already exists.
         fetch-tags: true
