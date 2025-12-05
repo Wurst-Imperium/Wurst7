@@ -7,9 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -108,8 +107,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 			return;
 		
 		// get valid blocks
-		ArrayList<BlockPos> validBlocks = getValidBlocks();
-		
+		List<BlockPos> validBlocks = getValidBlocks();
 		if(validBlocks.isEmpty())
 			return;
 		
@@ -151,7 +149,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		}
 	}
 	
-	private ArrayList<BlockPos> getValidBlocks()
+	private List<BlockPos> getValidBlocks()
 	{
 		Vec3 eyesVec = RotationUtils.getEyesPos();
 		BlockPos eyesBlock = BlockPos.containing(eyesVec);
@@ -167,8 +165,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		
 		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 			.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
-			.filter(this::isCorrectBlock).sorted(farthestFirst)
-			.collect(Collectors.toCollection(ArrayList::new));
+			.filter(this::isCorrectBlock).sorted(farthestFirst).toList();
 	}
 	
 	private boolean isCorrectBlock(BlockPos pos)
