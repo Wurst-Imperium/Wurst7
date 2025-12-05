@@ -70,7 +70,6 @@ loom {
 	runs {
 		clientWithMods {
 			inherit client
-			programArgs.add("--username=Wurst-Bot")
 		}
 
 		clientGameTestWithMods {
