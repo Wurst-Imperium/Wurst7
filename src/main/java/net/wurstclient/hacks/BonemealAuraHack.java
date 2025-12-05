@@ -33,6 +33,8 @@ import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
+import net.wurstclient.settings.TakeItemsFromSetting;
+import net.wurstclient.settings.TakeItemsFromSetting.TakeItemsFrom;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
@@ -52,13 +54,8 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
 		Mode.values(), Mode.FAST);
 	
-	private final EnumSetting<AutomationLevel> automationLevel =
-		new EnumSetting<>("Automation",
-			"How much of the bone-mealing process to automate.\n"
-				+ "\u00a7lRight Click\u00a7r simply right clicks plants with the bone meal in your hand.\n"
-				+ "\u00a7lHotbar\u00a7r selects bone meal in your hotbar and then uses it on plants.\n"
-				+ "\u00a7lInventory\u00a7r finds bone meal in your inventory, moves it to your hotbar and then uses it.",
-			AutomationLevel.values(), AutomationLevel.RIGHT_CLICK);
+	private final TakeItemsFromSetting takeItemsFrom =
+		TakeItemsFromSetting.withHands(this, TakeItemsFrom.HANDS);
 	
 	private final CheckboxSetting saplings =
 		new CheckboxSetting("Saplings", true);
@@ -79,7 +76,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(mode);
-		addSetting(automationLevel);
+		addSetting(takeItemsFrom);
 		addSetting(saplings);
 		addSetting(crops);
 		addSetting(stems);
@@ -123,7 +120,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		if(!MC.player.isHolding(Items.BONE_MEAL))
 		{
 			InventoryUtils.selectItem(Items.BONE_MEAL,
-				automationLevel.getSelected().maxInvSlot);
+				takeItemsFrom.getMaxInvSlot());
 			return;
 		}
 		
@@ -247,28 +244,6 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		private Mode(String name)
 		{
 			this.name = name;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
-	}
-	
-	private enum AutomationLevel
-	{
-		RIGHT_CLICK("Right Click", 0),
-		HOTBAR("Hotbar", 9),
-		INVENTORY("Inventory", 36);
-		
-		private final String name;
-		private final int maxInvSlot;
-		
-		private AutomationLevel(String name, int maxInvSlot)
-		{
-			this.name = name;
-			this.maxInvSlot = maxInvSlot;
 		}
 		
 		@Override
