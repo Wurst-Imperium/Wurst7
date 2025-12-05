@@ -9,6 +9,8 @@ package net.wurstclient.hacks;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -22,15 +24,16 @@ import net.minecraft.world.level.block.GrassBlock;
 import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleInputListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.FaceTargetSetting;
+import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SwingHandSetting;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.TakeItemsFromSetting;
 import net.wurstclient.settings.TakeItemsFromSetting.TakeItemsFrom;
@@ -48,10 +51,30 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
-		"\u00a7lFast\u00a7r mode can use bone meal on multiple blocks at once.\n"
-			+ "\u00a7lLegit\u00a7r mode can bypass NoCheat+.",
-		Mode.values(), Mode.FAST);
+	private final CheckboxSetting multiMeal = new CheckboxSetting("MultiMeal",
+		"description.wurst.setting.bonemealaura.multimeal", false);
+	
+	private final CheckboxSetting checkLOS =
+		new CheckboxSetting("Check line of sight",
+			"description.wurst.setting.bonemealaura.check_los", true);
+	
+	private final FaceTargetSetting faceTarget =
+		FaceTargetSetting.withPacketSpam(this, FaceTarget.SERVER);
+	
+	private final SwingHandSetting swingHand =
+		new SwingHandSetting(this, SwingHand.CLIENT);
+	
+	private final CheckboxSetting fastPlace =
+		new CheckboxSetting("Always FastPlace",
+			"description.wurst.setting.bonemealaura.always_fastplace", false);
+	
+	private final CheckboxSetting useWhileBreaking =
+		new CheckboxSetting("Use while breaking",
+			"description.wurst.setting.bonemealaura.use_while_breaking", false);
+	
+	private final CheckboxSetting useWhileRiding =
+		new CheckboxSetting("Use while riding",
+			"description.wurst.setting.bonemealaura.use_while_riding", false);
 	
 	private final TakeItemsFromSetting takeItemsFrom =
 		TakeItemsFromSetting.withHands(this, TakeItemsFrom.HANDS);
@@ -74,7 +97,13 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		super("BonemealAura");
 		setCategory(Category.BLOCKS);
 		addSetting(range);
-		addSetting(mode);
+		addSetting(multiMeal);
+		addSetting(checkLOS);
+		addSetting(faceTarget);
+		addSetting(swingHand);
+		addSetting(fastPlace);
+		addSetting(useWhileBreaking);
+		addSetting(useWhileRiding);
 		addSetting(takeItemsFrom);
 		addSetting(saplings);
 		addSetting(crops);
@@ -98,24 +127,18 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	@Override
 	public void onHandleInput()
 	{
-		// wait for right click timer
-		if(MC.rightClickDelay > 0)
+		if(!fastPlace.isChecked() && MC.rightClickDelay > 0)
 			return;
 		
-		// pause while breaking or riding
-		if(MC.gameMode.isDestroying() || MC.player.isHandsBusy())
+		if(!useWhileBreaking.isChecked() && MC.gameMode.isDestroying())
 			return;
 		
-		// get valid blocks
-		List<BlockPos> validBlocks = getValidBlocks();
-		if(validBlocks.isEmpty())
+		if(!useWhileRiding.isChecked() && MC.player.isHandsBusy())
 			return;
 		
-		// wait for AutoFarm
 		if(WURST.getHax().autoFarmHack.isBusy())
 			return;
 		
-		// check held item
 		if(!MC.player.isHolding(Items.BONE_MEAL))
 		{
 			InventoryUtils.selectItem(Items.BONE_MEAL,
@@ -123,49 +146,57 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 			return;
 		}
 		
-		if(mode.getSelected() == Mode.LEGIT)
+		List<BlockBreakingParams> validBlocks = getValidBlocks();
+		if(validBlocks.isEmpty())
+			return;
+		
+		if(multiMeal.isChecked())
 		{
-			// legit mode
-			
-			// use bone meal on next valid block
-			for(BlockPos pos : validBlocks)
-				if(rightClickBlockLegit(pos))
-					break;
-				
-		}else
-		{
-			// fast mode
-			
 			boolean shouldSwing = false;
 			
-			// use bone meal on all valid blocks
-			for(BlockPos pos : validBlocks)
-				if(rightClickBlockSimple(pos))
-					shouldSwing = true;
-				
-			// swing arm
+			for(BlockBreakingParams params : validBlocks)
+			{
+				faceTarget.face(params.hitVec());
+				InteractionSimulator.rightClickBlock(params.toHitResult(),
+					SwingHand.OFF);
+				shouldSwing = true;
+			}
+			
 			if(shouldSwing)
-				MC.player.swing(InteractionHand.MAIN_HAND);
+				swingHand.swing(InteractionHand.MAIN_HAND);
+			
+		}else
+		{
+			BlockBreakingParams params = validBlocks.getFirst();
+			MC.rightClickDelay = 4;
+			faceTarget.face(params.hitVec());
+			InteractionSimulator.rightClickBlock(params.toHitResult(),
+				swingHand.getSelected());
 		}
 	}
 	
-	private List<BlockPos> getValidBlocks()
+	private List<BlockBreakingParams> getValidBlocks()
 	{
-		Vec3 eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.containing(eyesVec);
+		BlockPos eyesBlock = BlockPos.containing(RotationUtils.getEyesPos());
 		double rangeSq = range.getValueSq();
-		int blockRange = range.getValueCeil();
 		
+		Stream<BlockBreakingParams> stream = BlockUtils
+			.getAllInBoxStream(eyesBlock, range.getValueCeil())
+			.filter(this::isCorrectBlock)
+			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
+			.filter(params -> params.distanceSq() <= rangeSq);
+		
+		if(checkLOS.isChecked())
+			stream = stream.filter(BlockBreakingParams::lineOfSight);
+			
 		// As plants are bone-mealed, they will grow larger and prevent line of
 		// sight to other plants behind them. That's why we need to bone-meal
 		// the farthest plants first.
-		Comparator<BlockPos> farthestFirst = Comparator
-			.comparingDouble((BlockPos pos) -> pos.distToCenterSqr(eyesVec))
-			.reversed();
+		Comparator<BlockBreakingParams> farthestFirst = Comparator
+			.comparingDouble(BlockBreakingParams::distanceSq).reversed();
+		stream = stream.sorted(farthestFirst);
 		
-		return BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-			.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
-			.filter(this::isCorrectBlock).sorted(farthestFirst).toList();
+		return stream.toList();
 	}
 	
 	private boolean isCorrectBlock(BlockPos pos)
@@ -198,52 +229,5 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 			return cocoa.isChecked();
 		
 		return other.isChecked();
-	}
-	
-	private boolean rightClickBlockLegit(BlockPos pos)
-	{
-		// if this block is unreachable, try the next one
-		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
-		if(params == null || params.distanceSq() > range.getValueSq()
-			|| !params.lineOfSight())
-			return false;
-		
-		// face and right click the block
-		MC.rightClickDelay = 4;
-		WURST.getRotationFaker().faceVectorPacket(params.hitVec());
-		InteractionSimulator.rightClickBlock(params.toHitResult());
-		return true;
-	}
-	
-	private boolean rightClickBlockSimple(BlockPos pos)
-	{
-		// if this block is unreachable, try the next one
-		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
-		if(params == null)
-			return false;
-		
-		// right click the block
-		InteractionSimulator.rightClickBlock(params.toHitResult(),
-			SwingHand.OFF);
-		return true;
-	}
-	
-	private enum Mode
-	{
-		FAST("Fast"),
-		LEGIT("Legit");
-		
-		private final String name;
-		
-		private Mode(String name)
-		{
-			this.name = name;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }
