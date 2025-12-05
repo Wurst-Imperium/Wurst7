@@ -90,7 +90,7 @@ jobs:
     - name: Run client gametests
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      run: ./gradlew runClientGameTest --info
+      run: ./gradlew runClientGameTest --stacktrace --warning-mode=fail
 
     - name: Run client gametests with mods
       env:
