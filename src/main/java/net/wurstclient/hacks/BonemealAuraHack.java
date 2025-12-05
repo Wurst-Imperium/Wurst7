@@ -103,6 +103,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		if(MC.rightClickDelay > 0)
 			return;
 		
+		// pause while breaking or riding
 		if(MC.gameMode.isDestroying() || MC.player.isHandsBusy())
 			return;
 		
@@ -204,10 +205,6 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	
 	private boolean rightClickBlockLegit(BlockPos pos)
 	{
-		// if breaking or riding, stop and don't try other blocks
-		if(MC.gameMode.isDestroying() || MC.player.isHandsBusy())
-			return true;
-		
 		// if this block is unreachable, try the next one
 		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
 		if(params == null || params.distanceSq() > range.getValueSq()
