@@ -29,6 +29,10 @@ public abstract class Command extends Feature
 		if(syntax.length > 0)
 			syntax[0] = "Syntax: " + syntax[0];
 		this.syntax = syntax;
+		
+		if(name.contains(" "))
+			throw new IllegalArgumentException(
+				"Feature name must not contain spaces: " + name);
 	}
 	
 	public abstract void call(String[] args) throws CmdException;

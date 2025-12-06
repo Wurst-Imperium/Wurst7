@@ -25,7 +25,7 @@ public final class DisableOtf extends OtherFeature
 	
 	public DisableOtf()
 	{
-		super("Disable Wurst",
+		super("DisableWurst",
 			"To disable Wurst, go to the Statistics screen and press the \"Disable Wurst\" button.\n"
 				+ "It will turn into an \"Enable Wurst\" button once pressed.");
 		addSetting(hideEnableButton);

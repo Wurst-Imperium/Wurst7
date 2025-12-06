@@ -30,6 +30,10 @@ public abstract class Hack extends Feature
 		this.name = Objects.requireNonNull(name);
 		description = "description.wurst.hack." + name.toLowerCase();
 		addPossibleKeybind(name, "Toggle " + name);
+		
+		if(name.contains(" "))
+			throw new IllegalArgumentException(
+				"Feature name must not contain spaces: " + name);
 	}
 	
 	@Override
