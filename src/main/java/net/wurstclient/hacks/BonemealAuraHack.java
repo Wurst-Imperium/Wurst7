@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Items;
@@ -203,29 +202,24 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	{
 		Block block = BlockUtils.getBlock(pos);
 		BlockState state = BlockUtils.getState(pos);
-		ClientLevel world = MC.level;
 		
-		if(!(block instanceof BonemealableBlock fBlock)
-			|| !fBlock.isBonemealSuccess(world, world.random, pos, state))
+		if(!(block instanceof BonemealableBlock bmBlock)
+			|| !bmBlock.isValidBonemealTarget(MC.level, pos, state))
 			return false;
 		
 		if(block instanceof GrassBlock)
 			return false;
 		
-		if(block instanceof SaplingBlock sapling
-			&& sapling.isValidBonemealTarget(world, pos, state))
+		if(block instanceof SaplingBlock)
 			return saplings.isChecked();
 		
-		if(block instanceof CropBlock crop
-			&& crop.isValidBonemealTarget(world, pos, state))
+		if(block instanceof CropBlock)
 			return crops.isChecked();
 		
-		if(block instanceof StemBlock stem
-			&& stem.isValidBonemealTarget(world, pos, state))
+		if(block instanceof StemBlock)
 			return stems.isChecked();
 		
-		if(block instanceof CocoaBlock cocoaBlock
-			&& cocoaBlock.isValidBonemealTarget(world, pos, state))
+		if(block instanceof CocoaBlock)
 			return cocoa.isChecked();
 		
 		return other.isChecked();
