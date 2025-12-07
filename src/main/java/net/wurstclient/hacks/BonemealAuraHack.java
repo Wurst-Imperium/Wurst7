@@ -48,7 +48,7 @@ import net.wurstclient.util.RotationUtils;
 public final class BonemealAuraHack extends Hack implements HandleInputListener
 {
 	private final SliderSetting range =
-		new SliderSetting("Range", 4.25, 1, 6, 0.05, ValueDisplay.DECIMAL);
+		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting multiMeal = new CheckboxSetting("MultiMeal",
 		"description.wurst.setting.bonemealaura.multimeal", false);
