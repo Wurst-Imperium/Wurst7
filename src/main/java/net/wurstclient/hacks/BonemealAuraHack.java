@@ -138,16 +138,21 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		if(WURST.getHax().autoFarmHack.isBusy())
 			return;
 		
-		if(!MC.player.isHolding(Items.BONE_MEAL))
-		{
-			InventoryUtils.selectItem(Items.BONE_MEAL,
-				takeItemsFrom.getMaxInvSlot());
+		boolean holdingBoneMeal = MC.player.isHolding(Items.BONE_MEAL);
+		int boneMealSlot = InventoryUtils.indexOf(Items.BONE_MEAL,
+			takeItemsFrom.getMaxInvSlot());
+		if(!holdingBoneMeal && boneMealSlot < 0)
 			return;
-		}
 		
 		List<BlockBreakingParams> validBlocks = getValidBlocks();
 		if(validBlocks.isEmpty())
 			return;
+		
+		if(!holdingBoneMeal)
+		{
+			InventoryUtils.selectItem(boneMealSlot);
+			return;
+		}
 		
 		if(multiMeal.isChecked())
 		{
