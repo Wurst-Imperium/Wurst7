@@ -71,6 +71,6 @@ public final class SugarCanePlantType extends AutoFarmPlantType
 	@Override
 	protected PlantTypeSetting createSetting()
 	{
-		return new PlantTypeSetting("Sugar Cane", Items.SUGAR_CANE, true, true);
+		return new PlantTypeSetting("Sugar cane", Items.SUGAR_CANE, true, true);
 	}
 }

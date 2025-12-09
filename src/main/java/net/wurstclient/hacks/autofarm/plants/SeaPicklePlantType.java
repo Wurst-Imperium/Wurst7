@@ -57,7 +57,7 @@ public final class SeaPicklePlantType extends AutoFarmPlantType
 	@Override
 	protected PlantTypeSetting createSetting()
 	{
-		return new PlantTypeSetting("Sea Pickles", Items.SEA_PICKLE, true,
+		return new PlantTypeSetting("Sea pickles", Items.SEA_PICKLE, true,
 			true);
 	}
 }

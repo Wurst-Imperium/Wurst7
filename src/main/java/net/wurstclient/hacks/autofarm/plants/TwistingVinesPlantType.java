@@ -54,7 +54,7 @@ public final class TwistingVinesPlantType extends AutoFarmPlantType
 	@Override
 	protected PlantTypeSetting createSetting()
 	{
-		return new PlantTypeSetting("Twisting Vines", Items.TWISTING_VINES,
+		return new PlantTypeSetting("Twisting vines", Items.TWISTING_VINES,
 			false, false);
 	}
 }
