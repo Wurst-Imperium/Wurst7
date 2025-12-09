@@ -15,13 +15,7 @@ import java.util.stream.Stream;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.CocoaBlock;
-import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.GrassBlock;
-import net.minecraft.world.level.block.SaplingBlock;
-import net.minecraft.world.level.block.StemBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -89,6 +83,9 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	
 	private final CheckboxSetting cocoa = new CheckboxSetting("Cocoa", true);
 	
+	private final CheckboxSetting seaPickles =
+		new CheckboxSetting("Sea pickles", true);
+	
 	private final CheckboxSetting other = new CheckboxSetting("Other", false);
 	
 	public BonemealAuraHack()
@@ -108,6 +105,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		addSetting(crops);
 		addSetting(stems);
 		addSetting(cocoa);
+		addSetting(seaPickles);
 		addSetting(other);
 	}
 	
@@ -226,6 +224,9 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		
 		if(block instanceof CocoaBlock)
 			return cocoa.isChecked();
+		
+		if(block instanceof SeaPickleBlock)
+			return seaPickles.isChecked();
 		
 		return other.isChecked();
 	}
