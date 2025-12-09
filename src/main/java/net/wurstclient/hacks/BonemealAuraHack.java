@@ -59,7 +59,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	
 	private final CheckboxSetting fastPlace =
 		new CheckboxSetting("Always FastPlace",
-			"description.wurst.setting.bonemealaura.always_fastplace", false);
+			"description.wurst.setting.bonemealaura.always_fastplace", true);
 	
 	private final CheckboxSetting useWhileBreaking =
 		new CheckboxSetting("Use while breaking",
