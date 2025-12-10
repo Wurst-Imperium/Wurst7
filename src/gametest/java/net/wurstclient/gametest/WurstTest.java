@@ -83,9 +83,6 @@ public class WurstTest implements FabricClientGameTest
 		TestClientWorldContext world = spContext.getClientWorld();
 		TestServerContext server = spContext.getServer();
 		
-		// Disable anisotropic filtering
-		context.runOnClient(mc -> mc.options.maxAnisotropyBit().set(0));
-		
 		// Disable chunk fade
 		context.runOnClient(mc -> mc.options.chunkSectionFadeInTime().set(0.0));
 		
