@@ -87,7 +87,9 @@ public abstract class BlockModelRendererMixin implements ItemLike
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;isEmpty()Z",
 			ordinal = 1),
-		method = "tesselateWithoutAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V")
+		method = {
+			"tesselateWithoutAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V",
+			"tesselateWithAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V"})
 	private boolean pretendEmptyToStopSecondRenderModelFaceFlatCall(
 		List<BakedQuad> instance, Operation<Boolean> original,
 		BlockAndTintGetter world, List<BlockModelPart> list, BlockState state,
