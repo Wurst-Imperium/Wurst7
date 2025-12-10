@@ -56,7 +56,8 @@ public enum XRayHackTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_opacity",
-			"https://i.imgur.com/Ee9ZANB.png");
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/a3GWEwb.png"
+				: "https://i.imgur.com/Ee9ZANB.png");
 		
 		// Exposed only + opacity
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed on");
@@ -65,7 +66,8 @@ public enum XRayHackTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_exposed_only_opacity",
-			"https://i.imgur.com/hQOQRVG.png");
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/CWbwr40.png"
+				: "https://i.imgur.com/hQOQRVG.png");
 		
 		// Clean up
 		runCommand(server, "fill ~-5 ~-2 ~5 ~5 ~5 ~7 air");

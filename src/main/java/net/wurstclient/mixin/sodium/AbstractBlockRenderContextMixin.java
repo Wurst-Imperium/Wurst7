@@ -23,12 +23,12 @@ import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 
 /**
  * Last updated for <a href=
- * "https://github.com/CaffeineMC/sodium/tree/02253db283e4679228ba5fbc30cfc851d17123c8">Sodium
- * 0.6.13+mc1.21.6</a>
+ * "https://github.com/CaffeineMC/sodium/blob/1ddf7faacbf7be60aff3f00b49d90d199fdd706a/common/src/main/java/net/caffeinemc/mods/sodium/client/render/model/AbstractBlockRenderContext.java">Sodium
+ * mc1.21.11-0.8.0</a>
  */
 @Pseudo
 @Mixin(targets = {
-	"net.caffeinemc.mods.sodium.client.render.frapi.render.AbstractBlockRenderContext"})
+	"net.caffeinemc.mods.sodium.client.render.model.AbstractBlockRenderContext"})
 public class AbstractBlockRenderContextMixin
 {
 	@Shadow
