@@ -26,7 +26,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -213,8 +213,8 @@ public final class EditItemListScreen extends Screen
 		@Override
 		public Component getNarration()
 		{
-			Item item = BuiltInRegistries.ITEM
-				.getValue(ResourceLocation.parse(itemName));
+			Item item =
+				BuiltInRegistries.ITEM.getValue(Identifier.parse(itemName));
 			ItemStack stack = new ItemStack(item);
 			
 			return Component.translatable("narrator.select",
@@ -229,8 +229,8 @@ public final class EditItemListScreen extends Screen
 			int x = getContentX();
 			int y = getContentY();
 			
-			Item item = BuiltInRegistries.ITEM
-				.getValue(ResourceLocation.parse(itemName));
+			Item item =
+				BuiltInRegistries.ITEM.getValue(Identifier.parse(itemName));
 			ItemStack stack = new ItemStack(item);
 			Font tr = minecraft.font;
 			

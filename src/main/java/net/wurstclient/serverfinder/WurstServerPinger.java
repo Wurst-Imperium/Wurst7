@@ -13,6 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerData.Type;
 import net.minecraft.client.multiplayer.ServerStatusPinger;
+import net.minecraft.server.network.EventLoopGroupHolder;
+import net.wurstclient.WurstClient;
 
 public class WurstServerPinger
 {
@@ -41,7 +43,8 @@ public class WurstServerPinger
 		
 		try
 		{
-			pinger.pingServer(server, () -> {}, () -> {});
+			pinger.pingServer(server, () -> {}, () -> {}, EventLoopGroupHolder
+				.remote(WurstClient.MC.options.useNativeTransport()));
 			System.out.println("Ping successful: " + ip + ":" + port);
 			
 		}catch(UnknownHostException e)

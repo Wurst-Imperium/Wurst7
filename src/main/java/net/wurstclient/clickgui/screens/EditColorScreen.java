@@ -16,7 +16,6 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -27,7 +26,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.ColorUtils;
@@ -46,8 +45,8 @@ public final class EditColorScreen extends Screen
 	
 	private Button doneButton;
 	
-	private final ResourceLocation paletteIdentifier =
-		ResourceLocation.fromNamespaceAndPath("wurst", "colorpalette.png");
+	private final Identifier paletteIdentifier =
+		Identifier.fromNamespaceAndPath("wurst", "colorpalette.png");
 	private BufferedImage paletteAsBufferedImage;
 	
 	private int paletteX = 0;
@@ -219,14 +218,14 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public void resize(Minecraft client, int width, int height)
+	public void resize(int width, int height)
 	{
 		String hex = hexValueField.getValue();
 		String r = redValueField.getValue();
 		String g = greenValueField.getValue();
 		String b = blueValueField.getValue();
 		
-		init(client, width, height);
+		init(width, height);
 		
 		hexValueField.setValue(hex);
 		redValueField.setValue(r);

@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.BufferWithLayer;
@@ -36,7 +36,7 @@ public final class NewChunksRenderer
 		this.oldChunksColor = oldChunksColor;
 	}
 	
-	public void updateBuffer(int i, RenderType.CompositeRenderType layer,
+	public void updateBuffer(int i, RenderType layer,
 		Consumer<VertexConsumer> callback)
 	{
 		vertexBuffers[i] = BufferWithLayer.createAndUpload(layer, callback);

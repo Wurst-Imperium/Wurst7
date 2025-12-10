@@ -10,7 +10,7 @@ package net.wurstclient.hud;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.WurstLogoOtf;
 import net.wurstclient.util.RenderUtils;
@@ -18,8 +18,8 @@ import net.wurstclient.util.RenderUtils;
 public final class WurstLogo
 {
 	private static final WurstClient WURST = WurstClient.INSTANCE;
-	private static final ResourceLocation LOGO_TEXTURE =
-		ResourceLocation.fromNamespaceAndPath("wurst", "wurst_128.png");
+	private static final Identifier LOGO_TEXTURE =
+		Identifier.fromNamespaceAndPath("wurst", "wurst_128.png");
 	
 	public void render(GuiGraphics context)
 	{

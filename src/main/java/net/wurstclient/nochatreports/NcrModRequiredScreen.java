@@ -11,7 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.Renderable;
@@ -129,8 +131,9 @@ public final class NcrModRequiredScreen extends Screen
 		
 		context.drawCenteredString(font, title, centerX, titleY,
 			CommonColors.LIGHT_GRAY);
-		reasonFormatted.render(context, MultiLineLabel.Align.CENTER, centerX,
-			reasonY, 9, true, -1);
+		ActiveTextCollector otherContext = context.textRenderer();
+		reasonFormatted.visitLines(TextAlignment.CENTER, centerX, reasonY, 9,
+			otherContext);
 		
 		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);

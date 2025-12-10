@@ -258,12 +258,14 @@ public class CleanUpScreen extends Screen
 	private final class CleanUpButton extends Button
 	{
 		private final Supplier<String> messageSupplier;
-		private final List<Component> tooltip;
+		private final List<net.minecraft.network.chat.Component> tooltip;
 		
 		public CleanUpButton(int x, int y, Supplier<String> messageSupplier,
 			String tooltip, OnPress pressAction)
 		{
-			super(x, y, 200, 20, Component.literal(messageSupplier.get()),
+			super(x, y, 200, 20,
+				net.minecraft.network.chat.Component
+					.literal(messageSupplier.get()),
 				pressAction, Button.DEFAULT_NARRATION);
 			this.messageSupplier = messageSupplier;
 			
@@ -273,9 +275,11 @@ public class CleanUpScreen extends Screen
 			{
 				String[] lines = tooltip.split("\n");
 				
-				Component[] lines2 = new Component[lines.length];
+				net.minecraft.network.chat.Component[] lines2 =
+					new net.minecraft.network.chat.Component[lines.length];
 				for(int i = 0; i < lines.length; i++)
-					lines2[i] = Component.literal(lines[i]);
+					lines2[i] =
+						net.minecraft.network.chat.Component.literal(lines[i]);
 				
 				this.tooltip = Arrays.asList(lines2);
 			}
@@ -285,7 +289,17 @@ public class CleanUpScreen extends Screen
 		public void onPress(InputWithModifiers context)
 		{
 			super.onPress(context);
-			setMessage(Component.literal(messageSupplier.get()));
+			setMessage(net.minecraft.network.chat.Component
+				.literal(messageSupplier.get()));
+		}
+		
+		@Override
+		protected void renderContents(GuiGraphics drawContext, int i, int j,
+			float f)
+		{
+			renderDefaultSprite(drawContext);
+			renderDefaultLabel(drawContext.textRendererForWidget(this,
+				GuiGraphics.HoveredTextEffects.NONE));
 		}
 	}
 }

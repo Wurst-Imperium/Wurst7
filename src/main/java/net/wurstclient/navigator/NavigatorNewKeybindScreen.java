@@ -78,6 +78,15 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				// empty method so that pressing Enter won't trigger this button
 				return false;
 			}
+			
+			@Override
+			protected void renderContents(GuiGraphics drawContext, int i, int j,
+				float f)
+			{
+				renderDefaultSprite(drawContext);
+				renderDefaultLabel(drawContext.textRendererForWidget(this,
+					GuiGraphics.HoveredTextEffects.NONE));
+			}
 		};
 		okButton.active = selectedCommand != null;
 		addRenderableWidget(okButton);

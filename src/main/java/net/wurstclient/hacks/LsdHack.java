@@ -7,7 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.wurstclient.Category;
 import net.wurstclient.hack.DontSaveState;
@@ -34,8 +34,8 @@ public final class LsdHack extends Hack
 		if(MC.gameRenderer.currentPostEffect() != null)
 			MC.gameRenderer.clearPostEffect();
 		
-		MC.gameRenderer.setPostEffect(
-			ResourceLocation.fromNamespaceAndPath("wurst", "lsd"));
+		MC.gameRenderer
+			.setPostEffect(Identifier.fromNamespaceAndPath("wurst", "lsd"));
 	}
 	
 	@Override

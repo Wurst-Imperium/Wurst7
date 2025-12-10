@@ -30,7 +30,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.OutputTarget;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.TextureTransform;
 
 /**
  * An abstraction of Minecraft 1.21.5's new {@code GpuBuffer} system that makes
@@ -67,7 +69,8 @@ public final class EasyVertexBuffer implements AutoCloseable
 		shapeIndexBuffer = RenderSystem.getSequentialBuffer(drawParams.mode());
 		indexCount = drawParams.indexCount();
 		
-		vertexBuffer = RenderSystem.getDevice().createBuffer(null, 40,
+		vertexBuffer = RenderSystem.getDevice().createBuffer(null,
+			GpuBuffer.USAGE_VERTEX | GpuBuffer.USAGE_COPY_DST,
 			buffer.vertexBuffer());
 	}
 	
@@ -78,14 +81,12 @@ public final class EasyVertexBuffer implements AutoCloseable
 		vertexBuffer = null;
 	}
 	
-	public void draw(PoseStack matrixStack,
-		RenderType.CompositeRenderType layer)
+	public void draw(PoseStack matrixStack, RenderType layer)
 	{
 		draw(matrixStack, layer, 1, 1, 1, 1);
 	}
 	
-	public void draw(PoseStack matrixStack,
-		RenderType.CompositeRenderType layer, int argb)
+	public void draw(PoseStack matrixStack, RenderType layer, int argb)
 	{
 		float alpha = (argb >> 24 & 0xFF) / 255F;
 		float red = (argb >> 16 & 0xFF) / 255F;
@@ -94,21 +95,22 @@ public final class EasyVertexBuffer implements AutoCloseable
 		draw(matrixStack, layer, red, green, blue, alpha);
 	}
 	
-	public void draw(PoseStack matrixStack,
-		RenderType.CompositeRenderType layer, float[] rgba)
+	public void draw(PoseStack matrixStack, RenderType layer, float[] rgba)
 	{
 		draw(matrixStack, layer, rgba[0], rgba[1], rgba[2], rgba[3]);
 	}
 	
-	public void draw(PoseStack matrixStack,
-		RenderType.CompositeRenderType layer, float[] rgb, float alpha)
+	public void draw(PoseStack matrixStack, RenderType layer, float[] rgb,
+		float alpha)
 	{
 		draw(matrixStack, layer, rgb[0], rgb[1], rgb[2], alpha);
 	}
 	
-	public void draw(PoseStack matrixStack,
-		RenderType.CompositeRenderType layer, float red, float green,
-		float blue, float alpha)
+	/*
+	 * Similar to {@link RenderLayer#draw(BuiltBuffer)}.
+	 */
+	public void draw(PoseStack matrixStack, RenderType layer, float red,
+		float green, float blue, float alpha)
 	{
 		if(vertexBuffer == null)
 			return;
@@ -117,15 +119,14 @@ public final class EasyVertexBuffer implements AutoCloseable
 		modelViewStack.pushMatrix();
 		modelViewStack.mul(matrixStack.last().pose());
 		
-		layer.setupRenderState();
 		GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms()
 			.writeTransform(RenderSystem.getModelViewMatrix(),
 				new Vector4f(red, green, blue, alpha), new Vector3f(),
-				RenderSystem.getTextureMatrix(),
-				RenderSystem.getShaderLineWidth());
+				TextureTransform.DEFAULT_TEXTURING.getMatrix());
 		
-		RenderTarget framebuffer = layer.state.outputState.getRenderTarget();
-		RenderPipeline pipeline = layer.renderPipeline;
+		RenderTarget framebuffer =
+			OutputTarget.ITEM_ENTITY_TARGET.getRenderTarget();
+		RenderPipeline pipeline = layer.pipeline();
 		GpuBuffer indexBuffer = shapeIndexBuffer.getBuffer(indexCount);
 		
 		try(RenderPass renderPass =
@@ -142,7 +143,6 @@ public final class EasyVertexBuffer implements AutoCloseable
 			renderPass.drawIndexed(0, 0, indexCount, 1);
 		}
 		
-		layer.clearRenderState();
 		modelViewStack.popMatrix();
 	}
 	

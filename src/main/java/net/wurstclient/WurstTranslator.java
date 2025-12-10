@@ -25,7 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -187,8 +187,8 @@ public class WurstTranslator implements ResourceManagerReloadListener
 		for(String langCode : langCodes)
 		{
 			String langFilePath = "translations/" + langCode + ".json";
-			ResourceLocation langId =
-				ResourceLocation.fromNamespaceAndPath("wurst", langFilePath);
+			Identifier langId =
+				Identifier.fromNamespaceAndPath("wurst", langFilePath);
 			
 			// IMPORTANT: Exceptions thrown by Language.loadFromJson() must
 			// be caught to prevent mod detection vulnerabilities using

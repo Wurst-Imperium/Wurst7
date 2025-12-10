@@ -19,7 +19,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.wurstclient.command.CmdError;
@@ -106,7 +106,7 @@ public final class ModifyCmd extends Command
 		throws CmdError
 	{
 		DataComponentType<?> type = BuiltInRegistries.DATA_COMPONENT_TYPE
-			.getValue(ResourceLocation.tryParse(typeName));
+			.getValue(Identifier.tryParse(typeName));
 		
 		if(type == null)
 			throw new CmdError(

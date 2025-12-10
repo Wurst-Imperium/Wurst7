@@ -12,13 +12,13 @@ import java.util.function.Consumer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
-public record BufferWithLayer(EasyVertexBuffer buffer,
-	RenderType.CompositeRenderType layer) implements AutoCloseable
+public record BufferWithLayer(EasyVertexBuffer buffer, RenderType layer)
+	implements AutoCloseable
 {
-	public static BufferWithLayer createAndUpload(
-		RenderType.CompositeRenderType layer, Consumer<VertexConsumer> callback)
+	public static BufferWithLayer createAndUpload(RenderType layer,
+		Consumer<VertexConsumer> callback)
 	{
 		return new BufferWithLayer(EasyVertexBuffer
 			.createAndUpload(layer.mode(), layer.format(), callback), layer);
