@@ -10,7 +10,7 @@ package net.wurstclient.settings.filters;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.animal.Pufferfish;
+import net.minecraft.world.entity.animal.fish.Pufferfish;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 
 public final class FilterNeutralSetting extends AttackDetectingEntityFilter

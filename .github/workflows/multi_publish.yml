@@ -6,25 +6,22 @@ on:
     inputs:
       wurst_version:
         description: "Wurst version (without v or -MC)"
-        required: true
         type: string
+        required: true
       branches:
         description: "Space-separated list of branches to publish from"
-        required: true
         type: string
+        required: true
       announce_update:
         description: "Announce as an update on WurstForum"
-        required: true
         type: boolean
         default: false
       announce_ports:
         description: "Announce as ports on WurstForum"
-        required: true
         type: boolean
         default: false
       dry_run:
         description: "Dry-run mode (don't actually publish anything)"
-        required: false
         type: boolean
         default: false
 
@@ -47,6 +44,15 @@ jobs:
         JSON_ARRAY="[${quoted_branches%,}]"
         echo "branches=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
         echo "Branches: $JSON_ARRAY" >> "$GITHUB_STEP_SUMMARY"
+    - name: Verify mod_version is as expected
+      run: |
+        expected_prefix="v${{ inputs.wurst_version }}-MC"
+        for branch in ${{ inputs.branches }}; do
+          url="https://raw.githubusercontent.com/${{ github.repository }}/${branch}/gradle.properties"
+          actual=$(curl -sf "$url" | grep "^mod_version=" | cut -d'=' -f2)
+          echo "$branch: $actual"
+          [[ "$actual" == "$expected_prefix"* ]] || { echo "::error::Expected $expected_prefix*, got $actual"; exit 1; }
+        done
 
   publish_each:
     runs-on: ubuntu-latest
@@ -62,14 +68,13 @@ jobs:
       fail-fast: true
       matrix:
         branch: ${{ fromJson(needs.prepare.outputs.branches) }}
-    # TODO: Maybe also verify that the wurst_version in each branch is as expected before publishing?
     steps:
     - name: Trigger publish workflow
       uses: Wurst-Imperium/dispatch-and-wait@v1
       with:
         token: ${{ github.token }}
-        owner: Wurst-Imperium
-        repo: Wurst7
+        owner: ${{ github.repository_owner }}
+        repo: ${{ github.event.repository.name }}
         ref: ${{ matrix.branch }}
         workflow: publish.yml
         workflow_inputs: |

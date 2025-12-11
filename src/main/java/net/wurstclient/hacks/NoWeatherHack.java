@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.world.level.MoonPhase;
 import net.wurstclient.Category;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
@@ -62,8 +63,8 @@ public final class NoWeatherHack extends Hack
 		return isEnabled() && changeMoonPhase.isChecked();
 	}
 	
-	public int getChangedMoonPhase()
+	public MoonPhase getChangedMoonPhase()
 	{
-		return moonPhase.getValueI();
+		return MoonPhase.values()[moonPhase.getValueI()];
 	}
 }

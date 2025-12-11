@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -32,7 +32,7 @@ public class IngameHudMixin
 	private void onRenderPlayerList(GuiGraphics context,
 		DeltaTracker tickCounter, CallbackInfo ci)
 	{
-		if(WurstClient.MC.debugEntries.isF3Visible())
+		if(WurstClient.MC.debugEntries.isOverlayVisible())
 			return;
 		
 		float tickDelta = tickCounter.getGameTimeDeltaPartialTick(true);
@@ -40,9 +40,9 @@ public class IngameHudMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "renderTextureOverlay(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/resources/ResourceLocation;F)V",
+		method = "renderTextureOverlay(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/resources/Identifier;F)V",
 		cancellable = true)
-	private void onRenderOverlay(GuiGraphics context, ResourceLocation texture,
+	private void onRenderOverlay(GuiGraphics context, Identifier texture,
 		float opacity, CallbackInfo ci)
 	{
 		if(texture == null)

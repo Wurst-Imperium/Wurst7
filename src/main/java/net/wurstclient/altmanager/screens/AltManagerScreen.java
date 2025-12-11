@@ -29,7 +29,6 @@ import com.google.gson.JsonObject;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -49,6 +48,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
+import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
 import net.wurstclient.mixinterface.IMinecraftClient;

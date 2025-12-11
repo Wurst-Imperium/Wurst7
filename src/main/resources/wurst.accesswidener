@@ -5,11 +5,8 @@ accessible	method	net/minecraft/client/gui/screens/inventory/AbstractContainerSc
 accessible	method	net/minecraft/client/KeyboardHandler	keyPress	(JILnet/minecraft/client/input/KeyEvent;)V
 accessible	method	net/minecraft/client/Minecraft	startUseItem	()V
 accessible	method	net/minecraft/client/MouseHandler	onButton	(JLnet/minecraft/client/input/MouseButtonInfo;I)V
-accessible	method	net/minecraft/client/renderer/GameRenderer	setPostEffect	(Lnet/minecraft/resources/ResourceLocation;)V
-accessible	method	net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder	createCompositeState	(Z)Lnet/minecraft/client/renderer/RenderType$CompositeState;
-accessible	method	net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder	setLayeringState	(Lnet/minecraft/client/renderer/RenderStateShard$LayeringStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
-accessible	method	net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder	setLineState	(Lnet/minecraft/client/renderer/RenderStateShard$LineStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
-accessible	method	net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder	setOutputState	(Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
+accessible	method	net/minecraft/client/renderer/GameRenderer	setPostEffect	(Lnet/minecraft/resources/Identifier;)V
+accessible	method	net/minecraft/client/renderer/rendertype/RenderType	create	(Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;
 accessible	method	net/minecraft/core/component/DataComponentMap$Builder	setUnchecked	(Lnet/minecraft/core/component/DataComponentType;Ljava/lang/Object;)V
 accessible	method	net/minecraft/world/entity/player/Player	canGlide	()Z
 accessible	method	net/minecraft/world/entity/projectile/FishingHook	calculateOpenWater	(Lnet/minecraft/core/BlockPos;)Z
@@ -30,9 +27,6 @@ accessible	field	net/minecraft/client/player/LocalPlayer	yRotLast	F
 accessible	field	net/minecraft/client/multiplayer/MultiPlayerGameMode	destroyDelay	I
 accessible	field	net/minecraft/client/multiplayer/MultiPlayerGameMode	isDestroying	Z
 accessible	field	net/minecraft/client/multiplayer/MultiPlayerGameMode	destroyProgress	F
-accessible	field	net/minecraft/client/renderer/RenderType$CompositeRenderType	state	Lnet/minecraft/client/renderer/RenderType$CompositeState;
-accessible	field	net/minecraft/client/renderer/RenderType$CompositeRenderType	renderPipeline	Lcom/mojang/blaze3d/pipeline/RenderPipeline;
-accessible	field	net/minecraft/client/renderer/RenderType$CompositeState	outputState	Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;
 accessible	field	net/minecraft/client/gui/components/toasts/ToastManager	queued	Ljava/util/Deque;
 accessible	field	net/minecraft/world/entity/Entity	stuckSpeedMultiplier	Lnet/minecraft/world/phys/Vec3;
 accessible	field	net/minecraft/world/entity/LivingEntity	equipment	Lnet/minecraft/world/entity/EntityEquipment;

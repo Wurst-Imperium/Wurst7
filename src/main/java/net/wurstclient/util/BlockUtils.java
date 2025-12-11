@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.CollisionGetter;
@@ -63,8 +63,7 @@ public enum BlockUtils
 	
 	/**
 	 * @param name
-	 *            a String containing the block's name
-	 *            ({@link ResourceLocation})
+	 *            a String containing the block's name ({@link Identifier})
 	 * @return the requested block, or <code>minecraft:air</code> if the block
 	 *         doesn't exist.
 	 */
@@ -72,10 +71,9 @@ public enum BlockUtils
 	{
 		try
 		{
-			return BuiltInRegistries.BLOCK
-				.getValue(ResourceLocation.parse(name));
+			return BuiltInRegistries.BLOCK.getValue(Identifier.parse(name));
 			
-		}catch(ResourceLocationException e)
+		}catch(IdentifierException e)
 		{
 			return Blocks.AIR;
 		}
@@ -83,8 +81,7 @@ public enum BlockUtils
 	
 	/**
 	 * @param nameOrId
-	 *            a String containing the block's name
-	 *            ({@link ResourceLocation}) or
+	 *            a String containing the block's name ({@link Identifier}) or
 	 *            numeric ID.
 	 * @return the requested block, or null if the block doesn't exist.
 	 */
@@ -102,13 +99,13 @@ public enum BlockUtils
 		
 		try
 		{
-			ResourceLocation id = ResourceLocation.parse(nameOrId);
+			Identifier id = Identifier.parse(nameOrId);
 			if(!BuiltInRegistries.BLOCK.containsKey(id))
 				return null;
 			
 			return BuiltInRegistries.BLOCK.getValue(id);
 			
-		}catch(ResourceLocationException e)
+		}catch(IdentifierException e)
 		{
 			return null;
 		}

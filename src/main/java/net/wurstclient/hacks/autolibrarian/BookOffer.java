@@ -16,7 +16,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.wurstclient.WurstClient;
@@ -30,7 +30,7 @@ public record BookOffer(String id, int level, int price)
 		RegistryAccess drm = WurstClient.MC.level.registryAccess();
 		Registry<Enchantment> registry =
 			drm.lookupOrThrow(Registries.ENCHANTMENT);
-		ResourceLocation id = registry.getKey(enchantment);
+		Identifier id = registry.getKey(enchantment);
 		return new BookOffer("" + id, enchantment.getMaxLevel(), 64);
 	}
 	
@@ -42,7 +42,7 @@ public record BookOffer(String id, int level, int price)
 		RegistryAccess drm = WurstClient.MC.level.registryAccess();
 		Registry<Enchantment> registry =
 			drm.lookupOrThrow(Registries.ENCHANTMENT);
-		return registry.get(ResourceLocation.parse(id));
+		return registry.get(Identifier.parse(id));
 	}
 	
 	public Enchantment getEnchantment()
@@ -102,7 +102,7 @@ public record BookOffer(String id, int level, int price)
 	 */
 	public boolean isMostlyValid()
 	{
-		return ResourceLocation.tryParse(id) != null && level >= 1 && price >= 1
+		return Identifier.tryParse(id) != null && level >= 1 && price >= 1
 			&& price <= 64;
 	}
 	

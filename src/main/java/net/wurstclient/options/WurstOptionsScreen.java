@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.Util;
-import net.minecraft.Util.OS;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -23,6 +21,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
+import net.minecraft.util.Util;
+import net.minecraft.util.Util.OS;
 import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.PlausibleAnalytics;
 import net.wurstclient.commands.FriendsCmd;
@@ -201,7 +201,7 @@ public class WurstOptionsScreen extends Screen
 	private final class WurstOptionsButton extends Button
 	{
 		private final Supplier<String> messageSupplier;
-		private final List<Component> tooltip;
+		private final List<net.minecraft.network.chat.Component> tooltip;
 		
 		public WurstOptionsButton(int xOffset, int yOffset,
 			Supplier<String> messageSupplier, String tooltip,
@@ -209,8 +209,9 @@ public class WurstOptionsScreen extends Screen
 		{
 			super(WurstOptionsScreen.this.width / 2 + xOffset,
 				WurstOptionsScreen.this.height / 4 - 16 + yOffset, 100, 20,
-				Component.literal(messageSupplier.get()), pressAction,
-				Button.DEFAULT_NARRATION);
+				net.minecraft.network.chat.Component
+					.literal(messageSupplier.get()),
+				pressAction, Button.DEFAULT_NARRATION);
 			
 			this.messageSupplier = messageSupplier;
 			
@@ -220,9 +221,11 @@ public class WurstOptionsScreen extends Screen
 			{
 				String[] lines = ChatUtils.wrapText(tooltip, 200).split("\n");
 				
-				Component[] lines2 = new Component[lines.length];
+				net.minecraft.network.chat.Component[] lines2 =
+					new net.minecraft.network.chat.Component[lines.length];
 				for(int i = 0; i < lines.length; i++)
-					lines2[i] = Component.literal(lines[i]);
+					lines2[i] =
+						net.minecraft.network.chat.Component.literal(lines[i]);
 				
 				this.tooltip = Arrays.asList(lines2);
 			}
@@ -234,7 +237,17 @@ public class WurstOptionsScreen extends Screen
 		public void onPress(InputWithModifiers context)
 		{
 			super.onPress(context);
-			setMessage(Component.literal(messageSupplier.get()));
+			setMessage(net.minecraft.network.chat.Component
+				.literal(messageSupplier.get()));
+		}
+		
+		@Override
+		protected void renderContents(GuiGraphics drawContext, int i, int j,
+			float f)
+		{
+			renderDefaultSprite(drawContext);
+			renderDefaultLabel(drawContext.textRendererForWidget(this,
+				GuiGraphics.HoveredTextEffects.NONE));
 		}
 	}
 }

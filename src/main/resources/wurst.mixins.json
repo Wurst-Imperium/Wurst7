@@ -26,7 +26,6 @@
     "ControlsListWidgetMixin",
     "CreativeInventoryScreenMixin",
     "DeathScreenMixin",
-    "DimensionOrBossFogModifierMixin",
     "DirectConnectScreenMixin",
     "DisconnectedScreenMixin",
     "DownloaderMixin",
@@ -48,6 +47,7 @@
     "LanguageManagerMixin",
     "LivingEntityMixin",
     "LivingEntityRendererMixin",
+    "LocalPlayerMixin",
     "MinecraftClientMixin",
     "MobEntityRendererMixin",
     "MouseMixin",
@@ -68,6 +68,7 @@
     "TelemetryManagerMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
+    "WorldEnvironmentAttributeAccessMixin",
     "WorldMixin",
     "WorldRendererMixin"
   ],

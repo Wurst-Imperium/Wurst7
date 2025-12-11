@@ -18,5 +18,5 @@ public final class LiquidsHack extends Hack
 		setCategory(Category.BLOCKS);
 	}
 	
-	// See GameRendererMixin.liquidsRaycast()
+	// See LocalPlayerMixin
 }

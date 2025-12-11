@@ -8,7 +8,7 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
 
 public final class FilterZombiePiglinsSetting
 	extends AttackDetectingEntityFilter

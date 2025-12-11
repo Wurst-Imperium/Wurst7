@@ -16,7 +16,6 @@ import java.nio.file.StandardCopyOption;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -28,6 +27,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.AltRenderer;
 import net.wurstclient.altmanager.NameGenerator;

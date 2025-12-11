@@ -85,14 +85,12 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 	}
 	
 	/**
-	 * Allows NoSlowdown to intercept the isUsingItem() call in
+	 * Allows NoSlowdown to intercept the isBlockedFromSprinting() call in
 	 * tickMovement().
 	 */
-	@WrapOperation(
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z",
-			ordinal = 0),
-		method = "aiStep()V")
+	@WrapOperation(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/player/LocalPlayer;isSlowDueToUsingItem()Z",
+		ordinal = 0), method = "aiStep()V")
 	private boolean wrapTickMovementItemUse(LocalPlayer instance,
 		Operation<Boolean> original)
 	{
@@ -169,9 +167,10 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 	 * too hungry.
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "hasEnoughFoodToSprint()Z",
+		method = "isSprintingPossible(Z)Z",
 		cancellable = true)
-	private void onCanSprint(CallbackInfoReturnable<Boolean> cir)
+	private void onCanSprint(boolean allowTouchingWater,
+		CallbackInfoReturnable<Boolean> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintHungry())
 			cir.setReturnValue(true);

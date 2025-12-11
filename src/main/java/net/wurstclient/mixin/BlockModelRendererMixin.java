@@ -7,6 +7,8 @@
  */
 package net.wurstclient.mixin;
 
+import java.util.List;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -14,8 +16,12 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -43,8 +49,9 @@ public abstract class BlockModelRendererMixin implements ItemLike
 	private static boolean onRenderSmoothOrFlat(BlockState state,
 		BlockState otherState, Direction side, Operation<Boolean> original,
 		BlockAndTintGetter world, BlockState stateButFromTheOtherMethod,
-		boolean cull, Direction sideButFromTheOtherMethod, BlockPos pos)
+		boolean cull, Direction sideButFromTheOtherMethod, BlockPos neighborPos)
 	{
+		BlockPos pos = neighborPos.relative(side.getOpposite());
 		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
 		EventManager.fire(event);
 		
@@ -70,5 +77,31 @@ public abstract class BlockModelRendererMixin implements ItemLike
 	private float modifyOpacity(float original)
 	{
 		return currentOpacity.get();
+	}
+	
+	/**
+	 * Hides blocks like grass and snow when neither Sodium nor Indigo are
+	 * running.
+	 */
+	@WrapOperation(
+		at = @At(value = "INVOKE",
+			target = "Ljava/util/List;isEmpty()Z",
+			ordinal = 1),
+		method = {
+			"tesselateWithoutAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V",
+			"tesselateWithAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V"})
+	private boolean pretendEmptyToStopSecondRenderModelFaceFlatCall(
+		List<BakedQuad> instance, Operation<Boolean> original,
+		BlockAndTintGetter world, List<BlockModelPart> list, BlockState state,
+		BlockPos pos, PoseStack poseStack, VertexConsumer vertexConsumer,
+		boolean cull, int light)
+	{
+		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
+		EventManager.fire(event);
+		
+		if(Boolean.FALSE.equals(event.isRendered()))
+			return true;
+		
+		return original.call(instance);
 	}
 }

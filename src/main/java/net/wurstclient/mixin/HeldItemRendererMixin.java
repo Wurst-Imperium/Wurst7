@@ -50,7 +50,7 @@ public abstract class HeldItemRendererMixin
 	 * renderFirstPersonItem(), right after `else if(player.isUsingRiptide())`.
 	 */
 	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;swingArm(FFLcom/mojang/blaze3d/vertex/PoseStack;ILnet/minecraft/world/entity/HumanoidArm;)V",
+		target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;swingArm(FLcom/mojang/blaze3d/vertex/PoseStack;ILnet/minecraft/world/entity/HumanoidArm;)V",
 		ordinal = 2),
 		method = "renderArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V")
 	private void onApplySwingOffsetNotBlocking(AbstractClientPlayer player,

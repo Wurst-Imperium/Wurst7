@@ -24,7 +24,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
 import net.wurstclient.WurstClient;
@@ -34,34 +34,34 @@ public final class AltRenderer
 	private static final ExecutorService BACKGROUND_THREAD =
 		Executors.newSingleThreadExecutor();
 	
-	private static final ConcurrentHashMap<String, ResourceLocation> onlineSkins =
+	private static final ConcurrentHashMap<String, Identifier> onlineSkins =
 		new ConcurrentHashMap<>();
 	
-	private static final HashMap<String, ResourceLocation> offlineSkins =
+	private static final HashMap<String, Identifier> offlineSkins =
 		new HashMap<>();
 	
-	private static ResourceLocation getSkinTexture(String name)
+	private static Identifier getSkinTexture(String name)
 	{
 		if(name.isEmpty())
 			name = "Steve";
 		
-		ResourceLocation offlineSkin = offlineSkins.get(name);
+		Identifier offlineSkin = offlineSkins.get(name);
 		if(offlineSkin == null)
 		{
 			queueOnlineSkinLoading(name);
 			offlineSkin = loadOfflineSkin(name);
 		}
 		
-		ResourceLocation onlineSkin = onlineSkins.get(name);
+		Identifier onlineSkin = onlineSkins.get(name);
 		return onlineSkin != null ? onlineSkin : offlineSkin;
 	}
 	
-	private static ResourceLocation loadOfflineSkin(String name)
+	private static Identifier loadOfflineSkin(String name)
 	{
 		UUID uuid = UUIDUtil.createOfflinePlayerUUID(name);
 		GameProfile profile = new GameProfile(uuid, name);
 		PlayerInfo entry = new PlayerInfo(profile, false);
-		ResourceLocation texture = entry.getSkin().body().texturePath();
+		Identifier texture = entry.getSkin().body().texturePath();
 		offlineSkins.put(name, texture);
 		return texture;
 	}
@@ -101,7 +101,7 @@ public final class AltRenderer
 	{
 		try
 		{
-			ResourceLocation texture = getSkinTexture(name);
+			Identifier texture = getSkinTexture(name);
 			int color = selected ? 0xFFFFFFFF : 0xFFE0E0E0;
 			
 			// Face
@@ -131,7 +131,7 @@ public final class AltRenderer
 	{
 		try
 		{
-			ResourceLocation texture = getSkinTexture(name);
+			Identifier texture = getSkinTexture(name);
 			
 			boolean slim =
 				DefaultPlayerSkin.get(UUIDUtil.createOfflinePlayerUUID(name))
@@ -270,7 +270,7 @@ public final class AltRenderer
 	{
 		try
 		{
-			ResourceLocation texture = getSkinTexture(name);
+			Identifier texture = getSkinTexture(name);
 			
 			boolean slim =
 				DefaultPlayerSkin.get(UUIDUtil.createOfflinePlayerUUID(name))

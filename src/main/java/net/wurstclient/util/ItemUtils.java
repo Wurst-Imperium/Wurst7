@@ -9,12 +9,12 @@ package net.wurstclient.util;
 
 import java.util.OptionalDouble;
 
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -35,8 +35,7 @@ public enum ItemUtils
 	
 	/**
 	 * @param nameOrId
-	 *            a String containing the item's name ({@link ResourceLocation})
-	 *            or
+	 *            a String containing the item's name ({@link Identifier}) or
 	 *            numeric ID.
 	 * @return the requested item, or null if the item doesn't exist.
 	 */
@@ -59,9 +58,9 @@ public enum ItemUtils
 			// getOptionalValue() returns null instead of Items.AIR if the
 			// requested item doesn't exist
 			return BuiltInRegistries.ITEM
-				.getOptional(ResourceLocation.parse(nameOrId)).orElse(null);
+				.getOptional(Identifier.parse(nameOrId)).orElse(null);
 			
-		}catch(ResourceLocationException e)
+		}catch(IdentifierException e)
 		{
 			return null;
 		}

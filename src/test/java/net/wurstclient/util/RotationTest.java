@@ -159,9 +159,9 @@ class RotationTest
 		
 		r = new Rotation(90, 0);
 		q = r.toQuaternion();
-		assertAlmostEquals(0.70710677F, q.w);
+		assertAlmostEquals(0.7070389986038208, q.w);
 		assertAlmostEquals(0, q.x);
-		assertAlmostEquals(-0.70710677F, q.y);
+		assertAlmostEquals(-0.7071067690849304, q.y);
 		assertAlmostEquals(0, q.z);
 		
 		r = new Rotation(180, 0);
@@ -173,9 +173,9 @@ class RotationTest
 		
 		r = new Rotation(270, 0);
 		q = r.toQuaternion();
-		assertAlmostEquals(0.70710677F, q.w);
+		assertAlmostEquals(0.7071067690849304, q.w);
 		assertAlmostEquals(0, q.x);
-		assertAlmostEquals(0.70710677F, q.y);
+		assertAlmostEquals(0.7071067690849304, q.y);
 		assertAlmostEquals(0, q.z);
 	}
 	

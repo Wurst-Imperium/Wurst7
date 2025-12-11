@@ -56,7 +56,8 @@ public enum XRayHackTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_opacity",
-			"https://i.imgur.com/0nLulJn.png");
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/hXdzoDB.png"
+				: "https://i.imgur.com/ERrL7ko.png");
 		
 		// Exposed only + opacity
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed on");
@@ -65,10 +66,11 @@ public enum XRayHackTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading(context, world);
 		assertScreenshotEquals(context, "xray_exposed_only_opacity",
-			"https://i.imgur.com/noPWDUl.png");
+			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/ZwIARSr.png"
+				: "https://i.imgur.com/mCnP6LG.png");
 		
 		// Clean up
-		runCommand(server, "fill ~-5 ~-2 ~5 ~5 ~5 ~7 air");
+		runCommand(server, "fill ~-5 ~-2 ~4 ~5 ~5 ~7 air");
 		waitForBlock(context, 5, 5, 7, Blocks.AIR);
 		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand(context, "setslider X-Ray opacity 0");
@@ -102,6 +104,10 @@ public enum XRayHackTest
 		// Fluids
 		runCommand(server, "setblock ~1 ~0 ~6 minecraft:water");
 		runCommand(server, "setblock ~-1 ~0 ~6 minecraft:lava");
+		
+		// Snow
+		runCommand(server, "fill ~-5 ~-1 ~4 ~5 ~-1 ~4 minecraft:stone");
+		runCommand(server, "fill ~-5 ~0 ~4 ~5 ~0 ~4 minecraft:snow");
 		
 		// Wait for blocks to appear
 		waitForBlock(context, -1, 0, 6, Blocks.LAVA);

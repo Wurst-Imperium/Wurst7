@@ -23,10 +23,11 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldBuilder;
+import net.fabricmc.fabric.impl.client.gametest.TestSystemProperties;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
@@ -42,13 +43,16 @@ public class WurstTest implements FabricClientGameTest
 	@Override
 	public void runTest(ClientGameTestContext context)
 	{
+		if(!TestSystemProperties.DISABLE_NETWORK_SYNCHRONIZER)
+			throw new RuntimeException("Network synchronizer is not disabled");
+		
 		LOGGER.info("Starting Wurst Client GameTest");
 		hideSplashTexts(context);
 		waitForTitleScreenFade(context);
 		
 		LOGGER.info("Reached title screen");
 		assertScreenshotEquals(context, "title_screen",
-			"https://i.imgur.com/4fSJRpd.png");
+			"https://i.imgur.com/xSAHDXr.png");
 		
 		AltManagerTest.testAltManagerButton(context);
 		
@@ -58,8 +62,8 @@ public class WurstTest implements FabricClientGameTest
 			String mcVersion = SharedConstants.getCurrentVersion().name();
 			creator.setName("E2E Test " + mcVersion);
 			creator.setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE);
-			creator.getGameRules().getRule(GameRules.RULE_SENDCOMMANDFEEDBACK)
-				.set(false, null);
+			creator.getGameRules().set(GameRules.SEND_COMMAND_FEEDBACK, false,
+				null);
 			applyFlatPresetWithSmoothStone(creator);
 		});
 		
@@ -78,6 +82,9 @@ public class WurstTest implements FabricClientGameTest
 		TestInput input = context.getInput();
 		TestClientWorldContext world = spContext.getClientWorld();
 		TestServerContext server = spContext.getServer();
+		
+		// Disable chunk fade
+		context.runOnClient(mc -> mc.options.chunkSectionFadeInTime().set(0.0));
 		
 		runCommand(server, "time set noon");
 		runCommand(server, "tp 0 -57 0");

@@ -18,8 +18,8 @@ import net.wurstclient.hacks.XRayHack;
 
 /**
  * Last updated for <a href=
- * "https://github.com/CaffeineMC/sodium/tree/02253db283e4679228ba5fbc30cfc851d17123c8">Sodium
- * 0.6.13+mc1.21.6</a>
+ * "https://github.com/CaffeineMC/sodium/blob/1ddf7faacbf7be60aff3f00b49d90d199fdd706a/common/src/main/java/net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderer.java">Sodium
+ * mc1.21.11-0.8.0</a>
  */
 @Pseudo
 @Mixin(targets = {
@@ -31,8 +31,8 @@ public class BlockRendererMixin extends AbstractBlockRenderContextMixin
 	 * Modifies opacity of blocks when using X-Ray with Sodium installed.
 	 */
 	@ModifyExpressionValue(at = @At(value = "INVOKE",
-		target = "Lnet/caffeinemc/mods/sodium/client/render/frapi/mesh/MutableQuadViewImpl;color(I)I"),
-		method = "bufferQuad(Lnet/caffeinemc/mods/sodium/client/render/frapi/mesh/MutableQuadViewImpl;[FLnet/caffeinemc/mods/sodium/client/render/chunk/terrain/material/Material;)V",
+		target = "Lnet/caffeinemc/mods/sodium/client/render/model/MutableQuadViewImpl;baseColor(I)I"),
+		method = "bufferQuad(Lnet/caffeinemc/mods/sodium/client/render/model/MutableQuadViewImpl;[FLnet/caffeinemc/mods/sodium/client/render/chunk/terrain/material/Material;)V",
 		require = 0)
 	private int onBufferQuad(int original)
 	{

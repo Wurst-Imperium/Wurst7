@@ -223,7 +223,7 @@ public final class TunnellerHack extends Hack
 		Vec3 arrowEnd = dirVec.scale(Math.max(0.5, length)).add(offset);
 		
 		vertexBuffers[0] = EasyVertexBuffer.createAndUpload(Mode.LINES,
-			DefaultVertexFormat.POSITION_COLOR_NORMAL, buffer -> {
+			DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, buffer -> {
 				RenderUtils.drawNode(buffer, nodeBox, cyan);
 				RenderUtils.drawArrow(buffer, arrowStart, arrowEnd, cyan, 0.1F);
 			});
@@ -347,7 +347,8 @@ public final class TunnellerHack extends Hack
 			int green = 0x8000FF00;
 			if(!boxes.isEmpty())
 				vertexBuffers[1] = EasyVertexBuffer.createAndUpload(Mode.LINES,
-					DefaultVertexFormat.POSITION_COLOR_NORMAL, buffer -> {
+					DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH,
+					buffer -> {
 						for(AABB box : boxes)
 							RenderUtils.drawOutlinedBox(buffer, box, green);
 					});
@@ -437,7 +438,8 @@ public final class TunnellerHack extends Hack
 				
 				int yellow = 0x80FFFF00;
 				vertexBuffers[2] = EasyVertexBuffer.createAndUpload(Mode.LINES,
-					DefaultVertexFormat.POSITION_COLOR_NORMAL, buffer -> {
+					DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH,
+					buffer -> {
 						for(BlockPos pos : blocks)
 							RenderUtils.drawOutlinedBox(buffer, box.move(pos),
 								yellow);
@@ -582,7 +584,8 @@ public final class TunnellerHack extends Hack
 				
 				int red = 0x80FF0000;
 				vertexBuffers[3] = EasyVertexBuffer.createAndUpload(Mode.LINES,
-					DefaultVertexFormat.POSITION_COLOR_NORMAL, buffer -> {
+					DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH,
+					buffer -> {
 						for(BlockPos pos : liquids)
 							RenderUtils.drawOutlinedBox(buffer, box.move(pos),
 								red);
@@ -672,7 +675,8 @@ public final class TunnellerHack extends Hack
 			
 			int yellow = 0x80FFFF00;
 			vertexBuffers[4] = EasyVertexBuffer.createAndUpload(Mode.LINES,
-				DefaultVertexFormat.POSITION_COLOR_NORMAL, buffer -> {
+				DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH,
+				buffer -> {
 					RenderUtils.drawArrow(buffer, torchVec,
 						torchVec.add(0, 0.5, 0), yellow, 0.1F);
 				});
