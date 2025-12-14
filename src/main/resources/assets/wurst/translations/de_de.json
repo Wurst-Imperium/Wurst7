@@ -87,6 +87,7 @@
   "description.wurst.hack.follow": "Ein Bot, der automatisch dem nächstliegenden Mob oder Spieler hinterherläuft.\nSehr nervig.\n\nBenutze .follow, um einem bestimmten Mob oder Spieler zu folgen.",
   "description.wurst.hack.forceop": "Knackt AuthMe-Passwörter.\nKann benutzt werden, um OP zu bekommen.",
   "description.wurst.hack.freecam": "Ermöglicht dir, die Kamera unabhängig von der Spielfigur zu bewegen.",
+  "description.wurst.setting.freecam.disable_on_damage": "Schaltet Freecam automatisch aus, wenn du Schaden nimmst.",
   "description.wurst.hack.fullbright": "Ermöglicht dir, im Dunkeln zu sehen.",
   "description.wurst.hack.glide": "Lässt dich beim Fallen langsam nach unten gleiten.\n\n§c§lWARNUNG:§r Du bekommst immer noch Fallschaden, wenn du nicht NoFall benutzt.",
   "description.wurst.hack.handnoclip": "NoClip für die Hände. Lässt dich bestimmte Blöcke durch Wände anklicken.",

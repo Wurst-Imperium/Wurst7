@@ -46,7 +46,12 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	private final ColorSetting color =
 		new ColorSetting("Tracer color", Color.WHITE);
 	
+	private final CheckboxSetting disableOnDamage =
+		new CheckboxSetting("Disable on damage",
+			"description.wurst.setting.freecam.disable_on_damage", true);
+	
 	private FakePlayerEntity fakePlayer;
+	private float lastHealth = Float.MIN_VALUE;
 	
 	public FreecamHack()
 	{
@@ -55,6 +60,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		addSetting(speed);
 		addSetting(tracer);
 		addSetting(color);
+		addSetting(disableOnDamage);
 	}
 	
 	@Override
@@ -95,6 +101,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		
 		fakePlayer.resetPlayerPosition();
 		fakePlayer.despawn();
+		lastHealth = Float.MIN_VALUE;
 		
 		LocalPlayer player = MC.player;
 		player.setDeltaMovement(Vec3.ZERO);
@@ -106,6 +113,15 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	public void onUpdate()
 	{
 		LocalPlayer player = MC.player;
+		
+		float currentHealth = player.getHealth();
+		if(disableOnDamage.isChecked() && currentHealth < lastHealth)
+		{
+			setEnabled(false);
+			return;
+		}
+		lastHealth = currentHealth;
+		
 		player.setDeltaMovement(Vec3.ZERO);
 		player.getAbilities().flying = false;
 		
