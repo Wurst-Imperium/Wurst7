@@ -25,10 +25,10 @@
   ],
   "accessWidener": "wurst.accesswidener",
   "depends": {
-    "fabricloader": ">=0.17.3",
-    "fabric-api": ">=0.139.1",
-    "minecraft": "~1.21.11-beta.1",
-    "java": ">=21"
+    "fabricloader": ">=0.18.3",
+    "fabric-api": ">=0.140.0",
+    "minecraft": "~26.1-",
+    "java": ">=25"
   },
   "suggests": {
     "mo_glass": "*"
