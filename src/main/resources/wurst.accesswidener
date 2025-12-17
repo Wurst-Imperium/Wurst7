@@ -1,4 +1,4 @@
-accessWidener	v1	named
+accessWidener	v1	official
 accessible	class	net/minecraft/client/gui/GuiGraphics$ScissorStack
 accessible	method	net/minecraft/client/renderer/RenderPipelines	register	(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 accessible	method	net/minecraft/client/gui/screens/inventory/AbstractContainerScreen	slotClicked	(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V

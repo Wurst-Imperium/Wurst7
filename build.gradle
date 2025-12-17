@@ -5,7 +5,7 @@ buildscript {
 }
 
 plugins {
-	id "fabric-loom" version "${loom_version}"
+	id "net.fabricmc.fabric-loom" version "${loom_version}"
 	id "com.diffplug.spotless" version "8.1.0"
 }
 
@@ -40,12 +40,11 @@ repositories {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 	
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
 	// net.wurstclient.ai.PathPos extends net.minecraft.util.math.BlockPos,
 	// which uses javax.annotation.concurrent.Immutable, which is part of
@@ -53,7 +52,7 @@ dependencies {
 	//
 	// In other words, Wurst won't compile without this library,
 	// even though it's Minecraft that actually uses it.
-	modImplementation "com.google.code.findbugs:jsr305:3.0.2"
+	implementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 fabricApi.configureTests {
@@ -138,8 +137,8 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.20.5 (24w14a) upwards uses Java 21.
-	it.options.release = 21
+	// Minecraft 26.1 (26.1-snapshot-1) upwards uses Java 25.
+	it.options.release = 25
 }
 
 java {
@@ -148,8 +147,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 	
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
@@ -237,8 +236,8 @@ task github(dependsOn: build) {
 			ghRelease = releaseBuilder.create()
 		}
 		
-		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
-		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
+		ghRelease.uploadAsset(jar.archiveFile.get().getAsFile(), "application/java-archive")
+		ghRelease.uploadAsset(sourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
 	}
 }
 
