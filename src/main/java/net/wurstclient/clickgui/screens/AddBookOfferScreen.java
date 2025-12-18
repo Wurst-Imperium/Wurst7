@@ -81,43 +81,32 @@ public final class AddBookOfferScreen extends Screen
 			28, 12, Component.literal(""));
 		addWidget(levelField);
 		levelField.setMaxLength(2);
-		levelField.setFilter(t -> {
-			if(t.isEmpty())
-				return true;
-			
-			if(!MathUtils.isInteger(t))
-				return false;
-			
-			int level = Integer.parseInt(t);
-			if(level < 1 || level > 10)
-				return false;
-			
-			if(offerToAdd == null)
-				return true;
-			
-			Enchantment enchantment = offerToAdd.getEnchantment();
-			return level <= enchantment.getMaxLevel();
-		});
 		levelField.setResponder(t -> {
-			if(!MathUtils.isInteger(t))
+			if(!isValidLevel(t))
+			{
+				levelField.setTextColor(WurstColors.LIGHT_RED);
 				return;
+			}
 			
-			int level = Integer.parseInt(t);
-			updateLevel(level, false);
+			levelField.setTextColor(EditBox.DEFAULT_TEXT_COLOR);
+			if(!t.isEmpty())
+				updateLevel(Integer.parseInt(t), false);
 		});
 		
 		priceField = new EditBox(minecraft.font, width / 2 - 32, height - 58,
 			28, 12, Component.literal(""));
 		addWidget(priceField);
 		priceField.setMaxLength(2);
-		priceField.setFilter(t -> t.isEmpty() || MathUtils.isInteger(t)
-			&& Integer.parseInt(t) >= 1 && Integer.parseInt(t) <= 64);
 		priceField.setResponder(t -> {
-			if(!MathUtils.isInteger(t))
+			if(!isValidPrice(t))
+			{
+				priceField.setTextColor(WurstColors.LIGHT_RED);
 				return;
+			}
 			
-			int price = Integer.parseInt(t);
-			updatePrice(price, false);
+			priceField.setTextColor(EditBox.DEFAULT_TEXT_COLOR);
+			if(!t.isEmpty())
+				updatePrice(Integer.parseInt(t), false);
 		});
 		
 		addRenderableWidget(levelPlusButton = Button
@@ -224,6 +213,31 @@ public final class AddBookOfferScreen extends Screen
 			if(!priceField.getValue().equals(price))
 				priceField.setValue(price);
 		}
+	}
+	
+	private boolean isValidLevel(String t)
+	{
+		if(t.isEmpty())
+			return true;
+		
+		if(!MathUtils.isInteger(t))
+			return false;
+		
+		int level = Integer.parseInt(t);
+		if(level < 1 || level > 10)
+			return false;
+		
+		if(offerToAdd == null)
+			return true;
+		
+		Enchantment enchantment = offerToAdd.getEnchantment();
+		return level <= enchantment.getMaxLevel();
+	}
+	
+	private boolean isValidPrice(String t)
+	{
+		return t.isEmpty() || MathUtils.isInteger(t) && Integer.parseInt(t) >= 1
+			&& Integer.parseInt(t) <= 64;
 	}
 	
 	@Override

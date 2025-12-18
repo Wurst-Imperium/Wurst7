@@ -11,7 +11,7 @@ import net.minecraft.client.User;
 
 public interface IMinecraftClient
 {
-	public IClientPlayerInteractionManager getInteractionManager();
+	public IMultiPlayerGameMode getInteractionManager();
 	
 	public IClientPlayerEntity getPlayer();
 	

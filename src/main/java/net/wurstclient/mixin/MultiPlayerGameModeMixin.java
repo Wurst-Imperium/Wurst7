@@ -29,18 +29,17 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
 import net.wurstclient.events.PlayerAttacksEntityListener.PlayerAttacksEntityEvent;
 import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 
 @Mixin(MultiPlayerGameMode.class)
-public abstract class ClientPlayerInteractionManagerMixin
-	implements IClientPlayerInteractionManager
+public abstract class MultiPlayerGameModeMixin implements IMultiPlayerGameMode
 {
 	@Shadow
 	@Final
@@ -77,28 +76,28 @@ public abstract class ClientPlayerInteractionManagerMixin
 	@Override
 	public void windowClick_PICKUP(int slot)
 	{
-		handleInventoryMouseClick(0, slot, 0, ClickType.PICKUP,
+		handleContainerInput(0, slot, 0, ContainerInput.PICKUP,
 			minecraft.player);
 	}
 	
 	@Override
 	public void windowClick_QUICK_MOVE(int slot)
 	{
-		handleInventoryMouseClick(0, slot, 0, ClickType.QUICK_MOVE,
+		handleContainerInput(0, slot, 0, ContainerInput.QUICK_MOVE,
 			minecraft.player);
 	}
 	
 	@Override
 	public void windowClick_THROW(int slot)
 	{
-		handleInventoryMouseClick(0, slot, 1, ClickType.THROW,
+		handleContainerInput(0, slot, 1, ContainerInput.THROW,
 			minecraft.player);
 	}
 	
 	@Override
 	public void windowClick_SWAP(int from, int to)
 	{
-		handleInventoryMouseClick(0, from, to, ClickType.SWAP,
+		handleContainerInput(0, from, to, ContainerInput.SWAP,
 			minecraft.player);
 	}
 	
@@ -150,6 +149,6 @@ public abstract class ClientPlayerInteractionManagerMixin
 		InteractionHand hand);
 	
 	@Shadow
-	public abstract void handleInventoryMouseClick(int syncId, int slotId,
-		int button, ClickType actionType, Player player);
+	public abstract void handleContainerInput(int syncId, int slotId,
+		int button, ContainerInput actionType, Player player);
 }

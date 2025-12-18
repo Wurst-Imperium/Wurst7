@@ -40,7 +40,7 @@ import net.wurstclient.events.HandleInputListener.HandleInputEvent;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
 @Mixin(Minecraft.class)
@@ -209,9 +209,9 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Override
-	public IClientPlayerInteractionManager getInteractionManager()
+	public IMultiPlayerGameMode getInteractionManager()
 	{
-		return (IClientPlayerInteractionManager)gameMode;
+		return (IMultiPlayerGameMode)gameMode;
 	}
 	
 	@Override

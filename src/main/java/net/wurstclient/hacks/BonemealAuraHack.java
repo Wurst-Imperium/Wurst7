@@ -180,7 +180,7 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		ClientLevel world = MC.level;
 		
 		if(!(block instanceof BonemealableBlock fBlock)
-			|| !fBlock.isBonemealSuccess(world, world.random, pos, state))
+			|| !fBlock.isBonemealSuccess(world, world.getRandom(), pos, state))
 			return false;
 		
 		if(block instanceof GrassBlock)
