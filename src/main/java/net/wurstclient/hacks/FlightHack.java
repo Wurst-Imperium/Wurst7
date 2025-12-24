@@ -109,7 +109,7 @@ public final class FlightHack extends Hack
 			// This bypasses Moved Wrongly error when enabling noFall.
 			if(WURST.getHax().noFallHack.isEnabled())
 			{
-				MC.options.keyShift.setDown(true);
+				MC.options.keyShift.setDown(false);
 			}
 			player.setDeltaMovement(velocity.x, -verticalSpeed.getValue(),
 				velocity.z);
@@ -159,3 +159,4 @@ public final class FlightHack extends Hack
 		event.setInWater(false);
 	}
 }
+
