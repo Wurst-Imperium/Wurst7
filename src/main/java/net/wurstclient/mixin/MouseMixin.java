@@ -53,6 +53,6 @@ public class MouseMixin
 	private boolean wrapOnMouseScroll(Inventory inventory, int slot)
 	{
 		return !WurstClient.INSTANCE.getOtfs().zoomOtf
-			.shouldPreventHotbarScrolling();
+			.isControllingScrollEvents();
 	}
 }

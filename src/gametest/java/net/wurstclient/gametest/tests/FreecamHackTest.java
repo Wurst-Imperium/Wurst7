@@ -34,21 +34,21 @@ public enum FreecamHackTest
 		context.waitTick();
 		world.waitForChunksRender();
 		assertScreenshotEquals(context, "freecam_start",
-			"https://i.imgur.com/RxkPywy.png");
+			"https://i.imgur.com/o0qNJF7.png");
 		clearChat(context);
 		
 		// Fly back and up a bit
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
 		assertScreenshotEquals(context, "freecam_moved",
-			"https://i.imgur.com/pZDlYfH.png");
+			"https://i.imgur.com/JtIh9z5.png");
 		clearChat(context);
 		
 		// Enable tracer
 		runWurstCommand(context, "setcheckbox Freecam tracer on");
 		context.waitTick();
 		assertScreenshotEquals(context, "freecam_tracer",
-			"https://i.imgur.com/jYqDFzE.png");
+			"https://i.imgur.com/DhHgnWs.png");
 		clearChat(context);
 		
 		// Clean up

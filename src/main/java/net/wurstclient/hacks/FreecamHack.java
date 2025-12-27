@@ -15,6 +15,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
@@ -32,16 +33,32 @@ import net.wurstclient.util.RenderUtils;
 
 @DontSaveState
 @SearchTags({"free camera", "spectator"})
-public final class FreecamHack extends Hack implements UpdateListener,
-	PacketOutputListener, IsPlayerInWaterListener, AirStrafingSpeedListener,
-	IsPlayerInLavaListener, CameraTransformViewBobbingListener,
-	IsNormalCubeListener, SetOpaqueCubeListener, RenderListener
+public final class FreecamHack extends Hack
+	implements UpdateListener, PacketOutputListener, IsPlayerInWaterListener,
+	AirStrafingSpeedListener, IsPlayerInLavaListener,
+	CameraTransformViewBobbingListener, IsNormalCubeListener,
+	SetOpaqueCubeListener, RenderListener, MouseScrollListener
 {
-	private final SliderSetting speed =
-		new SliderSetting("Speed", 1, 0.05, 10, 0.05, ValueDisplay.DECIMAL);
+	private final SliderSetting horizontalSpeed =
+		new SliderSetting("Horizontal speed",
+			"description.wurst.setting.freecam.horizontal_speed", 1, 0.05, 10,
+			0.05, ValueDisplay.DECIMAL);
+	
+	private final SliderSetting verticalSpeed = new SliderSetting(
+		"Vertical speed", "description.wurst.setting.freecam.vertical_speed", 1,
+		0.05, 5, 0.05,
+		v -> ValueDisplay.DECIMAL.getValueString(getActualVerticalSpeed()));
+	
+	private final CheckboxSetting scrollToChangeSpeed =
+		new CheckboxSetting("Scroll to change speed",
+			"description.wurst.setting.freecam.scroll_to_change_speed", true);
+	
+	private final CheckboxSetting renderSpeed =
+		new CheckboxSetting("Show speed in HackList",
+			"description.wurst.setting.freecam.show_speed_in_hacklist", true);
 	
 	private final CheckboxSetting tracer = new CheckboxSetting("Tracer",
-		"Draws a line to your character's actual position.", false);
+		"description.wurst.setting.freecam.tracer", false);
 	
 	private final ColorSetting color =
 		new ColorSetting("Tracer color", Color.WHITE);
@@ -57,10 +74,23 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	{
 		super("Freecam");
 		setCategory(Category.RENDER);
-		addSetting(speed);
+		addSetting(horizontalSpeed);
+		addSetting(verticalSpeed);
+		addSetting(scrollToChangeSpeed);
+		addSetting(renderSpeed);
 		addSetting(tracer);
 		addSetting(color);
 		addSetting(disableOnDamage);
+	}
+	
+	@Override
+	public String getRenderName()
+	{
+		if(!renderSpeed.isChecked())
+			return getName();
+		
+		return getName() + " [" + horizontalSpeed.getValueString() + ", "
+			+ verticalSpeed.getValueString() + "]";
 	}
 	
 	@Override
@@ -75,6 +105,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		EVENTS.add(IsNormalCubeListener.class, this);
 		EVENTS.add(SetOpaqueCubeListener.class, this);
 		EVENTS.add(RenderListener.class, this);
+		EVENTS.add(MouseScrollListener.class, this);
 		
 		fakePlayer = new FakePlayerEntity();
 		
@@ -98,6 +129,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		EVENTS.remove(IsNormalCubeListener.class, this);
 		EVENTS.remove(SetOpaqueCubeListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
+		EVENTS.remove(MouseScrollListener.class, this);
 		
 		fakePlayer.resetPlayerPosition();
 		fakePlayer.despawn();
@@ -128,17 +160,40 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		player.setOnGround(false);
 		Vec3 velocity = player.getDeltaMovement();
 		
+		double vSpeed = getActualVerticalSpeed();
+		
 		if(MC.options.keyJump.isDown())
-			player.setDeltaMovement(velocity.add(0, speed.getValue(), 0));
+			player.setDeltaMovement(velocity.add(0, vSpeed, 0));
 		
 		if(MC.options.keyShift.isDown())
-			player.setDeltaMovement(velocity.subtract(0, speed.getValue(), 0));
+			player.setDeltaMovement(velocity.subtract(0, vSpeed, 0));
+	}
+	
+	private double getActualVerticalSpeed()
+	{
+		return Mth.clamp(horizontalSpeed.getValue() * verticalSpeed.getValue(),
+			0.05, 10);
 	}
 	
 	@Override
 	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
 	{
-		event.setSpeed(speed.getValueF());
+		event.setSpeed(horizontalSpeed.getValueF());
+	}
+	
+	@Override
+	public void onMouseScroll(double amount)
+	{
+		if(!scrollToChangeSpeed.isChecked())
+			return;
+		
+		if(WURST.getOtfs().zoomOtf.isControllingScrollEvents())
+			return;
+		
+		if(amount > 0)
+			horizontalSpeed.increaseValue();
+		else if(amount < 0)
+			horizontalSpeed.decreaseValue();
 	}
 	
 	@Override
