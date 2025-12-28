@@ -52,7 +52,8 @@ public class MouseMixin
 		method = "onScroll(JDD)V")
 	private boolean wrapOnMouseScroll(Inventory inventory, int slot)
 	{
-		return !WurstClient.INSTANCE.getOtfs().zoomOtf
-			.isControllingScrollEvents();
+		WurstClient wurst = WurstClient.INSTANCE;
+		return !wurst.getOtfs().zoomOtf.isControllingScrollEvents()
+			&& !wurst.getHax().flightHack.isControllingScrollEvents();
 	}
 }
