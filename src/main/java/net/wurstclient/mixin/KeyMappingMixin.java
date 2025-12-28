@@ -20,17 +20,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 
 @Mixin(KeyMapping.class)
-public abstract class KeyBindingMixin implements IKeyBinding
+public abstract class KeyMappingMixin implements IKeyMapping
 {
 	@Shadow
 	private InputConstants.Key key;
 	
 	@Override
 	@Unique
-	@Deprecated // use IKeyBinding.resetPressedState() instead
+	@Deprecated // use IKeyMapping.resetPressedState() instead
 	public void wurst_resetPressedState()
 	{
 		Window window = WurstClient.MC.getWindow();
@@ -44,7 +44,7 @@ public abstract class KeyBindingMixin implements IKeyBinding
 	
 	@Override
 	@Unique
-	@Deprecated // use IKeyBinding.simulatePress() instead
+	@Deprecated // use IKeyMapping.simulatePress() instead
 	public void wurst_simulatePress(boolean pressed)
 	{
 		Minecraft mc = WurstClient.MC;
@@ -69,7 +69,7 @@ public abstract class KeyBindingMixin implements IKeyBinding
 			break;
 			
 			default:
-			System.out.println("Unknown keybinding type: " + key.getType());
+			System.out.println("Unknown key mapping type: " + key.getType());
 			break;
 		}
 	}

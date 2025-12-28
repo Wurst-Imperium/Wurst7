@@ -14,7 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 
 public abstract class PathProcessor
 {
@@ -77,6 +77,6 @@ public abstract class PathProcessor
 	{
 		// reset keys
 		for(KeyMapping key : CONTROLS)
-			IKeyBinding.get(key).resetPressedState();
+			IKeyMapping.get(key).resetPressedState();
 	}
 }

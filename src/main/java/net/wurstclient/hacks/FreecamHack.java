@@ -23,7 +23,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.*;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -114,7 +114,7 @@ public final class FreecamHack extends Hack
 			opt.keyRight, opt.keyJump, opt.keyShift};
 		
 		for(KeyMapping binding : bindings)
-			IKeyBinding.get(binding).resetPressedState();
+			IKeyMapping.get(binding).resetPressedState();
 	}
 	
 	@Override

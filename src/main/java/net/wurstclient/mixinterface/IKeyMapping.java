@@ -9,7 +9,7 @@ package net.wurstclient.mixinterface;
 
 import net.minecraft.client.KeyMapping;
 
-public interface IKeyBinding
+public interface IKeyMapping
 {
 	/**
 	 * Resets the pressed state to whether or not the user is actually pressing
@@ -41,12 +41,12 @@ public interface IKeyBinding
 	}
 	
 	/**
-	 * Returns the given KeyBinding object as an IKeyBinding, allowing you to
+	 * Returns the given KeyMapping object as an IKeyMapping, allowing you to
 	 * access the resetPressedState() method.
 	 */
-	public static IKeyBinding get(KeyMapping kb)
+	public static IKeyMapping get(KeyMapping kb)
 	{
-		return (IKeyBinding)kb;
+		return (IKeyMapping)kb;
 	}
 	
 	/**
