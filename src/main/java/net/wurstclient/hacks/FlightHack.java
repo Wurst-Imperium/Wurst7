@@ -104,8 +104,7 @@ public final class FlightHack extends Hack
 		
 		if(MC.options.keyShift.isDown())
 		{
-			// Avoid sneaking to disable server-side Player.backOffFromEdge
-			// check.
+			// Cancel sneaking to disable server backOffFromEdge check.
 			// This bypasses Moved Wrongly error when enabling noFall.
 			if(WURST.getHax().noFallHack.isEnabled())
 			{
@@ -159,4 +158,3 @@ public final class FlightHack extends Hack
 		event.setInWater(false);
 	}
 }
-
