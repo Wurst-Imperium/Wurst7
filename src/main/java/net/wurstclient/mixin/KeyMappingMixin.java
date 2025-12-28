@@ -30,16 +30,24 @@ public abstract class KeyMappingMixin implements IKeyMapping
 	
 	@Override
 	@Unique
-	@Deprecated // use IKeyMapping.resetPressedState() instead
-	public void wurst_resetPressedState()
+	@Deprecated // use IKeyMapping.isActuallyDown() instead
+	public boolean wurst_isActuallyDown()
 	{
 		Window window = WurstClient.MC.getWindow();
 		int code = key.getValue();
 		
 		if(key.getType() == InputConstants.Type.MOUSE)
-			setDown(GLFW.glfwGetMouseButton(window.handle(), code) == 1);
-		else
-			setDown(InputConstants.isKeyDown(window, code));
+			return GLFW.glfwGetMouseButton(window.handle(), code) == 1;
+		
+		return InputConstants.isKeyDown(window, code);
+	}
+	
+	@Override
+	@Unique
+	@Deprecated // use IKeyMapping.resetPressedState() instead
+	public void wurst_resetPressedState()
+	{
+		setDown(wurst_isActuallyDown());
 	}
 	
 	@Override

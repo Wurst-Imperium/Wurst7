@@ -15,6 +15,7 @@ import net.wurstclient.events.AirStrafingSpeedListener;
 import net.wurstclient.events.IsPlayerInWaterListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -30,11 +31,6 @@ public final class FlightHack extends Hack
 		"Vertical Speed",
 		"\u00a7c\u00a7lWARNING:\u00a7r Setting this too high can cause fall damage, even with NoFall.",
 		1, 0.05, 5, 0.05, ValueDisplay.DECIMAL);
-	
-	private final CheckboxSetting slowSneaking = new CheckboxSetting(
-		"Slow sneaking",
-		"Reduces your horizontal speed while you are sneaking to prevent you from glitching out.",
-		true);
 	
 	private final CheckboxSetting antiKick = new CheckboxSetting("Anti-Kick",
 		"Makes you fall a little bit every now and then to prevent you from getting kicked.",
@@ -61,7 +57,6 @@ public final class FlightHack extends Hack
 		setCategory(Category.MOVEMENT);
 		addSetting(horizontalSpeed);
 		addSetting(verticalSpeed);
-		addSetting(slowSneaking);
 		addSetting(antiKick);
 		addSetting(antiKickInterval);
 		addSetting(antiKickDistance);
@@ -102,9 +97,12 @@ public final class FlightHack extends Hack
 			player.setDeltaMovement(velocity.x, verticalSpeed.getValue(),
 				velocity.z);
 		
-		if(MC.options.keyShift.isDown())
+		if(IKeyMapping.get(MC.options.keyShift).isActuallyDown())
+		{
+			MC.options.keyShift.setDown(false);
 			player.setDeltaMovement(velocity.x, -verticalSpeed.getValue(),
 				velocity.z);
+		}
 		
 		if(antiKick.isChecked())
 			doAntiKick(velocity);
@@ -113,12 +111,7 @@ public final class FlightHack extends Hack
 	@Override
 	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
 	{
-		float speed = horizontalSpeed.getValueF();
-		
-		if(MC.options.keyShift.isDown() && slowSneaking.isChecked())
-			speed = Math.min(speed, 0.85F);
-		
-		event.setSpeed(speed);
+		event.setSpeed(horizontalSpeed.getValueF());
 	}
 	
 	private void doAntiKick(Vec3 velocity)

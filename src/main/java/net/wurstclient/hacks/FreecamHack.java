@@ -165,8 +165,11 @@ public final class FreecamHack extends Hack
 		if(MC.options.keyJump.isDown())
 			player.setDeltaMovement(velocity.add(0, vSpeed, 0));
 		
-		if(MC.options.keyShift.isDown())
+		if(IKeyMapping.get(MC.options.keyShift).isActuallyDown())
+		{
+			MC.options.keyShift.setDown(false);
 			player.setDeltaMovement(velocity.subtract(0, vSpeed, 0));
+		}
 	}
 	
 	private double getActualVerticalSpeed()

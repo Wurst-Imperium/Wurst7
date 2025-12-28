@@ -11,6 +11,15 @@ import net.minecraft.client.KeyMapping;
 
 public interface IKeyMapping
 {
+	/*
+	 * Returns whether the user is actually pressing this key on their keyboard
+	 * or mouse.
+	 */
+	public default boolean isActuallyDown()
+	{
+		return wurst_isActuallyDown();
+	}
+	
 	/**
 	 * Resets the pressed state to whether or not the user is actually pressing
 	 * this key on their keyboard.
@@ -48,6 +57,12 @@ public interface IKeyMapping
 	{
 		return (IKeyMapping)kb;
 	}
+	
+	/**
+	 * @deprecated Use {@link #isActuallyDown()} instead.
+	 */
+	@Deprecated
+	public boolean wurst_isActuallyDown();
 	
 	/**
 	 * @deprecated Use {@link #resetPressedState()} instead.
