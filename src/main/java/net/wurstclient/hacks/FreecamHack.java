@@ -33,11 +33,11 @@ import net.wurstclient.util.RenderUtils;
 
 @DontSaveState
 @SearchTags({"free camera", "spectator"})
-public final class FreecamHack extends Hack
-	implements UpdateListener, PacketOutputListener, IsPlayerInWaterListener,
-	AirStrafingSpeedListener, IsPlayerInLavaListener,
-	CameraTransformViewBobbingListener, IsNormalCubeListener,
-	SetOpaqueCubeListener, RenderListener, MouseScrollListener
+public final class FreecamHack extends Hack implements UpdateListener,
+	PacketOutputListener, IsPlayerInWaterListener, AirStrafingSpeedListener,
+	IsPlayerInLavaListener, CameraTransformViewBobbingListener,
+	IsNormalCubeListener, SetOpaqueCubeListener, RenderListener,
+	MouseScrollListener, VelocityFromFluidListener
 {
 	private final SliderSetting horizontalSpeed =
 		new SliderSetting("Horizontal speed",
@@ -106,6 +106,7 @@ public final class FreecamHack extends Hack
 		EVENTS.add(SetOpaqueCubeListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(MouseScrollListener.class, this);
+		EVENTS.add(VelocityFromFluidListener.class, this);
 		
 		fakePlayer = new FakePlayerEntity();
 		
@@ -130,6 +131,7 @@ public final class FreecamHack extends Hack
 		EVENTS.remove(SetOpaqueCubeListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		EVENTS.remove(MouseScrollListener.class, this);
+		EVENTS.remove(VelocityFromFluidListener.class, this);
 		
 		fakePlayer.resetPlayerPosition();
 		fakePlayer.despawn();
@@ -255,5 +257,12 @@ public final class FreecamHack extends Hack
 		// line
 		RenderUtils.drawTracer(matrixStack, partialTicks,
 			fakePlayer.getBoundingBox().getCenter(), colorI, false);
+	}
+	
+	@Override
+	public void onVelocityFromFluid(VelocityFromFluidEvent event)
+	{
+		if(event.getEntity() == MC.player)
+			event.cancel();
 	}
 }
