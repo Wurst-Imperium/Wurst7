@@ -31,7 +31,6 @@ public enum CopyItemCmdTest
 		TestClientWorldContext world = spContext.getClientWorld();
 		TestServerContext server = spContext.getServer();
 		
-		System.out.println("Testing .copyitem command");
 		input.pressKey(GLFW.GLFW_KEY_F5);
 		input.pressKey(GLFW.GLFW_KEY_F5);
 		clearInventory(context);
@@ -41,7 +40,7 @@ public enum CopyItemCmdTest
 		runCommand(server,
 			"item replace entity @s armor.head with golden_helmet");
 		clearToasts(context);
-		context.waitTick();
+		context.waitTicks(2);
 		world.waitForChunksRender();
 		context.takeScreenshot("copyitem_command_setup");
 		assertNoItemInSlot(context, 0);
