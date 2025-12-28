@@ -158,19 +158,17 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		
 		player.setDeltaMovement(Vec3.ZERO);
 		player.getAbilities().flying = false;
-		
 		player.setOnGround(false);
-		Vec3 velocity = player.getDeltaMovement();
 		
 		double vSpeed = getActualVerticalSpeed();
 		
 		if(MC.options.keyJump.isDown())
-			player.setDeltaMovement(velocity.add(0, vSpeed, 0));
+			player.addDeltaMovement(new Vec3(0, vSpeed, 0));
 		
 		if(IKeyMapping.get(MC.options.keyShift).isActuallyDown())
 		{
 			MC.options.keyShift.setDown(false);
-			player.setDeltaMovement(velocity.subtract(0, vSpeed, 0));
+			player.addDeltaMovement(new Vec3(0, -vSpeed, 0));
 		}
 	}
 	

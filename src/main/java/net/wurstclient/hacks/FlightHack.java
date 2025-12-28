@@ -117,24 +117,22 @@ public final class FlightHack extends Hack implements UpdateListener,
 			return;
 		
 		LocalPlayer player = MC.player;
-		
 		player.setDeltaMovement(Vec3.ZERO);
 		player.getAbilities().flying = false;
-		Vec3 velocity = player.getDeltaMovement();
 		
 		double vSpeed = getActualVerticalSpeed();
 		
 		if(MC.options.keyJump.isDown())
-			player.setDeltaMovement(velocity.add(0, vSpeed, 0));
+			player.addDeltaMovement(new Vec3(0, vSpeed, 0));
 		
 		if(IKeyMapping.get(MC.options.keyShift).isActuallyDown())
 		{
 			MC.options.keyShift.setDown(false);
-			player.setDeltaMovement(velocity.subtract(0, vSpeed, 0));
+			player.addDeltaMovement(new Vec3(0, -vSpeed, 0));
 		}
 		
 		if(antiKick.isChecked())
-			doAntiKick(velocity);
+			doAntiKick();
 	}
 	
 	@Override
@@ -165,7 +163,7 @@ public final class FlightHack extends Hack implements UpdateListener,
 			&& !WURST.getHax().freecamHack.isEnabled();
 	}
 	
-	private void doAntiKick(Vec3 velocity)
+	private void doAntiKick()
 	{
 		if(tickCounter > antiKickInterval.getValueI() + 1)
 			tickCounter = 0;
@@ -177,12 +175,12 @@ public final class FlightHack extends Hack implements UpdateListener,
 				if(MC.options.keyShift.isDown())
 					tickCounter = 2;
 				else
-					MC.player.setDeltaMovement(
-						velocity.subtract(0, antiKickDistance.getValue(), 0));
+					MC.player.addDeltaMovement(
+						new Vec3(0, -antiKickDistance.getValue(), 0));
 			}
 			
-			case 1 -> MC.player.setDeltaMovement(
-				velocity.add(0, antiKickDistance.getValue(), 0));
+			case 1 -> MC.player
+				.addDeltaMovement(new Vec3(0, antiKickDistance.getValue(), 0));
 		}
 		
 		tickCounter++;
