@@ -345,5 +345,9 @@
   "description.wurst.nochatreports.message_is_reportable": "This message has a valid signature and is thus vulnerable to fraudulent chat reports.",
   "gui.wurst.generic.allcaps_blocked": "BLOCKED",
   "gui.wurst.generic.allcaps_allowed": "ALLOWED",
+  "gui.wurst.generic.ctrl_left_click_for_precise_input": "§e[ctrl]§r+§e[left-click]§r for precise input",
+  "gui.wurst.generic.left_click_to_edit": "§e[left-click]§r to edit",
+  "gui.wurst.generic.right_click_to_reset": "§e[right-click]§r to reset",
+  "gui.wurst.generic.unknown_block": "§ounknown block§r",
   "key.wurst.zoom": "Zoom"
 }
