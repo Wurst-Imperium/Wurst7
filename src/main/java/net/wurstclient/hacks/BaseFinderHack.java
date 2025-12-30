@@ -193,7 +193,7 @@ public final class BaseFinderHack extends Hack
 		
 		int stepSize = MC.level.getHeight() / 64;
 		int startY = MC.level.getMaxY() - 1 - modulo * stepSize;
-		int endY = startY - stepSize;
+		int endY = Math.max(startY - stepSize, MC.level.getMinY());
 		
 		BlockPos playerPos =
 			BlockPos.containing(MC.player.getX(), 0, MC.player.getZ());
