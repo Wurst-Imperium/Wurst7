@@ -20,8 +20,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -113,9 +115,16 @@ public final class FeedAuraHack extends Hack
 		ItemStack heldStack = player.getInventory().getSelectedItem();
 		
 		double rangeSq = range.getValueSq();
-		Stream<Animal> stream = EntityUtils.getValidAnimals()
-			.filter(e -> player.distanceToSqr(e) <= rangeSq)
-			.filter(e -> e.isFood(heldStack)).filter(Animal::canFallInLove);
+		Stream<Animal> stream = EntityUtils.getValidAnimals();
+
+		if(heldStack.getItem() instanceof ShearsItem)
+			stream = stream.filter(e -> player.distanceToSqr(e) <= rangeSq)
+				.filter(e -> e instanceof Sheep)
+				.filter(e -> ((Sheep)e).readyForShearing());
+		else
+			stream = stream.filter(e -> player.distanceToSqr(e) <= rangeSq)
+				.filter(e -> e.isFood(heldStack))
+				.filter(Animal::canFallInLove);
 		
 		if(filterBabies.isChecked())
 			stream = stream.filter(filterBabies);
