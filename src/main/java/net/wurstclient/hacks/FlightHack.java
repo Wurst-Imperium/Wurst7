@@ -165,23 +165,27 @@ public final class FlightHack extends Hack implements UpdateListener,
 	
 	private void doAntiKick()
 	{
-		if (tickCounter > antiKickInterval.getValueI() + 1)
+		if(tickCounter > antiKickInterval.getValueI() + 1)
 			tickCounter = 0;
-
+		
 		Vec3 velocity = MC.player.getDeltaMovement();
-
-		switch (tickCounter) {
-			case 0 -> {
-				if (IKeyMapping.get(MC.options.keyShift).isActuallyDown()) {
+		
+		switch(tickCounter)
+		{
+			case 0 ->
+			{
+				if(IKeyMapping.get(MC.options.keyShift).isActuallyDown())
+				{
 					tickCounter = 2;
-				} else {
+				}else
+				{
 					MC.player.setDeltaMovement(velocity.x,
-							-antiKickDistance.getValue(), velocity.z);
+						-antiKickDistance.getValue(), velocity.z);
 				}
 			}
-
+			
 			case 1 -> MC.player.setDeltaMovement(velocity.x,
-					antiKickDistance.getValue(), velocity.z);
+				antiKickDistance.getValue(), velocity.z);
 		}
 		tickCounter++;
 	}
