@@ -116,15 +116,14 @@ public final class FeedAuraHack extends Hack
 		
 		double rangeSq = range.getValueSq();
 		Stream<Animal> stream = EntityUtils.getValidAnimals();
-
+		
 		if(heldStack.getItem() instanceof ShearsItem)
 			stream = stream.filter(e -> player.distanceToSqr(e) <= rangeSq)
 				.filter(e -> e instanceof Sheep)
 				.filter(e -> ((Sheep)e).readyForShearing());
 		else
 			stream = stream.filter(e -> player.distanceToSqr(e) <= rangeSq)
-				.filter(e -> e.isFood(heldStack))
-				.filter(Animal::canFallInLove);
+				.filter(e -> e.isFood(heldStack)).filter(Animal::canFallInLove);
 		
 		if(filterBabies.isChecked())
 			stream = stream.filter(filterBabies);
