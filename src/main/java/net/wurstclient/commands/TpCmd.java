@@ -44,37 +44,32 @@ public final class TpCmd extends Command
 	public void call(String[] args) throws CmdException
 	{
 		BlockPos pos = argsToPos(args);
+		LocalPlayer player = MC.player;
 		
 		if(disableFreecam.isChecked() && WURST.getHax().freecamHack.isEnabled())
 			WURST.getHax().freecamHack.setEnabled(false);
 		
-		LocalPlayer player = MC.player;
-		ClientPacketListener netHandler = player.connection;
-		
-		double startX = player.getX();
-		double startY = player.getY();
-		double startZ = player.getZ();
-		
-		double dX = pos.getX() - startX;
-		double dY = pos.getY() - startY;
-		double dZ = pos.getZ() - startZ;
-		double totalDistanceSq = dX * dX + dY * dY + dZ * dZ;
-		
-		if(totalDistanceSq < 100)
-			// Better stability.
-			player.setPos(pos.getX(), pos.getY(), pos.getZ());
-		else
+		// Simple teleport at low distances for better stability
+		if(player.distanceToSqr(pos.getBottomCenter()) < 100)
 		{
-			// We send 4 "dummy" packets at the starting location.
-			// This increments the server's packet counter 'i' from to 4.
-			// Which increases the maximum allowed distance.
-			for(int i = 0; i < 4; i++)
-				netHandler.send(new ServerboundMovePlayerPacket.Pos(startX,
-					startY, startZ, true, player.horizontalCollision));
-			
-			netHandler.send(new ServerboundMovePlayerPacket.Pos(pos.getX(),
-				pos.getY(), pos.getZ(), true, player.horizontalCollision));
+			player.setPos(pos.getX(), pos.getY(), pos.getZ());
+			return;
 		}
+		
+		// See ServerGamePacketListenerImpl.handleMovePlayer()
+		// for why it's using these numbers.
+		// Also, let me know if you find a way to bypass that check.
+		for(int i = 0; i < 4; i++)
+			sendPos(player.getX(), player.getY(), player.getZ(), true);
+		sendPos(pos.getX(), pos.getY(), pos.getZ(), true);
+		sendPos(pos.getX(), pos.getY(), pos.getZ(), false);
+	}
+	
+	private void sendPos(double x, double y, double z, boolean onGround)
+	{
+		ClientPacketListener netHandler = MC.player.connection;
+		netHandler.send(new ServerboundMovePlayerPacket.Pos(x, y, z, onGround,
+			MC.player.horizontalCollision));
 	}
 	
 	private BlockPos argsToPos(String... args) throws CmdException
