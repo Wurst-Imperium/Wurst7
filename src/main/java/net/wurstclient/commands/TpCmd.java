@@ -61,19 +61,16 @@ public final class TpCmd extends Command
 		double totalDistanceSq = dX * dX + dY * dY + dZ * dZ;
 		
 		if(totalDistanceSq < 100)
-		{
 			// Better stability.
 			player.setPos(pos.getX(), pos.getY(), pos.getZ());
-		}else
+		else
 		{
 			// We send 4 "dummy" packets at the starting location.
 			// This increments the server's packet counter 'i' from to 4.
 			// Which increases the maximum allowed distance.
 			for(int i = 0; i < 4; i++)
-			{
 				netHandler.send(new ServerboundMovePlayerPacket.Pos(startX,
 					startY, startZ, true, player.horizontalCollision));
-			}
 			
 			netHandler.send(new ServerboundMovePlayerPacket.Pos(pos.getX(),
 				pos.getY(), pos.getZ(), true, player.horizontalCollision));
