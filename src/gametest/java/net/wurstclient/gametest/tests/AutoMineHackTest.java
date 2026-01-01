@@ -10,7 +10,7 @@ package net.wurstclient.gametest.tests;
 import static net.wurstclient.gametest.WurstClientTestHelper.*;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.world.level.block.Blocks;
@@ -24,7 +24,7 @@ public enum AutoMineHackTest
 		TestSingleplayerContext spContext)
 	{
 		WurstTest.LOGGER.info("Testing AutoMine hack");
-		TestClientWorldContext world = spContext.getClientWorld();
+		TestClientLevelContext world = spContext.getClientLevel();
 		TestServerContext server = spContext.getServer();
 		runCommand(server, "gamemode survival");
 		

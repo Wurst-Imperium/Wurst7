@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.world.item.Items;
@@ -28,7 +28,7 @@ public enum CopyItemCmdTest
 	{
 		WurstTest.LOGGER.info("Testing .copyitem command");
 		TestInput input = context.getInput();
-		TestClientWorldContext world = spContext.getClientWorld();
+		TestClientLevelContext world = spContext.getClientLevel();
 		TestServerContext server = spContext.getServer();
 		
 		input.pressKey(GLFW.GLFW_KEY_F5);

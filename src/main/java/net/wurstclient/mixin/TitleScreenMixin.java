@@ -45,7 +45,7 @@ public abstract class TitleScreenMixin extends Screen
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 		{
 			if(!button.getMessage().getString().equals(I18n.get("menu.online")))
 				continue;

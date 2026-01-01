@@ -78,7 +78,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	@Unique
 	private void addWurstOptionsButton()
 	{
-		List<AbstractWidget> buttons = Screens.getButtons(this);
+		List<AbstractWidget> buttons = Screens.getWidgets(this);
 		
 		// Fallback position
 		int buttonX = width / 2 - 102;
@@ -118,7 +118,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	@Unique
 	private void hideFeedbackReportAndServerLinksButtons()
 	{
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 			if(isTrKey(button, "menu.sendFeedback")
 				|| isTrKey(button, "menu.reportBugs")
 				|| isTrKey(button, "menu.feedback")
@@ -131,7 +131,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	{
 		// Check if there are any buttons in the way
 		ArrayList<AbstractWidget> buttonsInTheWay = new ArrayList<>();
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 		{
 			if(button.getRight() < x || button.getX() > x + width
 				|| button.getBottom() < y || button.getY() > y + height)

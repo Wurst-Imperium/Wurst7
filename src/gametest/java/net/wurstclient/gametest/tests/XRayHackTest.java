@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.world.level.block.Blocks;
@@ -28,7 +28,7 @@ public enum XRayHackTest
 	{
 		WurstTest.LOGGER.info("Testing X-Ray hack");
 		TestInput input = context.getInput();
-		TestClientWorldContext world = spContext.getClientWorld();
+		TestClientLevelContext world = spContext.getClientLevel();
 		TestServerContext server = spContext.getServer();
 		buildTestRig(context, spContext);
 		
@@ -83,7 +83,7 @@ public enum XRayHackTest
 		TestSingleplayerContext spContext)
 	{
 		TestServerContext server = spContext.getServer();
-		TestClientWorldContext world = spContext.getClientWorld();
+		TestClientLevelContext world = spContext.getClientLevel();
 		
 		// Stone wall (9 wide, 7 high, 3 deep)
 		runCommand(server, "fill ~-5 ~-2 ~5 ~5 ~5 ~7 stone");
@@ -116,7 +116,7 @@ public enum XRayHackTest
 	}
 	
 	private static void waitForChunkReloading(ClientGameTestContext context,
-		TestClientWorldContext world)
+		TestClientLevelContext world)
 	{
 		// Wait longer if testing with Sodium, since we can't rely on
 		// waitForChunksRender() to track when Sodium finishes loading chunks

@@ -181,7 +181,7 @@ public class WurstOptionsScreen extends Screen
 	private void renderButtonTooltip(GuiGraphics context, int mouseX,
 		int mouseY)
 	{
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 		{
 			if(!button.isHoveredOrFocused()
 				|| !(button instanceof WurstOptionsButton))

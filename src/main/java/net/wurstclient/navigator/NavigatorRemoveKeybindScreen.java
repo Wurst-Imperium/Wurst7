@@ -141,7 +141,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int bgx2 = middleX + 154;
 		int bgy1 = 60;
 		int bgy2 = height - 43;
-		boolean noButtons = Screens.getButtons(this).isEmpty();
+		boolean noButtons = Screens.getWidgets(this).isEmpty();
 		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		
 		context.enableScissor(bgx1, bgy1, bgx2, bgy3);
@@ -198,7 +198,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		context.disableScissor();
 		
 		// buttons below scissor box
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 		{
 			// positions
 			int x1 = button.getX();

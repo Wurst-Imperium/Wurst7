@@ -10,7 +10,7 @@ package net.wurstclient.gametest.tests;
 import static net.wurstclient.gametest.WurstClientTestHelper.*;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.world.level.block.Blocks;
@@ -25,7 +25,7 @@ public enum PistonTest
 	{
 		WurstTest.LOGGER.info(
 			"Testing that a piston can extend and retract without crashing the game");
-		TestClientWorldContext world = spContext.getClientWorld();
+		TestClientLevelContext world = spContext.getClientLevel();
 		TestServerContext server = spContext.getServer();
 		
 		// Place a redstone block and piston

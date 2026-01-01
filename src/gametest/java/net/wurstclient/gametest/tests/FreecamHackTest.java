@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.wurstclient.gametest.WurstTest;
 
@@ -26,7 +26,7 @@ public enum FreecamHackTest
 	{
 		WurstTest.LOGGER.info("Testing Freecam hack");
 		TestInput input = context.getInput();
-		TestClientWorldContext world = spContext.getClientWorld();
+		TestClientLevelContext world = spContext.getClientLevel();
 		
 		// Enable Freecam with default settings
 		runWurstCommand(context, "setcheckbox Freecam tracer off");

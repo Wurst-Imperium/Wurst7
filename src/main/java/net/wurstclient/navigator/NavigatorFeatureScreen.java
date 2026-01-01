@@ -259,7 +259,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			return;
 		}
 		
-		boolean noButtons = Screens.getButtons(this).isEmpty();
+		boolean noButtons = Screens.getWidgets(this).isEmpty();
 		Rectangle area = new Rectangle(width / 2 - 154, 60, 308,
 			height - 60 - (noButtons ? 43 : 67));
 		if(!area.contains(x, y))
@@ -327,7 +327,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int bgx2 = middleX + 154;
 		int bgy1 = 60;
 		int bgy2 = height - 43;
-		boolean noButtons = Screens.getButtons(this).isEmpty();
+		boolean noButtons = Screens.getWidgets(this).isEmpty();
 		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		int windowY1 = bgy1 + scroll + windowComponentY;
 		int windowY2 = windowY1 + window.getInnerHeight();
@@ -455,7 +455,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		context.disableScissor();
 		
 		// buttons below scissor box
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 		{
 			// positions
 			int x1 = button.getX();
