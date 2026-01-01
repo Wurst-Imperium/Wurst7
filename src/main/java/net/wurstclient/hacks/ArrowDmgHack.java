@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -70,9 +70,9 @@ public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 		double y = player.getY();
 		double z = player.getZ();
 		
-		// See ServerPlayNetworkHandler.onPlayerMove()
+		// See ServerGamePacketListenerImpl.handleMovePlayer()
 		// for why it's using these numbers.
-		// Also, let me know if you find a way to bypass that check in 1.21.
+		// Also, let me know if you find a way to bypass that check.
 		double adjustedStrength = strength.getValue() / 10.0 * Math.sqrt(500);
 		Vec3 lookVec = player.getViewVector(1).scale(adjustedStrength);
 		for(int i = 0; i < 4; i++)
