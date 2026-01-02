@@ -103,8 +103,16 @@ public final class FlightHack extends Hack
 				velocity.z);
 		
 		if(MC.options.keyShift.isDown())
+		{
+			// Cancel sneaking to disable server backOffFromEdge check.
+			// This bypasses Moved Wrongly error when enabling noFall.
+			if(WURST.getHax().noFallHack.isEnabled())
+			{
+				MC.options.keyShift.setDown(false);
+			}
 			player.setDeltaMovement(velocity.x, -verticalSpeed.getValue(),
 				velocity.z);
+		}
 		
 		if(antiKick.isChecked())
 			doAntiKick(velocity);
