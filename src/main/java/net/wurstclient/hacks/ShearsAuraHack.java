@@ -14,50 +14,30 @@ import java.util.stream.Stream;
 
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShearsItem;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.filters.FilterBabiesSetting;
 import net.wurstclient.util.EntityUtils;
 
-@SearchTags({"feed aura", "BreedAura", "breed aura", "AutoBreeder",
-	"auto breeder"})
-public final class FeedAuraHack extends GenericInteractHack
+@SearchTags({"shears aura", "SheepAura", "sheep aura", "autoshears", "auto shears"})
+public final class ShearsAuraHack extends GenericInteractHack
 {
 	private final SliderSetting range = new SliderSetting("Range",
-		"Determines how far FeedAura will reach to feed animals.\n"
-			+ "Anything that is further away than the specified value will not be fed.",
+		"Determines how far ShearsAura will reach to shear sheep.\n"
+			+ "Anything that is further away than the specified value will not be sheared.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
-	
-	private final FilterBabiesSetting filterBabies =
-		new FilterBabiesSetting("Won't feed baby animals.\n"
-			+ "Saves food, but doesn't speed up baby growth.", true);
-	
-	private final CheckboxSetting filterUntamed =
-		new CheckboxSetting("Filter untamed",
-			"Won't feed tameable animals that haven't been tamed yet.", false);
-	
-	private final CheckboxSetting filterHorses = new CheckboxSetting(
-		"Filter horse-like animals",
-		"Won't feed horses, llamas, donkeys, etc.\n"
-			+ "Recommended in Minecraft versions before 1.20.3 due to MC-233276,"
-			+ "which causes these animals to consume items indefinitely.",
-		false);
 	
 	private final Random random = new Random();
 	
-	public FeedAuraHack()
+	public ShearsAuraHack()
 	{
-		super("FeedAura");
+		super("ShearsAura");
 		setCategory(Category.OTHER);
 		addSetting(range);
-		addSetting(filterBabies);
-		addSetting(filterUntamed);
-		addSetting(filterHorses);
 	}
 	
 	@Override
@@ -69,18 +49,13 @@ public final class FeedAuraHack extends GenericInteractHack
 		double rangeSq = range.getValueSq();
 		Stream<Animal> stream = EntityUtils.getValidAnimals();
 		
+		if(heldStack.getItem() instanceof ShearsItem)
+			stream = stream.filter(e -> player.distanceToSqr(e) <= rangeSq)
+				.filter(e -> e instanceof Sheep)
+				.filter(e -> ((Sheep)e).readyForShearing());
+		else
+			return;
 		
-		stream = stream.filter(e -> player.distanceToSqr(e) <= rangeSq)
-			.filter(e -> e.isFood(heldStack)).filter(Animal::canFallInLove);
-		
-		if(filterBabies.isChecked())
-			stream = stream.filter(filterBabies);
-		
-		if(filterUntamed.isChecked())
-			stream = stream.filter(e -> !isUntamed(e));
-		
-		if(filterHorses.isChecked())
-			stream = stream.filter(e -> !(e instanceof AbstractHorse));
 		
 		// convert targets to list
 		ArrayList<Animal> targets =
