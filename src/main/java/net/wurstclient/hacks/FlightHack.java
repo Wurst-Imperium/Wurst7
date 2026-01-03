@@ -174,7 +174,7 @@ public final class FlightHack extends Hack implements UpdateListener,
 		{
 			case 0 ->
 			{
-				if(IKeyMapping.get(MC.options.keyShift).isActuallyDown())
+				if(velocity.y <= -antiKickDistance.getValue())
 					tickCounter = 2;
 				else
 					MC.player.setDeltaMovement(velocity.x,
