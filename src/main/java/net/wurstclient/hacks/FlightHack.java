@@ -53,12 +53,12 @@ public final class FlightHack extends Hack implements UpdateListener,
 	
 	private final SliderSetting antiKickInterval =
 		new SliderSetting("Anti-Kick Interval",
-			"description.wurst.setting.flight.anti-kick_interval", 30, 5, 80, 1,
+			"description.wurst.setting.flight.anti-kick_interval", 70, 5, 80, 1,
 			ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private final SliderSetting antiKickDistance =
 		new SliderSetting("Anti-Kick Distance",
-			"description.wurst.setting.flight.anti-kick_distance", 0.07, 0.01,
+			"description.wurst.setting.flight.anti-kick_distance", 0.035, 0.01,
 			0.2, 0.001, ValueDisplay.DECIMAL.withSuffix("m"));
 	
 	private int tickCounter = 0;
