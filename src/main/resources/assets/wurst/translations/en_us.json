@@ -198,6 +198,8 @@
   "description.wurst.hack.nofall": "Protects you from fall damage.",
   "description.wurst.setting.nofall.allow_elytra": "Also tries to prevent fall damage while you are flying with an elytra.\n\n§c§lWARNING:§r This can sometimes cause you to stop flying unexpectedly.",
   "description.wurst.setting.nofall.pause_for_mace": "Pauses NoFall when holding a mace, so that you can take advantage of the mace's fall distance bonus.\n\n§c§lWARNING:§r You will not be protected from fall damage while you are holding a mace. Also, switching to or away from a mace while you are already falling will interrupt your fall, potentially causing you to take damage.",
+  "description.wurst.setting.nofall.min_fall_distance": "Minimum fall distance for NoFall to activate. Makes NoFall harder to detect by ignoring small falls that can't damage you anyway.\n\nMinecraft 1.21.4 had a bug that locked your fall distance value to 0, so you might want to set this to 0 (off) when playing on 1.21.4 servers.",
+  "description.wurst.setting.nofall.min_elytra_fall_distance": "Minimum fall distance for NoFall to activate while you are flying with an elytra. Makes NoFall harder to detect and avoids flight interruption issues by ignoring small falls that wouldn't meaningfully damage you anyway.\n\nMinecraft 1.21.4 had a bug that locked your fall distance value to 0, so you might want to set this to 0 (off) when playing on 1.21.4 servers.",
   "description.wurst.hack.nofireoverlay": "Blocks the overlay when you are on fire.\n\n§c§lWARNING:§r This can cause you to burn to death without noticing.",
   "description.wurst.hack.nofog": "Removes distance fog from the world.",
   "description.wurst.hack.nohurtcam": "Disables the shaking effect when you get hurt.",
