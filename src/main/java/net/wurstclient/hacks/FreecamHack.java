@@ -187,7 +187,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	@Override
 	public void onMouseScroll(double amount)
 	{
-		if(!scrollToChangeSpeed.isChecked())
+		if(!scrollToChangeSpeed.isChecked() || MC.screen != null)
 			return;
 		
 		if(WURST.getOtfs().zoomOtf.isControllingScrollEvents())
