@@ -73,8 +73,9 @@ public final class ChunkAreaSetting
 			ChunkPos center = MC.player.chunkPosition();
 			ArrayList<ChunkAccess> chunksInRange = new ArrayList<>();
 			
-			for(int x = center.x - chunkRange; x <= center.x + chunkRange; x++)
-				for(int z = center.z - chunkRange; z <= center.z
+			for(int x = center.x() - chunkRange; x <= center.x()
+				+ chunkRange; x++)
+				for(int z = center.z() - chunkRange; z <= center.z()
 					+ chunkRange; z++)
 				{
 					ChunkAccess chunk = MC.level.getChunk(x, z);
@@ -90,8 +91,8 @@ public final class ChunkAreaSetting
 		public boolean isInRange(ChunkPos pos)
 		{
 			ChunkPos center = MC.player.chunkPosition();
-			return Math.abs(pos.x - center.x) <= chunkRange
-				&& Math.abs(pos.z - center.z) <= chunkRange;
+			return Math.abs(pos.x() - center.x()) <= chunkRange
+				&& Math.abs(pos.z() - center.z()) <= chunkRange;
 		}
 		
 		@Override

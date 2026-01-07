@@ -24,7 +24,8 @@ public final class NewChunksSquareRenderer implements NewChunksChunkRenderer
 	public void buildBuffer(VertexConsumer buffer, Set<ChunkPos> chunks,
 		int drawDistance)
 	{
-		ChunkPos camChunkPos = new ChunkPos(RenderUtils.getCameraBlockPos());
+		ChunkPos camChunkPos =
+			ChunkPos.containing(RenderUtils.getCameraBlockPos());
 		RegionPos region = RegionPos.of(camChunkPos);
 		
 		for(ChunkPos chunkPos : chunks)
