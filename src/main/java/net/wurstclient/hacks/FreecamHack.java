@@ -33,11 +33,11 @@ import net.wurstclient.util.RenderUtils;
 
 @DontSaveState
 @SearchTags({"free camera", "spectator"})
-public final class FreecamHack extends Hack implements UpdateListener,
-	PacketOutputListener, IsPlayerInWaterListener, AirStrafingSpeedListener,
-	IsPlayerInLavaListener, CameraTransformViewBobbingListener,
-	IsNormalCubeListener, SetOpaqueCubeListener, RenderListener,
-	MouseScrollListener, VelocityFromFluidListener
+public final class FreecamHack extends Hack
+	implements UpdateListener, PacketOutputListener, IsPlayerInWaterListener,
+	AirStrafingSpeedListener, IsPlayerInLavaListener,
+	CameraTransformViewBobbingListener, IsNormalCubeListener, VisGraphListener,
+	RenderListener, MouseScrollListener, VelocityFromFluidListener
 {
 	private final SliderSetting horizontalSpeed =
 		new SliderSetting("Horizontal speed",
@@ -103,7 +103,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		EVENTS.add(AirStrafingSpeedListener.class, this);
 		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(IsNormalCubeListener.class, this);
-		EVENTS.add(SetOpaqueCubeListener.class, this);
+		EVENTS.add(VisGraphListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(MouseScrollListener.class, this);
 		EVENTS.add(VelocityFromFluidListener.class, this);
@@ -128,7 +128,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		EVENTS.remove(AirStrafingSpeedListener.class, this);
 		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(IsNormalCubeListener.class, this);
-		EVENTS.remove(SetOpaqueCubeListener.class, this);
+		EVENTS.remove(VisGraphListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		EVENTS.remove(MouseScrollListener.class, this);
 		EVENTS.remove(VelocityFromFluidListener.class, this);
@@ -233,7 +233,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onSetOpaqueCube(SetOpaqueCubeEvent event)
+	public void onVisGraph(VisGraphEvent event)
 	{
 		event.cancel();
 	}

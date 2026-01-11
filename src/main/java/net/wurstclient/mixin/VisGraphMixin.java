@@ -15,17 +15,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.renderer.chunk.VisGraph;
 import net.minecraft.core.BlockPos;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.SetOpaqueCubeListener.SetOpaqueCubeEvent;
+import net.wurstclient.events.VisGraphListener.VisGraphEvent;
 
 @Mixin(VisGraph.class)
-public class ChunkOcclusionGraphBuilderMixin
+public class VisGraphMixin
 {
 	@Inject(at = @At("HEAD"),
 		method = "setOpaque(Lnet/minecraft/core/BlockPos;)V",
 		cancellable = true)
-	private void onMarkClosed(BlockPos pos, CallbackInfo ci)
+	private void onSetOpaque(BlockPos pos, CallbackInfo ci)
 	{
-		SetOpaqueCubeEvent event = new SetOpaqueCubeEvent();
+		VisGraphEvent event = new VisGraphEvent();
 		EventManager.fire(event);
 		
 		if(event.isCancelled())

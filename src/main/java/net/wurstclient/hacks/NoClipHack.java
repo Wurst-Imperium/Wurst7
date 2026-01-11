@@ -13,14 +13,14 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.AirStrafingSpeedListener;
 import net.wurstclient.events.IsNormalCubeListener;
 import net.wurstclient.events.PlayerMoveListener;
-import net.wurstclient.events.SetOpaqueCubeListener;
+import net.wurstclient.events.VisGraphListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"no clip"})
 public final class NoClipHack extends Hack
 	implements UpdateListener, PlayerMoveListener, IsNormalCubeListener,
-	SetOpaqueCubeListener, AirStrafingSpeedListener
+	VisGraphListener, AirStrafingSpeedListener
 {
 	public NoClipHack()
 	{
@@ -34,7 +34,7 @@ public final class NoClipHack extends Hack
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PlayerMoveListener.class, this);
 		EVENTS.add(IsNormalCubeListener.class, this);
-		EVENTS.add(SetOpaqueCubeListener.class, this);
+		EVENTS.add(VisGraphListener.class, this);
 		EVENTS.add(AirStrafingSpeedListener.class, this);
 	}
 	
@@ -44,7 +44,7 @@ public final class NoClipHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(PlayerMoveListener.class, this);
 		EVENTS.remove(IsNormalCubeListener.class, this);
-		EVENTS.remove(SetOpaqueCubeListener.class, this);
+		EVENTS.remove(VisGraphListener.class, this);
 		EVENTS.remove(AirStrafingSpeedListener.class, this);
 		
 		MC.player.noPhysics = false;
@@ -88,7 +88,7 @@ public final class NoClipHack extends Hack
 	}
 	
 	@Override
-	public void onSetOpaqueCube(SetOpaqueCubeEvent event)
+	public void onVisGraph(VisGraphEvent event)
 	{
 		event.cancel();
 	}
