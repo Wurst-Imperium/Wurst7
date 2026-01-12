@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.InteractionHand;
@@ -24,7 +23,7 @@ import net.minecraft.world.item.Items;
 import net.wurstclient.WurstClient;
 
 @Mixin(ItemInHandRenderer.class)
-public abstract class HeldItemRendererMixin
+public abstract class ItemInHandRendererMixin
 {
 	/**
 	 * This mixin is injected into the `BLOCK` case of the `item.getUseAction()`
@@ -64,19 +63,5 @@ public abstract class HeldItemRendererMixin
 		if(item.getItem() == Items.SHIELD)
 			WurstClient.INSTANCE.getHax().noShieldOverlayHack
 				.adjustShieldPosition(matrices, false);
-	}
-	
-	/**
-	 * Makes the "Hide hand" setting in Freecam work.
-	 */
-	@Inject(at = @At("HEAD"),
-		method = "renderHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/player/LocalPlayer;I)V",
-		cancellable = true)
-	private void onRenderHandsWithItems(float tickProgress, PoseStack matrices,
-		SubmitNodeCollector entityRenderCommandQueue, LocalPlayer player,
-		int light, CallbackInfo ci)
-	{
-		if(WurstClient.INSTANCE.getHax().freecamHack.shouldHideHand())
-			ci.cancel();
 	}
 }
