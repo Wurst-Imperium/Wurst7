@@ -34,33 +34,33 @@ public enum FreecamHackTest
 		context.waitTick();
 		world.waitForChunksRender();
 		assertScreenshotEquals(context, "freecam_start",
-			"https://i.imgur.com/o0qNJF7.png");
+			"https://i.imgur.com/jdSno3u.png");
 		clearChat(context);
 		
 		// Fly back and up a bit
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
 		assertScreenshotEquals(context, "freecam_moved",
-			"https://i.imgur.com/JtIh9z5.png");
+			"https://i.imgur.com/59y5uW8.png");
 		clearChat(context);
 		
 		// Enable tracer
 		runWurstCommand(context, "setcheckbox Freecam tracer on");
 		context.waitTick();
 		assertScreenshotEquals(context, "freecam_tracer",
-			"https://i.imgur.com/DhHgnWs.png");
+			"https://i.imgur.com/8EQLZBD.png");
 		clearChat(context);
 		
-		// Disable tracer and enable hide hand
+		// Disable tracer and un-hide hand
 		runWurstCommand(context, "setcheckbox Freecam tracer off");
-		runWurstCommand(context, "setcheckbox Freecam hide_hand on");
+		runWurstCommand(context, "setcheckbox Freecam hide_hand off");
 		context.waitTick();
-		assertScreenshotEquals(context, "freecam_hide_hand",
-			"https://i.imgur.com/59y5uW8.png");
+		assertScreenshotEquals(context, "freecam_with_hand",
+			"https://i.imgur.com/JtIh9z5.png");
 		clearChat(context);
 		
 		// Clean up
-		runWurstCommand(context, "setcheckbox Freecam hide_hand off");
+		runWurstCommand(context, "setcheckbox Freecam hide_hand on");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();

@@ -64,7 +64,7 @@ public final class FreecamHack extends Hack
 		new ColorSetting("Tracer color", Color.WHITE);
 	
 	private final CheckboxSetting hideHand = new CheckboxSetting("Hide hand",
-		"description.wurst.setting.freecam.hide_hand", false);
+		"description.wurst.setting.freecam.hide_hand", true);
 	
 	private final CheckboxSetting disableOnDamage =
 		new CheckboxSetting("Disable on damage",
