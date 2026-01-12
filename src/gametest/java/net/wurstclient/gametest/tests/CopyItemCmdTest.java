@@ -35,6 +35,7 @@ public enum CopyItemCmdTest
 		input.pressKey(GLFW.GLFW_KEY_F5);
 		clearInventory(context);
 		clearChat(context);
+		context.waitTick();
 		
 		// Put on a golden helmet
 		runCommand(server,
