@@ -51,8 +51,16 @@ public enum FreecamHackTest
 			"https://i.imgur.com/DhHgnWs.png");
 		clearChat(context);
 		
-		// Clean up
+		// Disable tracer and enable hide hand
 		runWurstCommand(context, "setcheckbox Freecam tracer off");
+		runWurstCommand(context, "setcheckbox Freecam hide_hand on");
+		context.waitTick();
+		assertScreenshotEquals(context, "freecam_hide_hand",
+			"https://i.imgur.com/59y5uW8.png");
+		clearChat(context);
+		
+		// Clean up
+		runWurstCommand(context, "setcheckbox Freecam hide_hand off");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();

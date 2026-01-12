@@ -100,6 +100,7 @@
   "description.wurst.setting.freecam.scroll_to_change_speed": "Ändert deine Geschwindigkeit, wenn du das Mausrad scrollst.",
   "description.wurst.setting.freecam.show_speed_in_hacklist": "Zeigt deine aktuelle horizontale und vertikale Geschwindigkeit in der HackList an.",
   "description.wurst.setting.freecam.tracer": "Rendert eine Linie zur tatsächlichen Position deiner Spielfigur.",
+  "description.wurst.setting.freecam.hide_hand": "Blendet deine Hand und Items die du hältst aus, während du Freecam benutzt.",
   "description.wurst.setting.freecam.disable_on_damage": "Schaltet Freecam automatisch aus, wenn du Schaden nimmst.",
   "description.wurst.hack.fullbright": "Ermöglicht dir, im Dunkeln zu sehen.",
   "description.wurst.hack.glide": "Lässt dich beim Fallen langsam nach unten gleiten.\n\n§c§lWARNUNG:§r Du bekommst immer noch Fallschaden, wenn du nicht NoFall benutzt.",

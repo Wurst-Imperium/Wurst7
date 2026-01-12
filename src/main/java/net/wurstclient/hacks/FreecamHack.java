@@ -63,6 +63,9 @@ public final class FreecamHack extends Hack
 	private final ColorSetting color =
 		new ColorSetting("Tracer color", Color.WHITE);
 	
+	private final CheckboxSetting hideHand = new CheckboxSetting("Hide hand",
+		"description.wurst.setting.freecam.hide_hand", false);
+	
 	private final CheckboxSetting disableOnDamage =
 		new CheckboxSetting("Disable on damage",
 			"description.wurst.setting.freecam.disable_on_damage", true);
@@ -80,6 +83,7 @@ public final class FreecamHack extends Hack
 		addSetting(renderSpeed);
 		addSetting(tracer);
 		addSetting(color);
+		addSetting(hideHand);
 		addSetting(disableOnDamage);
 	}
 	
@@ -262,5 +266,10 @@ public final class FreecamHack extends Hack
 	{
 		if(event.getEntity() == MC.player)
 			event.cancel();
+	}
+	
+	public boolean shouldHideHand()
+	{
+		return isEnabled() && hideHand.isChecked();
 	}
 }
