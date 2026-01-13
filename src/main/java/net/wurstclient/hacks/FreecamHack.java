@@ -196,16 +196,20 @@ public final class FreecamHack extends Hack
 	@Override
 	public void onMouseScroll(double amount)
 	{
-		if(!scrollToChangeSpeed.isChecked() || MC.screen != null)
-			return;
-		
-		if(WURST.getOtfs().zoomOtf.isControllingScrollEvents())
+		if(!isControllingScrollEvents())
 			return;
 		
 		if(amount > 0)
 			horizontalSpeed.increaseValue();
 		else if(amount < 0)
 			horizontalSpeed.decreaseValue();
+	}
+	
+	public boolean isControllingScrollEvents()
+	{
+		return isEnabled() && scrollToChangeSpeed.isChecked()
+			&& MC.screen == null
+			&& !WURST.getOtfs().zoomOtf.isControllingScrollEvents();
 	}
 	
 	@Override
