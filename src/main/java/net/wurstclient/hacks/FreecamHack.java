@@ -23,6 +23,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.*;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.freecam.FreecamInitialPosSetting;
 import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
@@ -57,6 +58,9 @@ public final class FreecamHack extends Hack
 		new CheckboxSetting("Show speed in HackList",
 			"description.wurst.setting.freecam.show_speed_in_hacklist", true);
 	
+	private final FreecamInitialPosSetting initialPos =
+		new FreecamInitialPosSetting();
+	
 	private final CheckboxSetting tracer = new CheckboxSetting("Tracer",
 		"description.wurst.setting.freecam.tracer", false);
 	
@@ -81,6 +85,7 @@ public final class FreecamHack extends Hack
 		addSetting(verticalSpeed);
 		addSetting(scrollToChangeSpeed);
 		addSetting(renderSpeed);
+		addSetting(initialPos);
 		addSetting(tracer);
 		addSetting(color);
 		addSetting(hideHand);
@@ -113,6 +118,7 @@ public final class FreecamHack extends Hack
 		EVENTS.add(VelocityFromFluidListener.class, this);
 		
 		fakePlayer = new FakePlayerEntity();
+		initialPos.apply(MC.player);
 		
 		Options opt = MC.options;
 		KeyMapping[] bindings = {opt.keyUp, opt.keyDown, opt.keyLeft,
@@ -141,8 +147,7 @@ public final class FreecamHack extends Hack
 		fakePlayer.despawn();
 		lastHealth = Float.MIN_VALUE;
 		
-		LocalPlayer player = MC.player;
-		player.setDeltaMovement(Vec3.ZERO);
+		MC.player.setDeltaMovement(Vec3.ZERO);
 		
 		MC.levelRenderer.allChanged();
 	}

@@ -29,15 +29,45 @@ public enum FreecamHackTest
 		TestClientWorldContext world = spContext.getClientWorld();
 		
 		// Enable Freecam with default settings
-		runWurstCommand(context, "setcheckbox Freecam tracer off");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
-		assertScreenshotEquals(context, "freecam_start",
+		assertScreenshotEquals(context, "freecam_start_inside",
 			"https://i.imgur.com/jdSno3u.png");
+		input.pressKey(GLFW.GLFW_KEY_U);
+		context.waitTick();
+		world.waitForChunksRender();
 		clearChat(context);
 		
-		// Fly back and up a bit
+		// Enable Freecam with initial position in front
+		runWurstCommand(context, "setmode Freecam initial_position in_front");
+		input.pressKey(GLFW.GLFW_KEY_U);
+		context.waitTick();
+		world.waitForChunksRender();
+		assertScreenshotEquals(context, "freecam_start_in_front",
+			"https://i.imgur.com/nrMP191.png");
+		input.pressKey(GLFW.GLFW_KEY_U);
+		context.waitTick();
+		world.waitForChunksRender();
+		clearChat(context);
+		
+		// Enable Freecam with initial position above
+		runWurstCommand(context, "setmode Freecam initial_position above");
+		input.pressKey(GLFW.GLFW_KEY_U);
+		context.waitTick();
+		world.waitForChunksRender();
+		assertScreenshotEquals(context, "freecam_start_above",
+			"https://i.imgur.com/3LbAtRj.png");
+		input.pressKey(GLFW.GLFW_KEY_U);
+		context.waitTick();
+		world.waitForChunksRender();
+		clearChat(context);
+		
+		// Revert to inside, then fly back and up a bit
+		runWurstCommand(context, "setmode Freecam initial_position inside");
+		input.pressKey(GLFW.GLFW_KEY_U);
+		context.waitTick();
+		world.waitForChunksRender();
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
 		assertScreenshotEquals(context, "freecam_moved",
