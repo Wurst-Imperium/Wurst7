@@ -20,9 +20,9 @@ import net.wurstclient.settings.SwingHandSetting.SwingHand;
  * without sacrificing anti-cheat resistance or customizability.
  *
  * <p>
- * Accurately replicates {@link Minecraft#startUseItem()} as of 25w02a
- * (1.21.5), while being much easier to read and adding convenient ways to
- * change parts of the behavior.
+ * Accurately replicates {@link Minecraft#startUseItem()} as of 26.1-snapshot-3
+ * while being much easier to read and adding convenient ways to change parts of
+ * the behavior.
  */
 public enum InteractionSimulator
 {

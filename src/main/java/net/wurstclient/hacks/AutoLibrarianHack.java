@@ -382,10 +382,7 @@ public final class AutoLibrarianHack extends Hack
 		// click on villager
 		InteractionHand hand = InteractionHand.MAIN_HAND;
 		InteractionResult actionResult =
-			im.interactAt(player, villager, hitResult, hand);
-		
-		if(!actionResult.consumesAction())
-			im.interact(player, villager, hand);
+			im.interact(player, villager, hitResult, hand);
 		
 		// swing hand
 		if(actionResult instanceof InteractionResult.Success success

@@ -8,7 +8,7 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import net.minecraft.network.protocol.game.ServerboundAttackPacket;
 import net.minecraft.world.item.Items;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -117,9 +117,8 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 		
 		CHARS("Chars", () -> MC.getConnection().sendChat("\u00a7")),
 		
-		SELFHURT("SelfHurt",
-			() -> MC.getConnection().send(ServerboundInteractPacket
-				.createAttackPacket(MC.player, MC.player.isShiftKeyDown())));
+		SELFHURT("SelfHurt", () -> MC.getConnection()
+			.send(new ServerboundAttackPacket(MC.player.getId())));
 		
 		private final String name;
 		private final Runnable leave;

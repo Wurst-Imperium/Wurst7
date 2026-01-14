@@ -17,6 +17,7 @@
     "ChatInputSuggestorMixin",
     "ChatScreenMixin",
     "ChunkOcclusionGraphBuilderMixin",
+    "ClientClockManagerMixin",
     "ClientCommonNetworkHandlerMixin",
     "ClientConnectionMixin",
     "ClientPlayerEntityMixin",
@@ -30,6 +31,7 @@
     "DownloadQueueMixin",
     "EntityMixin",
     "EntityRendererMixin",
+    "EnvironmentAttributeSystemMixin",
     "FluidRendererMixin",
     "FogRendererMixin",
     "GameMenuScreenMixin",
@@ -68,7 +70,6 @@
     "TelemetryManagerMixin",
     "TextVisitFactoryMixin",
     "TitleScreenMixin",
-    "WorldEnvironmentAttributeAccessMixin",
     "WorldMixin",
     "WorldRendererMixin"
   ],

@@ -322,10 +322,10 @@ public enum WurstClientTestHelper
 		ItemStack stack = context
 			.computeOnClient(mc -> mc.player.getInventory().getItem(slot));
 		if(!stack.is(item) || stack.getCount() != 1)
-			throw new RuntimeException(
-				"Expected 1 " + item.getName().getString() + " at slot " + slot
-					+ ", found " + stack.getCount() + " "
-					+ stack.getItem().getName().getString() + " instead");
+			throw new RuntimeException("Expected 1 "
+				+ item.getDefaultInstance().getItemName().getString()
+				+ " at slot " + slot + ", found " + stack.getCount() + " "
+				+ stack.getItemName().getString() + " instead");
 	}
 	
 	public static void assertNoItemInSlot(ClientGameTestContext context,
@@ -336,6 +336,6 @@ public enum WurstClientTestHelper
 		if(!stack.isEmpty())
 			throw new RuntimeException("Expected no item in slot " + slot
 				+ ", found " + stack.getCount() + " "
-				+ stack.getItem().getName().getString() + " instead");
+				+ stack.getItemName().getString() + " instead");
 	}
 }
