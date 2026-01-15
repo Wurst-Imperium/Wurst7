@@ -52,7 +52,14 @@ public class MouseMixin
 		method = "onScroll(JDD)V")
 	private boolean wrapOnMouseScroll(Inventory inventory, int slot)
 	{
-		return !WurstClient.INSTANCE.getOtfs().zoomOtf
-			.shouldPreventHotbarScrolling();
+		if(WurstClient.INSTANCE.getOtfs().zoomOtf
+			.shouldPreventHotbarScrolling())
+			return false;
+		
+		if(WurstClient.INSTANCE.getHax().freecamHack
+			.shouldPreventHotbarScrolling())
+			return false;
+		
+		return true;
 	}
 }

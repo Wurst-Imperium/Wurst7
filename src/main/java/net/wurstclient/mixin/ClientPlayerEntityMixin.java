@@ -43,6 +43,7 @@ import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.hacks.FreecamHack;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 @Mixin(LocalPlayer.class)
@@ -52,6 +53,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 	@Shadow
 	@Final
 	protected Minecraft minecraft;
+	@Shadow
+	protected ClientInput input;
 	
 	private Screen tempCurrentScreen;
 	
@@ -69,25 +72,39 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 		EventManager.fire(UpdateEvent.INSTANCE);
 	}
 	
-	/**
-	 * This mixin makes AutoSprint's "Omnidirectional Sprint" setting work.
-	 */
 	@WrapOperation(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/player/ClientInput;hasForwardImpulse()Z",
 		ordinal = 0), method = "aiStep()V")
 	private boolean wrapHasForwardMovement(ClientInput input,
 		Operation<Boolean> original)
 	{
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(freecam.isBaritoneMode() && !freecam.isBaritonePathing())
+		{
+			freecam.clearClientInput(input);
+			return false;
+		}
+		
 		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldOmniSprint())
 			return input.getMoveVector().length() > 1e-5F;
 		
 		return original.call(input);
 	}
 	
-	/**
-	 * Allows NoSlowdown to intercept the isBlockedFromSprinting() call in
-	 * tickMovement().
-	 */
+	@Inject(
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/ClientInput;tick()V",
+			shift = At.Shift.AFTER),
+		method = "aiStep()V")
+	private void wurst$afterInputTick(CallbackInfo ci)
+	{
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(!freecam.isBaritoneMode() || freecam.isBaritonePathing())
+			return;
+		
+		freecam.clearClientInput(input);
+	}
+	
 	@WrapOperation(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/player/LocalPlayer;isSlowDueToUsingItem()Z",
 		ordinal = 0), method = "aiStep()V")
@@ -128,10 +145,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 			cir.setReturnValue(false);
 	}
 	
-	/**
-	 * When PortalGUI is enabled, this mixin temporarily sets the current screen
-	 * to null to prevent the updateNausea() method from closing it.
-	 */
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;",
 		opcode = Opcodes.GETFIELD,
@@ -145,10 +158,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 		minecraft.screen = null;
 	}
 	
-	/**
-	 * This mixin restores the current screen as soon as the updateNausea()
-	 * method is done looking at it.
-	 */
 	@Inject(at = @At(value = "FIELD",
 		target = "Lnet/minecraft/client/player/LocalPlayer;portalEffectIntensity:F",
 		opcode = Opcodes.GETFIELD,
@@ -162,10 +171,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 		tempCurrentScreen = null;
 	}
 	
-	/**
-	 * This mixin allows AutoSprint to enable sprinting even when the player is
-	 * too hungry.
-	 */
 	@Inject(at = @At("HEAD"),
 		method = "isSprintingPossible(Z)Z",
 		cancellable = true)
@@ -176,10 +181,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 			cir.setReturnValue(true);
 	}
 	
-	/**
-	 * Getter method for what used to be airStrafingSpeed.
-	 * Overridden to allow for the speed to be modified by hacks.
-	 */
 	@Override
 	protected float getFlyingSpeed()
 	{
@@ -220,8 +221,11 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 	@Override
 	public boolean isSpectator()
 	{
-		return super.isSpectator()
-			|| WurstClient.INSTANCE.getHax().freecamHack.isEnabled();
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(freecam.isEnabled() && !freecam.isBaritoneMode())
+			return true;
+		
+		return super.isSpectator();
 	}
 	
 	@Override
@@ -237,9 +241,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 			.getAdditionalJumpMotion();
 	}
 	
-	/**
-	 * This is the part that makes SafeWalk work.
-	 */
 	@Override
 	protected boolean isStayingOnGroundSurface()
 	{
@@ -247,10 +248,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
 	}
 	
-	/**
-	 * This mixin allows SafeWalk to sneak visibly when the player is
-	 * near a ledge.
-	 */
 	@Override
 	protected Vec3 maybeBackOffFromEdge(Vec3 movement, MoverType type)
 	{
