@@ -14,6 +14,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
+import net.minecraft.client.gui.screens.achievement.StatsScreen;
 
 public enum InGameMenuTest
 {
@@ -41,6 +42,8 @@ public enum InGameMenuTest
 		for(int i = 0; i < 2; i++)
 			input.pressKey(GLFW.GLFW_KEY_TAB);
 		input.pressKey(GLFW.GLFW_KEY_ENTER);
+		context.waitFor(mc -> mc.screen instanceof StatsScreen statsScreen
+			&& !statsScreen.isLoading);
 		assertScreenshotEquals(context, "statistics_screen",
 			"https://i.imgur.com/CPMAfzO.png");
 		// TODO: Test Disable Wurst button
@@ -65,6 +68,8 @@ public enum InGameMenuTest
 		for(int i = 0; i < 3; i++)
 			input.pressKey(GLFW.GLFW_KEY_TAB);
 		input.pressKey(GLFW.GLFW_KEY_ENTER);
+		context.waitFor(mc -> mc.screen instanceof StatsScreen statsScreen
+			&& !statsScreen.isLoading);
 		assertScreenshotEquals(context, "statistics_screen_alt",
 			"https://i.imgur.com/e8q4hJo.png");
 		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
