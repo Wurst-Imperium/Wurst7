@@ -112,15 +112,11 @@ public class WurstTest implements FabricClientGameTest
 			"https://i.imgur.com/LyQ5FSD.png");
 		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
 		
-		LOGGER.info("Opening game menu");
-		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
-		assertScreenshotEquals(context, "game_menu",
-			"https://i.imgur.com/3wB05mE.png");
-		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
-		
 		runWurstCommand(context,
 			"setmode WurstLogo visibility only_when_outdated");
 		runWurstCommand(context, "setcheckbox HackList animations off");
+		
+		InGameMenuTest.testMenuScreens(context);
 		
 		// TODO: Open ClickGUI and Navigator
 		
@@ -139,8 +135,6 @@ public class WurstTest implements FabricClientGameTest
 		
 		// Test special cases
 		PistonTest.testPistonDoesntCrash(context, spContext);
-		
-		// TODO: Check Wurst Options
 	}
 	
 	// because the grass texture is randomized and smooth stone isn't

@@ -277,6 +277,8 @@
   "description.wurst.hack.veinminer": "Automatically mines ore veins for you.",
   "description.wurst.hack.x-ray": "Allows you to see ores through walls.",
   "description.wurst.other_feature.nochatreports": "Disables the cryptographic signatures that since 1.19 are attached to your chat messages.\n\n§c§lWARNING: §cIf §cyou §csend §cchat §cmessages §cwith §csignatures, §cyour §cMinecraft §caccount §ccan §cget §creported §cand §cglobally §cbanned §cfrom §cmultiplayer!§r\n\nEven if you only say harmless things in chat, your signed messages can be abused to create a fake chat report that gets your account banned unfairly.\n\nIf you have to re-enable chat signatures to chat on a server, consider playing on an alt account that you don't mind losing.",
+  "description.wurst.other_feature.wurstoptions": "The main settings menu of Wurst.\n\nIf you ever lock yourself out of the GUI by deleting your keybinds, this is the place to go to restore them.",
+  "description.wurst.setting.wurstoptions.location": "Where to show the \"Wurst Options\" button.",
   "button.wurst.nochatreports.disable_signatures": "Disable Signatures",
   "button.wurst.nochatreports.re-enable_signatures": "Re-enable Signatures",
   "description.wurst.setting.generic.attack_speed": "Attack speed in clicks per second.\n0 = dynamically adjusts the speed to match your attack cooldown.",

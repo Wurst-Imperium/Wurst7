@@ -201,7 +201,7 @@ public class WurstOptionsScreen extends Screen
 	private final class WurstOptionsButton extends Button
 	{
 		private final Supplier<String> messageSupplier;
-		private final List<net.minecraft.network.chat.Component> tooltip;
+		private final List<Component> tooltip;
 		
 		public WurstOptionsButton(int xOffset, int yOffset,
 			Supplier<String> messageSupplier, String tooltip,
@@ -209,9 +209,8 @@ public class WurstOptionsScreen extends Screen
 		{
 			super(WurstOptionsScreen.this.width / 2 + xOffset,
 				WurstOptionsScreen.this.height / 4 - 16 + yOffset, 100, 20,
-				net.minecraft.network.chat.Component
-					.literal(messageSupplier.get()),
-				pressAction, Button.DEFAULT_NARRATION);
+				Component.literal(messageSupplier.get()), pressAction,
+				Button.DEFAULT_NARRATION);
 			
 			this.messageSupplier = messageSupplier;
 			
@@ -221,11 +220,9 @@ public class WurstOptionsScreen extends Screen
 			{
 				String[] lines = ChatUtils.wrapText(tooltip, 200).split("\n");
 				
-				net.minecraft.network.chat.Component[] lines2 =
-					new net.minecraft.network.chat.Component[lines.length];
+				Component[] lines2 = new Component[lines.length];
 				for(int i = 0; i < lines.length; i++)
-					lines2[i] =
-						net.minecraft.network.chat.Component.literal(lines[i]);
+					lines2[i] = Component.literal(lines[i]);
 				
 				this.tooltip = Arrays.asList(lines2);
 			}
@@ -237,8 +234,7 @@ public class WurstOptionsScreen extends Screen
 		public void onPress(InputWithModifiers context)
 		{
 			super.onPress(context);
-			setMessage(net.minecraft.network.chat.Component
-				.literal(messageSupplier.get()));
+			setMessage(Component.literal(messageSupplier.get()));
 		}
 		
 		@Override
