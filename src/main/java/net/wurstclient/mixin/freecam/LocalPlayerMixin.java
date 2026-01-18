@@ -8,27 +8,75 @@
 package net.wurstclient.mixin.freecam;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.FreecamHack;
 
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin extends AbstractClientPlayer
 {
+	@Shadow
+	public ClientInput input;
+	
+	@Unique
+	private ClientInput realInput;
+	
 	private LocalPlayerMixin(WurstClient wurst, ClientLevel world,
 		GameProfile profile)
 	{
 		super(world, profile);
 	}
 	
-	@Override
-	public boolean isSpectator()
+	@Inject(at = @At("HEAD"), method = "isShiftKeyDown()Z", cancellable = true)
+	private void onIsShiftKeyDown(CallbackInfoReturnable<Boolean> cir)
 	{
-		return super.isSpectator()
-			|| WurstClient.INSTANCE.getHax().freecamHack.isEnabled();
+		if(WurstClient.INSTANCE.getHax().freecamHack.isEnabled())
+			cir.setReturnValue(false);
+	}
+	
+	@Inject(at = @At("HEAD"), method = "aiStep()V")
+	private void onAiStepHead(CallbackInfo ci)
+	{
+		if(!WurstClient.INSTANCE.getHax().freecamHack.isEnabled())
+			return;
+		
+		realInput = input;
+		input.tick();
+		input = new ClientInput();
+	}
+	
+	@Inject(at = @At("RETURN"), method = "aiStep()V")
+	private void onAiStepReturn(CallbackInfo ci)
+	{
+		if(realInput == null)
+			return;
+		
+		input = realInput;
+		realInput = null;
+	}
+	
+	@Override
+	public void turn(double deltaYaw, double deltaPitch)
+	{
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(freecam.isEnabled())
+		{
+			freecam.turn(deltaYaw, deltaPitch);
+			return;
+		}
+		
+		super.turn(deltaYaw, deltaPitch);
 	}
 }

@@ -11,16 +11,17 @@ import java.awt.Color;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Options;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.*;
+import net.wurstclient.events.MouseScrollListener;
+import net.wurstclient.events.RenderListener;
+import net.wurstclient.events.UpdateListener;
+import net.wurstclient.events.VisGraphListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.freecam.FreecamInitialPosSetting;
@@ -29,16 +30,14 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.util.FakePlayerEntity;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.RotationUtils;
 
 @DontSaveState
 @SearchTags({"free camera", "spectator"})
-public final class FreecamHack extends Hack
-	implements UpdateListener, PacketOutputListener, IsPlayerInWaterListener,
-	AirStrafingSpeedListener, IsPlayerInLavaListener,
-	CameraTransformViewBobbingListener, IsNormalCubeListener, VisGraphListener,
-	RenderListener, MouseScrollListener, VelocityFromFluidListener
+public final class FreecamHack extends Hack implements UpdateListener,
+	VisGraphListener, RenderListener, MouseScrollListener
 {
 	private final SliderSetting horizontalSpeed =
 		new SliderSetting("Horizontal speed",
@@ -74,8 +73,11 @@ public final class FreecamHack extends Hack
 		new CheckboxSetting("Disable on damage",
 			"description.wurst.setting.freecam.disable_on_damage", true);
 	
-	private FakePlayerEntity fakePlayer;
-	private float lastHealth = Float.MIN_VALUE;
+	private Vec3 camPos;
+	private Vec3 prevCamPos;
+	private float camYaw;
+	private float camPitch;
+	private float lastHealth;
 	
 	public FreecamHack()
 	{
@@ -106,48 +108,25 @@ public final class FreecamHack extends Hack
 	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(PacketOutputListener.class, this);
-		EVENTS.add(IsPlayerInWaterListener.class, this);
-		EVENTS.add(IsPlayerInLavaListener.class, this);
-		EVENTS.add(AirStrafingSpeedListener.class, this);
-		EVENTS.add(CameraTransformViewBobbingListener.class, this);
-		EVENTS.add(IsNormalCubeListener.class, this);
 		EVENTS.add(VisGraphListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(MouseScrollListener.class, this);
-		EVENTS.add(VelocityFromFluidListener.class, this);
 		
-		fakePlayer = new FakePlayerEntity();
-		initialPos.apply(MC.player);
-		
-		Options opt = MC.options;
-		KeyMapping[] bindings = {opt.keyUp, opt.keyDown, opt.keyLeft,
-			opt.keyRight, opt.keyJump, opt.keyShift};
-		
-		for(KeyMapping binding : bindings)
-			IKeyMapping.get(binding).resetPressedState();
+		lastHealth = Float.MIN_VALUE;
+		camPos = RotationUtils.getEyesPos()
+			.add(initialPos.getSelected().getOffset());
+		prevCamPos = camPos;
+		camYaw = MC.player.getYRot();
+		camPitch = MC.player.getXRot();
 	}
 	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(PacketOutputListener.class, this);
-		EVENTS.remove(IsPlayerInWaterListener.class, this);
-		EVENTS.remove(IsPlayerInLavaListener.class, this);
-		EVENTS.remove(AirStrafingSpeedListener.class, this);
-		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
-		EVENTS.remove(IsNormalCubeListener.class, this);
 		EVENTS.remove(VisGraphListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		EVENTS.remove(MouseScrollListener.class, this);
-		EVENTS.remove(VelocityFromFluidListener.class, this);
-		
-		fakePlayer.resetPlayerPosition();
-		fakePlayer.despawn();
-		lastHealth = Float.MIN_VALUE;
-		
-		MC.player.setDeltaMovement(Vec3.ZERO);
 		
 		MC.levelRenderer.allChanged();
 	}
@@ -157,6 +136,7 @@ public final class FreecamHack extends Hack
 	{
 		LocalPlayer player = MC.player;
 		
+		// Check for damage
 		float currentHealth = player.getHealth();
 		if(disableOnDamage.isChecked() && currentHealth < lastHealth)
 		{
@@ -165,32 +145,35 @@ public final class FreecamHack extends Hack
 		}
 		lastHealth = currentHealth;
 		
-		player.setDeltaMovement(Vec3.ZERO);
-		player.getAbilities().flying = false;
-		player.setOnGround(false);
+		// Get movement vector (x=left, y=forward)
+		Vec2 moveVector = player.input.getMoveVector();
 		
+		// Convert to world coordinates
+		double yawRad = MC.gameRenderer.getMainCamera().yRot() * Mth.DEG_TO_RAD;
+		double sinYaw = Mth.sin(yawRad);
+		double cosYaw = Mth.cos(yawRad);
+		double offsetX = moveVector.x * cosYaw - moveVector.y * sinYaw;
+		double offsetZ = moveVector.x * sinYaw + moveVector.y * cosYaw;
+		
+		// Calculate vertical offset
+		double offsetY = 0;
 		double vSpeed = getActualVerticalSpeed();
-		
-		if(MC.options.keyJump.isDown())
-			player.addDeltaMovement(new Vec3(0, vSpeed, 0));
-		
+		if(IKeyMapping.get(MC.options.keyJump).isActuallyDown())
+			offsetY += vSpeed;
 		if(IKeyMapping.get(MC.options.keyShift).isActuallyDown())
-		{
-			MC.options.keyShift.setDown(false);
-			player.addDeltaMovement(new Vec3(0, -vSpeed, 0));
-		}
+			offsetY -= vSpeed;
+		
+		// Apply to camera
+		Vec3 offsetVec = new Vec3(offsetX, 0, offsetZ)
+			.scale(horizontalSpeed.getValueF()).add(0, offsetY, 0);
+		prevCamPos = camPos;
+		camPos = camPos.add(offsetVec);
 	}
 	
 	private double getActualVerticalSpeed()
 	{
 		return Mth.clamp(horizontalSpeed.getValue() * verticalSpeed.getValue(),
 			0.05, 10);
-	}
-	
-	@Override
-	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
-	{
-		event.setSpeed(horizontalSpeed.getValueF());
 	}
 	
 	@Override
@@ -213,39 +196,6 @@ public final class FreecamHack extends Hack
 	}
 	
 	@Override
-	public void onSentPacket(PacketOutputEvent event)
-	{
-		if(event.getPacket() instanceof ServerboundMovePlayerPacket)
-			event.cancel();
-	}
-	
-	@Override
-	public void onIsPlayerInWater(IsPlayerInWaterEvent event)
-	{
-		event.setInWater(false);
-	}
-	
-	@Override
-	public void onIsPlayerInLava(IsPlayerInLavaEvent event)
-	{
-		event.setInLava(false);
-	}
-	
-	@Override
-	public void onCameraTransformViewBobbing(
-		CameraTransformViewBobbingEvent event)
-	{
-		if(tracer.isChecked())
-			event.cancel();
-	}
-	
-	@Override
-	public void onIsNormalCube(IsNormalCubeEvent event)
-	{
-		event.cancel();
-	}
-	
-	@Override
 	public void onVisGraph(VisGraphEvent event)
 	{
 		event.cancel();
@@ -254,31 +204,47 @@ public final class FreecamHack extends Hack
 	@Override
 	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
-		if(fakePlayer == null || !tracer.isChecked())
+		if(!tracer.isChecked())
 			return;
 		
 		int colorI = color.getColorI(0x80);
 		
-		// box
+		// Box
 		double extraSize = 0.05;
-		AABB box = fakePlayer.getBoundingBox().move(0, extraSize, 0)
-			.inflate(extraSize);
+		AABB rawBox = EntityUtils.getLerpedBox(MC.player, partialTicks);
+		AABB box = rawBox.move(0, extraSize, 0).inflate(extraSize);
 		RenderUtils.drawOutlinedBox(matrixStack, box, colorI, false);
 		
-		// line
-		RenderUtils.drawTracer(matrixStack, partialTicks,
-			fakePlayer.getBoundingBox().getCenter(), colorI, false);
-	}
-	
-	@Override
-	public void onVelocityFromFluid(VelocityFromFluidEvent event)
-	{
-		if(event.getEntity() == MC.player)
-			event.cancel();
+		// Line
+		RenderUtils.drawTracer(matrixStack, partialTicks, rawBox.getCenter(),
+			colorI, false);
 	}
 	
 	public boolean shouldHideHand()
 	{
 		return isEnabled() && hideHand.isChecked();
+	}
+	
+	public Vec3 getCamPos(float partialTicks)
+	{
+		return Mth.lerp(partialTicks, prevCamPos, camPos);
+	}
+	
+	public void turn(double deltaYaw, double deltaPitch)
+	{
+		// This needs to be consistent with Entity.turn()
+		camYaw += (float)(deltaYaw * 0.15);
+		camPitch += (float)(deltaPitch * 0.15);
+		camPitch = Mth.clamp(camPitch, -90, 90);
+	}
+	
+	public float getCamYaw()
+	{
+		return camYaw;
+	}
+	
+	public float getCamPitch()
+	{
+		return camPitch;
 	}
 }

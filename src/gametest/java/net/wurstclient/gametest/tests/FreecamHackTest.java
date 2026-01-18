@@ -99,14 +99,14 @@ public enum FreecamHackTest
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
 		assertScreenshotEquals(context, "freecam_moved",
-			"https://i.imgur.com/59y5uW8.png");
+			"https://i.imgur.com/HxrcHbh.png");
 		clearChat(context);
 		
 		// Enable tracer
 		runWurstCommand(context, "setcheckbox Freecam tracer on");
 		context.waitTick();
 		assertScreenshotEquals(context, "freecam_tracer",
-			"https://i.imgur.com/8EQLZBD.png");
+			"https://i.imgur.com/z3pQumc.png");
 		clearChat(context);
 		
 		// Disable tracer and un-hide hand
@@ -114,7 +114,7 @@ public enum FreecamHackTest
 		runWurstCommand(context, "setcheckbox Freecam hide_hand off");
 		context.waitTick();
 		assertScreenshotEquals(context, "freecam_with_hand",
-			"https://i.imgur.com/JtIh9z5.png");
+			"https://i.imgur.com/6tahHsE.png");
 		clearChat(context);
 		
 		// Clean up

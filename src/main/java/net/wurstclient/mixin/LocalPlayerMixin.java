@@ -37,7 +37,6 @@ import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.AirStrafingSpeedListener.AirStrafingSpeedEvent;
-import net.wurstclient.events.IsPlayerInLavaListener.IsPlayerInLavaEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
@@ -207,16 +206,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		EventManager.fire(event);
 		
 		return event.isInWater();
-	}
-	
-	@Override
-	public boolean isInLava()
-	{
-		boolean inLava = super.isInLava();
-		IsPlayerInLavaEvent event = new IsPlayerInLavaEvent(inLava);
-		EventManager.fire(event);
-		
-		return event.isInLava();
 	}
 	
 	@Override

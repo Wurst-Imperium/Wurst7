@@ -10,7 +10,6 @@ package net.wurstclient.hacks.freecam;
 import static net.wurstclient.WurstClient.*;
 
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.text.WText;
@@ -37,13 +36,6 @@ public final class FreecamInitialPosSetting
 				.append(value.description);
 		
 		return text;
-	}
-	
-	public void apply(Entity e)
-	{
-		Vec3 oldPos = new Vec3(e.getX(), e.getY(), e.getZ());
-		Vec3 newPos = oldPos.add(getSelected().getOffset());
-		e.setPos(newPos);
 	}
 	
 	public enum InitialPosition
