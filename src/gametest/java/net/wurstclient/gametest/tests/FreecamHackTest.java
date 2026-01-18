@@ -34,6 +34,34 @@ public enum FreecamHackTest
 		world.waitForChunksRender();
 		assertScreenshotEquals(context, "freecam_start_inside",
 			"https://i.imgur.com/jdSno3u.png");
+		clearChat(context);
+		
+		// Scroll to change speed
+		input.scroll(1);
+		context.waitTick();
+		assertScreenshotEquals(context, "freecam_speed_scrolled",
+			"https://i.imgur.com/DysLqZw.png");
+		runWurstCommand(context, "setslider Freecam horizontal_speed 1");
+		if(context.computeOnClient(
+			mc -> mc.player.getInventory().getSelectedSlot()) != 0)
+			throw new RuntimeException(
+				"Scrolling while using Freecam with \"Scroll to change speed\" enabled changed the selected slot.");
+		clearChat(context);
+		
+		// Scroll to change selected slot
+		runWurstCommand(context,
+			"setcheckbox Freecam scroll_to_change_speed off");
+		input.scroll(1);
+		context.waitTick();
+		assertScreenshotEquals(context, "freecam_hotbar_scrolled",
+			"https://i.imgur.com/edjDUxr.png");
+		if(context.computeOnClient(
+			mc -> mc.player.getInventory().getSelectedSlot()) != 8)
+			throw new RuntimeException(
+				"Scrolling while using Freecam with \"Scroll to change speed\" disabled didn't change the selected slot.");
+		context.runOnClient(mc -> mc.player.getInventory().setSelectedSlot(0));
+		runWurstCommand(context,
+			"setcheckbox Freecam scroll_to_change_speed on");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
