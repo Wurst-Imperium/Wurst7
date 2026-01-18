@@ -30,9 +30,9 @@ public enum NoWeatherHackTest
 		runCommand(server, "weather rain");
 		server.runOnServer(s -> s.overworld().setRainLevel(1.0F));
 		context.runOnClient(mc -> mc.level.setRainLevel(1.0F));
-		context.waitTicks(7); // for hand animation
+		context.waitTicks(10);
 		assertScreenshotEquals(context, "noweather_raining_setup",
-			"https://i.imgur.com/AKzcchL.png");
+			"https://i.imgur.com/JQVtBh7.png");
 		
 		// Enable NoWeather
 		runWurstCommand(context, "t NoWeather on");
