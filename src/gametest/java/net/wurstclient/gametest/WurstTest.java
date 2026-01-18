@@ -124,6 +124,7 @@ public class WurstTest implements FabricClientGameTest
 		AutoMineHackTest.testAutoMineHack(context, spContext);
 		FreecamHackTest.testFreecamHack(context, spContext);
 		NoFallHackTest.testNoFallHack(context, spContext);
+		NoWeatherHackTest.testNoWeatherHack(context, spContext);
 		XRayHackTest.testXRayHack(context, spContext);
 		
 		// Test Wurst commands
