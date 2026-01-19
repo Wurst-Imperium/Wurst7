@@ -25,13 +25,8 @@ import net.wurstclient.util.MathUtils;
 
 public final class TpCmd extends Command
 {
-	private final CheckboxSetting disableFreecam =
-		new CheckboxSetting("Disable Freecam",
-			"Disables Freecam just before teleporting.\n\n"
-				+ "This allows you to teleport your actual character to your"
-				+ " Freecam position by typing \".tp ~ ~ ~\" while Freecam is"
-				+ " enabled.",
-			true);
+	private final CheckboxSetting disableFreecam = new CheckboxSetting(
+		"Disable Freecam", "Disables Freecam just before teleporting.", false);
 	
 	public TpCmd()
 	{
