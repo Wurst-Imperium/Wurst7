@@ -18,6 +18,7 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.MouseScrollListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -38,8 +39,9 @@ import net.wurstclient.util.RotationUtils;
 
 @DontSaveState
 @SearchTags({"free camera", "spectator"})
-public final class FreecamHack extends Hack implements UpdateListener,
-	VisGraphListener, RenderListener, MouseScrollListener
+public final class FreecamHack extends Hack
+	implements UpdateListener, VisGraphListener,
+	CameraTransformViewBobbingListener, RenderListener, MouseScrollListener
 {
 	private final FreecamInputSetting applyInputTo = new FreecamInputSetting();
 	
@@ -114,6 +116,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	{
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(VisGraphListener.class, this);
+		EVENTS.add(CameraTransformViewBobbingListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 		EVENTS.add(MouseScrollListener.class, this);
 		
@@ -130,6 +133,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(VisGraphListener.class, this);
+		EVENTS.remove(CameraTransformViewBobbingListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		EVENTS.remove(MouseScrollListener.class, this);
 		
@@ -213,6 +217,13 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	
 	@Override
 	public void onVisGraph(VisGraphEvent event)
+	{
+		event.cancel();
+	}
+	
+	@Override
+	public void onCameraTransformViewBobbing(
+		CameraTransformViewBobbingEvent event)
 	{
 		event.cancel();
 	}
