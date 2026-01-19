@@ -113,12 +113,12 @@ public final class FlightHack extends Hack implements UpdateListener,
 	@Override
 	public void onUpdate()
 	{
-		if(WURST.getHax().freecamHack.isEnabled())
-			return;
-		
 		LocalPlayer player = MC.player;
 		player.setDeltaMovement(Vec3.ZERO);
 		player.getAbilities().flying = false;
+		
+		if(WURST.getHax().freecamHack.isMovingCamera())
+			return;
 		
 		double vSpeed = getActualVerticalSpeed();
 		
@@ -138,7 +138,7 @@ public final class FlightHack extends Hack implements UpdateListener,
 	@Override
 	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
 	{
-		if(WURST.getHax().freecamHack.isEnabled())
+		if(WURST.getHax().freecamHack.isMovingCamera())
 			return;
 		
 		event.setSpeed(horizontalSpeed.getValueF());
@@ -161,7 +161,7 @@ public final class FlightHack extends Hack implements UpdateListener,
 		return isEnabled() && scrollToChangeSpeed.isChecked()
 			&& MC.screen == null
 			&& !WURST.getOtfs().zoomOtf.isControllingScrollEvents()
-			&& !WURST.getHax().freecamHack.isEnabled();
+			&& !WURST.getHax().freecamHack.isMovingCamera();
 	}
 	
 	private void doAntiKick()
