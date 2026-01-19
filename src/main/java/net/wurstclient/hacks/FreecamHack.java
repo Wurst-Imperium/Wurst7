@@ -25,6 +25,8 @@ import net.wurstclient.events.VisGraphListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.freecam.FreecamInitialPosSetting;
+import net.wurstclient.hacks.freecam.FreecamInputSetting;
+import net.wurstclient.hacks.freecam.FreecamInputSetting.ApplyInputTo;
 import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
@@ -39,6 +41,8 @@ import net.wurstclient.util.RotationUtils;
 public final class FreecamHack extends Hack implements UpdateListener,
 	VisGraphListener, RenderListener, MouseScrollListener
 {
+	private final FreecamInputSetting applyInputTo = new FreecamInputSetting();
+	
 	private final SliderSetting horizontalSpeed =
 		new SliderSetting("Horizontal speed",
 			"description.wurst.setting.freecam.horizontal_speed", 1, 0.05, 10,
@@ -83,6 +87,7 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	{
 		super("Freecam");
 		setCategory(Category.RENDER);
+		addSetting(applyInputTo);
 		addSetting(horizontalSpeed);
 		addSetting(verticalSpeed);
 		addSetting(scrollToChangeSpeed);
@@ -145,6 +150,12 @@ public final class FreecamHack extends Hack implements UpdateListener,
 		}
 		lastHealth = currentHealth;
 		
+		if(!isMovingCamera() || MC.screen != null)
+		{
+			prevCamPos = camPos;
+			return;
+		}
+		
 		// Get movement vector (x=left, y=forward)
 		Vec2 moveVector = player.input.getMoveVector();
 		
@@ -190,9 +201,14 @@ public final class FreecamHack extends Hack implements UpdateListener,
 	
 	public boolean isControllingScrollEvents()
 	{
-		return isEnabled() && scrollToChangeSpeed.isChecked()
+		return isMovingCamera() && scrollToChangeSpeed.isChecked()
 			&& MC.screen == null
 			&& !WURST.getOtfs().zoomOtf.isControllingScrollEvents();
+	}
+	
+	public boolean isMovingCamera()
+	{
+		return isEnabled() && applyInputTo.getSelected() == ApplyInputTo.CAMERA;
 	}
 	
 	@Override

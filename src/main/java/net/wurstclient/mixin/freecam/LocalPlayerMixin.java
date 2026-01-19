@@ -42,14 +42,14 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	@Inject(at = @At("HEAD"), method = "isShiftKeyDown()Z", cancellable = true)
 	private void onIsShiftKeyDown(CallbackInfoReturnable<Boolean> cir)
 	{
-		if(WurstClient.INSTANCE.getHax().freecamHack.isEnabled())
+		if(WurstClient.INSTANCE.getHax().freecamHack.isMovingCamera())
 			cir.setReturnValue(false);
 	}
 	
 	@Inject(at = @At("HEAD"), method = "aiStep()V")
 	private void onAiStepHead(CallbackInfo ci)
 	{
-		if(!WurstClient.INSTANCE.getHax().freecamHack.isEnabled())
+		if(!WurstClient.INSTANCE.getHax().freecamHack.isMovingCamera())
 			return;
 		
 		realInput = input;
@@ -71,7 +71,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	public void turn(double deltaYaw, double deltaPitch)
 	{
 		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
-		if(freecam.isEnabled())
+		if(freecam.isMovingCamera())
 		{
 			freecam.turn(deltaYaw, deltaPitch);
 			return;
