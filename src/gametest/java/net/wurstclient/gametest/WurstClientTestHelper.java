@@ -315,17 +315,35 @@ public enum WurstClientTestHelper
 	{
 		context.runOnClient(mc -> mc.getToastManager().clear());
 	}
-	
+
 	public static void assertOneItemInSlot(ClientGameTestContext context,
-		int slot, Item item)
+										   int slot, Item item)
 	{
-		ItemStack stack = context
-			.computeOnClient(mc -> mc.player.getInventory().getItem(slot));
-		if(!stack.is(item) || stack.getCount() != 1)
+		ItemStack stack = null;
+		boolean found = false;
+
+		for (int attempt = 0; attempt < 40; attempt++) {
+			stack = context.computeOnClient(mc -> mc.player.getInventory().getItem(slot));
+
+			if(stack.is(item) && stack.getCount() == 1) {
+				found = true;
+				break;
+			}
+
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException ignored) {
+				Thread.currentThread().interrupt();
+				break;
+			}
+		}
+
+		if(!found) {
 			throw new RuntimeException(
-				"Expected 1 " + item.getName().getString() + " at slot " + slot
-					+ ", found " + stack.getCount() + " "
-					+ stack.getItem().getName().getString() + " instead");
+					"Expected 1 " + item.getName().getString() + " at slot " + slot
+							+ ", found " + stack.getCount() + " "
+							+ stack.getItem().getName().getString() + " instead");
+		}
 	}
 	
 	public static void assertNoItemInSlot(ClientGameTestContext context,
