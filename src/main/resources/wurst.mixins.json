@@ -70,7 +70,9 @@
     "TitleScreenMixin",
     "WorldEnvironmentAttributeAccessMixin",
     "WorldMixin",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "ClientPacketListenerMixin",
+    "MultiPlayerGameModeMixin"
   ],
   "injectors": {
     "defaultRequire": 1
