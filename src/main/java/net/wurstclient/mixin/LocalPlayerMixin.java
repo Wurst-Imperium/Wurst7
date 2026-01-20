@@ -49,9 +49,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		
 		return original.call(instance, maxDistance, tickDelta, true);
 	}
-
+	
 	@Inject(at = @At("HEAD"), method = "closeContainer")
-	private void onCloseContainer(CallbackInfo ci) {
+	private void onCloseContainer(CallbackInfo ci)
+	{
 		TradingUtils.setWindowOpen(false);
 	}
 }

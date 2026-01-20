@@ -202,9 +202,10 @@ public abstract class MinecraftClientMixin
 		cir.setReturnValue(
 			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
 	}
-
+	
 	@Inject(method = "tick", at = @At("TAIL"))
-	private void onEndClientTick(CallbackInfo ci) {
+	private void onEndClientTick(CallbackInfo ci)
+	{
 		TradingUtils.clientLevelPost();
 	}
 	

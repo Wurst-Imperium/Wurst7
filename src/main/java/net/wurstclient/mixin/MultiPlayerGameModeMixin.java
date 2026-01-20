@@ -20,11 +20,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MultiPlayerGameMode.class)
-public class MultiPlayerGameModeMixin {
-    @Inject(at = @At("HEAD"), method = "interact")
-    private void onInteract(Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        if (target.getId() == MerchantPacket.lastEntityId) {
-            TradingUtils.setWindowOpen(true);
-        }
-    }
+public class MultiPlayerGameModeMixin
+{
+	@Inject(at = @At("HEAD"), method = "interact")
+	private void onInteract(Player player, Entity target, InteractionHand hand,
+		CallbackInfoReturnable<InteractionResult> cir)
+	{
+		if(target.getId() == MerchantPacket.lastEntityId)
+		{
+			TradingUtils.setWindowOpen(true);
+		}
+	}
 }
