@@ -33,14 +33,10 @@ public class ClientPacketListenerMixin
 	 *
 	 * @param packet
 	 *            商人交易报价数据包
-	 * @param ci
-	 *            回调信息
 	 */
 	@Inject(at = @At("HEAD"),
-		method = "handleMerchantOffers",
-		cancellable = true)
-	private void onHandleMerchantOffers(ClientboundMerchantOffersPacket packet,
-		CallbackInfo ci)
+		method = "handleMerchantOffers")
+	private void onHandleMerchantOffers(ClientboundMerchantOffersPacket packet)
 	{
 		if(TradingUtils.isEnableGuiLessTradeDetection())
 		{
@@ -48,7 +44,10 @@ public class ClientPacketListenerMixin
 		}
 	}
 	
-	@Inject(at = @At("HEAD"), method = "handleOpenScreen", cancellable = true)
+	@Inject(at = @At("HEAD"),
+		method = "handleOpenScreen",
+		cancellable = true,
+		order = 0)
 	private void onHandleOpenScreen(ClientboundOpenScreenPacket packet,
 		CallbackInfo ci)
 	{
