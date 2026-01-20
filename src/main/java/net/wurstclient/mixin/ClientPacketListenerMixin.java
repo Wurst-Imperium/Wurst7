@@ -48,7 +48,10 @@ public class ClientPacketListenerMixin
 		}
 	}
 	
-	@Inject(at = @At("HEAD"), method = "handleOpenScreen", cancellable = true)
+	@Inject(at = @At("HEAD"),
+		method = "handleOpenScreen",
+		cancellable = true,
+		order = 0)
 	private void onHandleOpenScreen(ClientboundOpenScreenPacket packet,
 		CallbackInfo ci)
 	{
