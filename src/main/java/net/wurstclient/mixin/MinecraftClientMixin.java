@@ -9,6 +9,7 @@ package net.wurstclient.mixin;
 
 import java.io.File;
 
+import net.wurstclient.util.TradingUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -200,6 +201,11 @@ public abstract class MinecraftClientMixin
 	{
 		cir.setReturnValue(
 			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
+	}
+
+	@Inject(method = "tick", at = @At("TAIL"))
+	private void onEndClientTick(CallbackInfo ci) {
+		TradingUtils.clientLevelPost();
 	}
 	
 	@Override
