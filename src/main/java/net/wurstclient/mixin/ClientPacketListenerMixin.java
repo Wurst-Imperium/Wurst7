@@ -34,8 +34,7 @@ public class ClientPacketListenerMixin
 	 * @param packet
 	 *            商人交易报价数据包
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "handleMerchantOffers")
+	@Inject(at = @At("HEAD"), method = "handleMerchantOffers")
 	private void onHandleMerchantOffers(ClientboundMerchantOffersPacket packet)
 	{
 		if(TradingUtils.isEnableGuiLessTradeDetection())
