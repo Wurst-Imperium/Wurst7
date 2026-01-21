@@ -36,7 +36,7 @@ public class ClientPacketListenerMixin
 	 */
 	@Inject(at = @At("HEAD"), method = "handleMerchantOffers")
 	private void onHandleMerchantOffers(ClientboundMerchantOffersPacket packet,
-										CallbackInfo ci)
+		CallbackInfo ci)
 	{
 		if(TradingUtils.isEnableGuiLessTradeDetection())
 		{
