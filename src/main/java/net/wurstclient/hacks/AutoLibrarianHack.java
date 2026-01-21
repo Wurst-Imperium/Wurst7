@@ -225,6 +225,7 @@ public final class AutoLibrarianHack extends Hack
 					"Lock In Trade is not available in GUI-less Trade Detection mode!");
 			}
 			
+			updateBooks.getSelected().update(wantedBooks, bookOffer);
 			MerchantPacket.reset();
 		}else
 		{
