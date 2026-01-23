@@ -191,9 +191,9 @@ public final class SliderComponent extends Component
 	@Override
 	public int getDefaultWidth()
 	{
-		int nameWitdh = TR.width(setting.getName());
+		int nameWidth = TR.width(setting.getName());
 		int valueWidth = TR.width(setting.getValueString());
-		return nameWitdh + valueWidth + 6;
+		return nameWidth + valueWidth + 6;
 	}
 	
 	@Override
