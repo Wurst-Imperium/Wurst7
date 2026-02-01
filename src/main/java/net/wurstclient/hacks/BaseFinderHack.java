@@ -43,10 +43,10 @@ public final class BaseFinderHack extends Hack
 		"minecraft:acacia_leaves", "minecraft:acacia_log", "minecraft:air",
 		"minecraft:allium", "minecraft:amethyst_block",
 		"minecraft:amethyst_cluster", "minecraft:andesite",
-		"minecraft:azure_bluet", "minecraft:bedrock", "minecraft:birch_leaves",
+		"minecraft:azure_bluet", "minecraft:bedrock", "minecraft:beehive", "minecraft:birch_leaves",
 		"minecraft:birch_log", "minecraft:blue_orchid",
 		"minecraft:brown_mushroom", "minecraft:brown_mushroom_block",
-		"minecraft:bubble_column", "minecraft:budding_amethyst",
+		"minecraft:bubble_column", "minecraft:budding_amethyst", "minecraft:bush",
 		"minecraft:calcite", "minecraft:cave_air", "minecraft:clay",
 		"minecraft:coal_ore", "minecraft:cobweb", "minecraft:copper_ore",
 		"minecraft:cornflower", "minecraft:dandelion",
@@ -64,8 +64,8 @@ public final class BaseFinderHack extends Hack
 		"minecraft:jungle_leaves", "minecraft:jungle_log", "minecraft:kelp",
 		"minecraft:kelp_plant", "minecraft:lapis_ore",
 		"minecraft:large_amethyst_bud", "minecraft:large_fern",
-		"minecraft:lava", "minecraft:lilac", "minecraft:lily_of_the_valley",
-		"minecraft:lily_pad", "minecraft:medium_amethyst_bud",
+		"minecraft:lava", "minecraft:leaf_litter", "minecraft:lilac", "minecraft:lily_of_the_valley",
+		"minecraft:lily_pad", "minecraft:magma_block", "minecraft:medium_amethyst_bud",
 		"minecraft:mossy_cobblestone", "minecraft:mushroom_stem",
 		"minecraft:nether_quartz_ore", "minecraft:netherrack",
 		"minecraft:oak_leaves", "minecraft:oak_log", "minecraft:obsidian",
@@ -74,12 +74,12 @@ public final class BaseFinderHack extends Hack
 		"minecraft:poppy", "minecraft:red_mushroom",
 		"minecraft:red_mushroom_block", "minecraft:red_tulip",
 		"minecraft:redstone_ore", "minecraft:rose_bush", "minecraft:sand",
-		"minecraft:sandstone", "minecraft:seagrass",
+		"minecraft:sandstone", "minecraft:seagrass", "minecraft:short_grass",
 		"minecraft:small_amethyst_bud", "minecraft:smooth_basalt",
 		"minecraft:snow", "minecraft:spawner", "minecraft:spruce_leaves",
 		"minecraft:spruce_log", "minecraft:stone", "minecraft:sunflower",
 		"minecraft:tall_grass", "minecraft:tall_seagrass", "minecraft:tuff",
-		"minecraft:vine", "minecraft:water", "minecraft:white_tulip");
+		"minecraft:vine", "minecraft:water", "minecraft:white_tulip", "minecraft:wildflowers");
 	
 	private final ColorSetting color = new ColorSetting("Color",
 		"Man-made blocks will be highlighted in this color.", Color.RED);
@@ -244,3 +244,4 @@ public final class BaseFinderHack extends Hack
 		vertices = BlockVertexCompiler.compile(matchingBlocks);
 	}
 }
+
