@@ -125,7 +125,8 @@ public final class BuildRandomHack extends Hack
 	{
 		lastPos = null;
 		
-		if(WURST.getHax().freecamHack.isEnabled())
+		if(WURST.getHax().freecamHack.isEnabled()
+			&& !WURST.getHax().freecamHack.isAiCompatibilityMode())
 			return;
 		
 		if(!fastPlace.isChecked() && MC.rightClickDelay > 0)
