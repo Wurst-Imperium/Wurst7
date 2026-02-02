@@ -86,7 +86,7 @@ jobs:
       run: |
         echo "wurst_version=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/^v//' | sed 's/-MC.*$//')" >> "$GITHUB_OUTPUT"
         echo "mc_version=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
-        echo "fapi_version=$(grep '^fabric_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
+        echo "fapi_version=$(grep '^fabric_api_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
 
     - name: Upload backups
       if: ${{ inputs.upload_backups }}

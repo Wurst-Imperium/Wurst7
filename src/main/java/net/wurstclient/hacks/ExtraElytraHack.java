@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,6 +14,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"EasyElytra", "extra elytra", "easy elytra"})
@@ -102,9 +103,16 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		
 		Vec3 v = MC.player.getDeltaMovement();
 		
-		if(MC.options.keyJump.isDown())
+		boolean jump = MC.options.keyJump.isDown();
+		boolean sneak = IKeyMapping.get(MC.options.keyShift).isActuallyDown();
+		
+		// ensure we don't enter sneaking pose
+		if(sneak)
+			MC.options.keyShift.setDown(false);
+		
+		if(jump && !sneak)
 			MC.player.setDeltaMovement(v.x, v.y + 0.08, v.z);
-		else if(MC.options.keyShift.isDown())
+		else if(sneak && !jump)
 			MC.player.setDeltaMovement(v.x, v.y - 0.04, v.z);
 	}
 	

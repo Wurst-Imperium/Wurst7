@@ -1,11 +1,13 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.xray;
+
+import java.util.List;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,16 +16,18 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.hacks.XRayHack;
 
 @Mixin(ModelBlockRenderer.class)
@@ -43,19 +47,19 @@ public abstract class BlockModelRendererMixin implements ItemLike
 	private static boolean onRenderSmoothOrFlat(BlockState state,
 		BlockState otherState, Direction side, Operation<Boolean> original,
 		BlockAndTintGetter world, BlockState stateButFromTheOtherMethod,
-		boolean cull, Direction sideButFromTheOtherMethod, BlockPos pos)
+		boolean cull, Direction sideButFromTheOtherMethod, BlockPos neighborPos)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
-		EventManager.fire(event);
-		
 		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
+		BlockPos pos = neighborPos.relative(side.getOpposite());
+		Boolean shouldDrawSide = xray.shouldDrawSide(state, pos);
+		
 		if(!xray.isOpacityMode() || xray.isVisible(state.getBlock(), pos))
 			currentOpacity.set(1F);
 		else
 			currentOpacity.set(xray.getOpacityFloat());
 		
-		if(event.isRendered() != null)
-			return event.isRendered();
+		if(shouldDrawSide != null)
+			return shouldDrawSide;
 		
 		return original.call(state, otherState, side);
 	}
@@ -70,5 +74,31 @@ public abstract class BlockModelRendererMixin implements ItemLike
 	private float modifyOpacity(float original)
 	{
 		return currentOpacity.get();
+	}
+	
+	/**
+	 * Hides blocks like grass and snow when neither Sodium nor Indigo are
+	 * running.
+	 */
+	@WrapOperation(
+		at = @At(value = "INVOKE",
+			target = "Ljava/util/List;isEmpty()Z",
+			ordinal = 1),
+		method = {
+			"tesselateWithoutAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V",
+			"tesselateWithAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V"})
+	private boolean pretendEmptyToStopSecondRenderModelFaceFlatCall(
+		List<BakedQuad> instance, Operation<Boolean> original,
+		BlockAndTintGetter world, List<BlockModelPart> list, BlockState state,
+		BlockPos pos, PoseStack poseStack, VertexConsumer vertexConsumer,
+		boolean cull, int light)
+	{
+		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
+		Boolean shouldDrawSide = xray.shouldDrawSide(state, pos);
+		
+		if(Boolean.FALSE.equals(shouldDrawSide))
+			return true;
+		
+		return original.call(instance);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -41,6 +41,14 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 	{
 		if(args.length > 0)
 		{
+			String newTarget = String.join(" ", args);
+			
+			if(enabled && target != null && target.equalsIgnoreCase(newTarget))
+			{
+				disable();
+				return;
+			}
+			
 			if(enabled)
 				disable();
 			
@@ -71,7 +79,7 @@ public final class AnnoyCmd extends Command implements ChatInputListener
 		enabled = true;
 	}
 	
-	private void disable() throws CmdException
+	private void disable()
 	{
 		EVENTS.remove(ChatInputListener.class, this);
 		

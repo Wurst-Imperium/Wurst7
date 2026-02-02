@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.xray;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,12 +18,14 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.RenderBlockEntityListener.RenderBlockEntityEvent;
+import net.wurstclient.WurstClient;
 
 @Mixin(BlockEntityRenderDispatcher.class)
 public class BlockEntityRenderDispatcherMixin
 {
+	/*
+	 * Hides block entities like chests when X-Ray is enabled.
+	 */
 	@Inject(at = @At("HEAD"),
 		method = "submit(Lnet/minecraft/client/renderer/blockentity/state/BlockEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V",
 		cancellable = true)
@@ -31,10 +33,8 @@ public class BlockEntityRenderDispatcherMixin
 		S renderState, PoseStack matrices, SubmitNodeCollector queue,
 		CameraRenderState cameraRenderState, CallbackInfo ci)
 	{
-		RenderBlockEntityEvent event = new RenderBlockEntityEvent(renderState);
-		EventManager.fire(event);
-		
-		if(event.isCancelled())
+		if(WurstClient.INSTANCE.getHax().xRayHack
+			.shouldHideBlockEntity(renderState))
 			ci.cancel();
 	}
 }

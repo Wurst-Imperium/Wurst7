@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -116,8 +116,12 @@ public enum RotationUtils
 	 */
 	public static Rotation slowlyTurnTowards(Rotation end, float maxChange)
 	{
-		float startYaw = MC.player.yRotLast;
-		float startPitch = MC.player.xRotLast;
+		LocalPlayer player = MC.player;
+		
+		float startYaw =
+			player.isPassenger() ? player.getYRot() : player.yRotLast;
+		float startPitch =
+			player.isPassenger() ? player.getXRot() : player.xRotLast;
 		float endYaw = end.yaw();
 		float endPitch = end.pitch();
 		

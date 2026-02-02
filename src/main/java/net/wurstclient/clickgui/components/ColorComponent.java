@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,6 +18,7 @@ import net.wurstclient.clickgui.screens.EditColorScreen;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.ColorUtils;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.text.WText;
 
 public final class ColorComponent extends Component
 {
@@ -95,12 +96,14 @@ public final class ColorComponent extends Component
 	
 	private String getColorTooltip()
 	{
-		String tooltip = "\u00a7cR:\u00a7r" + setting.getRed();
-		tooltip += " \u00a7aG:\u00a7r" + setting.getGreen();
-		tooltip += " \u00a79B:\u00a7r" + setting.getBlue();
-		tooltip += "\n\n\u00a7e[left-click]\u00a7r to edit";
-		tooltip += "\n\u00a7e[right-click]\u00a7r to reset";
-		return tooltip;
+		return WText.literal("\u00a7cR:\u00a7r" + setting.getRed())
+			.append(WText.literal(" \u00a7aG:\u00a7r" + setting.getGreen()))
+			.append(WText.literal(" \u00a79B:\u00a7r" + setting.getBlue()))
+			.append(WText.literal("\n\n"))
+			.append(WText.translated("gui.wurst.generic.left_click_to_edit"))
+			.append(WText.literal("\n"))
+			.append(WText.translated("gui.wurst.generic.right_click_to_reset"))
+			.toString();
 	}
 	
 	@Override
