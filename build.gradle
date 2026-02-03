@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
 	id "fabric-loom" version "${loom_version}"
-	id "com.diffplug.spotless" version "8.1.0"
+	id "com.diffplug.spotless" version "8.2.1"
 }
 
 def ENV = System.getenv()
