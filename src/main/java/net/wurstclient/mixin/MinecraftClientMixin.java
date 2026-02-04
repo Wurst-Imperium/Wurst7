@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -36,7 +36,7 @@ import net.wurstclient.events.HandleBlockBreakingListener.HandleBlockBreakingEve
 import net.wurstclient.events.HandleInputListener.HandleInputEvent;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
-import net.wurstclient.mixinterface.IClientPlayerEntity;
+import net.wurstclient.mixinterface.ILocalPlayer;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
@@ -192,9 +192,9 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Override
-	public IClientPlayerEntity getPlayer()
+	public ILocalPlayer getPlayer()
 	{
-		return (IClientPlayerEntity)player;
+		return (ILocalPlayer)player;
 	}
 	
 	@Override

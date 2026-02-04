@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -134,34 +134,29 @@ public final class AutoFarmHack extends Hack
 		List<BlockPos> blocksToInteract = List.of();
 		List<BlockPos> blocksToReplant = List.of();
 		
-		if(!WURST.getHax().freecamHack.isEnabled())
-		{
-			blocksToMine = nonEmptyBlocks.stream()
-				.filter(plantTypes::shouldHarvestByMining)
-				.sorted(Comparator
-					.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
-				.toList();
-			
-			blocksToInteract = nonEmptyBlocks.stream()
-				.filter(plantTypes::shouldHarvestByInteracting)
-				.sorted(Comparator
-					.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
-				.toList();
-			
-			blocksToReplant =
-				BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
-					.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
-					.filter(pos -> BlockUtils.getState(pos).canBeReplaced())
-					.filter(pos -> {
-						AutoFarmPlantType plantType = replantingSpots.get(pos);
-						return plantType != null
-							&& plantType.isReplantingEnabled()
-							&& plantType.hasPlantingSurface(pos);
-					})
-					.sorted(Comparator
-						.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
-					.toList();
-		}
+		blocksToMine = nonEmptyBlocks.stream()
+			.filter(plantTypes::shouldHarvestByMining)
+			.sorted(
+				Comparator.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
+			.toList();
+		
+		blocksToInteract = nonEmptyBlocks.stream()
+			.filter(plantTypes::shouldHarvestByInteracting)
+			.sorted(
+				Comparator.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
+			.toList();
+		
+		blocksToReplant = BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
+			.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq)
+			.filter(pos -> BlockUtils.getState(pos).canBeReplaced())
+			.filter(pos -> {
+				AutoFarmPlantType plantType = replantingSpots.get(pos);
+				return plantType != null && plantType.isReplantingEnabled()
+					&& plantType.hasPlantingSurface(pos);
+			})
+			.sorted(
+				Comparator.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
+			.toList();
 		
 		boolean replanting = replant(blocksToReplant);
 		boolean interacting =

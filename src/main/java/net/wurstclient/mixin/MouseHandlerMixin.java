@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,7 +23,7 @@ import net.wurstclient.events.MouseScrollListener.MouseScrollEvent;
 import net.wurstclient.events.MouseUpdateListener.MouseUpdateEvent;
 
 @Mixin(MouseHandler.class)
-public class MouseMixin
+public abstract class MouseHandlerMixin
 {
 	@Shadow
 	private double accumulatedDX;
@@ -31,14 +31,14 @@ public class MouseMixin
 	private double accumulatedDY;
 	
 	@Inject(at = @At("RETURN"), method = "onScroll(JDD)V")
-	private void onOnMouseScroll(long window, double horizontal,
-		double vertical, CallbackInfo ci)
+	private void onOnScroll(long window, double horizontal, double vertical,
+		CallbackInfo ci)
 	{
 		EventManager.fire(new MouseScrollEvent(vertical));
 	}
 	
 	@Inject(at = @At("HEAD"), method = "handleAccumulatedMovement()V")
-	private void onTick(CallbackInfo ci)
+	private void onHandleAccumulatedMovement(CallbackInfo ci)
 	{
 		MouseUpdateEvent event =
 			new MouseUpdateEvent(accumulatedDX, accumulatedDY);
@@ -50,9 +50,11 @@ public class MouseMixin
 	@WrapWithCondition(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlot(I)V"),
 		method = "onScroll(JDD)V")
-	private boolean wrapOnMouseScroll(Inventory inventory, int slot)
+	private boolean wrapOnScroll(Inventory inventory, int slot)
 	{
-		return !WurstClient.INSTANCE.getOtfs().zoomOtf
-			.shouldPreventHotbarScrolling();
+		WurstClient wurst = WurstClient.INSTANCE;
+		return !wurst.getOtfs().zoomOtf.isControllingScrollEvents()
+			&& !wurst.getHax().freecamHack.isControllingScrollEvents()
+			&& !wurst.getHax().flightHack.isControllingScrollEvents();
 	}
 }

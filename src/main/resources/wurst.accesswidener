@@ -35,6 +35,7 @@ accessible	field	net/minecraft/client/renderer/RenderType$CompositeRenderType	st
 accessible	field	net/minecraft/client/renderer/RenderType$CompositeRenderType	renderPipeline	Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 accessible	field	net/minecraft/client/renderer/RenderType$CompositeState	outputState	Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;
 accessible	field	net/minecraft/client/gui/components/toasts/ToastManager	queued	Ljava/util/Deque;
+accessible	field	net/minecraft/client/gui/screens/achievement/StatsScreen	isLoading	Z
 accessible	field	net/minecraft/world/entity/Entity	stuckSpeedMultiplier	Lnet/minecraft/world/phys/Vec3;
 accessible	field	net/minecraft/world/entity/LivingEntity	equipment	Lnet/minecraft/world/entity/EntityEquipment;
 accessible	field	net/minecraft/world/entity/LivingEntity	jumping	Z

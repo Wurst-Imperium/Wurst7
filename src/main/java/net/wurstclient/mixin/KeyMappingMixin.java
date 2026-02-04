@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,31 +17,39 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 
 @Mixin(KeyMapping.class)
-public abstract class KeyBindingMixin implements IKeyBinding
+public abstract class KeyMappingMixin implements IKeyMapping
 {
 	@Shadow
 	private InputConstants.Key key;
 	
 	@Override
 	@Unique
-	@Deprecated // use IKeyBinding.resetPressedState() instead
-	public void wurst_resetPressedState()
+	@Deprecated // use IKeyMapping.isActuallyDown() instead
+	public boolean wurst_isActuallyDown()
 	{
 		long handle = WurstClient.MC.getWindow().getWindow();
 		int code = key.getValue();
 		
 		if(key.getType() == InputConstants.Type.MOUSE)
-			setDown(GLFW.glfwGetMouseButton(handle, code) == 1);
-		else
-			setDown(InputConstants.isKeyDown(handle, code));
+			return GLFW.glfwGetMouseButton(handle, code) == 1;
+		
+		return InputConstants.isKeyDown(handle, code);
 	}
 	
 	@Override
 	@Unique
-	@Deprecated // use IKeyBinding.simulatePress() instead
+	@Deprecated // use IKeyMapping.resetPressedState() instead
+	public void wurst_resetPressedState()
+	{
+		setDown(wurst_isActuallyDown());
+	}
+	
+	@Override
+	@Unique
+	@Deprecated // use IKeyMapping.simulatePress() instead
 	public void wurst_simulatePress(boolean pressed)
 	{
 		Minecraft mc = WurstClient.MC;
@@ -64,7 +72,7 @@ public abstract class KeyBindingMixin implements IKeyBinding
 			break;
 			
 			default:
-			System.out.println("Unknown keybinding type: " + key.getType());
+			System.out.println("Unknown key mapping type: " + key.getType());
 			break;
 		}
 	}

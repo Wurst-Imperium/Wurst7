@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -17,7 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
@@ -129,8 +129,8 @@ public final class FishingSpotManager
 	
 	private void moveToNextSpot()
 	{
-		IKeyBinding forwardKey = IKeyBinding.get(MC.options.keyUp);
-		IKeyBinding jumpKey = IKeyBinding.get(MC.options.keyJump);
+		IKeyMapping forwardKey = IKeyMapping.get(MC.options.keyUp);
+		IKeyMapping jumpKey = IKeyMapping.get(MC.options.keyJump);
 		
 		PositionAndRotation nextPosRot = nextSpot.input();
 		forwardKey.resetPressedState();

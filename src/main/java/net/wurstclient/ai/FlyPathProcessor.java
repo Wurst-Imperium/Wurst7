@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -115,8 +115,7 @@ public class FlyPathProcessor extends PathProcessor
 		if(horizontal)
 		{
 			if(!creativeFlying && MC.player.position().distanceTo(
-				vecInPos) <= WURST.getHax().flightHack.horizontalSpeed
-					.getValue())
+				vecInPos) <= WURST.getHax().flightHack.getHorizontalSpeed())
 			{
 				MC.player.setPos(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;
@@ -134,7 +133,7 @@ public class FlyPathProcessor extends PathProcessor
 		}else if(y)
 		{
 			if(!creativeFlying && MC.player.position().distanceTo(
-				vecInPos) <= WURST.getHax().flightHack.verticalSpeed.getValue())
+				vecInPos) <= WURST.getHax().flightHack.getActualVerticalSpeed())
 			{
 				MC.player.setPos(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;

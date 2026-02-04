@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -23,6 +23,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldBuilder;
+import net.fabricmc.fabric.impl.client.gametest.TestSystemProperties;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.world.level.GameRules;
@@ -42,6 +43,9 @@ public class WurstTest implements FabricClientGameTest
 	@Override
 	public void runTest(ClientGameTestContext context)
 	{
+		if(TestSystemProperties.DISABLE_NETWORK_SYNCHRONIZER)
+			throw new RuntimeException("Network synchronizer is not enabled");
+		
 		LOGGER.info("Starting Wurst Client GameTest");
 		hideSplashTexts(context);
 		waitForTitleScreenFade(context);
@@ -106,15 +110,11 @@ public class WurstTest implements FabricClientGameTest
 			"https://i.imgur.com/LyQ5FSD.png");
 		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
 		
-		LOGGER.info("Opening game menu");
-		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
-		assertScreenshotEquals(context, "game_menu",
-			"https://i.imgur.com/L58HCGj.png");
-		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
-		
 		runWurstCommand(context,
 			"setmode WurstLogo visibility only_when_outdated");
 		runWurstCommand(context, "setcheckbox HackList animations off");
+		
+		InGameMenuTest.testMenuScreens(context);
 		
 		// TODO: Open ClickGUI and Navigator
 		
@@ -122,6 +122,7 @@ public class WurstTest implements FabricClientGameTest
 		AutoMineHackTest.testAutoMineHack(context, spContext);
 		FreecamHackTest.testFreecamHack(context, spContext);
 		NoFallHackTest.testNoFallHack(context, spContext);
+		NoWeatherHackTest.testNoWeatherHack(context, spContext);
 		XRayHackTest.testXRayHack(context, spContext);
 		
 		// Test Wurst commands
@@ -133,8 +134,6 @@ public class WurstTest implements FabricClientGameTest
 		
 		// Test special cases
 		PistonTest.testPistonDoesntCrash(context, spContext);
-		
-		// TODO: Check Wurst Options
 	}
 	
 	// because the grass texture is randomized and smooth stone isn't

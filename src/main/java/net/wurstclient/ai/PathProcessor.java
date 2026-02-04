@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -14,7 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 
 public abstract class PathProcessor
 {
@@ -77,6 +77,6 @@ public abstract class PathProcessor
 	{
 		// reset keys
 		for(KeyMapping key : CONTROLS)
-			IKeyBinding.get(key).resetPressedState();
+			IKeyMapping.get(key).resetPressedState();
 	}
 }

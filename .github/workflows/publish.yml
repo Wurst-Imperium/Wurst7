@@ -6,25 +6,22 @@ on:
     inputs:
       close_milestone:
         description: "Close milestone"
-        required: true
         type: boolean
         default: true
       upload_backups:
         description: "Upload to backups server"
-        required: true
         type: boolean
         default: true
       publish_github:
         description: "Publish to GitHub"
-        required: true
         type: boolean
         default: true
       update_website:
         description: "Update WurstClient.net post (only works if there already is one)"
-        required: true
         type: boolean
         default: false
       distinct_id:
+        type: string
         required: false
 
 permissions:
@@ -69,6 +66,7 @@ jobs:
       run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: Create and push tag
+      if: ${{ github.ref_type != 'tag' }}
       run: |
         MOD_VERSION=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
         git config --global user.name "Wurst-Bot"
@@ -88,7 +86,7 @@ jobs:
       run: |
         echo "wurst_version=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/^v//' | sed 's/-MC.*$//')" >> "$GITHUB_OUTPUT"
         echo "mc_version=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
-        echo "fapi_version=$(grep '^fabric_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
+        echo "fapi_version=$(grep '^fabric_api_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
 
     - name: Upload backups
       if: ${{ inputs.upload_backups }}

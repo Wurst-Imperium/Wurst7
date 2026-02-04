@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -193,7 +193,7 @@ public final class BaseFinderHack extends Hack
 		
 		int stepSize = MC.level.getHeight() / 64;
 		int startY = MC.level.getMaxY() - 1 - modulo * stepSize;
-		int endY = startY - stepSize;
+		int endY = Math.max(startY - stepSize, MC.level.getMinY());
 		
 		BlockPos playerPos =
 			BlockPos.containing(MC.player.getX(), 0, MC.player.getZ());

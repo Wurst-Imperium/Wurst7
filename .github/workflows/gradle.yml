@@ -90,15 +90,15 @@ jobs:
     - name: Run client gametests
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      run: xvfb-run --auto-servernum ./gradlew runClientGameTest --stacktrace --warning-mode=fail
+      run: ./gradlew runClientGameTest --stacktrace --warning-mode=fail
 
     - name: Run client gametests with mods
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      run: xvfb-run --auto-servernum ./gradlew runClientGameTestWithMods --stacktrace --warning-mode=fail
+      run: ./gradlew runClientGameTestWithMods --stacktrace --warning-mode=fail
 
     - name: Upload screenshots
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       if: ${{ success() || failure() }}
       with:
         name: screenshots
@@ -106,14 +106,14 @@ jobs:
         compression-level: 0
 
     - name: Upload logs
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       if: ${{ success() || failure() }}
       with:
         name: logs
         path: build/run/*/logs/latest.log
 
     - name: Upload crash reports
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       if: ${{ failure() }}
       with:
         name: crash-reports

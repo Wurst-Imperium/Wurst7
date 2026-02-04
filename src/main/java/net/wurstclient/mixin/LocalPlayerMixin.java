@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -35,7 +35,6 @@ import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.AirStrafingSpeedListener.AirStrafingSpeedEvent;
-import net.wurstclient.events.IsPlayerInLavaListener.IsPlayerInLavaEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
@@ -43,11 +42,11 @@ import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
 import net.wurstclient.hack.HackList;
-import net.wurstclient.mixinterface.IClientPlayerEntity;
+import net.wurstclient.mixinterface.ILocalPlayer;
 
 @Mixin(LocalPlayer.class)
-public class ClientPlayerEntityMixin extends AbstractClientPlayer
-	implements IClientPlayerEntity
+public abstract class LocalPlayerMixin extends AbstractClientPlayer
+	implements ILocalPlayer
 {
 	@Shadow
 	@Final
@@ -55,7 +54,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 	
 	private Screen tempCurrentScreen;
 	
-	public ClientPlayerEntityMixin(WurstClient wurst, ClientLevel world,
+	private LocalPlayerMixin(WurstClient wurst, ClientLevel world,
 		GameProfile profile)
 	{
 		super(world, profile);
@@ -206,23 +205,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 		EventManager.fire(event);
 		
 		return event.isInWater();
-	}
-	
-	@Override
-	public boolean isInLava()
-	{
-		boolean inLava = super.isInLava();
-		IsPlayerInLavaEvent event = new IsPlayerInLavaEvent(inLava);
-		EventManager.fire(event);
-		
-		return event.isInLava();
-	}
-	
-	@Override
-	public boolean isSpectator()
-	{
-		return super.isSpectator()
-			|| WurstClient.INSTANCE.getHax().freecamHack.isEnabled();
 	}
 	
 	@Override

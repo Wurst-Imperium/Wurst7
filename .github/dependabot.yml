@@ -6,13 +6,15 @@ updates:
 - package-ecosystem: "gradle"
   directory: "/"
   schedule:
-    interval: "daily"
+    interval: "weekly"
+    day: "monday"
     time: "06:00"
     timezone: "Europe/Berlin"
 - package-ecosystem: "github-actions"
   # Directory should be `/` instead of `/.github/workflows` according to the docs.
   directory: "/"
   schedule:
-    interval: "daily"
+    interval: "weekly"
+    day: "monday"
     time: "06:00"
     timezone: "Europe/Berlin"
