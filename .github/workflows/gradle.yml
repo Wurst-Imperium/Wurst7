@@ -55,6 +55,20 @@ jobs:
         cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
         cache-read-only: ${{ github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/heads/1.') }}
 
+    - name: Resolve dependencies
+      run: |
+        max_attempts=3
+        attempt=1
+        until ./gradlew dependencies --stacktrace; do
+          if [ $attempt -ge $max_attempts ]; then
+            echo "Failed to resolve dependencies after $max_attempts attempts"
+            exit 1
+          fi
+          echo "Attempt $attempt failed, retrying in 30 seconds..."
+          attempt=$((attempt + 1))
+          sleep 30
+        done
+
     - name: Build
       run: ./gradlew build --stacktrace --warning-mode=fail
 
