@@ -43,6 +43,7 @@ import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.hacks.FreecamHack;
 import net.wurstclient.mixinterface.IClientPlayerEntity;
 
 @Mixin(LocalPlayer.class)
@@ -220,8 +221,12 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayer
 	@Override
 	public boolean isSpectator()
 	{
-		return super.isSpectator()
-			|| WurstClient.INSTANCE.getHax().freecamHack.isEnabled();
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		// only force spectator mode when not in AI compatibility mode
+		if(freecam.isEnabled() && !freecam.isAiCompatibilityMode())
+			return true;
+		
+		return super.isSpectator();
 	}
 	
 	@Override

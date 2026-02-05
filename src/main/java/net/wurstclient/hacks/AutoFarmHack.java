@@ -134,7 +134,8 @@ public final class AutoFarmHack extends Hack
 		List<BlockPos> blocksToInteract = List.of();
 		List<BlockPos> blocksToReplant = List.of();
 		
-		if(!WURST.getHax().freecamHack.isEnabled())
+		if(!WURST.getHax().freecamHack.isEnabled()
+			|| WURST.getHax().freecamHack.isAiCompatibilityMode())
 		{
 			blocksToMine = nonEmptyBlocks.stream()
 				.filter(plantTypes::shouldHarvestByMining)

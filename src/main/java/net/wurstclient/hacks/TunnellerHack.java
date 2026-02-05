@@ -169,7 +169,11 @@ public final class TunnellerHack extends Hack
 		for(Hack hack : incompatibleHax)
 			hack.setEnabled(false);
 		
-		if(hax.freecamHack.isEnabled() || hax.remoteViewHack.isEnabled())
+		if(hax.remoteViewHack.isEnabled())
+			return;
+		
+		if(hax.freecamHack.isEnabled()
+			&& !hax.freecamHack.isAiCompatibilityMode())
 			return;
 		
 		Options gs = MC.options;

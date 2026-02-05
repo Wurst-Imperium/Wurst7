@@ -21,17 +21,29 @@ import net.wurstclient.util.text.WText;
 public abstract class Setting
 {
 	private final String name;
+	private final String displayName;
 	private final WText description;
 	
 	public Setting(String name, WText description)
 	{
+		this(name, name, description);
+	}
+	
+	protected Setting(String name, String displayName, WText description)
+	{
 		this.name = Objects.requireNonNull(name);
+		this.displayName = Objects.requireNonNull(displayName);
 		this.description = Objects.requireNonNull(description);
 	}
 	
 	public final String getName()
 	{
 		return name;
+	}
+	
+	public final String getDisplayName()
+	{
+		return displayName;
 	}
 	
 	public final String getDescription()

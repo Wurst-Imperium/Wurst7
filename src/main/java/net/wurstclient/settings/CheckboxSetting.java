@@ -34,9 +34,23 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 		checkedByDefault = checked;
 	}
 	
+	public CheckboxSetting(String name, String displayName, WText description,
+		boolean checked)
+	{
+		super(name, displayName, description);
+		this.checked = checked;
+		checkedByDefault = checked;
+	}
+	
 	public CheckboxSetting(String name, String descriptionKey, boolean checked)
 	{
 		this(name, WText.translated(descriptionKey), checked);
+	}
+	
+	public CheckboxSetting(String name, String displayName,
+		String descriptionKey, boolean checked)
+	{
+		this(name, displayName, WText.translated(descriptionKey), checked);
 	}
 	
 	public CheckboxSetting(String name, boolean checked)
@@ -123,7 +137,7 @@ public class CheckboxSetting extends Setting implements CheckboxLock
 	@Override
 	public final Set<PossibleKeybind> getPossibleKeybinds(String featureName)
 	{
-		String fullName = featureName + " " + getName();
+		String fullName = featureName + " " + getDisplayName();
 		
 		String command = ".setcheckbox " + featureName.toLowerCase() + " ";
 		command += getName().toLowerCase().replace(" ", "_") + " ";
