@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin.sodium;
+package net.wurstclient.mixin.xray.sodium;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,8 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
+import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.XRayHack;
 
 /**
  * Last updated for <a href=
@@ -48,10 +48,10 @@ public class AbstractBlockRenderContextMixin
 	private void onIsFaceCulled(@Nullable Direction face,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
-		EventManager.fire(event);
+		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
+		Boolean shouldDrawSide = xray.shouldDrawSide(state, pos);
 		
-		if(event.isRendered() != null)
-			cir.setReturnValue(!event.isRendered());
+		if(shouldDrawSide != null)
+			cir.setReturnValue(!shouldDrawSide);
 	}
 }

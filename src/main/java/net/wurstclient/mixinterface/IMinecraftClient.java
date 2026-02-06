@@ -13,7 +13,7 @@ public interface IMinecraftClient
 {
 	public IMultiPlayerGameMode getInteractionManager();
 	
-	public IClientPlayerEntity getPlayer();
+	public ILocalPlayer getPlayer();
 	
 	public User getWurstSession();
 	

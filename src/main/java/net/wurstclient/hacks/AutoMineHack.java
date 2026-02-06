@@ -19,7 +19,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleBlockBreakingListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"auto mine", "AutoBreak", "auto break"})
@@ -59,7 +59,7 @@ public final class AutoMineHack extends Hack
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(HandleBlockBreakingListener.class, this);
-		IKeyBinding.get(MC.options.keyAttack).resetPressedState();
+		IKeyMapping.get(MC.options.keyAttack).resetPressedState();
 		MC.gameMode.stopDestroyBlock();
 	}
 	

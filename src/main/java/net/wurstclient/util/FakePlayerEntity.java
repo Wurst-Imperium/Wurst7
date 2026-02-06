@@ -32,6 +32,7 @@ public class FakePlayerEntity extends RemotePlayer
 		copyPosition(player);
 		
 		copyInventory();
+		getAttributes().assignAllValues(player.getAttributes());
 		copyRotation();
 		
 		spawn();

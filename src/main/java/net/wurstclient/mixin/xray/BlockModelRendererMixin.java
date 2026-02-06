@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.xray;
 
 import java.util.List;
 
@@ -28,8 +28,6 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.hacks.XRayHack;
 
 @Mixin(ModelBlockRenderer.class)
@@ -51,18 +49,17 @@ public abstract class BlockModelRendererMixin implements ItemLike
 		BlockAndTintGetter world, BlockState stateButFromTheOtherMethod,
 		boolean cull, Direction sideButFromTheOtherMethod, BlockPos neighborPos)
 	{
-		BlockPos pos = neighborPos.relative(side.getOpposite());
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
-		EventManager.fire(event);
-		
 		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
+		BlockPos pos = neighborPos.relative(side.getOpposite());
+		Boolean shouldDrawSide = xray.shouldDrawSide(state, pos);
+		
 		if(!xray.isOpacityMode() || xray.isVisible(state.getBlock(), pos))
 			currentOpacity.set(1F);
 		else
 			currentOpacity.set(xray.getOpacityFloat());
 		
-		if(event.isRendered() != null)
-			return event.isRendered();
+		if(shouldDrawSide != null)
+			return shouldDrawSide;
 		
 		return original.call(state, otherState, side);
 	}
@@ -96,10 +93,10 @@ public abstract class BlockModelRendererMixin implements ItemLike
 		BlockPos pos, PoseStack poseStack, VertexConsumer vertexConsumer,
 		boolean cull, int light)
 	{
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, pos);
-		EventManager.fire(event);
+		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
+		Boolean shouldDrawSide = xray.shouldDrawSide(state, pos);
 		
-		if(Boolean.FALSE.equals(event.isRendered()))
+		if(Boolean.FALSE.equals(shouldDrawSide))
 			return true;
 		
 		return original.call(instance);

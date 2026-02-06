@@ -46,7 +46,7 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.hacks.autolibrarian.UpdateBooksSetting;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FaceTargetSetting;
@@ -324,7 +324,7 @@ public final class AutoLibrarianHack extends Hack
 			? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
 		
 		// sneak-place to avoid activating trapdoors/chests/etc.
-		IKeyBinding sneakKey = IKeyBinding.get(MC.options.keyShift);
+		IKeyMapping sneakKey = IKeyMapping.get(MC.options.keyShift);
 		sneakKey.setDown(true);
 		if(!MC.player.isShiftKeyDown())
 			return;

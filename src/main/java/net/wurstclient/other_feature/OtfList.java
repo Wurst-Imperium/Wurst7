@@ -33,6 +33,7 @@ public final class OtfList
 	public final WikiDataExportOtf wikiDataExportOtf = new WikiDataExportOtf();
 	public final WurstCapesOtf wurstCapesOtf = new WurstCapesOtf();
 	public final WurstLogoOtf wurstLogoOtf = new WurstLogoOtf();
+	public final WurstOptionsOtf wurstOptionsOtf = new WurstOptionsOtf();
 	public final ZoomOtf zoomOtf = new ZoomOtf();
 	
 	private final TreeMap<String, OtherFeature> otfs =

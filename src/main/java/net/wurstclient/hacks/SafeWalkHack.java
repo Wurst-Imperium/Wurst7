@@ -12,7 +12,7 @@ import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -78,7 +78,7 @@ public final class SafeWalkHack extends Hack
 	
 	private void setSneaking(boolean sneaking)
 	{
-		IKeyBinding sneakKey = IKeyBinding.get(MC.options.keyShift);
+		IKeyMapping sneakKey = IKeyMapping.get(MC.options.keyShift);
 		
 		if(sneaking)
 			sneakKey.setDown(true);

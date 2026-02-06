@@ -29,16 +29,14 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.GetAmbientOcclusionLightLevelListener.GetAmbientOcclusionLightLevelEvent;
 import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.hacks.HandNoClipHack;
 
 @Mixin(BlockStateBase.class)
-public abstract class AbstractBlockStateMixin
-	extends StateHolder<Block, BlockState>
+public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 {
-	private AbstractBlockStateMixin(WurstClient wurst, Block owner,
+	private BlockStateBaseMixin(WurstClient wurst, Block owner,
 		Reference2ObjectArrayMap<Property<?>, Comparable<?>> propertyMap,
 		MapCodec<BlockState> codec)
 	{
@@ -55,20 +53,6 @@ public abstract class AbstractBlockStateMixin
 		EventManager.fire(event);
 		
 		cir.setReturnValue(cir.getReturnValue() && !event.isCancelled());
-	}
-	
-	@Inject(at = @At("TAIL"),
-		method = "getShadeBrightness(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F",
-		cancellable = true)
-	private void onGetAmbientOcclusionLightLevel(BlockGetter blockView,
-		BlockPos blockPos, CallbackInfoReturnable<Float> cir)
-	{
-		GetAmbientOcclusionLightLevelEvent event =
-			new GetAmbientOcclusionLightLevelEvent((BlockState)(Object)this,
-				cir.getReturnValueF());
-		
-		EventManager.fire(event);
-		cir.setReturnValue(event.getLightLevel());
 	}
 	
 	@Inject(at = @At("HEAD"),

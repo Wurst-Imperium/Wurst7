@@ -22,25 +22,18 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.options.WurstOptionsScreen;
 
 @Mixin(PauseScreen.class)
-public abstract class GameMenuScreenMixin extends Screen
+public abstract class PauseScreenMixin extends Screen
 {
-	@Unique
-	private static final Identifier WURST_TEXTURE =
-		Identifier.fromNamespaceAndPath("wurst", "wurst_128.png");
-	
 	@Unique
 	private Button wurstOptionsButton;
 	
-	private GameMenuScreenMixin(WurstClient wurst, Component title)
+	private PauseScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}
@@ -48,10 +41,8 @@ public abstract class GameMenuScreenMixin extends Screen
 	@Inject(at = @At("TAIL"), method = "createPauseMenu()V")
 	private void onInitWidgets(CallbackInfo ci)
 	{
-		if(!WurstClient.INSTANCE.isEnabled())
-			return;
-		
-		addWurstOptionsButton();
+		if(WurstClient.INSTANCE.getOtfs().wurstOptionsOtf.isVisibleInGameMenu())
+			addWurstOptionsButton();
 	}
 	
 	@Inject(at = @At("TAIL"),
@@ -59,20 +50,12 @@ public abstract class GameMenuScreenMixin extends Screen
 	private void onRender(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
-		if(!WurstClient.INSTANCE.isEnabled() || wurstOptionsButton == null)
+		WurstClient wurst = WurstClient.INSTANCE;
+		if(!wurst.isEnabled())
 			return;
 		
-		int x = wurstOptionsButton.getX() + 34;
-		int y = wurstOptionsButton.getY() + 2;
-		int w = 63;
-		int h = 16;
-		int fw = 63;
-		int fh = 16;
-		float u = 0;
-		float v = 0;
-		context.guiRenderState.up();
-		context.blit(RenderPipelines.GUI_TEXTURED, WURST_TEXTURE, x, y, u, v, w,
-			h, fw, fh);
+		wurst.getOtfs().wurstOptionsOtf.drawWurstLogoOnButton(context,
+			wurstOptionsButton);
 	}
 	
 	@Unique
@@ -109,8 +92,8 @@ public abstract class GameMenuScreenMixin extends Screen
 		ensureSpaceAvailable(buttonX, buttonY, buttonWidth, buttonHeight);
 		
 		// Create Wurst Options button
-		MutableComponent buttonText = Component.literal("            Options");
-		wurstOptionsButton = Button.builder(buttonText, b -> openWurstOptions())
+		wurstOptionsButton = WurstClient.INSTANCE.getOtfs().wurstOptionsOtf
+			.buttonBuilder(this::openWurstOptions)
 			.bounds(buttonX, buttonY, buttonWidth, buttonHeight).build();
 		buttons.add(wurstOptionsButton);
 	}
@@ -154,7 +137,7 @@ public abstract class GameMenuScreenMixin extends Screen
 	}
 	
 	@Unique
-	private void openWurstOptions()
+	private void openWurstOptions(Button button)
 	{
 		minecraft.setScreen(new WurstOptionsScreen(this));
 	}

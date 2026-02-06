@@ -16,17 +16,16 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.screens.EditBlockListScreen;
-import net.wurstclient.events.GetAmbientOcclusionLightLevelListener;
-import net.wurstclient.events.RenderBlockEntityListener;
-import net.wurstclient.events.SetOpaqueCubeListener;
-import net.wurstclient.events.ShouldDrawSideListener;
 import net.wurstclient.events.UpdateListener;
+import net.wurstclient.events.VisGraphListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.ISimpleOption;
 import net.wurstclient.settings.BlockListSetting;
@@ -37,9 +36,8 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"XRay", "x ray", "OreFinder", "ore finder"})
-public final class XRayHack extends Hack implements UpdateListener,
-	SetOpaqueCubeListener, GetAmbientOcclusionLightLevelListener,
-	ShouldDrawSideListener, RenderBlockEntityListener
+public final class XRayHack extends Hack
+	implements UpdateListener, VisGraphListener
 {
 	private final BlockListSetting ores = new BlockListSetting("Ores",
 		"A list of blocks that X-Ray will show. They don't have to be just ores"
@@ -121,10 +119,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 		
 		// add event listeners
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(SetOpaqueCubeListener.class, this);
-		EVENTS.add(GetAmbientOcclusionLightLevelListener.class, this);
-		EVENTS.add(ShouldDrawSideListener.class, this);
-		EVENTS.add(RenderBlockEntityListener.class, this);
+		EVENTS.add(VisGraphListener.class, this);
 		
 		// reload chunks
 		MC.levelRenderer.allChanged();
@@ -139,10 +134,7 @@ public final class XRayHack extends Hack implements UpdateListener,
 	{
 		// remove event listeners
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(SetOpaqueCubeListener.class, this);
-		EVENTS.remove(GetAmbientOcclusionLightLevelListener.class, this);
-		EVENTS.remove(ShouldDrawSideListener.class, this);
-		EVENTS.remove(RenderBlockEntityListener.class, this);
+		EVENTS.remove(VisGraphListener.class, this);
 		
 		// reload chunks
 		MC.levelRenderer.allChanged();
@@ -162,35 +154,34 @@ public final class XRayHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onSetOpaqueCube(SetOpaqueCubeEvent event)
+	public void onVisGraph(VisGraphEvent event)
 	{
 		event.cancel();
 	}
 	
-	@Override
-	public void onGetAmbientOcclusionLightLevel(
-		GetAmbientOcclusionLightLevelEvent event)
+	public Boolean shouldDrawSide(BlockState state, BlockPos pos)
 	{
-		event.setLightLevel(1);
-	}
-	
-	@Override
-	public void onShouldDrawSide(ShouldDrawSideEvent event)
-	{
-		boolean visible =
-			isVisible(event.getState().getBlock(), event.getPos());
-		if(!visible && opacity.getValue() > 0)
-			return;
+		if(!isEnabled())
+			return null;
 		
-		event.setRendered(visible);
+		boolean visible = isVisible(state.getBlock(), pos);
+		if(!visible && opacity.getValue() > 0)
+			return null;
+		
+		return visible;
 	}
 	
-	@Override
-	public void onRenderBlockEntity(RenderBlockEntityEvent event)
+	public boolean shouldHideBlockEntity(BlockEntityRenderState state)
 	{
-		BlockPos pos = event.getState().blockPos;
-		if(!isVisible(BlockUtils.getBlock(pos), pos))
-			event.cancel();
+		if(!isEnabled())
+			return false;
+		
+		BlockPos pos = state.blockPos;
+		Block block = BlockUtils.getBlock(pos);
+		if(isVisible(block, pos))
+			return false;
+		
+		return true;
 	}
 	
 	public boolean isVisible(Block block, BlockPos pos)
@@ -231,6 +222,11 @@ public final class XRayHack extends Hack implements UpdateListener,
 		return opacity.getValueF();
 	}
 	
+	public void openBlockListEditor(Screen prevScreen)
+	{
+		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
+	}
+	
 	/**
 	 * Checks if OptiFine/OptiFabric is installed and returns a warning message
 	 * if it is.
@@ -247,11 +243,4 @@ public final class XRayHack extends Hack implements UpdateListener,
 		
 		return null;
 	}
-	
-	public void openBlockListEditor(Screen prevScreen)
-	{
-		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
-	}
-	
-	// See AbstractBlockRenderContextMixin, RenderLayersMixin
 }

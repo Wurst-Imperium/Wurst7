@@ -12,7 +12,7 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 
@@ -63,7 +63,7 @@ public final class SneakHack extends Hack
 		switch(mode.getSelected())
 		{
 			case LEGIT:
-			IKeyBinding.get(MC.options.keyShift).resetPressedState();
+			IKeyMapping.get(MC.options.keyShift).resetPressedState();
 			break;
 			
 			case PACKET:
@@ -75,7 +75,7 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPreMotion()
 	{
-		IKeyBinding sneakKey = IKeyBinding.get(MC.options.keyShift);
+		IKeyMapping sneakKey = IKeyMapping.get(MC.options.keyShift);
 		
 		switch(mode.getSelected())
 		{
