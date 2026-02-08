@@ -115,8 +115,7 @@ public class FlyPathProcessor extends PathProcessor
 		if(horizontal)
 		{
 			if(!creativeFlying && MC.player.position().distanceTo(
-				vecInPos) <= WURST.getHax().flightHack.horizontalSpeed
-					.getValue())
+				vecInPos) <= WURST.getHax().flightHack.getHorizontalSpeed())
 			{
 				MC.player.setPos(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;
@@ -134,7 +133,7 @@ public class FlyPathProcessor extends PathProcessor
 		}else if(y)
 		{
 			if(!creativeFlying && MC.player.position().distanceTo(
-				vecInPos) <= WURST.getHax().flightHack.verticalSpeed.getValue())
+				vecInPos) <= WURST.getHax().flightHack.getActualVerticalSpeed())
 			{
 				MC.player.setPos(vecInPos.x, vecInPos.y, vecInPos.z);
 				return;

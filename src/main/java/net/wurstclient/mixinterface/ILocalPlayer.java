@@ -7,7 +7,7 @@
  */
 package net.wurstclient.mixinterface;
 
-public interface IClientPlayerEntity
+public interface ILocalPlayer
 {
 	public boolean isTouchingWaterBypass();
 }

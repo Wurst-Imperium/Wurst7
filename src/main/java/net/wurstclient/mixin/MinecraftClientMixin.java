@@ -40,7 +40,7 @@ import net.wurstclient.events.HandleBlockBreakingListener.HandleBlockBreakingEve
 import net.wurstclient.events.HandleInputListener.HandleInputEvent;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
-import net.wurstclient.mixinterface.IClientPlayerEntity;
+import net.wurstclient.mixinterface.ILocalPlayer;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
@@ -210,9 +210,9 @@ public abstract class MinecraftClientMixin
 	}
 	
 	@Override
-	public IClientPlayerEntity getPlayer()
+	public ILocalPlayer getPlayer()
 	{
-		return (IClientPlayerEntity)player;
+		return (ILocalPlayer)player;
 	}
 	
 	@Override

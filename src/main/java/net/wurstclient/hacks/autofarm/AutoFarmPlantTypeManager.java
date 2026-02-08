@@ -35,6 +35,7 @@ public final class AutoFarmPlantTypeManager
 		new PitcherPlantPlantType();
 	public final PotatoesPlantType potatoesType = new PotatoesPlantType();
 	public final PumpkinPlantType pumpkinType = new PumpkinPlantType();
+	public final SeaPicklePlantType seaPickleType = new SeaPicklePlantType();
 	public final SugarCanePlantType sugarCaneType = new SugarCanePlantType();
 	public final SweetBerryPlantType sweetBerryPlantType =
 		new SweetBerryPlantType();
@@ -50,8 +51,8 @@ public final class AutoFarmPlantTypeManager
 		List.of(amethystType, bambooType, beetrootsType, cactusType,
 			carrotsType, chorusFruitType, cocoaBeanType, glowBerryType,
 			kelpType, melonType, netherWartType, pitcherPlantType, potatoesType,
-			pumpkinType, sugarCaneType, sweetBerryPlantType, torchflowerType,
-			twistingVinesType, weepingVinesType, wheatType);
+			pumpkinType, seaPickleType, sugarCaneType, sweetBerryPlantType,
+			torchflowerType, twistingVinesType, weepingVinesType, wheatType);
 	
 	public final ToggleAllPlantTypesSetting toggleAllSetting =
 		new ToggleAllPlantTypesSetting("All plant types",

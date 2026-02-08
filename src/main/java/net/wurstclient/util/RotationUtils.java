@@ -116,8 +116,12 @@ public enum RotationUtils
 	 */
 	public static Rotation slowlyTurnTowards(Rotation end, float maxChange)
 	{
-		float startYaw = MC.player.yRotLast;
-		float startPitch = MC.player.xRotLast;
+		LocalPlayer player = MC.player;
+		
+		float startYaw =
+			player.isPassenger() ? player.getYRot() : player.yRotLast;
+		float startPitch =
+			player.isPassenger() ? player.getXRot() : player.xRotLast;
 		float endYaw = end.yaw();
 		float endPitch = end.pitch();
 		
