@@ -61,6 +61,8 @@
     "WorldEnvironmentAttributeAccessMixin",
     "WorldMixin",
     "WorldRendererMixin",
+    "ClientPacketListenerMixin",
+    "MultiPlayerGameModeMixin"
     "freecam.CameraMixin",
     "freecam.ItemInHandRendererMixin",
     "freecam.LocalPlayerMixin",

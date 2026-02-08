@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.wurstclient.util.TradingUtils;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,6 +36,8 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.AirStrafingSpeedListener.AirStrafingSpeedEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
@@ -321,5 +324,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 				includeFluids);
 		
 		return original.call(instance, maxDistance, tickDelta, true);
+	}
+	
+	@Inject(at = @At("HEAD"), method = "closeContainer")
+	private void onCloseContainer(CallbackInfo ci)
+	{
+		TradingUtils.setWindowOpen(false);
 	}
 }

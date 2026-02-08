@@ -58,6 +58,7 @@ import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.*;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
+import net.wurstclient.data.MerchantPacket;
 
 @SearchTags({"auto librarian", "AutoVillager", "auto villager",
 	"VillagerTrainer", "villager trainer", "LibrarianTrainer",
@@ -106,6 +107,11 @@ public final class AutoLibrarianHack extends Hack
 			+ "Can be adjusted from 0 (off) to 100 remaining uses.",
 		1, 0, 100, 1, ValueDisplay.INTEGER.withLabel(0, "off"));
 	
+	public final CheckboxSetting enableGuiLessTradeDetection =
+		new CheckboxSetting("GUI-less Trade Detection",
+			"When enabled, GUI-less Trade Detection allows AutoLibrarian to monitor network packets for trade detection instead of requiring the GUI to be opened.",
+			false);
+	
 	private final OverlayRenderer overlay = new OverlayRenderer();
 	private final HashSet<Villager> experiencedVillagers = new HashSet<>();
 	
@@ -126,6 +132,7 @@ public final class AutoLibrarianHack extends Hack
 		addSetting(faceTarget);
 		addSetting(swingHand);
 		addSetting(repairMode);
+		addSetting(enableGuiLessTradeDetection);
 	}
 	
 	@Override
@@ -187,16 +194,119 @@ public final class AutoLibrarianHack extends Hack
 			return;
 		}
 		
-		if(!(MC.screen instanceof MerchantScreen tradeScreen))
+		if(enableGuiLessTradeDetection.isChecked())
 		{
-			openTradeScreen();
-			return;
+			if(MerchantPacket.packet == null
+				|| MerchantPacket.lastEntityId == 0)
+			{
+				return;
+			}
+			
+			if(handleTradeLockedVillager(MerchantPacket.packet.getVillagerXp()))
+			{
+				return;
+			}
+			
+			BookOffer bookOffer =
+				findEnchantedBookOffer(MerchantPacket.packet.getOffers());
+			if(handleIfNotSellingEnchantedBook(bookOffer))
+			{
+				return;
+			}
+			
+			if(handleUnwantedBookOffer(bookOffer))
+			{
+				return;
+			}
+			
+			if(lockInTrade.isChecked())
+			{
+				ChatUtils.warning(
+					"Lock In Trade is not available in GUI-less Trade Detection mode!");
+			}
+			
+			updateBooks.getSelected().update(wantedBooks, bookOffer);
+			MerchantPacket.reset();
+		}else
+		{
+			if(!(MC.screen instanceof MerchantScreen tradeScreen))
+			{
+				openTradeScreen();
+				return;
+			}
+			
+			// Can't see experience until the trade screen is open, so we have
+			// to
+			// check it here and start over if the villager is already
+			// experienced.
+			int experience = tradeScreen.getMenu().getTraderXp();
+			if(handleTradeLockedVillager(experience))
+			{
+				closeTradeScreen();
+				return;
+			}
+			
+			// check which book the villager is selling
+			BookOffer bookOffer =
+				findEnchantedBookOffer(tradeScreen.getMenu().getOffers());
+			
+			if(handleIfNotSellingEnchantedBook(bookOffer))
+			{
+				closeTradeScreen();
+				return;
+			}
+			
+			// if wrong enchantment, break job site and start over
+			if(handleUnwantedBookOffer(bookOffer))
+			{
+				closeTradeScreen();
+				return;
+			}
+			
+			// lock in the trade, if enabled
+			if(lockInTrade.isChecked())
+			{
+				// select the first valid trade
+				tradeScreen.getMenu().setSelectionHint(0);
+				tradeScreen.getMenu().tryMoveItems(0);
+				MC.getConnection().send(new ServerboundSelectTradePacket(0));
+				
+				// buy whatever the villager is selling
+				MC.gameMode.handleInventoryMouseClick(
+					tradeScreen.getMenu().containerId, 2, 0, ClickType.PICKUP,
+					MC.player);
+				
+				// close the trade screen
+				closeTradeScreen();
+			}
+			
+			// update wanted books based on the user's settings
+			updateBooks.getSelected().update(wantedBooks, bookOffer);
 		}
 		
-		// Can't see experience until the trade screen is open, so we have to
-		// check it here and start over if the villager is already experienced.
-		int experience = tradeScreen.getMenu().getTraderXp();
-		if(experience > 0)
+		ChatUtils.message("Done!");
+		setEnabled(false);
+	}
+	
+	private boolean handleIfNotSellingEnchantedBook(BookOffer bookOffer)
+	{
+		if(bookOffer == null)
+		{
+			ChatUtils.message("Villager is not selling an enchanted book.");
+			breakingJobSite = true;
+			System.out.println("Breaking job site...");
+			return true;
+		}
+		
+		ChatUtils.message(
+			"Villager is selling " + bookOffer.getEnchantmentNameWithLevel()
+				+ " for " + bookOffer.getFormattedPrice() + ".");
+		return false;
+	}
+	
+	private boolean handleTradeLockedVillager(int exp)
+	{
+		if(exp > 0)
 		{
 			ChatUtils.warning("Villager at "
 				+ villager.blockPosition().toShortString()
@@ -205,58 +315,20 @@ public final class AutoLibrarianHack extends Hack
 			experiencedVillagers.add(villager);
 			villager = null;
 			jobSite = null;
-			closeTradeScreen();
-			return;
+			return true;
 		}
-		
-		// check which book the villager is selling
-		BookOffer bookOffer =
-			findEnchantedBookOffer(tradeScreen.getMenu().getOffers());
-		
-		if(bookOffer == null)
-		{
-			ChatUtils.message("Villager is not selling an enchanted book.");
-			closeTradeScreen();
-			breakingJobSite = true;
-			System.out.println("Breaking job site...");
-			return;
-		}
-		
-		ChatUtils.message(
-			"Villager is selling " + bookOffer.getEnchantmentNameWithLevel()
-				+ " for " + bookOffer.getFormattedPrice() + ".");
-		
-		// if wrong enchantment, break job site and start over
+		return false;
+	}
+	
+	private boolean handleUnwantedBookOffer(BookOffer bookOffer)
+	{
 		if(!wantedBooks.isWanted(bookOffer))
 		{
 			breakingJobSite = true;
 			System.out.println("Breaking job site...");
-			closeTradeScreen();
-			return;
+			return true;
 		}
-		
-		// lock in the trade, if enabled
-		if(lockInTrade.isChecked())
-		{
-			// select the first valid trade
-			tradeScreen.getMenu().setSelectionHint(0);
-			tradeScreen.getMenu().tryMoveItems(0);
-			MC.getConnection().send(new ServerboundSelectTradePacket(0));
-			
-			// buy whatever the villager is selling
-			MC.gameMode.handleInventoryMouseClick(
-				tradeScreen.getMenu().containerId, 2, 0, ClickType.PICKUP,
-				MC.player);
-			
-			// close the trade screen
-			closeTradeScreen();
-		}
-		
-		// update wanted books based on the user's settings
-		updateBooks.getSelected().update(wantedBooks, bookOffer);
-		
-		ChatUtils.message("Done!");
-		setEnabled(false);
+		return false;
 	}
 	
 	private void breakJobSite()
