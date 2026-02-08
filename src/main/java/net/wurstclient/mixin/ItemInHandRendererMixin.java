@@ -23,7 +23,7 @@ import net.minecraft.world.item.Items;
 import net.wurstclient.WurstClient;
 
 @Mixin(ItemInHandRenderer.class)
-public abstract class HeldItemRendererMixin
+public abstract class ItemInHandRendererMixin
 {
 	/**
 	 * This mixin is injected into the `BLOCK` case of the `item.getUseAction()`

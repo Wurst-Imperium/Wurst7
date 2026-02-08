@@ -194,7 +194,6 @@ public class WurstTranslator implements ResourceManagerReloadListener
 			// be caught to prevent mod detection vulnerabilities using
 			// intentionally corrupted resource packs.
 			for(Resource resource : manager.getResourceStack(langId))
-			{
 				try(InputStream stream = resource.open())
 				{
 					if(isBuiltInWurstResourcePack(resource))
@@ -213,7 +212,6 @@ public class WurstTranslator implements ResourceManagerReloadListener
 							+ langCode);
 					e.printStackTrace();
 				}
-			}
 		}
 	}
 	

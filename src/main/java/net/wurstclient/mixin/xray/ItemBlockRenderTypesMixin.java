@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.xray;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,7 +19,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.WurstClient;
 
 @Mixin(ItemBlockRenderTypes.class)
-public abstract class RenderLayersMixin
+public abstract class ItemBlockRenderTypesMixin
 {
 	/**
 	 * Puts all blocks on the translucent layer if Opacity X-Ray is enabled.

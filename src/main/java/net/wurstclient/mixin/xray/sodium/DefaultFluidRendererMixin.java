@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin.sodium;
+package net.wurstclient.mixin.xray.sodium;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -22,8 +22,6 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.hacks.XRayHack;
 
 /**
@@ -49,12 +47,13 @@ public class DefaultFluidRendererMixin
 		BlockPos pos, Direction dir, BlockState state, FluidState fluid,
 		CallbackInfoReturnable<Boolean> cir)
 	{
-		// Note: the null BlockPos is here to skip the "exposed only" check
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
-		EventManager.fire(event);
+		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
 		
-		if(event.isRendered() != null)
-			cir.setReturnValue(!event.isRendered());
+		// Note: the null BlockPos is here to skip the "exposed only" check
+		Boolean shouldDrawSide = xray.shouldDrawSide(state, null);
+		
+		if(shouldDrawSide != null)
+			cir.setReturnValue(!shouldDrawSide);
 	}
 	
 	/**
@@ -69,21 +68,21 @@ public class DefaultFluidRendererMixin
 	private void onIsSideExposed(BlockAndTintGetter world, int x, int y, int z,
 		Direction dir, float height, CallbackInfoReturnable<Boolean> cir)
 	{
+		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
 		BlockPos pos = new BlockPos(x, y, z);
 		BlockState state = world.getBlockState(pos);
 		
 		// Note: the null BlockPos is here to skip the "exposed only" check
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(state, null);
-		EventManager.fire(event);
+		Boolean shouldDrawSide = xray.shouldDrawSide(state, null);
 		
-		if(event.isRendered() == null)
+		if(shouldDrawSide == null)
 			return;
 		
 		BlockPos nPos = pos.offset(dir.getUnitVec3i());
 		BlockState neighborState = world.getBlockState(nPos);
 		
 		cir.setReturnValue(!neighborState.getFluidState().getType()
-			.isSame(state.getFluidState().getType()) && event.isRendered());
+			.isSame(state.getFluidState().getType()) && shouldDrawSide);
 	}
 	
 	/**

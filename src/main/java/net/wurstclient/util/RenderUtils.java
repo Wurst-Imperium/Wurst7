@@ -19,7 +19,6 @@ import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Camera;
-import net.minecraft.client.CameraType;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -70,6 +69,15 @@ public enum RenderUtils
 			return Vec3.ZERO;
 		
 		return camera.position();
+	}
+	
+	public static Rotation getCameraRotation()
+	{
+		Camera camera = WurstClient.MC.gameRenderer.getMainCamera();
+		if(camera == null)
+			return new Rotation(0, 0);
+		
+		return new Rotation(camera.yRot(), camera.xRot());
 	}
 	
 	public static BlockPos getCameraBlockPos()
@@ -126,12 +134,7 @@ public enum RenderUtils
 	
 	private static Vec3 getTracerOrigin(float partialTicks)
 	{
-		Vec3 start = RotationUtils.getClientLookVec(partialTicks).scale(10);
-		if(WurstClient.MC.options
-			.getCameraType() == CameraType.THIRD_PERSON_FRONT)
-			start = start.reverse();
-		
-		return start;
+		return getCameraRotation().toLookVec().scale(10);
 	}
 	
 	public static void drawTracer(PoseStack matrices, float partialTicks,

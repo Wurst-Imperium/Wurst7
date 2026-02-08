@@ -40,9 +40,10 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.TakeItemsFromSetting;
+import net.wurstclient.settings.TakeItemsFromSetting.TakeItemsFrom;
 import net.wurstclient.util.InventoryUtils;
 
 @SearchTags({"auto eat", "AutoFood", "auto food", "AutoFeeder", "auto feeder",
@@ -66,9 +67,8 @@ public final class AutoEatHack extends Hack implements UpdateListener
 			"description.wurst.setting.autoeat.injury_threshold", 1.5, 0.5, 10,
 			0.5, ValueDisplay.DECIMAL);
 	
-	private final EnumSetting<TakeItemsFrom> takeItemsFrom = new EnumSetting<>(
-		"Take items from", "description.wurst.setting.autoeat.take_items_from",
-		TakeItemsFrom.values(), TakeItemsFrom.HOTBAR);
+	private final TakeItemsFromSetting takeItemsFrom =
+		TakeItemsFromSetting.withHands(this, TakeItemsFrom.HOTBAR);
 	
 	private final CheckboxSetting allowOffhand =
 		new CheckboxSetting("Allow offhand", true);
@@ -209,7 +209,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		FoodProperties bestFood = null;
 		int bestSlot = -1;
 		
-		int maxInvSlot = takeItemsFrom.getSelected().maxInvSlot;
+		int maxInvSlot = takeItemsFrom.getMaxInvSlot();
 		
 		ArrayList<Integer> slots = new ArrayList<>();
 		if(maxInvSlot == 0)
@@ -334,29 +334,5 @@ public final class AutoEatHack extends Hack implements UpdateListener
 	{
 		int injuryThresholdI = (int)(injuryThreshold.getValue() * 2);
 		return player.getHealth() < player.getMaxHealth() - injuryThresholdI;
-	}
-	
-	private enum TakeItemsFrom
-	{
-		HANDS("Hands", 0),
-		
-		HOTBAR("Hotbar", 9),
-		
-		INVENTORY("Inventory", 36);
-		
-		private final String name;
-		private final int maxInvSlot;
-		
-		private TakeItemsFrom(String name, int maxInvSlot)
-		{
-			this.name = name;
-			this.maxInvSlot = maxInvSlot;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }

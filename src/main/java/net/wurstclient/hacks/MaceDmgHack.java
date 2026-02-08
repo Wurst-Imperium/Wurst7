@@ -48,9 +48,9 @@ public final class MaceDmgHack extends Hack
 		if(!MC.player.getMainHandItem().is(Items.MACE))
 			return;
 			
-		// See ServerPlayNetworkHandler.onPlayerMove()
+		// See ServerGamePacketListenerImpl.handleMovePlayer()
 		// for why it's using these numbers.
-		// Also, let me know if you find a way to bypass that check in 1.21.
+		// Also, let me know if you find a way to bypass that check.
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
 		sendFakeY(Math.sqrt(500));

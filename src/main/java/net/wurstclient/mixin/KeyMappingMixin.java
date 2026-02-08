@@ -20,31 +20,39 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IKeyBinding;
+import net.wurstclient.mixinterface.IKeyMapping;
 
 @Mixin(KeyMapping.class)
-public abstract class KeyBindingMixin implements IKeyBinding
+public abstract class KeyMappingMixin implements IKeyMapping
 {
 	@Shadow
 	private InputConstants.Key key;
 	
 	@Override
 	@Unique
-	@Deprecated // use IKeyBinding.resetPressedState() instead
-	public void wurst_resetPressedState()
+	@Deprecated // use IKeyMapping.isActuallyDown() instead
+	public boolean wurst_isActuallyDown()
 	{
 		Window window = WurstClient.MC.getWindow();
 		int code = key.getValue();
 		
 		if(key.getType() == InputConstants.Type.MOUSE)
-			setDown(GLFW.glfwGetMouseButton(window.handle(), code) == 1);
-		else
-			setDown(InputConstants.isKeyDown(window, code));
+			return GLFW.glfwGetMouseButton(window.handle(), code) == 1;
+		
+		return InputConstants.isKeyDown(window, code);
 	}
 	
 	@Override
 	@Unique
-	@Deprecated // use IKeyBinding.simulatePress() instead
+	@Deprecated // use IKeyMapping.resetPressedState() instead
+	public void wurst_resetPressedState()
+	{
+		setDown(wurst_isActuallyDown());
+	}
+	
+	@Override
+	@Unique
+	@Deprecated // use IKeyMapping.simulatePress() instead
 	public void wurst_simulatePress(boolean pressed)
 	{
 		Minecraft mc = WurstClient.MC;
@@ -69,7 +77,7 @@ public abstract class KeyBindingMixin implements IKeyBinding
 			break;
 			
 			default:
-			System.out.println("Unknown keybinding type: " + key.getType());
+			System.out.println("Unknown key mapping type: " + key.getType());
 			break;
 		}
 	}

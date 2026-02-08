@@ -7,6 +7,8 @@
  */
 package net.wurstclient.other_feature;
 
+import java.util.Objects;
+
 import net.wurstclient.Feature;
 
 public abstract class OtherFeature extends Feature
@@ -16,8 +18,12 @@ public abstract class OtherFeature extends Feature
 	
 	public OtherFeature(String name, String description)
 	{
-		this.name = name;
-		this.description = description;
+		this.name = Objects.requireNonNull(name);
+		this.description = Objects.requireNonNull(description);
+		
+		if(name.contains(" "))
+			throw new IllegalArgumentException(
+				"Feature name must not contain spaces: " + name);
 	}
 	
 	@Override

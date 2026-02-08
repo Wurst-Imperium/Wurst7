@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.xray;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -24,8 +24,6 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ShouldDrawSideListener.ShouldDrawSideEvent;
 import net.wurstclient.hacks.XRayHack;
 
 @Mixin(LiquidBlockRenderer.class)
@@ -46,18 +44,18 @@ public class FluidRendererMixin
 		BlockAndTintGetter world, BlockPos pos, VertexConsumer vertexConsumer,
 		BlockState blockState, FluidState fluidState)
 	{
-		// Note: the null BlockPos is here to skip the "exposed only" check
-		ShouldDrawSideEvent event = new ShouldDrawSideEvent(blockState, null);
-		EventManager.fire(event);
-		
 		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
+		
+		// Note: the null BlockPos is here to skip the "exposed only" check
+		Boolean shouldDrawSide = xray.shouldDrawSide(blockState, null);
+		
 		if(!xray.isOpacityMode() || xray.isVisible(blockState.getBlock(), pos))
 			currentOpacity.set(1F);
 		else
 			currentOpacity.set(xray.getOpacityFloat());
 		
-		if(event.isRendered() != null)
-			return !event.isRendered();
+		if(shouldDrawSide != null)
+			return !shouldDrawSide;
 		
 		return original.call(side, height, neighborState);
 	}
