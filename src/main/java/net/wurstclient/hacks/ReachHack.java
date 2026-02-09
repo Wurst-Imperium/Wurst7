@@ -31,6 +31,7 @@ public final class ReachHack extends Hack
 		return range.getValue();
 	}
 	
-	// See ClientPlayerEntityMixin.getBlockInteractionRange() and
-	// ClientPlayerEntityMixin.getEntityInteractionRange()
+	// See LocalPlayerMixin.blockInteractionRange() and
+	// LocalPlayerMixin.entityInteractionRange()
 }
+
