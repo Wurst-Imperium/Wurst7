@@ -7,15 +7,12 @@
  */
 package net.wurstclient.mixin;
 
-import java.nio.ByteBuffer;
-
-import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
+import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.FogRenderer;
 import net.wurstclient.WurstClient;
 
@@ -26,24 +23,16 @@ public class FogRendererMixin
 	 * Removes the fog near the end of the render distance in all dimensions, if
 	 * NoFog is enabled.
 	 */
-	@WrapOperation(
-		method = "setupFog(Lnet/minecraft/client/Camera;ILnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;)Lorg/joml/Vector4f;",
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/fog/FogRenderer;updateBuffer(Ljava/nio/ByteBuffer;ILorg/joml/Vector4f;FFFFFF)V"))
-	private void wrapApplyFog(FogRenderer instance, ByteBuffer buffer,
-		int bufPos, Vector4f fogColor, float environmentalStart,
-		float environmentalEnd, float renderDistanceStart,
-		float renderDistanceEnd, float skyEnd, float cloudEnd,
-		Operation<Void> original)
+	@ModifyReturnValue(at = @At("RETURN"),
+		method = "setupFog(Lnet/minecraft/client/Camera;ILnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;)Lnet/minecraft/client/renderer/fog/FogData;")
+	private FogData modifyFogData(FogData fog)
 	{
 		if(WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
 		{
-			renderDistanceStart = 1000000;
-			renderDistanceEnd = 1000000;
+			fog.renderDistanceStart = 1000000;
+			fog.renderDistanceEnd = 1000000;
 		}
 		
-		original.call(instance, buffer, bufPos, fogColor, environmentalStart,
-			environmentalEnd, renderDistanceStart, renderDistanceEnd, skyEnd,
-			cloudEnd);
+		return fog;
 	}
 }

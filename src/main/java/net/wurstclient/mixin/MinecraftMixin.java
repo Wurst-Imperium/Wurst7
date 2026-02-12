@@ -40,11 +40,11 @@ import net.wurstclient.events.HandleInputListener.HandleInputEvent;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.ILocalPlayer;
-import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 
 @Mixin(Minecraft.class)
-public abstract class MinecraftClientMixin
+public abstract class MinecraftMixin
 	extends ReentrantBlockableEventLoop<Runnable>
 	implements WindowEventHandler, IMinecraftClient
 {
@@ -62,9 +62,10 @@ public abstract class MinecraftClientMixin
 	private User wurstSession;
 	private ProfileKeyPairManager wurstProfileKeys;
 	
-	private MinecraftClientMixin(WurstClient wurst, String name)
+	private MinecraftMixin(WurstClient wurst, String name,
+		boolean propagatesCrashes)
 	{
-		super(name);
+		super(name, propagatesCrashes);
 	}
 	
 	@Inject(at = @At(value = "INVOKE",

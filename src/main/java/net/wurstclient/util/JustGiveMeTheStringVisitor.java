@@ -7,7 +7,7 @@
  */
 package net.wurstclient.util;
 
-import net.minecraft.client.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSink;
 

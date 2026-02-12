@@ -20,9 +20,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 
-import net.minecraft.client.GuiMessage;
-import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MessageSignature;
 import net.wurstclient.WurstClient;
@@ -30,17 +31,17 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 
 @Mixin(ChatComponent.class)
-public class ChatHudMixin
+public class ChatComponentMixin
 {
 	@Shadow
 	@Final
 	private List<GuiMessage.Line> trimmedMessages;
 	
 	@Inject(at = @At("HEAD"),
-		method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V",
+		method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V",
 		cancellable = true)
 	private void onAddMessage(Component messageDontUse,
-		@Nullable MessageSignature signature,
+		@Nullable MessageSignature signature, GuiMessageSource source,
 		@Nullable GuiMessageTag indicatorDontUse, CallbackInfo ci,
 		@Local(argsOnly = true) LocalRef<Component> message,
 		@Local(argsOnly = true) LocalRef<GuiMessageTag> indicator)

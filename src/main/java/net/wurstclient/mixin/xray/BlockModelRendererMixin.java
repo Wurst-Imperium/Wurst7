@@ -11,19 +11,19 @@ import java.util.List;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.renderer.block.BakedQuadOutput;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.state.BlockState;
@@ -68,12 +68,18 @@ public abstract class BlockModelRendererMixin implements ItemLike
 	 * Applies X-Ray's opacity mask to the block color after all the normal
 	 * coloring and shading is done, if neither Sodium nor Indigo are running.
 	 */
-	@ModifyConstant(
-		method = "putQuadData(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;Lnet/minecraft/client/renderer/block/ModelBlockRenderer$CommonRenderStorage;I)V",
-		constant = @Constant(floatValue = 1F))
-	private float modifyOpacity(float original)
+	@ModifyArg(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/client/renderer/block/BakedQuadOutput;put(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;Lcom/mojang/blaze3d/vertex/QuadBrightness;ILcom/mojang/blaze3d/vertex/QuadLightmapCoords;I)V"),
+		method = "putQuadData(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/renderer/block/BakedQuadOutput;Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;Lnet/minecraft/client/renderer/block/ModelBlockRenderer$CommonRenderStorage;I)V",
+		index = 3)
+	private int modifyOpacity(int tintColor)
 	{
-		return currentOpacity.get();
+		float opacity = currentOpacity.get();
+		if(opacity >= 1F)
+			return tintColor;
+		
+		return ARGB.color(Math.round(255F * opacity), ARGB.red(tintColor),
+			ARGB.green(tintColor), ARGB.blue(tintColor));
 	}
 	
 	/**
@@ -85,13 +91,13 @@ public abstract class BlockModelRendererMixin implements ItemLike
 			target = "Ljava/util/List;isEmpty()Z",
 			ordinal = 1),
 		method = {
-			"tesselateWithoutAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V",
-			"tesselateWithAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V"})
+			"tesselateWithoutAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/block/BakedQuadOutput;ZI)V",
+			"tesselateWithAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/block/BakedQuadOutput;ZI)V"})
 	private boolean pretendEmptyToStopSecondRenderModelFaceFlatCall(
 		List<BakedQuad> instance, Operation<Boolean> original,
 		BlockAndTintGetter world, List<BlockModelPart> list, BlockState state,
-		BlockPos pos, PoseStack poseStack, VertexConsumer vertexConsumer,
-		boolean cull, int light)
+		BlockPos pos, PoseStack poseStack, BakedQuadOutput output, boolean cull,
+		int light)
 	{
 		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
 		Boolean shouldDrawSide = xray.shouldDrawSide(state, pos);

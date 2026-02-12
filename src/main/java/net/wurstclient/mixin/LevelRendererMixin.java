@@ -13,38 +13,28 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.wurstclient.WurstClient;
+import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.RenderListener.RenderEvent;
 
 @Mixin(LevelRenderer.class)
-public class WorldRendererMixin
+public class LevelRendererMixin
 {
-	@Inject(at = @At("HEAD"),
-		method = "doesMobEffectBlockSky(Lnet/minecraft/client/Camera;)Z",
-		cancellable = true)
-	private void onHasBlindnessOrDarkness(Camera camera,
-		CallbackInfoReturnable<Boolean> ci)
-	{
-		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
-			ci.setReturnValue(false);
-	}
-	
 	@Inject(at = @At("RETURN"),
-		method = "renderLevel(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V")
+		method = "renderLevel(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/renderer/state/CameraRenderState;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;ZLnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;)V")
 	private void onRender(GraphicsResourceAllocator allocator,
-		DeltaTracker tickCounter, boolean renderBlockOutline, Camera camera,
-		Matrix4f positionMatrix, Matrix4f projectionMatrix, Matrix4f matrix4f2,
-		GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl,
+		DeltaTracker tickCounter, boolean renderBlockOutline,
+		CameraRenderState cameraState, Matrix4f positionMatrix,
+		GpuBufferSlice gpuBufferSlice, Vector4f vector4f,
+		boolean shouldRenderSky, ChunkSectionsToRender chunkSectionsToRender,
 		CallbackInfo ci)
 	{
 		PoseStack matrixStack = new PoseStack();

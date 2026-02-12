@@ -10,8 +10,7 @@ package net.wurstclient.mixin.xray;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -20,6 +19,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.block.LiquidBlockRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -27,7 +27,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.XRayHack;
 
 @Mixin(LiquidBlockRenderer.class)
-public class FluidRendererMixin
+public class LiquidBlockRendererMixin
 {
 	@Unique
 	private static final ThreadLocal<Float> currentOpacity =
@@ -63,11 +63,17 @@ public class FluidRendererMixin
 	/**
 	 * Modifies opacity of fluids when using X-Ray without Sodium installed.
 	 */
-	@ModifyConstant(
-		method = "vertex(Lcom/mojang/blaze3d/vertex/VertexConsumer;FFFFFFFFI)V",
-		constant = @Constant(floatValue = 1F, ordinal = 0))
-	private float modifyOpacity(float original)
+	@ModifyArg(at = @At(value = "INVOKE",
+		target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;addVertex(FFFIFFIIFFF)V"),
+		method = "vertex(Lcom/mojang/blaze3d/vertex/VertexConsumer;FFFIFFI)V",
+		index = 3)
+	private int modifyOpacity(int color)
 	{
-		return currentOpacity.get();
+		float opacity = currentOpacity.get();
+		if(opacity >= 1F)
+			return color;
+		
+		return ARGB.color(Math.round(255F * opacity), ARGB.red(color),
+			ARGB.green(color), ARGB.blue(color));
 	}
 }

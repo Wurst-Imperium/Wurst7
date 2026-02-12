@@ -10,7 +10,7 @@ package net.wurstclient.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.network.chat.Component;
 import net.wurstclient.event.CancellableEvent;
 import net.wurstclient.event.Listener;

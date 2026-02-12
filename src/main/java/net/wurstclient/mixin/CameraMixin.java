@@ -11,9 +11,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.world.level.material.FogType;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.CameraDistanceHack;
@@ -49,5 +53,43 @@ public abstract class CameraMixin
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
 			cir.setReturnValue(FogType.NONE);
+	}
+	
+	/**
+	 * Prevents blindness and darkness effects from changing the sky when
+	 * AntiBlind is enabled.
+	 *
+	 * <p>
+	 * In 26.1-snapshot-7, those effects don't appear to visibly change the sky
+	 * even without this mixin. Might be a bug in that snapshot.
+	 */
+	@Inject(at = @At("RETURN"),
+		method = "extractRenderState(Lnet/minecraft/client/renderer/state/CameraRenderState;F)V")
+	private void onExtractRenderState(CameraRenderState cameraState,
+		float partialTicks, CallbackInfo ci)
+	{
+		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
+			cameraState.entityRenderState.doesMobEffectBlockSky = false;
+	}
+	
+	/**
+	 * Makes the zoom work.
+	 */
+	@ModifyReturnValue(at = @At("RETURN"), method = "calculateFov(F)F")
+	private float onCalculateFov(float original)
+	{
+		return WurstClient.INSTANCE.getOtfs().zoomOtf
+			.changeFovBasedOnZoom(original);
+	}
+	
+	/**
+	 * Moves the hand in first person mode out of the way as you zoom in
+	 * further.
+	 */
+	@ModifyReturnValue(at = @At("RETURN"), method = "calculateHudFov(F)F")
+	private float onCalculateHudFov(float original)
+	{
+		return WurstClient.INSTANCE.getOtfs().zoomOtf
+			.changeFovBasedOnZoom(original);
 	}
 }

@@ -13,12 +13,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
@@ -28,27 +28,22 @@ import net.wurstclient.hacks.FullbrightHack;
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin implements AutoCloseable
 {
+	/**
+	 * Prevents view bobbing when hacks disable it.
+	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/GameRenderer;bobView(Lcom/mojang/blaze3d/vertex/PoseStack;F)V",
+		target = "Lnet/minecraft/client/renderer/GameRenderer;bobView(Lnet/minecraft/client/renderer/state/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
 		ordinal = 0),
 		method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V")
-	private void onBobView(GameRenderer instance, PoseStack matrices,
-		float tickDelta, Operation<Void> original)
+	private void onBobView(GameRenderer instance, CameraRenderState cameraState,
+		PoseStack matrices, Operation<Void> original)
 	{
 		CameraTransformViewBobbingEvent event =
 			new CameraTransformViewBobbingEvent();
 		EventManager.fire(event);
 		
 		if(!event.isCancelled())
-			original.call(instance, matrices, tickDelta);
-	}
-	
-	@ModifyReturnValue(at = @At("RETURN"),
-		method = "getFov(Lnet/minecraft/client/Camera;FZ)F")
-	private float onGetFov(float original)
-	{
-		return WurstClient.INSTANCE.getOtfs().zoomOtf
-			.changeFovBasedOnZoom(original);
+			original.call(instance, cameraState, matrices);
 	}
 	
 	@WrapOperation(
@@ -78,11 +73,14 @@ public abstract class GameRendererMixin implements AutoCloseable
 			cir.setReturnValue(fullbright.getNightVisionStrength());
 	}
 	
+	/**
+	 * Makes NoHurtcam work.
+	 */
 	@Inject(at = @At("HEAD"),
-		method = "bobHurt(Lcom/mojang/blaze3d/vertex/PoseStack;F)V",
+		method = "bobHurt(Lnet/minecraft/client/renderer/state/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
 		cancellable = true)
-	private void onTiltViewWhenHurt(PoseStack matrices, float tickDelta,
-		CallbackInfo ci)
+	private void onTiltViewWhenHurt(CameraRenderState cameraState,
+		PoseStack matrices, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
 			ci.cancel();
