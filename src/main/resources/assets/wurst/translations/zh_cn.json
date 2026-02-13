@@ -1,4 +1,4 @@
-﻿{
+{
     "description.wurst.hack.aimassist":  "帮助你瞄准附近的实体。",
     "description.wurst.setting.aimassist.fov":  "视野范围 - 实体与准星相距多远会被忽略。\n360° = 会瞄准你周围所有实体。",
     "description.wurst.setting.aimassist.ignore_mouse_input":  "在 AimAssist 瞄准时忽略部分鼠标输入，使你更难不小心偏离目标。",
