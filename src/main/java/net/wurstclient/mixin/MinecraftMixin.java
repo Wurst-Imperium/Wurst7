@@ -121,7 +121,7 @@ public abstract class MinecraftMixin
 			ci.cancel();
 	}
 	
-	@Inject(at = @At("HEAD"), method = "pickBlock()V")
+	@Inject(at = @At("HEAD"), method = "pickBlockOrEntity()V")
 	private void onDoItemPick(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
