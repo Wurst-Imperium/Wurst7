@@ -176,7 +176,8 @@ public final class InstaBuildHack extends Hack
 				continue;
 			
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
-			if(params == null || params.distanceSq() > range.getValueSq())
+			if(params == null || params.distanceSq() > range.getValueSq()
+				|| params.requiresSneaking())
 				continue;
 			
 			if(useSavedBlocks.isChecked() && item != Items.AIR

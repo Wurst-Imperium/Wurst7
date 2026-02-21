@@ -216,7 +216,8 @@ public final class AutoFarmHack extends Hack
 				
 				BlockPlacingParams params =
 					BlockPlacer.getBlockPlacingParams(pos);
-				if(params == null || params.distanceSq() > range.getValueSq())
+				if(params == null || params.distanceSq() > range.getValueSq()
+					|| params.requiresSneaking())
 					continue;
 				
 				if(checkLOS.isChecked() && !params.lineOfSight())
@@ -233,7 +234,8 @@ public final class AutoFarmHack extends Hack
 		for(BlockPos pos : blocksToReplant)
 		{
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
-			if(params == null || params.distanceSq() > range.getValueSq())
+			if(params == null || params.distanceSq() > range.getValueSq()
+				|| params.requiresSneaking())
 				continue;
 			
 			AutoFarmPlantType plantType = replantingSpots.get(pos);

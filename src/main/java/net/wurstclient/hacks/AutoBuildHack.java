@@ -241,6 +241,7 @@ public final class AutoBuildHack extends Hack
 			
 			BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
 			if(params == null || params.distanceSq() > rangeSq
+				|| params.requiresSneaking()
 				|| checkLOS.isChecked() && !params.lineOfSight())
 				if(strictBuildOrder.isChecked())
 					return;

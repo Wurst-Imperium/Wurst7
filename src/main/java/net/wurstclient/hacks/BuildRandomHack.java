@@ -162,7 +162,8 @@ public final class BuildRandomHack extends Hack
 			return false;
 		
 		BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(pos);
-		if(params == null || params.distanceSq() > range.getValueSq())
+		if(params == null || params.distanceSq() > range.getValueSq()
+			|| params.requiresSneaking())
 			return false;
 		if(checkLOS.isChecked() && !params.lineOfSight())
 			return false;
