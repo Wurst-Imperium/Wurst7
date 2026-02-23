@@ -23,11 +23,11 @@ public abstract class MobEntityRendererMixin
 	 * Makes name-tagged mobs always show their name tags if configured in
 	 * NameTags.
 	 */
-	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;crosshairPickEntity:Lnet/minecraft/world/entity/Entity;",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 0),
-		method = "shouldShowName(Lnet/minecraft/world/entity/Mob;D)Z",
+	@Inject(method = "shouldShowName(Lnet/minecraft/world/entity/Mob;D)Z",
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;crosshairPickEntity:Lnet/minecraft/world/entity/Entity;",
+			opcode = Opcodes.GETFIELD,
+			ordinal = 0),
 		cancellable = true)
 	private void onHasLabel(CallbackInfoReturnable<Boolean> cir)
 	{

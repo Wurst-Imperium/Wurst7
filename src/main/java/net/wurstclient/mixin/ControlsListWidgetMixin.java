@@ -34,10 +34,11 @@ public abstract class ControlsListWidgetMixin
 	/**
 	 * Prevents Wurst's zoom keybind from being added to the controls list.
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/gui/screens/options/controls/KeyBindsList;addEntry(Lnet/minecraft/client/gui/components/AbstractSelectionList$Entry;)I",
-		ordinal = 1),
-		method = "<init>(Lnet/minecraft/client/gui/screens/options/controls/KeyBindsScreen;Lnet/minecraft/client/Minecraft;)V")
+	@WrapOperation(
+		method = "<init>(Lnet/minecraft/client/gui/screens/options/controls/KeyBindsScreen;Lnet/minecraft/client/Minecraft;)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/screens/options/controls/KeyBindsList;addEntry(Lnet/minecraft/client/gui/components/AbstractSelectionList$Entry;)I",
+			ordinal = 1))
 	private int dontAddZoomEntry(KeyBindsList instance,
 		AbstractSelectionList.Entry<?> entry, Operation<Integer> original)
 	{

@@ -43,8 +43,9 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 		super(owner, propertyMap, codec);
 	}
 	
-	@Inject(at = @At("TAIL"),
+	@Inject(
 		method = "isCollisionShapeFullBlock(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Z",
+		at = @At("TAIL"),
 		cancellable = true)
 	private void onIsFullCube(BlockGetter world, BlockPos pos,
 		CallbackInfoReturnable<Boolean> cir)
@@ -55,8 +56,9 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 		cir.setReturnValue(cir.getReturnValue() && !event.isCancelled());
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetOutlineShape(BlockGetter view, BlockPos pos,
 		CollisionContext context, CallbackInfoReturnable<VoxelShape> cir)
@@ -75,8 +77,9 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 		cir.setReturnValue(Shapes.empty());
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetCollisionShape(BlockGetter world, BlockPos pos,
 		CollisionContext context, CallbackInfoReturnable<VoxelShape> cir)

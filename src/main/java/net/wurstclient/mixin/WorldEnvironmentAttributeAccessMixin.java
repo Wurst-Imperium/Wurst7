@@ -23,10 +23,10 @@ import net.wurstclient.hacks.NoWeatherHack;
 public abstract class WorldEnvironmentAttributeAccessMixin
 	implements EnvironmentAttributeReader
 {
-	@ModifyReturnValue(at = @At("RETURN"),
-		method = {
-			"getDimensionValue(Lnet/minecraft/world/attribute/EnvironmentAttribute;)Ljava/lang/Object;",
-			"getValue(Lnet/minecraft/world/attribute/EnvironmentAttribute;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/attribute/SpatialAttributeInterpolator;)Ljava/lang/Object;"},
+	@ModifyReturnValue(method = {
+		"getDimensionValue(Lnet/minecraft/world/attribute/EnvironmentAttribute;)Ljava/lang/Object;",
+		"getValue(Lnet/minecraft/world/attribute/EnvironmentAttribute;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/attribute/SpatialAttributeInterpolator;)Ljava/lang/Object;"},
+		at = @At("RETURN"),
 		require = 2)
 	public Object onGetAttributeValue(Object original,
 		EnvironmentAttribute<?> attribute)

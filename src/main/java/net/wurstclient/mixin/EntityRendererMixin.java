@@ -31,9 +31,10 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	/**
 	 * Disables the nametag distance limit if configured in NameTags.
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"),
-		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V")
+	@WrapOperation(
+		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"))
 	private double fakeSquaredDistanceToCamera(
 		EntityRenderDispatcher dispatcher, Entity entity,
 		Operation<Double> original,
@@ -51,8 +52,9 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	 * Restores the true squared distance so we don't break other code that
 	 * might rely on it.
 	 */
-	@Inject(at = @At("TAIL"),
-		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V")
+	@Inject(
+		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V",
+		at = @At("TAIL"))
 	private void restoreSquaredDistanceToCamera(T entity, S state,
 		float tickDelta, CallbackInfo ci,
 		@Share("actualDistanceSq") LocalDoubleRef actualDistanceSq)
@@ -66,8 +68,9 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	 * the health values are always up-to-date and automatically revert when
 	 * HealthTags is disabled.
 	 */
-	@Inject(at = @At("TAIL"),
-		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V")
+	@Inject(
+		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V",
+		at = @At("TAIL"))
 	private void addHealthToDisplayName(T entity, S state, float tickProgress,
 		CallbackInfo ci)
 	{

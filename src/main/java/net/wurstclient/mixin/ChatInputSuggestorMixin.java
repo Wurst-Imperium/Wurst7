@@ -32,7 +32,7 @@ public abstract class ChatInputSuggestorMixin
 	@Shadow
 	private CompletableFuture<Suggestions> pendingSuggestions;
 	
-	@Inject(at = @At("TAIL"), method = "updateCommandInfo()V")
+	@Inject(method = "updateCommandInfo()V", at = @At("TAIL"))
 	private void onRefresh(CallbackInfo ci)
 	{
 		AutoCompleteHack autoComplete =

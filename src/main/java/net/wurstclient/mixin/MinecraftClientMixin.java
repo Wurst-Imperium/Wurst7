@@ -67,9 +67,10 @@ public abstract class MinecraftClientMixin
 		super(name);
 	}
 	
-	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/server/Services;create(Lcom/mojang/authlib/yggdrasil/YggdrasilAuthenticationService;Ljava/io/File;)Lnet/minecraft/server/Services;",
-		shift = At.Shift.AFTER), method = "<init>")
+	@Inject(method = "<init>",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/server/Services;create(Lcom/mojang/authlib/yggdrasil/YggdrasilAuthenticationService;Ljava/io/File;)Lnet/minecraft/server/Services;",
+			shift = At.Shift.AFTER))
 	private void captureAuthenticationService(GameConfig args, CallbackInfo ci,
 		@Local YggdrasilAuthenticationService yggdrasilAuthenticationService)
 	{
@@ -81,9 +82,10 @@ public abstract class MinecraftClientMixin
 	 * the <code>overlay == null && currentScreen == null</code> check in
 	 * {@link Minecraft#tick()}.
 	 */
-	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/Minecraft;overlay:Lnet/minecraft/client/gui/screens/Overlay;",
-		ordinal = 0), method = "tick()V")
+	@Inject(method = "tick()V",
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/Minecraft;overlay:Lnet/minecraft/client/gui/screens/Overlay;",
+			ordinal = 0))
 	private void onHandleInputEvents(CallbackInfo ci)
 	{
 		// Make sure this event is not fired outside of gameplay
@@ -93,9 +95,11 @@ public abstract class MinecraftClientMixin
 		EventManager.fire(HandleInputEvent.INSTANCE);
 	}
 	
-	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/Minecraft;hitResult:Lnet/minecraft/world/phys/HitResult;",
-		ordinal = 0), method = "startAttack()Z", cancellable = true)
+	@Inject(method = "startAttack()Z",
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/Minecraft;hitResult:Lnet/minecraft/world/phys/HitResult;",
+			ordinal = 0),
+		cancellable = true)
 	private void onDoAttack(CallbackInfoReturnable<Boolean> cir)
 	{
 		LeftClickEvent event = new LeftClickEvent();
@@ -105,11 +109,10 @@ public abstract class MinecraftClientMixin
 			cir.setReturnValue(false);
 	}
 	
-	@Inject(
+	@Inject(method = "startUseItem()V",
 		at = @At(value = "FIELD",
 			target = "Lnet/minecraft/client/Minecraft;rightClickDelay:I",
 			ordinal = 0),
-		method = "startUseItem()V",
 		cancellable = true)
 	private void onDoItemUse(CallbackInfo ci)
 	{
@@ -120,7 +123,7 @@ public abstract class MinecraftClientMixin
 			ci.cancel();
 	}
 	
-	@Inject(at = @At("HEAD"), method = "pickBlock()V")
+	@Inject(method = "pickBlock()V", at = @At("HEAD"))
 	private void onDoItemPick(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -137,7 +140,7 @@ public abstract class MinecraftClientMixin
 	 * Allows hacks to cancel vanilla block breaking and replace it with their
 	 * own. Useful for Nuker-like hacks.
 	 */
-	@Inject(at = @At("HEAD"), method = "continueAttack(Z)V", cancellable = true)
+	@Inject(method = "continueAttack(Z)V", at = @At("HEAD"), cancellable = true)
 	private void onHandleBlockBreaking(boolean breaking, CallbackInfo ci)
 	{
 		HandleBlockBreakingEvent event = new HandleBlockBreakingEvent();
@@ -147,8 +150,8 @@ public abstract class MinecraftClientMixin
 			ci.cancel();
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "getUser()Lnet/minecraft/client/User;",
+	@Inject(method = "getUser()Lnet/minecraft/client/User;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetSession(CallbackInfoReturnable<User> cir)
 	{
@@ -156,8 +159,8 @@ public abstract class MinecraftClientMixin
 			cir.setReturnValue(wurstSession);
 	}
 	
-	@Inject(at = @At("RETURN"),
-		method = "getGameProfile()Lcom/mojang/authlib/GameProfile;",
+	@Inject(method = "getGameProfile()Lcom/mojang/authlib/GameProfile;",
+		at = @At("RETURN"),
 		cancellable = true)
 	public void onGetGameProfile(CallbackInfoReturnable<GameProfile> cir)
 	{
@@ -170,8 +173,9 @@ public abstract class MinecraftClientMixin
 		cir.setReturnValue(newProfile);
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getProfileKeyPairManager()Lnet/minecraft/client/multiplayer/ProfileKeyPairManager;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetProfileKeys(
 		CallbackInfoReturnable<ProfileKeyPairManager> cir)
@@ -185,15 +189,15 @@ public abstract class MinecraftClientMixin
 		cir.setReturnValue(wurstProfileKeys);
 	}
 	
-	@Inject(at = @At("HEAD"), method = "allowsTelemetry()Z", cancellable = true)
+	@Inject(method = "allowsTelemetry()Z", at = @At("HEAD"), cancellable = true)
 	private void onIsTelemetryEnabledByApi(CallbackInfoReturnable<Boolean> cir)
 	{
 		cir.setReturnValue(
 			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "extraTelemetryAvailable()Z",
+	@Inject(method = "extraTelemetryAvailable()Z",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onIsOptionalTelemetryEnabledByApi(
 		CallbackInfoReturnable<Boolean> cir)

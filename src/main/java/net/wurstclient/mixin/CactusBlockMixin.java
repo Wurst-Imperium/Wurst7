@@ -31,8 +31,9 @@ public abstract class CactusBlockMixin extends Block
 		super(settings);
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getCollisionShape(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetCollisionShape(BlockState state, BlockGetter world,
 		BlockPos pos, CollisionContext context,

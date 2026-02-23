@@ -32,8 +32,9 @@ public class ClientWorldMixin
 	/**
 	 * This is the part that makes BarrierESP work.
 	 */
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getMarkerParticleTarget()Lnet/minecraft/world/level/block/Block;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetBlockParticle(CallbackInfoReturnable<Block> cir)
 	{

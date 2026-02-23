@@ -32,10 +32,11 @@ public abstract class ClientConnectionMixin
 	private ConcurrentLinkedQueue<ConnectionPacketOutputEvent> events =
 		new ConcurrentLinkedQueue<>();
 	
-	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/network/Connection;genericsFtw(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;)V",
-		ordinal = 0),
+	@Inject(
 		method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/protocol/Packet;)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/network/Connection;genericsFtw(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;)V",
+			ordinal = 0),
 		cancellable = true)
 	private void onChannelRead0(ChannelHandlerContext context, Packet<?> packet,
 		CallbackInfo ci)
@@ -49,8 +50,9 @@ public abstract class ClientConnectionMixin
 	
 	// These mixins target the second "send" method. The one with two arguments.
 	
-	@ModifyVariable(at = @At("HEAD"),
-		method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;)V")
+	@ModifyVariable(
+		method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;)V",
+		at = @At("HEAD"))
 	public Packet<?> modifyPacket(Packet<?> packet)
 	{
 		ConnectionPacketOutputEvent event =
@@ -60,8 +62,9 @@ public abstract class ClientConnectionMixin
 		return event.getPacket();
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onSend(Packet<?> packet,
 		@Nullable ChannelFutureListener callback, CallbackInfo ci)

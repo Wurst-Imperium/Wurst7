@@ -30,8 +30,9 @@ public abstract class CreativeInventoryScreenMixin
 		super(screenHandler, inventory, title);
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "hasPermissions(Lnet/minecraft/world/entity/player/Player;)Z",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onShouldShowOperatorTab(Player player,
 		CallbackInfoReturnable<Boolean> cir)

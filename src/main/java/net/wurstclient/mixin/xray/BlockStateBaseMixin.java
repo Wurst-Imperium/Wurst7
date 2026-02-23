@@ -35,8 +35,9 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 	 * This, together with the gamma override, makes ores bright enough to see
 	 * when using X-Ray.
 	 */
-	@ModifyReturnValue(at = @At("RETURN"),
-		method = "getShadeBrightness(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F")
+	@ModifyReturnValue(
+		method = "getShadeBrightness(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F",
+		at = @At("RETURN"))
 	private float modifyShadeBrightness(float original)
 	{
 		if(!WurstClient.INSTANCE.getHax().xRayHack.isEnabled())

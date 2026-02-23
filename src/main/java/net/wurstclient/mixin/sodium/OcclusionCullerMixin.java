@@ -29,8 +29,9 @@ public class OcclusionCullerMixin
 	 * Makes VisGraphEvent work when Sodium is installed. Sodium replaces
 	 * vanilla's SectionOcclusionGraph with its own OcclusionCuller.
 	 */
-	@ModifyVariable(at = @At("HEAD"),
+	@ModifyVariable(
 		method = "findVisible(Lnet/caffeinemc/mods/sodium/client/render/chunk/lists/RenderSectionVisitor;Lnet/caffeinemc/mods/sodium/client/render/viewport/Viewport;FZI)V",
+		at = @At("HEAD"),
 		argsOnly = true,
 		ordinal = 0,
 		require = 0,

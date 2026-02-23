@@ -36,7 +36,7 @@ public class MultiplayerScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(at = @At("HEAD"), method = "init()V")
+	@Inject(method = "init()V", at = @At("HEAD"))
 	private void beforeVanillaButtons(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -52,9 +52,10 @@ public class MultiplayerScreenMixin extends Screen
 		addRenderableWidget(lastServerButton);
 	}
 	
-	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen;repositionElements()V",
-		ordinal = 0), method = "init()V")
+	@Inject(method = "init()V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen;repositionElements()V",
+			ordinal = 0))
 	private void afterVanillaButtons(CallbackInfo ci,
 		@Local(ordinal = 1) LinearLayout footerTopRow,
 		@Local(ordinal = 2) LinearLayout footerBottomRow)
@@ -79,14 +80,14 @@ public class MultiplayerScreenMixin extends Screen
 		footerBottomRow.addChild(cleanUpButton);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "repositionElements()V")
+	@Inject(method = "repositionElements()V", at = @At("TAIL"))
 	private void onRefreshWidgetPositions(CallbackInfo ci)
 	{
 		updateLastServerButton();
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "join(Lnet/minecraft/client/multiplayer/ServerData;)V")
+	@Inject(method = "join(Lnet/minecraft/client/multiplayer/ServerData;)V",
+		at = @At("HEAD"))
 	private void onConnect(ServerData entry, CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(entry);

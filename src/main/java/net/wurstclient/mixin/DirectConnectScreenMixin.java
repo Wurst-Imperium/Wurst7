@@ -33,7 +33,7 @@ public class DirectConnectScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "onSelect()V")
+	@Inject(method = "onSelect()V", at = @At("TAIL"))
 	private void onSaveAndClose(CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(serverData);

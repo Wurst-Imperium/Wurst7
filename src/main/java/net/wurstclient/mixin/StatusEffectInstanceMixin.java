@@ -19,8 +19,8 @@ import net.wurstclient.WurstClient;
 public abstract class StatusEffectInstanceMixin
 	implements Comparable<MobEffectInstance>
 {
-	@Inject(at = @At("HEAD"),
-		method = "tickDownDuration()V",
+	@Inject(method = "tickDownDuration()V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onUpdateDuration(CallbackInfo ci)
 	{

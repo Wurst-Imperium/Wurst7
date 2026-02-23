@@ -32,15 +32,15 @@ public abstract class ChatScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "init()V")
+	@Inject(method = "init()V", at = @At("TAIL"))
 	protected void onInit(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().infiniChatHack.isEnabled())
 			input.setMaxLength(Integer.MAX_VALUE);
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "handleChatInput(Ljava/lang/String;Z)V",
+	@Inject(method = "handleChatInput(Ljava/lang/String;Z)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	public void onSendMessage(String message, boolean addToHistory,
 		CallbackInfo ci)

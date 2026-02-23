@@ -22,9 +22,9 @@ import net.wurstclient.events.VisGraphListener.VisGraphEvent;
 @Mixin(SectionOcclusionGraph.class)
 public class SectionOcclusionGraphMixin
 {
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/chunk/SectionMesh;facesCanSeeEachother(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;)Z"),
-		method = "runUpdates")
+	@WrapOperation(method = "runUpdates",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/chunk/SectionMesh;facesCanSeeEachother(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;)Z"))
 	private boolean wrapFacesCanSeeEachother(SectionMesh mesh, Direction from,
 		Direction to, Operation<Boolean> original)
 	{

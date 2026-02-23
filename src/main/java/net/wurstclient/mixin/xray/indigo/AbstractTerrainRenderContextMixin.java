@@ -34,8 +34,9 @@ public abstract class AbstractTerrainRenderContextMixin
 	 * Applies X-Ray's opacity mask to the block color after all the normal
 	 * coloring and shading is done, if Indigo is running.
 	 */
-	@Inject(at = @At("RETURN"),
+	@Inject(
 		method = "shadeQuad(Lnet/fabricmc/fabric/impl/client/indigo/renderer/mesh/MutableQuadViewImpl;ZZZ)V",
+		at = @At("RETURN"),
 		require = 0)
 	private void onShadeQuad(MutableQuadViewImpl quad, boolean ao,
 		boolean emissive, boolean vanillaShade, CallbackInfo ci)

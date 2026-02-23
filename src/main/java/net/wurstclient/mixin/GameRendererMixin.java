@@ -28,10 +28,10 @@ import net.wurstclient.hacks.FullbrightHack;
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin implements AutoCloseable
 {
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/GameRenderer;bobView(Lcom/mojang/blaze3d/vertex/PoseStack;F)V",
-		ordinal = 0),
-		method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V")
+	@WrapOperation(method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/GameRenderer;bobView(Lcom/mojang/blaze3d/vertex/PoseStack;F)V",
+			ordinal = 0))
 	private void onBobView(GameRenderer instance, PoseStack matrices,
 		float tickDelta, Operation<Void> original)
 	{
@@ -43,19 +43,18 @@ public abstract class GameRendererMixin implements AutoCloseable
 			original.call(instance, matrices, tickDelta);
 	}
 	
-	@ModifyReturnValue(at = @At("RETURN"),
-		method = "getFov(Lnet/minecraft/client/Camera;FZ)F")
+	@ModifyReturnValue(method = "getFov(Lnet/minecraft/client/Camera;FZ)F",
+		at = @At("RETURN"))
 	private float onGetFov(float original)
 	{
 		return WurstClient.INSTANCE.getOtfs().zoomOtf
 			.changeFovBasedOnZoom(original);
 	}
 	
-	@WrapOperation(
+	@WrapOperation(method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/util/Mth;lerp(FFF)F",
-			ordinal = 0),
-		method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V")
+			ordinal = 0))
 	private float onRenderWorldNauseaLerp(float delta, float start, float end,
 		Operation<Float> original)
 	{
@@ -65,8 +64,9 @@ public abstract class GameRendererMixin implements AutoCloseable
 		return 0;
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getNightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
+		at = @At("HEAD"),
 		cancellable = true)
 	private static void onGetNightVisionStrength(LivingEntity entity,
 		float tickDelta, CallbackInfoReturnable<Float> cir)
@@ -78,8 +78,8 @@ public abstract class GameRendererMixin implements AutoCloseable
 			cir.setReturnValue(fullbright.getNightVisionStrength());
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "bobHurt(Lcom/mojang/blaze3d/vertex/PoseStack;F)V",
+	@Inject(method = "bobHurt(Lcom/mojang/blaze3d/vertex/PoseStack;F)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onTiltViewWhenHurt(PoseStack matrices, float tickDelta,
 		CallbackInfo ci)

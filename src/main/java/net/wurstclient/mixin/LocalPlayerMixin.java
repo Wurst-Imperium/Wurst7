@@ -62,9 +62,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		super(world, profile);
 	}
 	
-	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/player/AbstractClientPlayer;tick()V",
-		ordinal = 0), method = "tick()V")
+	@Inject(method = "tick()V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/AbstractClientPlayer;tick()V",
+			ordinal = 0))
 	private void onTick(CallbackInfo ci)
 	{
 		EventManager.fire(UpdateEvent.INSTANCE);
@@ -73,9 +74,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	/**
 	 * This mixin makes AutoSprint's "Omnidirectional Sprint" setting work.
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/player/ClientInput;hasForwardImpulse()Z",
-		ordinal = 0), method = "aiStep()V")
+	@WrapOperation(method = "aiStep()V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/ClientInput;hasForwardImpulse()Z",
+			ordinal = 0))
 	private boolean wrapHasForwardMovement(ClientInput input,
 		Operation<Boolean> original)
 	{
@@ -89,9 +91,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	 * Allows NoSlowdown to intercept the isBlockedFromSprinting() call in
 	 * tickMovement().
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/player/LocalPlayer;isSlowDueToUsingItem()Z",
-		ordinal = 0), method = "aiStep()V")
+	@WrapOperation(method = "aiStep()V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;isSlowDueToUsingItem()Z",
+			ordinal = 0))
 	private boolean wrapTickMovementItemUse(LocalPlayer instance,
 		Operation<Boolean> original)
 	{
@@ -101,27 +104,28 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		return original.call(instance);
 	}
 	
-	@Inject(at = @At("HEAD"), method = "sendPosition()V")
+	@Inject(method = "sendPosition()V", at = @At("HEAD"))
 	private void onSendMovementPacketsHEAD(CallbackInfo ci)
 	{
 		EventManager.fire(PreMotionEvent.INSTANCE);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "sendPosition()V")
+	@Inject(method = "sendPosition()V", at = @At("TAIL"))
 	private void onSendMovementPacketsTAIL(CallbackInfo ci)
 	{
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V")
+	@Inject(
+		method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
+		at = @At("HEAD"))
 	private void onMove(MoverType type, Vec3 offset, CallbackInfo ci)
 	{
 		EventManager.fire(PlayerMoveEvent.INSTANCE);
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "isAutoJumpEnabled()Z",
+	@Inject(method = "isAutoJumpEnabled()Z",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onIsAutoJumpEnabled(CallbackInfoReturnable<Boolean> cir)
 	{
@@ -133,10 +137,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	 * When PortalGUI is enabled, this mixin temporarily sets the current screen
 	 * to null to prevent the updateNausea() method from closing it.
 	 */
-	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 0), method = "handlePortalTransitionEffect(Z)V")
+	@Inject(method = "handlePortalTransitionEffect(Z)V",
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;",
+			opcode = Opcodes.GETFIELD,
+			ordinal = 0))
 	private void beforeTickNausea(boolean fromPortalEffect, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
@@ -150,10 +155,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	 * This mixin restores the current screen as soon as the updateNausea()
 	 * method is done looking at it.
 	 */
-	@Inject(at = @At(value = "FIELD",
-		target = "Lnet/minecraft/client/player/LocalPlayer;portalEffectIntensity:F",
-		opcode = Opcodes.GETFIELD,
-		ordinal = 1), method = "handlePortalTransitionEffect(Z)V")
+	@Inject(method = "handlePortalTransitionEffect(Z)V",
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/player/LocalPlayer;portalEffectIntensity:F",
+			opcode = Opcodes.GETFIELD,
+			ordinal = 1))
 	private void afterTickNausea(boolean fromPortalEffect, CallbackInfo ci)
 	{
 		if(tempCurrentScreen == null)
@@ -167,8 +173,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	 * This mixin allows AutoSprint to enable sprinting even when the player is
 	 * too hungry.
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "isSprintingPossible(Z)Z",
+	@Inject(method = "isSprintingPossible(Z)Z",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onCanSprint(boolean allowTouchingWater,
 		CallbackInfoReturnable<Boolean> cir)
@@ -309,10 +315,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	/**
 	 * This is the part that makes Liquids work.
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;",
-		ordinal = 0),
-		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;")
+	@WrapOperation(
+		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;",
+			ordinal = 0))
 	private static HitResult liquidsRaycast(Entity instance, double maxDistance,
 		float tickDelta, boolean includeFluids, Operation<HitResult> original)
 	{

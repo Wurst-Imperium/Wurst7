@@ -26,8 +26,9 @@ public class BlockEntityRenderDispatcherMixin
 	/*
 	 * Hides block entities like chests when X-Ray is enabled.
 	 */
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "submit(Lnet/minecraft/client/renderer/blockentity/state/BlockEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private <S extends BlockEntityRenderState> void onRenderRenderState(
 		S renderState, PoseStack matrices, SubmitNodeCollector queue,

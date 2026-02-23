@@ -29,13 +29,13 @@ public abstract class DeathScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "tick()V")
+	@Inject(method = "tick()V", at = @At("TAIL"))
 	private void onTick(CallbackInfo ci)
 	{
 		EventManager.fire(DeathEvent.INSTANCE);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "init()V")
+	@Inject(method = "init()V", at = @At("TAIL"))
 	private void onInit(CallbackInfo ci)
 	{
 		AutoRespawnHack autoRespawn =

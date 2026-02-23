@@ -30,14 +30,14 @@ public abstract class MouseHandlerMixin
 	@Shadow
 	private double accumulatedDY;
 	
-	@Inject(at = @At("RETURN"), method = "onScroll(JDD)V")
+	@Inject(method = "onScroll(JDD)V", at = @At("RETURN"))
 	private void onOnScroll(long window, double horizontal, double vertical,
 		CallbackInfo ci)
 	{
 		EventManager.fire(new MouseScrollEvent(vertical));
 	}
 	
-	@Inject(at = @At("HEAD"), method = "handleAccumulatedMovement()V")
+	@Inject(method = "handleAccumulatedMovement()V", at = @At("HEAD"))
 	private void onHandleAccumulatedMovement(CallbackInfo ci)
 	{
 		MouseUpdateEvent event =
@@ -47,9 +47,9 @@ public abstract class MouseHandlerMixin
 		accumulatedDY = event.getDeltaY();
 	}
 	
-	@WrapWithCondition(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlot(I)V"),
-		method = "onScroll(JDD)V")
+	@WrapWithCondition(method = "onScroll(JDD)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlot(I)V"))
 	private boolean wrapOnScroll(Inventory inventory, int slot)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;

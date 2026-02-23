@@ -22,10 +22,11 @@ public abstract class LivingEntityRendererMixin
 	/**
 	 * Forces the nametag to be rendered if configured in NameTags.
 	 */
-	@Inject(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/Minecraft;getInstance()Lnet/minecraft/client/Minecraft;",
-		ordinal = 0),
+	@Inject(
 		method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/Minecraft;getInstance()Lnet/minecraft/client/Minecraft;",
+			ordinal = 0),
 		cancellable = true)
 	private void shouldForceLabel(LivingEntity entity, double distanceSq,
 		CallbackInfoReturnable<Boolean> cir)

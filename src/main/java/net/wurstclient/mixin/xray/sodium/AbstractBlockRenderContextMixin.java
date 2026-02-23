@@ -40,8 +40,8 @@ public class AbstractBlockRenderContextMixin
 	/**
 	 * Hides and shows blocks when using X-Ray with Sodium installed.
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "isFaceCulled(Lnet/minecraft/class_2350;)Z",
+	@Inject(method = "isFaceCulled(Lnet/minecraft/class_2350;)Z",
+		at = @At("HEAD"),
 		cancellable = true,
 		remap = false,
 		require = 0)

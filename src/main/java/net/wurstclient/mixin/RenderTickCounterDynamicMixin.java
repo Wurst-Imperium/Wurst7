@@ -23,12 +23,11 @@ public abstract class RenderTickCounterDynamicMixin
 	@Shadow
 	public float deltaTicks;
 	
-	@Inject(
+	@Inject(method = "advanceGameTime(J)I",
 		at = @At(value = "FIELD",
 			target = "Lnet/minecraft/client/DeltaTracker$Timer;lastMs:J",
 			opcode = Opcodes.PUTFIELD,
-			ordinal = 0),
-		method = "advanceGameTime(J)I")
+			ordinal = 0))
 	public void onBeginRenderTick(long timeMillis,
 		CallbackInfoReturnable<Integer> cir)
 	{

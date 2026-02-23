@@ -29,8 +29,8 @@ import net.wurstclient.events.RenderListener.RenderEvent;
 @Mixin(LevelRenderer.class)
 public class WorldRendererMixin
 {
-	@Inject(at = @At("HEAD"),
-		method = "doesMobEffectBlockSky(Lnet/minecraft/client/Camera;)Z",
+	@Inject(method = "doesMobEffectBlockSky(Lnet/minecraft/client/Camera;)Z",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onHasBlindnessOrDarkness(Camera camera,
 		CallbackInfoReturnable<Boolean> ci)
@@ -39,8 +39,9 @@ public class WorldRendererMixin
 			ci.setReturnValue(false);
 	}
 	
-	@Inject(at = @At("RETURN"),
-		method = "renderLevel(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V")
+	@Inject(
+		method = "renderLevel(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V",
+		at = @At("RETURN"))
 	private void onRender(GraphicsResourceAllocator allocator,
 		DeltaTracker tickCounter, boolean renderBlockOutline, Camera camera,
 		Matrix4f positionMatrix, Matrix4f projectionMatrix, Matrix4f matrix4f2,
