@@ -9,7 +9,9 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.minecraft.client.renderer.SectionOcclusionGraph;
 import net.minecraft.client.renderer.chunk.SectionMesh;
@@ -20,11 +22,11 @@ import net.wurstclient.events.VisGraphListener.VisGraphEvent;
 @Mixin(SectionOcclusionGraph.class)
 public class SectionOcclusionGraphMixin
 {
-	@Redirect(at = @At(value = "INVOKE",
+	@WrapOperation(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/client/renderer/chunk/SectionMesh;facesCanSeeEachother(Lnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;)Z"),
 		method = "runUpdates")
-	private boolean onFacesCanSeeEachother(SectionMesh mesh, Direction from,
-		Direction to)
+	private boolean wrapFacesCanSeeEachother(SectionMesh mesh, Direction from,
+		Direction to, Operation<Boolean> original)
 	{
 		VisGraphEvent event = new VisGraphEvent();
 		EventManager.fire(event);
@@ -32,6 +34,6 @@ public class SectionOcclusionGraphMixin
 		if(event.isCancelled())
 			return true;
 		
-		return mesh.facesCanSeeEachother(from, to);
+		return original.call(mesh, from, to);
 	}
 }
