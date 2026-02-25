@@ -86,13 +86,6 @@ public class WurstTest implements FabricClientGameTest
 		// Disable chunk fade
 		context.runOnClient(mc -> mc.options.chunkSectionFadeInTime().set(0.0));
 		
-		// Re-apply gamerules since setting them in the world builder doesn't
-		// work as of 26.1-snapshot-8
-		runCommand(server, "gamerule send_command_feedback false");
-		runCommand(server, "gamerule advance_time false");
-		runCommand(server, "gamerule advance_weather false");
-		runCommand(server, "gamerule spawn_mobs false");
-		
 		runCommand(server, "time set noon");
 		runCommand(server, "tp 0 -57 0");
 		runCommand(server, "fill ~ ~-3 ~ ~ ~-1 ~ smooth_stone");
