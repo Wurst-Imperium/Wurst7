@@ -36,7 +36,7 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 		1, 1, 64, 1, ValueDisplay.INTEGER);
 	
 	private final RandomSource random =
-		RandomSource.createNewThreadLocalInstance();
+		RandomSource.createThreadLocalInstance();
 	
 	public ItemGeneratorHack()
 	{

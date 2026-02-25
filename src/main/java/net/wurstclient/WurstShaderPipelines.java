@@ -8,9 +8,12 @@
 package net.wurstclient;
 
 import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import java.util.Optional;
+
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderPipeline.Snippet;
-import com.mojang.blaze3d.platform.DepthTestFunction;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
@@ -29,7 +32,8 @@ public enum WurstShaderPipelines
 			RenderPipelines.GLOBALS_SNIPPET)
 		.withVertexShader(Identifier.parse("wurst:core/fogless_lines"))
 		.withFragmentShader(Identifier.parse("wurst:core/fogless_lines"))
-		.withBlend(BlendFunction.TRANSLUCENT).withCull(false)
+		.withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+		.withCull(false)
 		.withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH,
 			Mode.LINES)
 		.buildSnippet();
@@ -41,7 +45,7 @@ public enum WurstShaderPipelines
 		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
 			.withLocation(
 				Identifier.parse("wurst:pipeline/wurst_depth_test_lines"))
-			.build());
+			.withDepthStencilState(DepthStencilState.DEFAULT).build());
 	
 	/**
 	 * Similar to the LINES ShaderPipeline, but with no depth test or fog.
@@ -49,7 +53,7 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline ESP_LINES =
 		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
 			.withLocation(Identifier.parse("wurst:pipeline/wurst_esp_lines"))
-			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
+			.build());
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with culling enabled.
@@ -57,8 +61,7 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline QUADS = RenderPipelines
 		.register(RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
 			.withLocation(Identifier.parse("wurst:pipeline/wurst_quads"))
-			.withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-			.build());
+			.withDepthStencilState(DepthStencilState.DEFAULT).build());
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with culling enabled
@@ -67,7 +70,7 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline ESP_QUADS = RenderPipelines
 		.register(RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
 			.withLocation(Identifier.parse("wurst:pipeline/wurst_esp_quads"))
-			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
+			.withDepthStencilState(Optional.empty()).build());
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with no depth test.
@@ -75,6 +78,5 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline ESP_QUADS_NO_CULLING = RenderPipelines
 		.register(RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
 			.withLocation(Identifier.parse("wurst:pipeline/wurst_esp_quads"))
-			.withCull(false)
-			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
+			.withDepthStencilState(Optional.empty()).withCull(false).build());
 }

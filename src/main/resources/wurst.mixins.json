@@ -68,7 +68,6 @@
     "xray.BlockEntityRenderDispatcherMixin",
     "xray.BlockModelRendererMixin",
     "xray.BlockStateBaseMixin",
-    "xray.ItemBlockRenderTypesMixin",
     "xray.LiquidBlockRendererMixin",
     "xray.SectionCompilerMixin",
     "xray.indigo.AbstractTerrainRenderContextMixin",

@@ -58,7 +58,7 @@ public final class AntiAfkHack extends Hack
 			"description.wurst.setting.antiafk.show_wait_time", true);
 	
 	private int timer;
-	private RandomSource random = RandomSource.createNewThreadLocalInstance();
+	private RandomSource random = RandomSource.createThreadLocalInstance();
 	private BlockPos start;
 	private BlockPos nextBlock;
 	
