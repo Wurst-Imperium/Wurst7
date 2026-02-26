@@ -9,11 +9,14 @@ package net.wurstclient.mixin.xray;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.serialization.MapCodec;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,15 +37,21 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 	/*
 	 * This, together with the gamma override, makes ores bright enough to see
 	 * when using X-Ray.
+	 *
+	 * Uses priority 980 to be applied before Iris's MixinBlockStateBehavior
+	 * with priority 990.
 	 */
-	@ModifyReturnValue(
+	@Inject(
 		method = "getShadeBrightness(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F",
-		at = @At("RETURN"))
-	private float modifyShadeBrightness(float original)
+		at = @At("RETURN"),
+		cancellable = true,
+		order = 980)
+	private void onGetShadeBrightness(BlockGetter blockGetter,
+		BlockPos blockPos, CallbackInfoReturnable<Float> original)
 	{
 		if(!WurstClient.INSTANCE.getHax().xRayHack.isEnabled())
-			return original;
+			return;
 		
-		return 1;
+		original.setReturnValue(1F);
 	}
 }
