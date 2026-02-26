@@ -120,9 +120,12 @@ public final class BindsCmd extends Command
 	{
 		String key = displayKey.toLowerCase();
 		
-		String prefix = "key.keyboard.";
-		if(!key.startsWith(prefix))
-			key = prefix + key;
+		if(key.startsWith("key.mouse.") || key.startsWith("key.keyboard."))
+			; // Already has a full prefix
+		else if(key.startsWith("mouse."))
+			key = "key." + key;
+		else
+			key = "key.keyboard." + key;
 		
 		try
 		{

@@ -188,8 +188,7 @@ public final class KeybindManagerScreen extends Screen
 			
 			Font tr = minecraft.font;
 			
-			String keyText =
-				"Key: " + keybind.getKey().replace("key.keyboard.", "");
+			String keyText = "Key: " + Keybind.getDisplayKey(keybind.getKey());
 			context.drawString(tr, keyText, x + 3, y + 3,
 				WurstColors.VERY_LIGHT_GRAY, false);
 			

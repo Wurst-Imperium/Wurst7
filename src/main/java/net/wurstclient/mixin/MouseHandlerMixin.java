@@ -16,9 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 
 import net.minecraft.client.MouseHandler;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.world.entity.player.Inventory;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
+import net.wurstclient.events.MouseButtonPressListener.MouseButtonPressEvent;
 import net.wurstclient.events.MouseScrollListener.MouseScrollEvent;
 import net.wurstclient.events.MouseUpdateListener.MouseUpdateEvent;
 
@@ -29,6 +31,16 @@ public abstract class MouseHandlerMixin
 	private double accumulatedDX;
 	@Shadow
 	private double accumulatedDY;
+	
+	@Inject(
+		method = "onButton(JLnet/minecraft/client/input/MouseButtonInfo;I)V",
+		at = @At("HEAD"))
+	private void onOnButton(long windowHandle, MouseButtonInfo mouseButtonInfo,
+		int action, CallbackInfo ci)
+	{
+		EventManager
+			.fire(new MouseButtonPressEvent(mouseButtonInfo.button(), action));
+	}
 	
 	@Inject(method = "onScroll(JDD)V", at = @At("RETURN"))
 	private void onOnScroll(long window, double horizontal, double vertical,

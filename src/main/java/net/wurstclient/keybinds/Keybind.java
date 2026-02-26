@@ -9,6 +9,8 @@ package net.wurstclient.keybinds;
 
 import java.util.Objects;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 public class Keybind implements Comparable<Keybind>
 {
 	private final String key;
@@ -56,6 +58,22 @@ public class Keybind implements Comparable<Keybind>
 	@Override
 	public String toString()
 	{
-		return key.replace("key.keyboard.", "") + " -> " + commands;
+		return getDisplayKey(key) + " -> " + commands;
+	}
+	
+	/**
+	 * Converts a key identifier like "key.keyboard.w" or "key.mouse.left" to a
+	 * translated display string like "W" or "Left Button".
+	 */
+	public static String getDisplayKey(String key)
+	{
+		try
+		{
+			return InputConstants.getKey(key).getDisplayName().getString();
+			
+		}catch(IllegalArgumentException e)
+		{
+			return key;
+		}
 	}
 }
