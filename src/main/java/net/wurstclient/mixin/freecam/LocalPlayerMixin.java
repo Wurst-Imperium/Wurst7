@@ -15,12 +15,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.HitResult;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.FreecamHack;
 
@@ -78,5 +82,22 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		}
 		
 		super.turn(deltaYaw, deltaPitch);
+	}
+	
+	@WrapOperation(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;",
+		ordinal = 0),
+		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;")
+	private static HitResult modifyPick(Entity instance, double maxDistance,
+		float partialTicks, boolean includeFluids,
+		Operation<HitResult> original)
+	{
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(freecam.isMovingCamera())
+			return freecam.raytrace(instance, maxDistance, partialTicks,
+				includeFluids);
+		
+		return original.call(instance, maxDistance, partialTicks,
+			includeFluids);
 	}
 }
