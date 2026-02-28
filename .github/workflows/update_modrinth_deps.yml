@@ -5,6 +5,10 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
+permissions:
+  # Needed to edit gradle.properties on the PR branches
+  contents: write
+
 jobs:
   update-deps:
     runs-on: ubuntu-latest
