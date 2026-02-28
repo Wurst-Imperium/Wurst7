@@ -5,6 +5,7 @@ accessible	method	net/minecraft/client/gui/screens/inventory/AbstractContainerSc
 accessible	method	net/minecraft/client/KeyboardHandler	keyPress	(JILnet/minecraft/client/input/KeyEvent;)V
 accessible	method	net/minecraft/client/Minecraft	startUseItem	()V
 accessible	method	net/minecraft/client/MouseHandler	onButton	(JLnet/minecraft/client/input/MouseButtonInfo;I)V
+accessible	method	net/minecraft/client/player/LocalPlayer	pick	(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;
 accessible	method	net/minecraft/client/renderer/GameRenderer	setPostEffect	(Lnet/minecraft/resources/Identifier;)V
 accessible	method	net/minecraft/client/renderer/rendertype/RenderType	create	(Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;
 accessible	method	net/minecraft/core/component/DataComponentMap$Builder	setUnchecked	(Lnet/minecraft/core/component/DataComponentType;Ljava/lang/Object;)V

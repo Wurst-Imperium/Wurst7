@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin.freecam;
 
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -24,7 +25,9 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.FreecamHack;
 
@@ -84,20 +87,52 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		super.turn(deltaYaw, deltaPitch);
 	}
 	
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;",
-		ordinal = 0),
-		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;")
-	private static HitResult modifyPick(Entity instance, double maxDistance,
-		float partialTicks, boolean includeFluids,
-		Operation<HitResult> original)
+	@Inject(at = @At("HEAD"),
+		method = "raycastHitResult(FLnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/HitResult;",
+		cancellable = true)
+	private void onRaycastHitResult(float partialTicks, Entity entity,
+		CallbackInfoReturnable<HitResult> cir)
 	{
 		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
 		if(freecam.isMovingCamera())
-			return freecam.raytrace(instance, maxDistance, partialTicks,
-				includeFluids);
+			cir.setReturnValue(LocalPlayer.pick(entity, blockInteractionRange(),
+				entityInteractionRange(), partialTicks));
+	}
+	
+	@WrapOperation(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;getViewVector(F)Lnet/minecraft/world/phys/Vec3;"),
+		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;")
+	private static Vec3 modifyViewVectorForPick(Entity entity,
+		float partialTicks, Operation<Vec3> original)
+	{
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(freecam.isMovingCamera())
+			return freecam.getCamViewVec();
 		
-		return original.call(instance, maxDistance, partialTicks,
-			includeFluids);
+		return original.call(entity, partialTicks);
+	}
+	
+	@WrapOperation(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/world/entity/Entity;getBoundingBox()Lnet/minecraft/world/phys/AABB;"),
+		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;")
+	private static AABB modifyBoundingBoxForPick(Entity entity,
+		Operation<AABB> original)
+	{
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(freecam.isMovingCamera())
+			return freecam.getCamBoundingBox();
+		
+		return original.call(entity);
+	}
+	
+	@Override
+	public @NotNull HitResult pick(double maxDistance, float partialTicks,
+		boolean includeFluids)
+	{
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(freecam.isMovingCamera())
+			return freecam.raytrace(maxDistance, partialTicks, includeFluids);
+		
+		return super.pick(maxDistance, partialTicks, includeFluids);
 	}
 }
