@@ -13,7 +13,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
@@ -257,6 +260,11 @@ public final class FreecamHack extends Hack
 		return Mth.lerp(partialTicks, prevCamPos, camPos);
 	}
 	
+	public AABB getCamBoundingBox()
+	{
+		return EntityType.PLAYER.getDimensions().makeBoundingBox(camPos);
+	}
+	
 	public void turn(double deltaYaw, double deltaPitch)
 	{
 		// This needs to be consistent with Entity.turn()
@@ -273,5 +281,22 @@ public final class FreecamHack extends Hack
 	public float getCamPitch()
 	{
 		return camPitch;
+	}
+	
+	public Vec3 getCamViewVec()
+	{
+		return Vec3.directionFromRotation(camPitch, camYaw);
+	}
+	
+	public BlockHitResult raytrace(double maxDistance, float partialTicks,
+		boolean includeFluids)
+	{
+		Vec3 dir = getCamViewVec().scale(maxDistance);
+		Vec3 start = getCamPos(partialTicks);
+		Vec3 end = start.add(dir);
+		return MC.level
+			.clip(new ClipContext(start, end, ClipContext.Block.OUTLINE,
+				includeFluids ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE,
+				MC.player));
 	}
 }
