@@ -1,0 +1,24 @@
+name: Update Modrinth Dependencies
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ['master', '26.1']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Update Modrinth Dependencies
+        uses: Wurst-Imperium/update-modrinth-deps@v1
+        with:
+          token: ${{ secrets.UMD_PR_TOKEN }}
