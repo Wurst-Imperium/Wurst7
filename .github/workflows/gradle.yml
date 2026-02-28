@@ -4,6 +4,7 @@ on:
   push:
     branches-ignore:
     - "dependabot/**"
+    - "modrinth_deps/**"
     tags-ignore:
     - "**"
     paths:
