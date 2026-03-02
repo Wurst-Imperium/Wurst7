@@ -13,7 +13,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -256,11 +255,6 @@ public final class FreecamHack extends Hack
 	public Vec3 getCamPos(float partialTicks)
 	{
 		return Mth.lerp(partialTicks, prevCamPos, camPos);
-	}
-	
-	public AABB getCamBoundingBox()
-	{
-		return EntityType.PLAYER.getDimensions().makeBoundingBox(camPos);
 	}
 	
 	public void turn(double deltaYaw, double deltaPitch)
