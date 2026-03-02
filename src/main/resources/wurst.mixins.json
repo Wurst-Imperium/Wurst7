@@ -62,7 +62,6 @@
     "WorldMixin",
     "WorldRendererMixin",
     "freecam.CameraMixin",
-    "freecam.EntityMixin",
     "freecam.ItemInHandRendererMixin",
     "freecam.LocalPlayerMixin",
     "sodium.OcclusionCullerMixin",
