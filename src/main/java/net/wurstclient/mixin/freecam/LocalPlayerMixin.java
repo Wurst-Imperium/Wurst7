@@ -101,7 +101,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		Operation<HitResult> original)
 	{
 		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
-		if(!freecam.isMovingCamera())
+		if(!freecam.isClickingFromCamera())
 			return original.call(player, maxDist, partialTicks, includeFluids);
 		
 		Vec3 camStart = freecam.getCamPos(partialTicks);
@@ -122,7 +122,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		@Local(ordinal = 0) double maxDist)
 	{
 		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
-		if(!freecam.isMovingCamera())
+		if(!freecam.isClickingFromCamera())
 			return original.call(instance, start, end, bounds, predicate,
 				maxDistSq);
 		
