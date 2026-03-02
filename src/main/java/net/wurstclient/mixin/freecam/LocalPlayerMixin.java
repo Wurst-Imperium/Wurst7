@@ -7,7 +7,6 @@
  */
 package net.wurstclient.mixin.freecam;
 
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -87,18 +86,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		super.turn(deltaYaw, deltaPitch);
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "raycastHitResult(FLnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/HitResult;",
-		cancellable = true)
-	private void onRaycastHitResult(float partialTicks, Entity entity,
-		CallbackInfoReturnable<HitResult> cir)
-	{
-		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
-		if(freecam.isMovingCamera())
-			cir.setReturnValue(LocalPlayer.pick(entity, blockInteractionRange(),
-				entityInteractionRange(), partialTicks));
-	}
-	
 	@WrapOperation(at = @At(value = "INVOKE",
 		target = "Lnet/minecraft/world/entity/Entity;getViewVector(F)Lnet/minecraft/world/phys/Vec3;"),
 		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;")
@@ -126,7 +113,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	}
 	
 	@Override
-	public @NotNull HitResult pick(double maxDistance, float partialTicks,
+	public HitResult pick(double maxDistance, float partialTicks,
 		boolean includeFluids)
 	{
 		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
