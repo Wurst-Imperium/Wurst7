@@ -283,7 +283,7 @@ public final class FreecamHack extends Hack
 		return camPitch;
 	}
 	
-	public Vec3 getCamViewVec()
+	public Vec3 getCamDirVec()
 	{
 		return Vec3.directionFromRotation(camPitch, camYaw);
 	}
@@ -291,7 +291,7 @@ public final class FreecamHack extends Hack
 	public BlockHitResult raytrace(double maxDistance, float partialTicks,
 		boolean includeFluids)
 	{
-		Vec3 dir = getCamViewVec().scale(maxDistance);
+		Vec3 dir = getCamDirVec().scale(maxDistance);
 		Vec3 start = getCamPos(partialTicks);
 		Vec3 end = start.add(dir);
 		return MC.level
