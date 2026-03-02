@@ -28,6 +28,7 @@ import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -94,6 +95,26 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	@WrapOperation(
 		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;",
 		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;"))
+	private static HitResult modifyBlockRaycast(Entity player, double maxDist,
+		float partialTicks, boolean includeFluids,
+		Operation<HitResult> original)
+	{
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(!freecam.isMovingCamera())
+			return original.call(player, maxDist, partialTicks, includeFluids);
+		
+		Vec3 camStart = freecam.getCamPos(partialTicks);
+		Vec3 camEnd = camStart.add(freecam.getScaledCamDir(maxDist));
+		return player.level()
+			.clip(new ClipContext(camStart, camEnd, ClipContext.Block.OUTLINE,
+				includeFluids ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE,
+				player));
+	}
+	
+	@WrapOperation(
+		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;",
+		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/world/entity/projectile/ProjectileUtil;getEntityHitResult(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/AABB;Ljava/util/function/Predicate;D)Lnet/minecraft/world/phys/EntityHitResult;"))
 	private static EntityHitResult modifyEntityRaycast(Entity instance,
 		Vec3 start, Vec3 end, AABB bounds, Predicate<Entity> predicate,
@@ -106,23 +127,12 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 				maxDistSq);
 		
 		Vec3 camStart = freecam.getCamPos(1F);
-		Vec3 scaledCamDir = freecam.getCamDirVec().scale(maxDist);
+		Vec3 scaledCamDir = freecam.getScaledCamDir(maxDist);
 		Vec3 camEnd = camStart.add(scaledCamDir);
 		AABB camBounds = EntityType.PLAYER.getDimensions()
 			.makeBoundingBox(camStart).expandTowards(scaledCamDir).inflate(1);
 		
 		return original.call(instance, camStart, camEnd, camBounds, predicate,
 			maxDistSq);
-	}
-	
-	@Override
-	public HitResult pick(double maxDistance, float partialTicks,
-		boolean includeFluids)
-	{
-		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
-		if(freecam.isMovingCamera())
-			return freecam.raytrace(maxDistance, partialTicks, includeFluids);
-		
-		return super.pick(maxDistance, partialTicks, includeFluids);
 	}
 }
