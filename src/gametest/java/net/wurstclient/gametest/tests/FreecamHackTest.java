@@ -9,6 +9,8 @@ package net.wurstclient.gametest.tests;
 
 import static net.wurstclient.gametest.WurstClientTestHelper.*;
 
+import java.nio.file.Path;
+
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
@@ -16,6 +18,10 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.gametest.WurstTest;
 
 public enum FreecamHackTest
@@ -129,12 +135,97 @@ public enum FreecamHackTest
 		context.waitTick();
 		world.waitForChunksRender();
 		
-		// Clean up
+		// Reset player and remove walkway
 		runCommand(server, "fill 0 -58 1 0 -58 2 air");
 		runCommand(server, "tp @s 0 -57 0 0 0");
-		context.waitTicks(2);
-		world.waitForChunksRender();
 		// Restore body rotation - /tp only rotates the head as of 1.21.11
 		context.runOnClient(mc -> mc.player.setYBodyRot(0));
+		
+		// Test "Interact from" setting
+		runCommand(server, "setblock 0 -56 2 smooth_stone");
+		waitForBlock(context, 0, 1, 2, Blocks.SMOOTH_STONE);
+		runCommand(server, "setblock 0 -56 1 lever[face=wall,facing=north]");
+		runCommand(server, "setblock 0 -56 3 lever[face=wall,facing=south]");
+		waitForBlock(context, 0, 1, 3, Blocks.LEVER);
+		context.waitTicks(WurstTest.IS_MOD_COMPAT_TEST ? 5 : 1);
+		world.waitForChunksRender();
+		context.takeScreenshot("freecam_interact_setup");
+		
+		// Enable Freecam and fly to a side view
+		runWurstCommand(context, "setslider Freecam horizontal_speed 0.95");
+		input.pressKey(GLFW.GLFW_KEY_U);
+		input.holdKeyFor(GLFW.GLFW_KEY_W, 3);
+		context.waitTick();
+		runWurstCommand(context, "setslider Freecam horizontal_speed 1");
+		for(int i = 0; i < 6; i++)
+		{
+			input.moveCursor(120, 0);
+			context.waitTick();
+		}
+		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
+		context.waitTick();
+		world.waitForChunksRender();
+		context.takeScreenshot("freecam_interact_side_view");
+		
+		// Right click with "Interact from: Player" (default)
+		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+		context.waitTick();
+		assertLeverState(context, spContext, 0, -56, 1, true,
+			"near lever, player mode");
+		assertLeverState(context, spContext, 0, -56, 3, false,
+			"far lever, player mode");
+		
+		// Switch to "Interact from: Camera" and right click
+		runWurstCommand(context, "setmode Freecam interact_from camera");
+		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+		context.waitTick();
+		assertLeverState(context, spContext, 0, -56, 3, true,
+			"far lever, camera mode");
+		assertLeverState(context, spContext, 0, -56, 1, true,
+			"near lever, camera mode");
+		
+		// Clean up
+		runCommand(server, "fill 0 -56 1 0 -56 3 air");
+		runWurstCommand(context, "setmode Freecam interact_from player");
+		input.pressKey(GLFW.GLFW_KEY_U);
+		context.waitTick();
+		world.waitForChunksRender();
+	}
+	
+	private static void assertLeverState(ClientGameTestContext context,
+		TestSingleplayerContext spContext, int x, int y, int z,
+		boolean expectedPowered, String description)
+	{
+		TestServerContext server = spContext.getServer();
+		BlockState state = server.computeOnServer(
+			s -> s.overworld().getBlockState(new BlockPos(x, y, z)));
+		
+		String errorMessage = null;
+		if(state.getBlock() != Blocks.LEVER)
+			errorMessage = "Expected lever at " + x + ", " + y + ", " + z + " ("
+				+ description + ") but found " + state;
+		else if(state.getValue(LeverBlock.POWERED) != expectedPowered)
+			errorMessage = "Lever at " + x + ", " + y + ", " + z + " ("
+				+ description + ") expected powered=" + expectedPowered
+				+ " but was powered=" + !expectedPowered;
+		
+		if(errorMessage == null)
+			return;
+		
+		TestClientWorldContext world = spContext.getClientWorld();
+		context.waitTick();
+		world.waitForChunksRender();
+		
+		String fileName = "freecam_interact_failed";
+		Path screenshotPath = context.takeScreenshot(fileName);
+		ghSummary("### Freecam interact test failed");
+		ghSummary(errorMessage);
+		String url = tryUploadToImgur(screenshotPath);
+		if(url != null)
+			ghSummary("![" + fileName + "](" + url + ")");
+		else
+			ghSummary("Couldn't upload " + fileName
+				+ ".png to Imgur. Check the Test Screenshots.zip artifact.");
+		throw new RuntimeException(errorMessage);
 	}
 }
