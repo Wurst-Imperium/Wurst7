@@ -19,8 +19,8 @@ import com.mojang.blaze3d.vertex.QuadInstance;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.BlockQuadOutput;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
@@ -68,8 +68,8 @@ public abstract class BlockModelRendererMixin implements ItemLike
 	 * coloring and shading is done, if neither Sodium nor Indigo are running.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/block/BlockQuadOutput;put(FFFLnet/minecraft/client/renderer/block/model/BakedQuad;Lcom/mojang/blaze3d/vertex/QuadInstance;)V"),
-		method = "putQuadWithTint(Lnet/minecraft/client/renderer/block/BlockQuadOutput;FFFLnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/renderer/block/model/BakedQuad;)V")
+		target = "Lnet/minecraft/client/renderer/block/BlockQuadOutput;put(FFFLnet/minecraft/client/resources/model/geometry/BakedQuad;Lcom/mojang/blaze3d/vertex/QuadInstance;)V"),
+		method = "putQuadWithTint(Lnet/minecraft/client/renderer/block/BlockQuadOutput;FFFLnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/resources/model/geometry/BakedQuad;)V")
 	private void modifyOpacity(BlockQuadOutput output, float x, float y,
 		float z, BakedQuad quad, QuadInstance instance,
 		Operation<Void> original)
@@ -94,16 +94,16 @@ public abstract class BlockModelRendererMixin implements ItemLike
 	 * when X-Ray should hide the block.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/block/model/BlockModelPart;getQuads(Lnet/minecraft/core/Direction;)Ljava/util/List;",
+		target = "Lnet/minecraft/client/renderer/block/dispatch/BlockStateModelPart;getQuads(Lnet/minecraft/core/Direction;)Ljava/util/List;",
 		ordinal = 1),
 		method = {
 			"tesselateFlat(Lnet/minecraft/client/renderer/block/BlockQuadOutput;FFFLjava/util/List;Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V",
 			"tesselateAmbientOcclusion(Lnet/minecraft/client/renderer/block/BlockQuadOutput;FFFLjava/util/List;Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V"})
-	private List<BakedQuad> hideUnculledQuads(BlockModelPart part,
+	private List<BakedQuad> hideUnculledQuads(BlockStateModelPart part,
 		Direction direction, Operation<List<BakedQuad>> original,
 		BlockQuadOutput output, float x, float y, float z,
-		List<BlockModelPart> list, BlockAndTintGetter level, BlockState state,
-		BlockPos pos)
+		List<BlockStateModelPart> list, BlockAndTintGetter level,
+		BlockState state, BlockPos pos)
 	{
 		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
 		Boolean shouldDrawSide = xray.shouldDrawSide(state, pos);
