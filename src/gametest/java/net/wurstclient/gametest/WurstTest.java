@@ -116,26 +116,26 @@ public class WurstTest implements FabricClientGameTest
 			"setmode WurstLogo visibility only_when_outdated");
 		runWurstCommand(context, "setcheckbox HackList animations off");
 		
-		InGameMenuTest.testMenuScreens(context);
+		new InGameMenuTest(context, spContext).run();
 		
 		// TODO: Open ClickGUI and Navigator
 		
 		// Test Wurst hacks
-		AutoMineHackTest.testAutoMineHack(context, spContext);
-		FreecamHackTest.testFreecamHack(context, spContext);
-		NoFallHackTest.testNoFallHack(context, spContext);
-		NoWeatherHackTest.testNoWeatherHack(context, spContext);
-		XRayHackTest.testXRayHack(context, spContext);
+		new AutoMineHackTest(context, spContext).run();
+		new FreecamHackTest(context, spContext).run();
+		new NoFallHackTest(context, spContext).run();
+		new NoWeatherHackTest(context, spContext).run();
+		new XRayHackTest(context, spContext).run();
 		
 		// Test Wurst commands
-		CopyItemCmdTest.testCopyItemCmd(context, spContext);
-		GiveCmdTest.testGiveCmd(context, spContext);
-		ModifyCmdTest.testModifyCmd(context, spContext);
+		new CopyItemCmdTest(context, spContext).run();
+		new GiveCmdTest(context, spContext).run();
+		new ModifyCmdTest(context, spContext).run();
 		
 		// TODO: Test more Wurst features
 		
 		// Test special cases
-		PistonTest.testPistonDoesntCrash(context, spContext);
+		new PistonTest(context, spContext).run();
 	}
 	
 	// because the grass texture is randomized and smooth stone isn't
