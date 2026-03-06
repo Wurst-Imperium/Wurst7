@@ -19,6 +19,9 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -167,7 +170,7 @@ public enum FreecamHackTest
 		world.waitForChunksRender();
 		context.takeScreenshot("freecam_interact_side_view");
 		
-		// Right click with "Interact from: Player" (default)
+		// Right click with "Interact from: Player"
 		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
 		context.waitTick();
 		assertLeverState(context, spContext, 0, -56, 1, true,
@@ -175,7 +178,7 @@ public enum FreecamHackTest
 		assertLeverState(context, spContext, 0, -56, 3, false,
 			"far lever, player mode");
 		
-		// Switch to "Interact from: Camera" and right click
+		// Right click with "Interact from: Camera"
 		runWurstCommand(context, "setmode Freecam interact_from camera");
 		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
 		context.waitTick();
@@ -184,12 +187,53 @@ public enum FreecamHackTest
 		assertLeverState(context, spContext, 0, -56, 1, true,
 			"near lever, camera mode");
 		
+		// Replace levers with chickens
+		runCommand(server, "fill 0 -56 1 0 -56 3 air strict");
+		Chicken nearChicken = spawnChicken(server, 1.5);
+		Chicken farChicken = spawnChicken(server, 3.5);
+		context.waitTick();
+		
+		// Left click with "Interact from: Player"
+		runWurstCommand(context, "setmode Freecam interact_from player");
+		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT);
+		context.waitTick();
+		assertChickenHealth(context, nearChicken, true,
+			"near chicken, player mode");
+		assertChickenHealth(context, farChicken, false,
+			"far chicken, player mode");
+		
+		// Left click with "Interact from: Camera"
+		nearChicken.discard();
+		nearChicken = spawnChicken(server, 1.5);
+		context.waitTick();
+		runWurstCommand(context, "setmode Freecam interact_from camera");
+		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT);
+		context.waitTick();
+		assertChickenHealth(context, farChicken, true,
+			"far chicken, camera mode");
+		assertChickenHealth(context, nearChicken, false,
+			"near chicken, camera mode");
+		
 		// Clean up
-		runCommand(server, "fill 0 -56 1 0 -56 3 air");
+		nearChicken.discard();
+		farChicken.discard();
 		runWurstCommand(context, "setmode Freecam interact_from player");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
+	}
+	
+	private static Chicken spawnChicken(TestServerContext server, double z)
+	{
+		return server.computeOnServer(s -> {
+			Chicken c = EntityType.CHICKEN.create(s.overworld(),
+				EntitySpawnReason.COMMAND);
+			c.setPos(0.5, -56, z);
+			c.setNoAi(true);
+			c.setNoGravity(true);
+			s.overworld().addFreshEntity(c);
+			return c;
+		});
 	}
 	
 	private static void assertLeverState(ClientGameTestContext context,
@@ -212,13 +256,34 @@ public enum FreecamHackTest
 		if(errorMessage == null)
 			return;
 		
-		TestClientWorldContext world = spContext.getClientWorld();
-		context.waitTick();
-		world.waitForChunksRender();
-		
 		String fileName = "freecam_interact_failed";
 		Path screenshotPath = context.takeScreenshot(fileName);
 		ghSummary("### Freecam interact test failed");
+		ghSummary(errorMessage);
+		String url = tryUploadToImgur(screenshotPath);
+		if(url != null)
+			ghSummary("![" + fileName + "](" + url + ")");
+		else
+			ghSummary("Couldn't upload " + fileName
+				+ ".png to Imgur. Check the Test Screenshots.zip artifact.");
+		throw new RuntimeException(errorMessage);
+	}
+	
+	private static void assertChickenHealth(ClientGameTestContext context,
+		Chicken chicken, boolean expectedDamaged, String description)
+	{
+		float health = chicken.getHealth();
+		boolean isDamaged = health < 4.0f;
+		if(isDamaged == expectedDamaged)
+			return;
+		
+		String errorMessage = "Chicken (" + description + ") expected "
+			+ (expectedDamaged ? "damaged" : "full health") + " but had health="
+			+ health;
+		
+		String fileName = "freecam_entity_interact_failed";
+		Path screenshotPath = context.takeScreenshot(fileName);
+		ghSummary("### Freecam entity interact test failed");
 		ghSummary(errorMessage);
 		String url = tryUploadToImgur(screenshotPath);
 		if(url != null)
