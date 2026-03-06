@@ -20,6 +20,5 @@ public final class NoSlowdownHack extends Hack
 		setCategory(Category.MOVEMENT);
 	}
 	
-	// See BlockMixin.onGetVelocityMultiplier() and
-	// ClientPlayerEntityMixin.wurstIsUsingItem()
+	// See BlockMixin, LocalPlayerMixin
 }

@@ -88,14 +88,30 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	}
 	
 	/**
-	 * Allows NoSlowdown to intercept the isBlockedFromSprinting() call in
-	 * tickMovement().
+	 * Makes you keep sprinting when using an item while NoSlowdown is enabled.
 	 */
 	@WrapOperation(method = "aiStep()V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/player/LocalPlayer;isSlowDueToUsingItem()Z",
 			ordinal = 0))
 	private boolean wrapTickMovementItemUse(LocalPlayer instance,
+		Operation<Boolean> original)
+	{
+		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
+			return false;
+		
+		return original.call(instance);
+	}
+	
+	/**
+	 * Prevents item-use movement slowdown while NoSlowdown is enabled.
+	 */
+	@WrapOperation(
+		method = "modifyInput(Lnet/minecraft/world/phys/Vec2;)Lnet/minecraft/world/phys/Vec2;",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z",
+			ordinal = 0))
+	private boolean wrapModifyInputItemUse(LocalPlayer instance,
 		Operation<Boolean> original)
 	{
 		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
