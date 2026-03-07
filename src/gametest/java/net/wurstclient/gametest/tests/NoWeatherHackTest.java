@@ -7,8 +7,6 @@
  */
 package net.wurstclient.gametest.tests;
 
-import static net.wurstclient.gametest.WurstClientTestHelper.*;
-
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.wurstclient.gametest.SingleplayerTest;
@@ -33,28 +31,28 @@ public final class NoWeatherHackTest extends SingleplayerTest
 		server.runOnServer(s -> s.overworld().setRainLevel(1.0F));
 		context.runOnClient(mc -> mc.level.setRainLevel(1.0F));
 		context.waitTicks(10);
-		assertScreenshotEquals(context, "noweather_raining_setup",
+		assertScreenshotEquals("noweather_raining_setup",
 			"https://i.imgur.com/JQVtBh7.png");
 		
 		// Enable NoWeather
 		runWurstCommand("t NoWeather on");
-		assertScreenshotEquals(context, "noweather_rain_disabled",
+		assertScreenshotEquals("noweather_rain_disabled",
 			"https://i.imgur.com/YNFnIPj.png");
 		
 		// Enable time changing
 		runWurstCommand("setcheckbox NoWeather change_world_time on");
-		assertScreenshotEquals(context, "noweather_time_6000",
+		assertScreenshotEquals("noweather_time_6000",
 			"https://i.imgur.com/wxaAvAi.png");
 		
 		// Change time to 18000 (midnight)
 		runWurstCommand("setslider NoWeather time 18000");
-		assertScreenshotEquals(context, "noweather_time_18000",
+		assertScreenshotEquals("noweather_time_18000",
 			"https://i.imgur.com/6RaX1xL.png");
 		
 		// Change moon phase to 4
 		runWurstCommand("setcheckbox NoWeather change_moon_phase on");
 		runWurstCommand("setslider NoWeather moon_phase 4");
-		assertScreenshotEquals(context, "noweather_moon_phase_4",
+		assertScreenshotEquals("noweather_moon_phase_4",
 			"https://i.imgur.com/EjalAH4.png");
 		
 		// Clean up

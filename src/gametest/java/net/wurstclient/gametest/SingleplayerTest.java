@@ -44,7 +44,7 @@ public abstract class SingleplayerTest
 	public final void run()
 	{
 		runImpl();
-		WurstClientTestHelper.assertScreenshotEquals(context,
+		assertScreenshotEquals(
 			getClass().getSimpleName().toLowerCase() + "_cleanup",
 			"https://i.imgur.com/i2Nr9is.png");
 	}
@@ -104,6 +104,13 @@ public abstract class SingleplayerTest
 				"Expected 1 " + item.getName().getString() + " at slot " + slot
 					+ ", found " + stack.getCount() + " "
 					+ stack.getItem().getName().getString() + " instead");
+	}
+	
+	protected final void assertScreenshotEquals(String fileName,
+		String templateUrl)
+	{
+		WurstClientTestHelper.assertScreenshotEquals(context, fileName,
+			templateUrl);
 	}
 	
 	protected final void assertNoItemInSlot(int slot)

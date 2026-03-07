@@ -7,8 +7,6 @@
  */
 package net.wurstclient.gametest.tests;
 
-import static net.wurstclient.gametest.WurstClientTestHelper.*;
-
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -36,7 +34,7 @@ public final class XRayHackTest extends SingleplayerTest
 		runWurstCommand("setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading();
-		assertScreenshotEquals(context, "xray_default",
+		assertScreenshotEquals("xray_default",
 			"https://i.imgur.com/Dftamqv.png");
 		
 		// Exposed only
@@ -45,7 +43,7 @@ public final class XRayHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading();
-		assertScreenshotEquals(context, "xray_exposed_only",
+		assertScreenshotEquals("xray_exposed_only",
 			"https://i.imgur.com/QlEpQTu.png");
 		
 		// Opacity mode
@@ -54,7 +52,7 @@ public final class XRayHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading();
-		assertScreenshotEquals(context, "xray_opacity",
+		assertScreenshotEquals("xray_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/hXdzoDB.png"
 				: "https://i.imgur.com/oZqevTx.png");
 		
@@ -64,7 +62,7 @@ public final class XRayHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading();
-		assertScreenshotEquals(context, "xray_exposed_only_opacity",
+		assertScreenshotEquals("xray_exposed_only_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/ZwIARSr.png"
 				: "https://i.imgur.com/3DLxNuS.png");
 		

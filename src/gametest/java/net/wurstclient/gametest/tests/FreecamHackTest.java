@@ -42,13 +42,13 @@ public final class FreecamHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
-		assertScreenshotEquals(context, "freecam_start_inside",
+		assertScreenshotEquals("freecam_start_inside",
 			"https://i.imgur.com/jdSno3u.png");
 		
 		// Scroll to change speed
 		input.scroll(1);
 		context.waitTick();
-		assertScreenshotEquals(context, "freecam_speed_scrolled",
+		assertScreenshotEquals("freecam_speed_scrolled",
 			"https://i.imgur.com/DysLqZw.png");
 		runWurstCommand("setslider Freecam horizontal_speed 1");
 		if(context.computeOnClient(
@@ -60,7 +60,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		runWurstCommand("setcheckbox Freecam scroll_to_change_speed off");
 		input.scroll(1);
 		context.waitTick();
-		assertScreenshotEquals(context, "freecam_hotbar_scrolled",
+		assertScreenshotEquals("freecam_hotbar_scrolled",
 			"https://i.imgur.com/edjDUxr.png");
 		if(context.computeOnClient(
 			mc -> mc.player.getInventory().getSelectedSlot()) != 8)
@@ -77,7 +77,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
-		assertScreenshotEquals(context, "freecam_start_in_front",
+		assertScreenshotEquals("freecam_start_in_front",
 			"https://i.imgur.com/nrMP191.png");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
@@ -88,7 +88,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
-		assertScreenshotEquals(context, "freecam_start_above",
+		assertScreenshotEquals("freecam_start_above",
 			"https://i.imgur.com/3LbAtRj.png");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
@@ -101,20 +101,20 @@ public final class FreecamHackTest extends SingleplayerTest
 		world.waitForChunksRender();
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
-		assertScreenshotEquals(context, "freecam_moved",
+		assertScreenshotEquals("freecam_moved",
 			"https://i.imgur.com/HxrcHbh.png");
 		
 		// Enable tracer
 		runWurstCommand("setcheckbox Freecam tracer on");
 		context.waitTick();
-		assertScreenshotEquals(context, "freecam_tracer",
+		assertScreenshotEquals("freecam_tracer",
 			"https://i.imgur.com/z3pQumc.png");
 		
 		// Disable tracer and un-hide hand
 		runWurstCommand("setcheckbox Freecam tracer off");
 		runWurstCommand("setcheckbox Freecam hide_hand off");
 		context.waitTick();
-		assertScreenshotEquals(context, "freecam_with_hand",
+		assertScreenshotEquals("freecam_with_hand",
 			"https://i.imgur.com/6tahHsE.png");
 		runWurstCommand("setcheckbox Freecam hide_hand on");
 		
@@ -128,7 +128,7 @@ public final class FreecamHackTest extends SingleplayerTest
 			context.waitTick();
 		}
 		context.waitTick();
-		assertScreenshotEquals(context, "freecam_player_moved",
+		assertScreenshotEquals("freecam_player_moved",
 			"https://i.imgur.com/mf6NgQl.png");
 		runWurstCommand("setmode Freecam apply_input_to camera");
 		input.pressKey(GLFW.GLFW_KEY_U);
