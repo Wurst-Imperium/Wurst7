@@ -34,7 +34,7 @@ public final class FreecamHackTest extends SingleplayerTest
 	}
 	
 	@Override
-	public void run()
+	protected void runImpl()
 	{
 		logger.info("Testing Freecam hack");
 		
@@ -184,6 +184,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		runCommand("fill 0 -56 1 0 -56 3 air strict");
 		Chicken nearChicken = spawnChicken(1.5);
 		Chicken farChicken = spawnChicken(3.5);
+		clearParticles();
 		context.waitTick();
 		
 		// Left click with "Interact from: Player"
@@ -208,8 +209,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		farChicken.discard();
 		runWurstCommand("setmode Freecam interact_from player");
 		input.pressKey(GLFW.GLFW_KEY_U);
-		context.waitTick();
-		world.waitForChunksRender();
+		context.waitTicks(2);
 	}
 	
 	private Chicken spawnChicken(double z)

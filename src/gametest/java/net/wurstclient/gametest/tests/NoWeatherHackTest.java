@@ -22,7 +22,7 @@ public final class NoWeatherHackTest extends SingleplayerTest
 	}
 	
 	@Override
-	public void run()
+	protected void runImpl()
 	{
 		logger.info("Testing NoWeather hack");
 		

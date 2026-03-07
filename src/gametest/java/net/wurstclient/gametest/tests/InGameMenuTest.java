@@ -25,7 +25,7 @@ public final class InGameMenuTest extends SingleplayerTest
 	}
 	
 	@Override
-	public void run()
+	protected void runImpl()
 	{
 		logger.info("Opening game menu");
 		input.pressKey(GLFW.GLFW_KEY_ESCAPE);

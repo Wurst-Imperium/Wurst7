@@ -21,7 +21,7 @@ public final class PistonTest extends SingleplayerTest
 	}
 	
 	@Override
-	public void run()
+	protected void runImpl()
 	{
 		logger.info(
 			"Testing that a piston can extend and retract without crashing the game");

@@ -26,7 +26,7 @@ public final class XRayHackTest extends SingleplayerTest
 	}
 	
 	@Override
-	public void run()
+	protected void runImpl()
 	{
 		logger.info("Testing X-Ray hack");
 		buildTestRig();
@@ -69,7 +69,7 @@ public final class XRayHackTest extends SingleplayerTest
 				: "https://i.imgur.com/3DLxNuS.png");
 		
 		// Clean up
-		runCommand("fill ~-5 ~-2 ~4 ~5 ~5 ~7 air");
+		runCommand("fill ~-5 ~-2 ~4 ~5 ~5 ~7 air strict");
 		waitForBlock(5, 5, 7, Blocks.AIR);
 		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand("setslider X-Ray opacity 0");

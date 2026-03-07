@@ -21,7 +21,7 @@ public final class GiveCmdTest extends SingleplayerTest
 	}
 	
 	@Override
-	public void run()
+	protected void runImpl()
 	{
 		logger.info("Testing .give command");
 		

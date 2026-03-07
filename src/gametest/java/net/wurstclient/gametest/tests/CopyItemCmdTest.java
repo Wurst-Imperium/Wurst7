@@ -23,7 +23,7 @@ public final class CopyItemCmdTest extends SingleplayerTest
 	}
 	
 	@Override
-	public void run()
+	protected void runImpl()
 	{
 		logger.info("Testing .copyitem command");
 		

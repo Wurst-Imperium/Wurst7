@@ -38,7 +38,23 @@ public abstract class SingleplayerTest
 		this.server = spContext.getServer();
 	}
 	
-	public abstract void run();
+	/**
+	 * Runs the test and verifies cleanup afterward.
+	 */
+	public final void run()
+	{
+		runImpl();
+		WurstClientTestHelper.assertScreenshotEquals(context,
+			getClass().getSimpleName().toLowerCase() + "_cleanup",
+			"https://i.imgur.com/i2Nr9is.png");
+	}
+	
+	/**
+	 * Implement the actual test logic here. The test is responsible for
+	 * cleaning up after itself (disabling hacks, removing blocks, clearing
+	 * chat/inventory/particles, etc.).
+	 */
+	protected abstract void runImpl();
 	
 	protected final void runCommand(String command)
 	{

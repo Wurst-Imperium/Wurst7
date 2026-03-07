@@ -24,7 +24,7 @@ public final class NoFallHackTest extends SingleplayerTest
 	}
 	
 	@Override
-	public void run()
+	protected void runImpl()
 	{
 		logger.info("Testing NoFall hack");
 		
@@ -54,6 +54,7 @@ public final class NoFallHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_F5);
 		input.pressKey(GLFW.GLFW_KEY_F5);
 		clearChat();
+		context.waitTicks(5);
 	}
 	
 	private void fall5Blocks()

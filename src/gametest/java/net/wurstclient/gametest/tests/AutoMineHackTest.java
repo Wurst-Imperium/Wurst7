@@ -21,7 +21,7 @@ public final class AutoMineHackTest extends SingleplayerTest
 	}
 	
 	@Override
-	public void run()
+	protected void runImpl()
 	{
 		logger.info("Testing AutoMine hack");
 		runCommand("gamemode survival");
