@@ -7,6 +7,8 @@
  */
 package net.wurstclient.gametest;
 
+import java.nio.file.Path;
+
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
@@ -111,6 +113,22 @@ public abstract class SingleplayerTest
 	{
 		WurstClientTestHelper.assertScreenshotEquals(context, fileName,
 			templateUrl);
+	}
+	
+	protected final void failWithScreenshot(String fileName, String title,
+		String errorMessage)
+	{
+		Path screenshotPath = context.takeScreenshot(fileName);
+		
+		WurstClientTestHelper.ghSummary("### " + title + "\n" + errorMessage);
+		String url = WurstClientTestHelper.tryUploadToImgur(screenshotPath);
+		if(url != null)
+			WurstClientTestHelper.ghSummary("![" + fileName + "](" + url + ")");
+		else
+			WurstClientTestHelper.ghSummary("Couldn't upload " + fileName
+				+ ".png to Imgur. Check the Test Screenshots.zip artifact.");
+		
+		throw new RuntimeException(title + ": " + errorMessage);
 	}
 	
 	protected final void assertNoItemInSlot(int slot)

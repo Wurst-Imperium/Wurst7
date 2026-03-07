@@ -7,10 +7,6 @@
  */
 package net.wurstclient.gametest.tests;
 
-import static net.wurstclient.gametest.WurstClientTestHelper.*;
-
-import java.nio.file.Path;
-
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -243,17 +239,8 @@ public final class FreecamHackTest extends SingleplayerTest
 		if(errorMessage == null)
 			return;
 		
-		String fileName = "freecam_interact_failed";
-		Path screenshotPath = context.takeScreenshot(fileName);
-		ghSummary("### Freecam interact test failed");
-		ghSummary(errorMessage);
-		String url = tryUploadToImgur(screenshotPath);
-		if(url != null)
-			ghSummary("![" + fileName + "](" + url + ")");
-		else
-			ghSummary("Couldn't upload " + fileName
-				+ ".png to Imgur. Check the Test Screenshots.zip artifact.");
-		throw new RuntimeException(errorMessage);
+		failWithScreenshot("freecam_block_interaction_failed",
+			"Freecam block interaction test failed", errorMessage);
 	}
 	
 	private void assertChickenHealth(Chicken chicken, boolean expectedDamaged,
@@ -268,16 +255,7 @@ public final class FreecamHackTest extends SingleplayerTest
 			+ (expectedDamaged ? "damaged" : "full health") + " but had health="
 			+ health;
 		
-		String fileName = "freecam_entity_interact_failed";
-		Path screenshotPath = context.takeScreenshot(fileName);
-		ghSummary("### Freecam entity interact test failed");
-		ghSummary(errorMessage);
-		String url = tryUploadToImgur(screenshotPath);
-		if(url != null)
-			ghSummary("![" + fileName + "](" + url + ")");
-		else
-			ghSummary("Couldn't upload " + fileName
-				+ ".png to Imgur. Check the Test Screenshots.zip artifact.");
-		throw new RuntimeException(errorMessage);
+		failWithScreenshot("freecam_entity_interaction_failed",
+			"Freecam entity interaction test failed", errorMessage);
 	}
 }
