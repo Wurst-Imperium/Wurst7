@@ -120,7 +120,8 @@ public abstract class SingleplayerTest
 	{
 		Path screenshotPath = context.takeScreenshot(fileName);
 		
-		WurstClientTestHelper.ghSummary("### " + title + "\n" + errorMessage);
+		WurstClientTestHelper
+			.ghSummary("### " + title + "\n" + errorMessage + "\n");
 		String url = WurstClientTestHelper.tryUploadToImgur(screenshotPath);
 		if(url != null)
 			WurstClientTestHelper.ghSummary("![" + fileName + "](" + url + ")");
