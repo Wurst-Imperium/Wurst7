@@ -78,7 +78,7 @@ jobs:
       env:
         VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
       if: ${{ env.VIRUSTOTAL_API_KEY }}
-      uses: crazy-max/ghaction-virustotal@v4
+      uses: crazy-max/ghaction-virustotal@v5
       with:
         vt_api_key: ${{ env.VIRUSTOTAL_API_KEY }}
         files: |
