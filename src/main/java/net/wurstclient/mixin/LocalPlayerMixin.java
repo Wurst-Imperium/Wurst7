@@ -34,6 +34,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.wurstclient.InputFaker;
+import net.wurstclient.InputFaker.TempRealInput;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.AirStrafingSpeedListener.AirStrafingSpeedEvent;
@@ -62,13 +64,40 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		super(world, profile);
 	}
 	
+	@Inject(method = "tick()V", at = @At("HEAD"))
+	private void onTickHead(CallbackInfo ci)
+	{
+		InputFaker.swapIfNeeded();
+	}
+	
+	@Inject(method = "tick()V", at = @At("RETURN"))
+	private void onTickReturn(CallbackInfo ci)
+	{
+		InputFaker.restoreIfNeeded();
+	}
+	
+	@Inject(method = "rideTick()V", at = @At("HEAD"))
+	private void onRideTickHead(CallbackInfo ci)
+	{
+		InputFaker.swapIfNeeded();
+	}
+	
+	@Inject(method = "rideTick()V", at = @At("RETURN"))
+	private void onRideTickReturn(CallbackInfo ci)
+	{
+		InputFaker.restoreIfNeeded();
+	}
+	
 	@Inject(method = "tick()V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/player/AbstractClientPlayer;tick()V",
 			ordinal = 0))
 	private void onTick(CallbackInfo ci)
 	{
-		EventManager.fire(UpdateEvent.INSTANCE);
+		try(TempRealInput ignore = new TempRealInput())
+		{
+			EventManager.fire(UpdateEvent.INSTANCE);
+		}
 	}
 	
 	/**
