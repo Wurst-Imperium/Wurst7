@@ -75,6 +75,21 @@ public abstract class SingleplayerTest
 			.getBlock() == block);
 	}
 	
+	/**
+	 * Waits for the hand swing and equip animations to finish. Call this
+	 * after any action that changes/clears the currently held item, if a
+	 * screenshot is taken soon after (<1 second).
+	 */
+	protected final void waitForHandSwing()
+	{
+		context.waitFor(mc -> {
+			var renderer =
+				mc.getEntityRenderDispatcher().getItemInHandRenderer();
+			return !mc.player.swinging && renderer.mainHandHeight == 1
+				&& renderer.oMainHandHeight == 1;
+		}, 20);
+	}
+	
 	protected final void clearChat()
 	{
 		context.runOnClient(mc -> mc.gui.getChat().clearMessages(true));

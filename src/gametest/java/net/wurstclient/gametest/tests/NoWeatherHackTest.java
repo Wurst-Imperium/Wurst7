@@ -63,6 +63,6 @@ public final class NoWeatherHackTest extends SingleplayerTest
 		server.runOnServer(s -> s.overworld().setRainLevel(0.0F));
 		context.runOnClient(mc -> mc.level.setRainLevel(0.0F));
 		clearParticles();
-		context.waitTicks(7); // for hand animation
+		context.waitTicks(7); // for hand to catch up with rotation
 	}
 }

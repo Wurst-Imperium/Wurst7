@@ -53,6 +53,6 @@ public final class CopyItemCmdTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_F5);
 		clearInventory();
 		clearChat();
-		context.waitTicks(7);
+		waitForHandSwing();
 	}
 }

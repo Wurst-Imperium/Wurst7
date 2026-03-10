@@ -34,6 +34,6 @@ public final class GiveCmdTest extends SingleplayerTest
 		// Clean up
 		clearInventory();
 		clearChat();
-		context.waitTicks(7);
+		waitForHandSwing();
 	}
 }
