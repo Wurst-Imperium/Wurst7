@@ -11,9 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.mojang.serialization.MapCodec;
 
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,10 +23,9 @@ import net.wurstclient.WurstClient;
 public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 {
 	private BlockStateBaseMixin(WurstClient wurst, Block owner,
-		Reference2ObjectArrayMap<Property<?>, Comparable<?>> propertyMap,
-		MapCodec<BlockState> codec)
+		Property<?>[] properties, Comparable<?>[] values)
 	{
-		super(owner, propertyMap, codec);
+		super(owner, properties, values);
 	}
 	
 	/*

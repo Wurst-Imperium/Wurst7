@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.wurstclient.WurstClient;
@@ -28,8 +28,8 @@ public class IngameHudMixin
 	// runs after renderScoreboardSidebar()
 	// and before playerListHud.setVisible()
 	@Inject(at = @At("HEAD"),
-		method = "renderTabList(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V")
-	private void onRenderPlayerList(GuiGraphics context,
+		method = "extractTabList(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V")
+	private void onRenderPlayerList(GuiGraphicsExtractor context,
 		DeltaTracker tickCounter, CallbackInfo ci)
 	{
 		if(WurstClient.MC.debugEntries.isOverlayVisible())
@@ -40,10 +40,10 @@ public class IngameHudMixin
 	}
 	
 	@Inject(at = @At("HEAD"),
-		method = "renderTextureOverlay(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/resources/Identifier;F)V",
+		method = "extractTextureOverlay(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/resources/Identifier;F)V",
 		cancellable = true)
-	private void onRenderOverlay(GuiGraphics context, Identifier texture,
-		float opacity, CallbackInfo ci)
+	private void onRenderOverlay(GuiGraphicsExtractor context,
+		Identifier texture, float opacity, CallbackInfo ci)
 	{
 		if(texture == null)
 			return;
@@ -60,9 +60,9 @@ public class IngameHudMixin
 			ci.cancel();
 	}
 	
-	@Inject(at = @At("HEAD"), method = "renderVignette", cancellable = true)
-	private void onRenderVignetteOverlay(GuiGraphics context, Entity entity,
-		CallbackInfo ci)
+	@Inject(at = @At("HEAD"), method = "extractVignette", cancellable = true)
+	private void onRenderVignetteOverlay(GuiGraphicsExtractor context,
+		Entity entity, CallbackInfo ci)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax == null || !hax.noVignetteHack.isEnabled())

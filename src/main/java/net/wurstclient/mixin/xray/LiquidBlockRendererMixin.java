@@ -10,17 +10,13 @@ package net.wurstclient.mixin.xray;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.client.renderer.block.LiquidBlockRenderer;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
@@ -29,7 +25,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.XRayHack;
 
-@Mixin(LiquidBlockRenderer.class)
+@Mixin(FluidRenderer.class)
 public class LiquidBlockRendererMixin
 {
 	@Unique
@@ -40,11 +36,11 @@ public class LiquidBlockRendererMixin
 	 * Hides and shows fluids when using X-Ray without Sodium installed.
 	 */
 	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;isFaceOccludedByNeighbor(Lnet/minecraft/core/Direction;FLnet/minecraft/world/level/block/state/BlockState;)Z"),
-		method = "tesselate(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/material/FluidState;)V")
+		target = "Lnet/minecraft/client/renderer/block/FluidRenderer;isFaceOccludedByNeighbor(Lnet/minecraft/core/Direction;FLnet/minecraft/world/level/block/state/BlockState;)Z"),
+		method = "tesselate(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/renderer/block/FluidRenderer$Output;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/material/FluidState;)V")
 	private boolean modifyShouldSkipRendering(Direction side, float height,
 		BlockState neighborState, Operation<Boolean> original,
-		BlockAndTintGetter world, BlockPos pos, VertexConsumer vertexConsumer,
+		BlockAndTintGetter world, BlockPos pos, FluidRenderer.Output output,
 		BlockState blockState, FluidState fluidState)
 	{
 		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
@@ -78,20 +74,5 @@ public class LiquidBlockRendererMixin
 		
 		return ARGB.color(Math.round(255F * opacity), ARGB.red(color),
 			ARGB.green(color), ARGB.blue(color));
-	}
-	
-	/**
-	 * Puts all fluids on the translucent layer if Opacity X-Ray is enabled.
-	 */
-	@Inject(at = @At("HEAD"),
-		method = "getRenderLayer(Lnet/minecraft/world/level/material/FluidState;)Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;",
-		cancellable = true)
-	private void onGetFluidLayer(FluidState state,
-		CallbackInfoReturnable<ChunkSectionLayer> cir)
-	{
-		if(!WurstClient.INSTANCE.getHax().xRayHack.isOpacityMode())
-			return;
-		
-		cir.setReturnValue(ChunkSectionLayer.TRANSLUCENT);
 	}
 }

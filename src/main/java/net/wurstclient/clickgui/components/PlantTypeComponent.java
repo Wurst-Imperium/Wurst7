@@ -10,7 +10,7 @@ package net.wurstclient.clickgui.components;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
@@ -69,7 +69,7 @@ public final class PlantTypeComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int harvestWidth = TR.width(HARVEST);
@@ -125,11 +125,9 @@ public final class PlantTypeComponent extends Component
 		
 		// text
 		String name = setting.getName();
-		context.drawString(TR, name, x3 + 2, y1 + 3, GUI.getTxtColor(), false);
-		context.drawString(TR, HARVEST, x4 + 2, y3 + 2, GUI.getTxtColor(),
-			false);
-		context.drawString(TR, REPLANT, x6 + 2, y3 + 2, GUI.getTxtColor(),
-			false);
+		context.text(TR, name, x3 + 2, y1 + 3, GUI.getTxtColor(), false);
+		context.text(TR, HARVEST, x4 + 2, y3 + 2, GUI.getTxtColor(), false);
+		context.text(TR, REPLANT, x6 + 2, y3 + 2, GUI.getTxtColor(), false);
 	}
 	
 	private int getFillColor(boolean hovering)

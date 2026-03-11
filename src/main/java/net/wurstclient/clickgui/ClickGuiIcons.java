@@ -7,7 +7,7 @@
  */
 package net.wurstclient.clickgui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.RenderUtils;
 
@@ -15,7 +15,7 @@ public enum ClickGuiIcons
 {
 	;
 	
-	public static void drawMinimizeArrow(GuiGraphics context, float x1,
+	public static void drawMinimizeArrow(GuiGraphicsExtractor context, float x1,
 		float y1, float x2, float y2, boolean hovering, boolean minimized)
 	{
 		float xa1 = x1 + 1;
@@ -48,8 +48,8 @@ public enum ClickGuiIcons
 		RenderUtils.drawLineStrip2D(context, arrowVertices, outlineColor);
 	}
 	
-	public static void drawRadarArrow(GuiGraphics context, float x1, float y1,
-		float x2, float y2)
+	public static void drawRadarArrow(GuiGraphicsExtractor context, float x1,
+		float y1, float x2, float y2)
 	{
 		float x3 = x1 + (x2 - x1) / 2;
 		float y3 = y1 + (y2 - y1) * 0.75F;
@@ -66,7 +66,7 @@ public enum ClickGuiIcons
 		RenderUtils.drawLineStrip2D(context, arrowVertices, outlineColor);
 	}
 	
-	public static void drawPin(GuiGraphics context, float x1, float y1,
+	public static void drawPin(GuiGraphicsExtractor context, float x1, float y1,
 		float x2, float y2, boolean hovering, boolean pinned)
 	{
 		int needleColor = hovering ? 0xFFFFFFFF : 0xFFD9D9D9;
@@ -145,8 +145,8 @@ public enum ClickGuiIcons
 		}
 	}
 	
-	public static void drawCheck(GuiGraphics context, float x1, float y1,
-		float x2, float y2, boolean hovering, boolean grayedOut)
+	public static void drawCheck(GuiGraphicsExtractor context, float x1,
+		float y1, float x2, float y2, boolean hovering, boolean grayedOut)
 	{
 		float xc1 = x1 + 2.5F;
 		float xc2 = x1 + 3.5F;
@@ -174,8 +174,9 @@ public enum ClickGuiIcons
 		RenderUtils.drawLineStrip2D(context, outlineVertices, outlineColor);
 	}
 	
-	public static void drawIndeterminateCheck(GuiGraphics context, float x1,
-		float y1, float x2, float y2, boolean hovering, boolean grayedOut)
+	public static void drawIndeterminateCheck(GuiGraphicsExtractor context,
+		float x1, float y1, float x2, float y2, boolean hovering,
+		boolean grayedOut)
 	{
 		float xc1 = x1 + 2.5F;
 		float xc2 = x2 - 2.5F;
@@ -192,8 +193,8 @@ public enum ClickGuiIcons
 		RenderUtils.drawBorder2D(context, xc1, yc1, xc2, yc2, outlineColor);
 	}
 	
-	public static void drawCross(GuiGraphics context, float x1, float y1,
-		float x2, float y2, boolean hovering)
+	public static void drawCross(GuiGraphicsExtractor context, float x1,
+		float y1, float x2, float y2, boolean hovering)
 	{
 		float xc1 = x1 + 2;
 		float xc2 = x1 + 3;
