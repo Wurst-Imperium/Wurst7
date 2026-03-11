@@ -162,6 +162,7 @@
   "description.wurst.setting.freecam.tracer": "Draws a line to your character's actual position.",
   "description.wurst.setting.freecam.hide_hand": "Hides your hand and held items while using Freecam.",
   "description.wurst.setting.freecam.disable_on_damage": "Automatically turns off Freecam when you take damage.",
+  "description.wurst.setting.freecam.reload_chunks": "Reloads all chunks when you turn off Freecam.\n\nTurning this off improves performance but can cause issues with visual holes in the world.",
   "description.wurst.hack.fullbright": "Allows you to see in the dark.",
   "description.wurst.hack.glide": "Makes you glide down slowly when falling.\n\n§c§lWARNING:§r You will take fall damage if you don't use NoFall.",
   "description.wurst.hack.handnoclip": "Allows you to reach specific blocks through walls.",

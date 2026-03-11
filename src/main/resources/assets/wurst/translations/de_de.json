@@ -112,6 +112,7 @@
   "description.wurst.setting.freecam.tracer": "Rendert eine Linie zur tatsächlichen Position deiner Spielfigur.",
   "description.wurst.setting.freecam.hide_hand": "Blendet deine Hand und Items die du hältst aus, während du Freecam benutzt.",
   "description.wurst.setting.freecam.disable_on_damage": "Schaltet Freecam automatisch aus, wenn du Schaden nimmst.",
+  "description.wurst.setting.freecam.reload_chunks": "Lädt alle Chunks neu, wenn du Freecam ausschaltest.\n\nDiese Option auszuschalten verbessert die Performance, kann aber zu visuellen Löchern in der Welt führen.",
   "description.wurst.hack.fullbright": "Ermöglicht dir, im Dunkeln zu sehen.",
   "description.wurst.hack.glide": "Lässt dich beim Fallen langsam nach unten gleiten.\n\n§c§lWARNUNG:§r Du bekommst immer noch Fallschaden, wenn du nicht NoFall benutzt.",
   "description.wurst.hack.handnoclip": "NoClip für die Hände. Lässt dich bestimmte Blöcke durch Wände anklicken.",

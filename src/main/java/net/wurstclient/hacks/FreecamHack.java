@@ -84,6 +84,10 @@ public final class FreecamHack extends Hack
 		new CheckboxSetting("Disable on damage",
 			"description.wurst.setting.freecam.disable_on_damage", true);
 	
+	private final CheckboxSetting reloadChunks =
+		new CheckboxSetting("Reload chunks",
+			"description.wurst.setting.freecam.reload_chunks", true);
+	
 	private Vec3 camPos;
 	private Vec3 prevCamPos;
 	private float camYaw;
@@ -105,6 +109,7 @@ public final class FreecamHack extends Hack
 		addSetting(color);
 		addSetting(hideHand);
 		addSetting(disableOnDamage);
+		addSetting(reloadChunks);
 	}
 	
 	@Override
@@ -143,7 +148,8 @@ public final class FreecamHack extends Hack
 		EVENTS.remove(RenderListener.class, this);
 		EVENTS.remove(MouseScrollListener.class, this);
 		
-		MC.levelRenderer.allChanged();
+		if(reloadChunks.isChecked())
+			MC.levelRenderer.allChanged();
 	}
 	
 	@Override
