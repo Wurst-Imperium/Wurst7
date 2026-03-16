@@ -38,7 +38,7 @@ public abstract class TitleScreenMixin extends Screen
 	 * Adds the AltManager button to the title screen. This mixin must not
 	 * run in demo mode, as the Realms button doesn't exist there.
 	 */
-	@Inject(at = @At("RETURN"), method = "createNormalMenuOptions(II)I")
+	@Inject(method = "createNormalMenuOptions(II)I", at = @At("RETURN"))
 	private void onAddNormalWidgets(int y, int spacingY,
 		CallbackInfoReturnable<Integer> cir)
 	{
@@ -68,7 +68,7 @@ public abstract class TitleScreenMixin extends Screen
 			.bounds(width / 2 + 2, realmsButton.getY(), 98, 20).build());
 	}
 	
-	@Inject(at = @At("RETURN"), method = "tick()V")
+	@Inject(method = "tick()V", at = @At("RETURN"))
 	private void onTick(CallbackInfo ci)
 	{
 		if(realmsButton == null || altsButton == null)
@@ -83,8 +83,9 @@ public abstract class TitleScreenMixin extends Screen
 	 * Stops the multiplayer button being grayed out if the user's Microsoft
 	 * account is parental-control'd or banned from online play.
 	 */
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getMultiplayerDisabledReason()Lnet/minecraft/network/chat/Component;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetMultiplayerDisabledText(
 		CallbackInfoReturnable<Component> cir)

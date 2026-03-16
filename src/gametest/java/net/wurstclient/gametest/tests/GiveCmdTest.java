@@ -7,31 +7,33 @@
  */
 package net.wurstclient.gametest.tests;
 
-import static net.wurstclient.gametest.WurstClientTestHelper.*;
-
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.world.item.Items;
-import net.wurstclient.gametest.WurstTest;
+import net.wurstclient.gametest.SingleplayerTest;
 
-public enum GiveCmdTest
+public final class GiveCmdTest extends SingleplayerTest
 {
-	;
-	
-	public static void testGiveCmd(ClientGameTestContext context,
+	public GiveCmdTest(ClientGameTestContext context,
 		TestSingleplayerContext spContext)
 	{
-		WurstTest.LOGGER.info("Testing .give command");
+		super(context, spContext);
+	}
+	
+	@Override
+	protected void runImpl()
+	{
+		logger.info("Testing .give command");
 		
-		runWurstCommand(context, "give diamond");
-		clearToasts(context);
+		runWurstCommand("give diamond");
+		clearToasts();
 		context.waitTick();
-		assertOneItemInSlot(context, 0, Items.DIAMOND);
+		assertOneItemInSlot(0, Items.DIAMOND);
 		context.takeScreenshot("give_command_result");
 		
 		// Clean up
-		clearInventory(context);
-		clearChat(context);
-		context.waitTicks(7);
+		clearInventory();
+		clearChat();
+		waitForHandSwing();
 	}
 }

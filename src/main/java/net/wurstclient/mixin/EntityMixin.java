@@ -36,11 +36,12 @@ public abstract class EntityMixin
 	 * AntiWaterPush. It's set to require 0 because it doesn't work in Forge,
 	 * when using Sinytra Connector.
 	 */
-	@WrapWithCondition(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V",
-		opcode = Opcodes.INVOKEVIRTUAL,
-		ordinal = 0),
+	@WrapWithCondition(
 		method = "updateFluidHeightAndDoFluidPushing(Lnet/minecraft/tags/TagKey;D)Z",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V",
+			opcode = Opcodes.INVOKEVIRTUAL,
+			ordinal = 0),
 		require = 0)
 	private boolean shouldSetVelocity(Entity instance, Vec3 velocity)
 	{
@@ -49,8 +50,8 @@ public abstract class EntityMixin
 		return !event.isCancelled();
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "push(Lnet/minecraft/world/entity/Entity;)V",
+	@Inject(method = "push(Lnet/minecraft/world/entity/Entity;)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onPushAwayFrom(Entity entity, CallbackInfo ci)
 	{
@@ -65,8 +66,9 @@ public abstract class EntityMixin
 	/**
 	 * Makes invisible entities render as ghosts if TrueSight is enabled.
 	 */
-	@Inject(at = @At("RETURN"),
+	@Inject(
 		method = "isInvisibleTo(Lnet/minecraft/world/entity/player/Player;)Z",
+		at = @At("RETURN"),
 		cancellable = true)
 	private void onIsInvisibleTo(Player player,
 		CallbackInfoReturnable<Boolean> cir)
