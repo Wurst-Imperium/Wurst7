@@ -27,8 +27,9 @@ public abstract class CameraMixin implements TrackedWaypoint.Camera
 	@Shadow
 	private boolean detached;
 	
-	@Inject(at = @At("RETURN"),
+	@Inject(
 		method = "setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V",
+		at = @At("RETURN"),
 		cancellable = false)
 	public void onSetup(BlockGetter blockGetter, Entity entity, boolean bl,
 		boolean bl2, float partialTicks, CallbackInfo ci)

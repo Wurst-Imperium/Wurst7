@@ -16,11 +16,13 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.screens.ClickGuiScreen;
 import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.events.KeyPressListener;
+import net.wurstclient.events.MouseButtonPressListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.util.ChatUtils;
 
-public final class KeybindProcessor implements KeyPressListener
+public final class KeybindProcessor
+	implements KeyPressListener, MouseButtonPressListener
 {
 	private final HackList hax;
 	private final KeybindList keybinds;
@@ -40,12 +42,7 @@ public final class KeybindProcessor implements KeyPressListener
 		if(event.getAction() != GLFW.GLFW_PRESS)
 			return;
 		
-		if(InputConstants.isKeyDown(WurstClient.MC.getWindow().getWindow(),
-			GLFW.GLFW_KEY_F3))
-			return;
-		
-		Screen screen = WurstClient.MC.screen;
-		if(screen != null && !(screen instanceof ClickGuiScreen))
+		if(!isKeybindProcessingAllowed())
 			return;
 		
 		String keyName = getKeyName(event);
@@ -57,11 +54,45 @@ public final class KeybindProcessor implements KeyPressListener
 		processCmds(cmds);
 	}
 	
+	@Override
+	public void onMouseButtonPress(MouseButtonPressEvent event)
+	{
+		if(event.getAction() != GLFW.GLFW_PRESS)
+			return;
+		
+		if(!isKeybindProcessingAllowed())
+			return;
+		
+		String keyName = getMouseButtonName(event);
+		
+		String cmds = keybinds.getCommands(keyName);
+		if(cmds == null)
+			return;
+		
+		processCmds(cmds);
+	}
+	
+	private boolean isKeybindProcessingAllowed()
+	{
+		if(InputConstants.isKeyDown(WurstClient.MC.getWindow().getWindow(),
+			GLFW.GLFW_KEY_F3))
+			return false;
+		
+		Screen screen = WurstClient.MC.screen;
+		return screen == null || screen instanceof ClickGuiScreen;
+	}
+	
 	private String getKeyName(KeyPressEvent event)
 	{
 		int keyCode = event.getKeyCode();
 		int scanCode = event.getScanCode();
 		return InputConstants.getKey(keyCode, scanCode).getName();
+	}
+	
+	private String getMouseButtonName(MouseButtonPressEvent event)
+	{
+		return InputConstants.Type.MOUSE.getOrCreate(event.getButton())
+			.getName();
 	}
 	
 	private void processCmds(String cmds)

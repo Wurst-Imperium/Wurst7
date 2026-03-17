@@ -37,9 +37,6 @@ import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotCompari
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 
 public enum WurstClientTestHelper
 {
@@ -285,57 +282,4 @@ public enum WurstClientTestHelper
 		}
 	}
 	
-	public static void waitForBlock(ClientGameTestContext context, int relX,
-		int relY, int relZ, Block block)
-	{
-		context.waitFor(mc -> mc.level
-			.getBlockState(mc.player.blockPosition().offset(relX, relY, relZ))
-			.getBlock() == block);
-	}
-	
-	public static void clearChat(ClientGameTestContext context)
-	{
-		context.runOnClient(mc -> mc.gui.getChat().clearMessages(true));
-	}
-	
-	public static void clearInventory(ClientGameTestContext context)
-	{
-		TestInput input = context.getInput();
-		input.pressKey(GLFW.GLFW_KEY_T);
-		input.typeChars("/clear");
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
-	}
-	
-	public static void clearParticles(ClientGameTestContext context)
-	{
-		context.runOnClient(mc -> mc.particleEngine.clearParticles());
-	}
-	
-	public static void clearToasts(ClientGameTestContext context)
-	{
-		context.runOnClient(mc -> mc.getToastManager().clear());
-	}
-	
-	public static void assertOneItemInSlot(ClientGameTestContext context,
-		int slot, Item item)
-	{
-		ItemStack stack = context
-			.computeOnClient(mc -> mc.player.getInventory().getItem(slot));
-		if(!stack.is(item) || stack.getCount() != 1)
-			throw new RuntimeException(
-				"Expected 1 " + item.getName().getString() + " at slot " + slot
-					+ ", found " + stack.getCount() + " "
-					+ stack.getItem().getName().getString() + " instead");
-	}
-	
-	public static void assertNoItemInSlot(ClientGameTestContext context,
-		int slot)
-	{
-		ItemStack stack = context
-			.computeOnClient(mc -> mc.player.getInventory().getItem(slot));
-		if(!stack.isEmpty())
-			throw new RuntimeException("Expected no item in slot " + slot
-				+ ", found " + stack.getCount() + " "
-				+ stack.getItem().getName().getString() + " instead");
-	}
 }

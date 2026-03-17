@@ -33,7 +33,7 @@ public class MultiplayerScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "init()V")
+	@Inject(method = "init()V", at = @At("TAIL"))
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -61,8 +61,8 @@ public class MultiplayerScreenMixin extends Screen
 			.bounds(width / 2 + 154 + 4, height - 30, 100, 20).build());
 	}
 	
-	@Inject(at = @At("HEAD"),
-		method = "join(Lnet/minecraft/client/multiplayer/ServerData;)V")
+	@Inject(method = "join(Lnet/minecraft/client/multiplayer/ServerData;)V",
+		at = @At("HEAD"))
 	private void onConnect(ServerData entry, CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(entry);

@@ -40,8 +40,9 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	@Final
 	protected EntityRenderDispatcher entityRenderDispatcher;
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "renderNameTag(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lnet/minecraft/network/chat/Component;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onRenderLabelIfPresent(S state, Component text,
 		PoseStack matrices, MultiBufferSource vertexConsumers, int light,
@@ -115,9 +116,10 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	/**
 	 * Disables the nametag distance limit if configured in NameTags.
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"),
-		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V")
+	@WrapOperation(
+		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"))
 	private double fakeSquaredDistanceToCamera(
 		EntityRenderDispatcher dispatcher, Entity entity,
 		Operation<Double> original,
@@ -135,8 +137,9 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	 * Restores the true squared distance so we don't break other code that
 	 * might rely on it.
 	 */
-	@Inject(at = @At("TAIL"),
-		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V")
+	@Inject(
+		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V",
+		at = @At("TAIL"))
 	private void restoreSquaredDistanceToCamera(T entity, S state,
 		float tickDelta, CallbackInfo ci,
 		@Share("actualDistanceSq") LocalDoubleRef actualDistanceSq)

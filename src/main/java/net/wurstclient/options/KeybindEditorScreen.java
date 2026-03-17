@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.wurstclient.WurstClient;
+import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.util.WurstColors;
 
 public final class KeybindEditorScreen extends Screen
@@ -100,7 +101,7 @@ public final class KeybindEditorScreen extends Screen
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			CommonColors.WHITE);
 		
-		context.drawString(font, "Key: " + key.replace("key.keyboard.", ""),
+		context.drawString(font, "Key: " + Keybind.getDisplayKey(key),
 			width / 2 - 100, 47, WurstColors.VERY_LIGHT_GRAY);
 		context.drawString(font, "Commands (separated by ';')", width / 2 - 100,
 			87, WurstColors.VERY_LIGHT_GRAY);

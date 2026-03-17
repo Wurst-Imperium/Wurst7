@@ -40,8 +40,9 @@ public abstract class ClientPlayNetworkHandlerMixin
 		super(client, connection, connectionState);
 	}
 	
-	@Inject(at = @At("TAIL"),
-		method = "handleLogin(Lnet/minecraft/network/protocol/game/ClientboundLoginPacket;)V")
+	@Inject(
+		method = "handleLogin(Lnet/minecraft/network/protocol/game/ClientboundLoginPacket;)V",
+		at = @At("TAIL"))
 	public void onOnGameJoin(ClientboundLoginPacket packet, CallbackInfo ci)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
@@ -67,16 +68,18 @@ public abstract class ClientPlayNetworkHandlerMixin
 		minecraft.getToastManager().addToast(systemToast);
 	}
 	
-	@Inject(at = @At("TAIL"),
-		method = "updateLevelChunk(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)V")
+	@Inject(
+		method = "updateLevelChunk(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)V",
+		at = @At("TAIL"))
 	private void onLoadChunk(int x, int z,
 		ClientboundLevelChunkPacketData chunkData, CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getHax().newChunksHack.afterLoadChunk(x, z);
 	}
 	
-	@Inject(at = @At("TAIL"),
-		method = "handleBlockUpdate(Lnet/minecraft/network/protocol/game/ClientboundBlockUpdatePacket;)V")
+	@Inject(
+		method = "handleBlockUpdate(Lnet/minecraft/network/protocol/game/ClientboundBlockUpdatePacket;)V",
+		at = @At("TAIL"))
 	private void onOnBlockUpdate(ClientboundBlockUpdatePacket packet,
 		CallbackInfo ci)
 	{
@@ -84,8 +87,9 @@ public abstract class ClientPlayNetworkHandlerMixin
 			.afterUpdateBlock(packet.getPos());
 	}
 	
-	@Inject(at = @At("TAIL"),
-		method = "handleChunkBlocksUpdate(Lnet/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket;)V")
+	@Inject(
+		method = "handleChunkBlocksUpdate(Lnet/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket;)V",
+		at = @At("TAIL"))
 	private void onOnChunkDeltaUpdate(
 		ClientboundSectionBlocksUpdatePacket packet, CallbackInfo ci)
 	{

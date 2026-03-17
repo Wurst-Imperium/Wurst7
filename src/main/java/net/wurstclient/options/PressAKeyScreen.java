@@ -47,6 +47,15 @@ public class PressAKeyScreen extends Screen
 	}
 	
 	@Override
+	public boolean mouseClicked(double x, double y, int button)
+	{
+		prevScreen
+			.setKey(InputConstants.Type.MOUSE.getOrCreate(button).getName());
+		minecraft.setScreen((Screen)prevScreen);
+		return true;
+	}
+	
+	@Override
 	public boolean shouldCloseOnEsc()
 	{
 		return false;
@@ -56,8 +65,8 @@ public class PressAKeyScreen extends Screen
 	public void render(GuiGraphics context, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		context.drawCenteredString(font, "Press a key", width / 2,
-			height / 4 + 48, CommonColors.WHITE);
+		context.drawCenteredString(font, "Press a key or mouse button",
+			width / 2, height / 4 + 48, CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
 			drawable.render(context, mouseX, mouseY, partialTicks);

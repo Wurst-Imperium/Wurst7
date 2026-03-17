@@ -41,9 +41,10 @@ public abstract class BlockModelRendererMixin implements ItemLike
 	 * called while Indigo is running when breaking a block in survival mode or
 	 * seeing a piston retract.
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/world/level/block/Block;shouldRenderFace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z"),
-		method = "shouldRenderFace(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;ZLnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos;)Z")
+	@WrapOperation(
+		method = "shouldRenderFace(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;ZLnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos;)Z",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/world/level/block/Block;shouldRenderFace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z"))
 	private static boolean onRenderSmoothOrFlat(BlockState state,
 		BlockState otherState, Direction side, Operation<Boolean> original,
 		BlockAndTintGetter world, BlockState stateButFromTheOtherMethod,
@@ -80,13 +81,12 @@ public abstract class BlockModelRendererMixin implements ItemLike
 	 * Hides blocks like grass and snow when neither Sodium nor Indigo are
 	 * running.
 	 */
-	@WrapOperation(
+	@WrapOperation(method = {
+		"tesselateWithoutAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V",
+		"tesselateWithAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V"},
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;isEmpty()Z",
-			ordinal = 1),
-		method = {
-			"tesselateWithoutAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V",
-			"tesselateWithAO(Lnet/minecraft/world/level/BlockAndTintGetter;Ljava/util/List;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZI)V"})
+			ordinal = 1))
 	private boolean pretendEmptyToStopSecondRenderModelFaceFlatCall(
 		List<BakedQuad> instance, Operation<Boolean> original,
 		BlockAndTintGetter world, List<BlockModelPart> list, BlockState state,

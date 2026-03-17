@@ -36,8 +36,9 @@ public class ChatHudMixin
 	@Final
 	private List<GuiMessage.Line> trimmedMessages;
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onAddMessage(Component messageDontUse,
 		@Nullable MessageSignature signature,

@@ -33,8 +33,9 @@ public class InGameOverlayRendererMixin
 			.getOverlayOffset();
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "renderWater(Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private static void onRenderUnderwaterOverlay(Minecraft client,
 		PoseStack matrices, MultiBufferSource vertexConsumerProvider,

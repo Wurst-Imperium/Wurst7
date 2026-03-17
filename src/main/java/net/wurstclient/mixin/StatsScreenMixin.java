@@ -37,9 +37,10 @@ public abstract class StatsScreenMixin extends Screen
 		super(title);
 	}
 	
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/gui/layouts/LinearLayout;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;",
-		ordinal = 4), method = "initButtons()V")
+	@WrapOperation(method = "initButtons()V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/layouts/LinearLayout;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;",
+			ordinal = 4))
 	private <T extends LayoutElement> T onAddDoneButton(
 		LinearLayout footerLayout, T doneWidget, Operation<T> original,
 		@Local(ordinal = 0) HeaderAndFooterLayout headerAndFooterLayout)
