@@ -49,7 +49,7 @@ public class DisconnectedScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "init()V")
+	@Inject(method = "init()V", at = @At("TAIL"))
 	private void onInit(CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())

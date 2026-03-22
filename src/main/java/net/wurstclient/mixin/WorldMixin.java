@@ -19,7 +19,7 @@ import net.wurstclient.WurstClient;
 @Mixin(Level.class)
 public abstract class WorldMixin implements LevelAccessor, AutoCloseable
 {
-	@Inject(at = @At("HEAD"), method = "getRainLevel(F)F", cancellable = true)
+	@Inject(method = "getRainLevel(F)F", at = @At("HEAD"), cancellable = true)
 	private void onGetRainGradient(float delta,
 		CallbackInfoReturnable<Float> cir)
 	{

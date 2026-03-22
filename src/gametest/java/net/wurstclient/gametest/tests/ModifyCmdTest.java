@@ -7,36 +7,35 @@
  */
 package net.wurstclient.gametest.tests;
 
-import static net.wurstclient.gametest.WurstClientTestHelper.*;
-
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.wurstclient.gametest.WurstTest;
+import net.wurstclient.gametest.SingleplayerTest;
 
-public enum ModifyCmdTest
+public final class ModifyCmdTest extends SingleplayerTest
 {
-	;
-	
-	public static void testModifyCmd(ClientGameTestContext context,
+	public ModifyCmdTest(ClientGameTestContext context,
 		TestSingleplayerContext spContext)
 	{
-		WurstTest.LOGGER.info("Testing .modify command");
-		TestServerContext server = spContext.getServer();
+		super(context, spContext);
+	}
+	
+	@Override
+	protected void runImpl()
+	{
+		logger.info("Testing .modify command");
 		
 		// /give a diamond
-		runCommand(server, "give @s diamond");
+		runCommand("give @s diamond");
 		context.waitTick();
-		assertOneItemInSlot(context, 0, Items.DIAMOND);
+		assertOneItemInSlot(0, Items.DIAMOND);
 		
 		// .modify it with NBT data
-		runWurstCommand(context,
-			"modify set custom_name {\"text\":\"$cRed Name\"}");
-		assertOneItemInSlot(context, 0, Items.DIAMOND);
+		runWurstCommand("modify set custom_name {\"text\":\"$cRed Name\"}");
+		assertOneItemInSlot(0, Items.DIAMOND);
 		ItemStack stack = context
 			.computeOnClient(mc -> mc.player.getInventory().getSelectedItem());
 		String name = stack.getComponents()
@@ -44,12 +43,12 @@ public enum ModifyCmdTest
 			.getString();
 		if(!name.equals("\u00a7cRed Name"))
 			throw new RuntimeException("Custom name is wrong: " + name);
-		runWurstCommand(context, "viewcomp type name");
+		runWurstCommand("viewcomp type name");
 		context.takeScreenshot("modify_command_result");
 		
 		// Clean up
-		clearInventory(context);
-		clearChat(context);
-		context.waitTicks(7);
+		clearInventory();
+		clearChat();
+		waitForHandSwing();
 	}
 }

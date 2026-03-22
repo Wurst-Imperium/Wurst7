@@ -23,8 +23,9 @@ public class FogRendererMixin
 	 * Removes the fog near the end of the render distance in all dimensions, if
 	 * NoFog is enabled.
 	 */
-	@ModifyReturnValue(at = @At("RETURN"),
-		method = "setupFog(Lnet/minecraft/client/Camera;ILnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;)Lnet/minecraft/client/renderer/fog/FogData;")
+	@ModifyReturnValue(
+		method = "setupFog(Lnet/minecraft/client/Camera;ILnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;)Lnet/minecraft/client/renderer/fog/FogData;",
+		at = @At("RETURN"))
 	private FogData modifyFogData(FogData fog)
 	{
 		if(WurstClient.INSTANCE.getHax().noFogHack.isEnabled())

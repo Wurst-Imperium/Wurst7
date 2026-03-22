@@ -38,9 +38,10 @@ public abstract class StatsScreenMixin extends Screen
 		super(title);
 	}
 	
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/gui/layouts/HeaderAndFooterLayout;addToFooter(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;",
-		ordinal = 0), method = "init()V")
+	@WrapOperation(method = "init()V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/layouts/HeaderAndFooterLayout;addToFooter(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;",
+			ordinal = 0))
 	private <T extends LayoutElement> T onAddToFooter(
 		HeaderAndFooterLayout layout, T doneWidget, Operation<T> original)
 	{
@@ -75,8 +76,9 @@ public abstract class StatsScreenMixin extends Screen
 		return original.call(layout, vLayout);
 	}
 	
-	@Inject(at = @At("TAIL"),
-		method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V")
+	@Inject(
+		method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
+		at = @At("TAIL"))
 	private void onRender(GuiGraphicsExtractor context, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{

@@ -31,10 +31,10 @@ public abstract class GameRendererMixin implements AutoCloseable
 	/**
 	 * Prevents view bobbing when hacks disable it.
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/renderer/GameRenderer;bobView(Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
-		ordinal = 0),
-		method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V")
+	@WrapOperation(method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/GameRenderer;bobView(Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
+			ordinal = 0))
 	private void onBobView(GameRenderer instance, CameraRenderState cameraState,
 		PoseStack matrices, Operation<Void> original)
 	{
@@ -46,11 +46,10 @@ public abstract class GameRendererMixin implements AutoCloseable
 			original.call(instance, cameraState, matrices);
 	}
 	
-	@WrapOperation(
+	@WrapOperation(method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/util/Mth;lerp(FFF)F",
-			ordinal = 0),
-		method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V")
+			ordinal = 0))
 	private float onRenderWorldNauseaLerp(float delta, float start, float end,
 		Operation<Float> original)
 	{
@@ -60,8 +59,9 @@ public abstract class GameRendererMixin implements AutoCloseable
 		return 0;
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getNightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
+		at = @At("HEAD"),
 		cancellable = true)
 	private static void onGetNightVisionStrength(LivingEntity entity,
 		float tickDelta, CallbackInfoReturnable<Float> cir)
@@ -76,8 +76,9 @@ public abstract class GameRendererMixin implements AutoCloseable
 	/**
 	 * Makes NoHurtcam work.
 	 */
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "bobHurt(Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onTiltViewWhenHurt(CameraRenderState cameraState,
 		PoseStack matrices, CallbackInfo ci)

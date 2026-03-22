@@ -38,15 +38,16 @@ public abstract class PauseScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(at = @At("TAIL"), method = "createPauseMenu()V")
+	@Inject(method = "createPauseMenu()V", at = @At("TAIL"))
 	private void onInitWidgets(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getOtfs().wurstOptionsOtf.isVisibleInGameMenu())
 			addWurstOptionsButton();
 	}
 	
-	@Inject(at = @At("TAIL"),
-		method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V")
+	@Inject(
+		method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
+		at = @At("TAIL"))
 	private void onRender(GuiGraphicsExtractor context, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{

@@ -21,8 +21,8 @@ public class SectionCompilerMixin
 	/**
 	 * Puts all quads on the translucent layer if Opacity X-Ray is enabled.
 	 */
-	@ModifyVariable(at = @At("HEAD"),
-		method = "getOrBeginLayer",
+	@ModifyVariable(method = "getOrBeginLayer",
+		at = @At("HEAD"),
 		argsOnly = true,
 		ordinal = 0)
 	private ChunkSectionLayer forceTranslucentLayer(

@@ -27,8 +27,9 @@ public class IngameHudMixin
 {
 	// runs after renderScoreboardSidebar()
 	// and before playerListHud.setVisible()
-	@Inject(at = @At("HEAD"),
-		method = "extractTabList(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V")
+	@Inject(
+		method = "extractTabList(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V",
+		at = @At("HEAD"))
 	private void onRenderPlayerList(GuiGraphicsExtractor context,
 		DeltaTracker tickCounter, CallbackInfo ci)
 	{
@@ -39,8 +40,9 @@ public class IngameHudMixin
 		EventManager.fire(new GUIRenderEvent(context, tickDelta));
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "extractTextureOverlay(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/resources/Identifier;F)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onRenderOverlay(GuiGraphicsExtractor context,
 		Identifier texture, float opacity, CallbackInfo ci)
@@ -60,7 +62,7 @@ public class IngameHudMixin
 			ci.cancel();
 	}
 	
-	@Inject(at = @At("HEAD"), method = "extractVignette", cancellable = true)
+	@Inject(method = "extractVignette", at = @At("HEAD"), cancellable = true)
 	private void onRenderVignetteOverlay(GuiGraphicsExtractor context,
 		Entity entity, CallbackInfo ci)
 	{

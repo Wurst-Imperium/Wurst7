@@ -27,7 +27,7 @@ public abstract class ClientClockManagerMixin
 	 * is changing the time. This affects all timeline-based environment
 	 * attributes including sun/moon/star angles, sky colors, fog, etc.
 	 */
-	@ModifyReturnValue(at = @At("RETURN"), method = "getTotalTicks")
+	@ModifyReturnValue(method = "getTotalTicks", at = @At("RETURN"))
 	private long onGetTotalTicks(long original, Holder<WorldClock> definition)
 	{
 		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;

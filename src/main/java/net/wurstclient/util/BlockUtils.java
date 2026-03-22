@@ -19,9 +19,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.CollisionGetter;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -252,5 +252,60 @@ public enum BlockUtils
 	{
 		return getAllInBoxStream(center.offset(-range, -range, -range),
 			center.offset(range, range, range));
+	}
+	
+	/**
+	 * Checks if the given block state opens a UI screen when right-clicked.
+	 * Returns false for null input.
+	 *
+	 * <p>
+	 * Note: Some blocks can change their interactivity: lectern only with
+	 * book, command/structure/jigsaw blocks only with OP.
+	 */
+	public static boolean isInteractive(BlockState state)
+	{
+		if(state == null)
+			return false;
+		
+		Block block = state.getBlock();
+		
+		// Containers
+		if(block instanceof AbstractChestBlock || block instanceof BarrelBlock
+			|| block instanceof ShulkerBoxBlock)
+			return true;
+		
+		// Workstations
+		if(block instanceof AnvilBlock || block instanceof CartographyTableBlock
+			|| block instanceof CraftingTableBlock
+			|| block instanceof EnchantingTableBlock
+			|| block instanceof GrindstoneBlock || block instanceof LoomBlock
+			|| block instanceof StonecutterBlock)
+			return true;
+		
+		// Machines
+		if(block instanceof AbstractFurnaceBlock
+			|| block instanceof BrewingStandBlock
+			|| block instanceof DispenserBlock || block instanceof HopperBlock
+			|| block instanceof CrafterBlock)
+			return true;
+		
+		// Beacons
+		if(block instanceof BeaconBlock)
+			return true;
+		
+		// Signs
+		if(block instanceof SignBlock)
+			return true;
+		
+		// Special case: Lectern only opens UI when it has a book
+		if(block instanceof LecternBlock)
+			return state.getValue(BlockStateProperties.HAS_BOOK);
+		
+		// Special case: OP-only blocks
+		if(block instanceof CommandBlock || block instanceof StructureBlock
+			|| block instanceof JigsawBlock)
+			return MC.player.canUseGameMasterBlocks();
+		
+		return false;
 	}
 }

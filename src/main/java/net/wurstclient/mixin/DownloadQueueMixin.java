@@ -40,10 +40,12 @@ public abstract class DownloadQueueMixin implements AutoCloseable
 	 *
 	 * @see https://github.com/Wurst-Imperium/Wurst7/issues/1226
 	 */
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Ljava/nio/file/Path;resolve(Ljava/lang/String;)Ljava/nio/file/Path;",
-		ordinal = 0,
-		remap = false), method = "lambda$runDownload$0", remap = false)
+	@WrapOperation(method = "lambda$runDownload$0",
+		at = @At(value = "INVOKE",
+			target = "Ljava/nio/file/Path;resolve(Ljava/lang/String;)Ljava/nio/file/Path;",
+			ordinal = 0,
+			remap = false),
+		remap = false)
 	private Path wrapResolve(Path instance, String filename,
 		Operation<Path> original)
 	{
