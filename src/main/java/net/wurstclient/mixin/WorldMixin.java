@@ -22,7 +22,7 @@ import net.wurstclient.hacks.NoWeatherHack;
 @Mixin(Level.class)
 public abstract class WorldMixin implements LevelAccessor, AutoCloseable
 {
-	@Inject(at = @At("HEAD"), method = "getRainLevel(F)F", cancellable = true)
+	@Inject(method = "getRainLevel(F)F", at = @At("HEAD"), cancellable = true)
 	private void onGetRainGradient(float delta,
 		CallbackInfoReturnable<Float> cir)
 	{
@@ -30,7 +30,7 @@ public abstract class WorldMixin implements LevelAccessor, AutoCloseable
 			cir.setReturnValue(0F);
 	}
 	
-	@ModifyReturnValue(at = @At("RETURN"), method = "getDayTime()J")
+	@ModifyReturnValue(method = "getDayTime()J", at = @At("RETURN"))
 	public long onGetTimeOfDay(long original)
 	{
 		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;

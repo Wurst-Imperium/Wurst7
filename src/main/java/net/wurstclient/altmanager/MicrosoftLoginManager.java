@@ -95,7 +95,7 @@ public enum MicrosoftLoginManager
 		Pattern.compile("\"urlPost\":\"([^\"]+)");
 	
 	private static final Pattern AUTHCODE_REGEX =
-		Pattern.compile("[?&]code=([\\w\\.-]+)");
+		Pattern.compile("[?&]code=([^&]+)");
 	
 	public static void login(String email, String password)
 		throws LoginException

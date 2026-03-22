@@ -19,8 +19,9 @@ import net.wurstclient.WurstClient;
 @Mixin(ClientTelemetryManager.class)
 public class TelemetryManagerMixin
 {
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getOutsideSessionSender()Lnet/minecraft/client/telemetry/TelemetryEventSender;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetSender(CallbackInfoReturnable<TelemetryEventSender> cir)
 	{

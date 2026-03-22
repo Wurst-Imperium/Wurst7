@@ -39,8 +39,9 @@ public class AllowedAddressResolverMixin
 	 * by Mojang, such as CS:GO and GTA clones that are apparently "too
 	 * adult-oriented" for having pixelated guns.
 	 */
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "resolveAddress(Lnet/minecraft/client/multiplayer/resolver/ServerAddress;)Ljava/util/Optional;",
+		at = @At("HEAD"),
 		cancellable = true)
 	public void resolve(ServerAddress address,
 		CallbackInfoReturnable<Optional<ResolvedServerAddress>> cir)

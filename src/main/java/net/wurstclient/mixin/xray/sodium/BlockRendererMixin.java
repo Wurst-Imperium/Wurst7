@@ -30,9 +30,10 @@ public class BlockRendererMixin extends AbstractBlockRenderContextMixin
 	/**
 	 * Modifies opacity of blocks when using X-Ray with Sodium installed.
 	 */
-	@ModifyExpressionValue(at = @At(value = "INVOKE",
-		target = "Lnet/caffeinemc/mods/sodium/client/render/model/MutableQuadViewImpl;baseColor(I)I"),
+	@ModifyExpressionValue(
 		method = "bufferQuad(Lnet/caffeinemc/mods/sodium/client/render/model/MutableQuadViewImpl;[FLnet/caffeinemc/mods/sodium/client/render/chunk/terrain/material/Material;)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/caffeinemc/mods/sodium/client/render/model/MutableQuadViewImpl;baseColor(I)I"),
 		require = 0)
 	private int onBufferQuad(int original)
 	{

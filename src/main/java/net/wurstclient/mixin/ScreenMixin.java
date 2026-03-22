@@ -22,8 +22,9 @@ import net.wurstclient.WurstClient;
 public abstract class ScreenMixin extends AbstractContainerEventHandler
 	implements Renderable
 {
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "renderTransparentBackground(Lnet/minecraft/client/gui/GuiGraphics;)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	public void onRenderInGameBackground(GuiGraphics context, CallbackInfo ci)
 	{

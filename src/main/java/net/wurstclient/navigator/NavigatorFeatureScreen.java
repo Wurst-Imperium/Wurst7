@@ -72,6 +72,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		
 		window.setWidth(308);
 		window.setFixedWidth(true);
+		window.setPositionClampingEnabled(false);
 		window.pack();
 	}
 	
@@ -248,8 +249,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int button = context.button();
 		
 		// popups
-		if(WurstClient.INSTANCE.getGui().handleNavigatorPopupClick(x, y,
-			button))
+		if(WurstClient.INSTANCE.getGui().handlePopupMouseClick(x, y, button))
 			return;
 		
 		// back button
@@ -484,6 +484,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		}
 		
 		// popups & tooltip
+		gui.closePopupsOutsideArea(window, bgx1, bgy1, bgx2, bgy3);
 		gui.renderPopups(context, mouseX, mouseY);
 		gui.renderTooltip(context, mouseX, mouseY);
 	}

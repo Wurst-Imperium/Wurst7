@@ -26,6 +26,7 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatOutputListener;
 import net.wurstclient.events.GUIRenderListener;
 import net.wurstclient.events.KeyPressListener;
+import net.wurstclient.events.MouseButtonPressListener;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.UpdateListener;
@@ -50,7 +51,7 @@ public enum WurstClient
 	public static Minecraft MC;
 	public static IMinecraftClient IMC;
 	
-	public static final String VERSION = "7.52";
+	public static final String VERSION = "7.53";
 	public static final String MC_VERSION = "1.21.11";
 	
 	private PlausibleAnalytics plausible;
@@ -124,6 +125,7 @@ public enum WurstClient
 		KeybindProcessor keybindProcessor =
 			new KeybindProcessor(hax, keybinds, cmdProcessor);
 		eventManager.add(KeyPressListener.class, keybindProcessor);
+		eventManager.add(MouseButtonPressListener.class, keybindProcessor);
 		
 		hud = new IngameHUD();
 		eventManager.add(GUIRenderListener.class, hud);

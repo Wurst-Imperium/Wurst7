@@ -204,14 +204,12 @@ public final class ClickGui
 			handlePopupMouseClick(mouseX, mouseY, mouseButton);
 		
 		if(!popupClicked)
+		{
 			handleWindowMouseClick(mouseX, mouseY, mouseButton, context);
+			closeInvalidPopups();
+		}
 		
-		for(Popup popup : popups)
-			if(popup.getOwner().getParent().isClosing())
-				popup.close();
-			
 		windows.removeIf(Window::isClosing);
-		popups.removeIf(Popup::isClosing);
 	}
 	
 	public void handleMouseRelease(double mouseX, double mouseY,
@@ -246,26 +244,9 @@ public final class ClickGui
 			scroll = Math.max(scroll,
 				-window.getInnerHeight() + window.getHeight() - 13);
 			window.setScrollOffset(scroll);
+			closeInvalidPopups();
 			break;
 		}
-	}
-	
-	public boolean handleNavigatorPopupClick(double mouseX, double mouseY,
-		int mouseButton)
-	{
-		boolean popupClicked =
-			handlePopupMouseClick(mouseX, mouseY, mouseButton);
-		
-		if(popupClicked)
-		{
-			for(Popup popup : popups)
-				if(popup.getOwner().getParent().isClosing())
-					popup.close();
-				
-			popups.removeIf(Popup::isClosing);
-		}
-		
-		return popupClicked;
 	}
 	
 	public void handleNavigatorMouseClick(double cMouseX, double cMouseY,
@@ -277,16 +258,28 @@ public final class ClickGui
 		handleComponentMouseClick(window, cMouseX, cMouseY, mouseButton,
 			context);
 		
+		closeInvalidPopups();
+	}
+	
+	public void closePopupsOutsideArea(Window window, int x1, int y1, int x2,
+		int y2)
+	{
 		for(Popup popup : popups)
-			if(popup.getOwner().getParent().isClosing())
+		{
+			Component owner = popup.getOwner();
+			if(owner.getParent() == window
+				&& !isComponentVisibleWithinBounds(owner, x1, y1, x2, y2))
 				popup.close();
-			
+		}
+		
 		popups.removeIf(Popup::isClosing);
 	}
 	
-	private boolean handlePopupMouseClick(double mouseX, double mouseY,
+	public boolean handlePopupMouseClick(double mouseX, double mouseY,
 		int mouseButton)
 	{
+		closeInvalidPopups();
+		
 		for(int i = popups.size() - 1; i >= 0; i--)
 		{
 			Popup popup = popups.get(i);
@@ -313,10 +306,49 @@ public final class ClickGui
 			
 			popups.remove(i);
 			popups.add(popup);
+			closeInvalidPopups();
 			return true;
 		}
 		
 		return false;
+	}
+	
+	private void closeInvalidPopups()
+	{
+		for(Popup popup : popups)
+		{
+			Window parent = popup.getOwner().getParent();
+			if(parent == null || parent.isClosing()
+				|| !isPopupOwnerVisible(popup))
+				popup.close();
+		}
+		
+		popups.removeIf(Popup::isClosing);
+	}
+	
+	private boolean isPopupOwnerVisible(Popup popup)
+	{
+		Component owner = popup.getOwner();
+		Window parent = owner.getParent();
+		if(parent == null || parent.isInvisible() || parent.isMinimized())
+			return false;
+		
+		int x1 = parent.getX();
+		int y1 = parent.getY() + 13;
+		int x2 = x1 + parent.getWidth();
+		int y2 = parent.getY() + parent.getHeight();
+		return isComponentVisibleWithinBounds(owner, x1, y1, x2, y2);
+	}
+	
+	private boolean isComponentVisibleWithinBounds(Component c, int x1, int y1,
+		int x2, int y2)
+	{
+		Window parent = c.getParent();
+		int cx1 = parent.getX() + c.getX();
+		int cy1 = parent.getY() + 13 + parent.getScrollOffset() + c.getY();
+		int cx2 = cx1 + c.getWidth();
+		int cy2 = cy1 + c.getHeight();
+		return cx2 > x1 && cx1 < x2 && cy2 > y1 && cy1 < y2;
 	}
 	
 	private void handleWindowMouseClick(int mouseX, int mouseY, int mouseButton,
@@ -502,6 +534,8 @@ public final class ClickGui
 	
 	public void renderPopups(GuiGraphics context, int mouseX, int mouseY)
 	{
+		closeInvalidPopups();
+		
 		Matrix3x2fStack matrixStack = context.pose();
 		for(Popup popup : popups)
 		{

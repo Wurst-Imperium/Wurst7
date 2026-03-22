@@ -7,116 +7,107 @@
  */
 package net.wurstclient.gametest.tests;
 
-import static net.wurstclient.gametest.WurstClientTestHelper.*;
-
 import org.lwjgl.glfw.GLFW;
 
-import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.world.level.block.Blocks;
+import net.wurstclient.gametest.SingleplayerTest;
 import net.wurstclient.gametest.WurstTest;
 
-public enum XRayHackTest
+public final class XRayHackTest extends SingleplayerTest
 {
-	;
-	
-	public static void testXRayHack(ClientGameTestContext context,
+	public XRayHackTest(ClientGameTestContext context,
 		TestSingleplayerContext spContext)
 	{
-		WurstTest.LOGGER.info("Testing X-Ray hack");
-		TestInput input = context.getInput();
-		TestClientWorldContext world = spContext.getClientWorld();
-		TestServerContext server = spContext.getServer();
-		buildTestRig(context, spContext);
+		super(context, spContext);
+	}
+	
+	@Override
+	protected void runImpl()
+	{
+		logger.info("Testing X-Ray hack");
+		buildTestRig();
 		
 		// Enable X-Ray with default settings
-		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
-		runWurstCommand(context, "setslider X-Ray opacity 0");
+		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
+		runWurstCommand("setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
-		waitForChunkReloading(context, world);
-		assertScreenshotEquals(context, "xray_default",
+		waitForChunkReloading();
+		assertScreenshotEquals("xray_default",
 			"https://i.imgur.com/Dftamqv.png");
 		
 		// Exposed only
-		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed on");
-		runWurstCommand(context, "setslider X-Ray opacity 0");
+		runWurstCommand("setcheckbox X-Ray only_show_exposed on");
+		runWurstCommand("setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		input.pressKey(GLFW.GLFW_KEY_X);
-		waitForChunkReloading(context, world);
-		assertScreenshotEquals(context, "xray_exposed_only",
+		waitForChunkReloading();
+		assertScreenshotEquals("xray_exposed_only",
 			"https://i.imgur.com/QlEpQTu.png");
 		
 		// Opacity mode
-		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
-		runWurstCommand(context, "setslider X-Ray opacity 0.5");
+		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
+		runWurstCommand("setslider X-Ray opacity 0.5");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		input.pressKey(GLFW.GLFW_KEY_X);
-		waitForChunkReloading(context, world);
-		assertScreenshotEquals(context, "xray_opacity",
+		waitForChunkReloading();
+		assertScreenshotEquals("xray_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/hXdzoDB.png"
 				: "https://i.imgur.com/oZqevTx.png");
 		
 		// Exposed only + opacity
-		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed on");
-		runWurstCommand(context, "setslider X-Ray opacity 0.5");
+		runWurstCommand("setcheckbox X-Ray only_show_exposed on");
+		runWurstCommand("setslider X-Ray opacity 0.5");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		input.pressKey(GLFW.GLFW_KEY_X);
-		waitForChunkReloading(context, world);
-		assertScreenshotEquals(context, "xray_exposed_only_opacity",
+		waitForChunkReloading();
+		assertScreenshotEquals("xray_exposed_only_opacity",
 			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/ZwIARSr.png"
 				: "https://i.imgur.com/3DLxNuS.png");
 		
 		// Clean up
-		runCommand(server, "fill ~-5 ~-2 ~4 ~5 ~5 ~7 air");
-		waitForBlock(context, 5, 5, 7, Blocks.AIR);
-		runWurstCommand(context, "setcheckbox X-Ray only_show_exposed off");
-		runWurstCommand(context, "setslider X-Ray opacity 0");
+		runCommand("fill ~-5 ~-2 ~4 ~5 ~5 ~7 air strict");
+		waitForBlock(5, 5, 7, Blocks.AIR);
+		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
+		runWurstCommand("setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
-		waitForChunkReloading(context, world);
-		clearChat(context);
+		waitForChunkReloading();
+		clearChat();
 	}
 	
-	private static void buildTestRig(ClientGameTestContext context,
-		TestSingleplayerContext spContext)
+	private void buildTestRig()
 	{
-		TestServerContext server = spContext.getServer();
-		TestClientWorldContext world = spContext.getClientWorld();
-		
 		// Stone wall (9 wide, 7 high, 3 deep)
-		runCommand(server, "fill ~-5 ~-2 ~5 ~5 ~5 ~7 stone");
+		runCommand("fill ~-5 ~-2 ~5 ~5 ~5 ~7 stone");
 		
 		// Ores (1 exposed and 1 hidden each)
-		runCommand(server, "fill ~-4 ~1 ~5 ~-4 ~1 ~6 minecraft:coal_ore");
-		runCommand(server, "fill ~-2 ~1 ~5 ~-2 ~1 ~6 minecraft:iron_ore");
-		runCommand(server, "fill ~0 ~1 ~5 ~0 ~1 ~6 minecraft:gold_ore");
-		runCommand(server, "fill ~2 ~1 ~5 ~2 ~1 ~6 minecraft:diamond_ore");
-		runCommand(server, "fill ~4 ~1 ~5 ~4 ~1 ~6 minecraft:emerald_ore");
-		runCommand(server, "fill ~-4 ~3 ~5 ~-4 ~3 ~6 minecraft:lapis_ore");
-		runCommand(server, "fill ~-2 ~3 ~5 ~-2 ~3 ~6 minecraft:redstone_ore");
-		runCommand(server, "fill ~0 ~3 ~5 ~0 ~3 ~6 minecraft:copper_ore");
-		runCommand(server, "fill ~2 ~3 ~5 ~2 ~3 ~6 minecraft:nether_gold_ore");
-		runCommand(server,
-			"fill ~4 ~3 ~5 ~4 ~3 ~6 minecraft:nether_quartz_ore");
+		runCommand("fill ~-4 ~1 ~5 ~-4 ~1 ~6 minecraft:coal_ore");
+		runCommand("fill ~-2 ~1 ~5 ~-2 ~1 ~6 minecraft:iron_ore");
+		runCommand("fill ~0 ~1 ~5 ~0 ~1 ~6 minecraft:gold_ore");
+		runCommand("fill ~2 ~1 ~5 ~2 ~1 ~6 minecraft:diamond_ore");
+		runCommand("fill ~4 ~1 ~5 ~4 ~1 ~6 minecraft:emerald_ore");
+		runCommand("fill ~-4 ~3 ~5 ~-4 ~3 ~6 minecraft:lapis_ore");
+		runCommand("fill ~-2 ~3 ~5 ~-2 ~3 ~6 minecraft:redstone_ore");
+		runCommand("fill ~0 ~3 ~5 ~0 ~3 ~6 minecraft:copper_ore");
+		runCommand("fill ~2 ~3 ~5 ~2 ~3 ~6 minecraft:nether_gold_ore");
+		runCommand("fill ~4 ~3 ~5 ~4 ~3 ~6 minecraft:nether_quartz_ore");
 		
 		// Fluids
-		runCommand(server, "setblock ~1 ~0 ~6 minecraft:water");
-		runCommand(server, "setblock ~-1 ~0 ~6 minecraft:lava");
+		runCommand("setblock ~1 ~0 ~6 minecraft:water");
+		runCommand("setblock ~-1 ~0 ~6 minecraft:lava");
 		
 		// Snow
-		runCommand(server, "fill ~-5 ~-1 ~4 ~5 ~-1 ~4 minecraft:stone");
-		runCommand(server, "fill ~-5 ~0 ~4 ~5 ~0 ~4 minecraft:snow");
+		runCommand("fill ~-5 ~-1 ~4 ~5 ~-1 ~4 minecraft:stone");
+		runCommand("fill ~-5 ~0 ~4 ~5 ~0 ~4 minecraft:snow");
 		
 		// Wait for blocks to appear
-		waitForBlock(context, -1, 0, 6, Blocks.LAVA);
-		waitForChunkReloading(context, world);
-		clearChat(context);
+		waitForBlock(-1, 0, 6, Blocks.LAVA);
+		waitForChunkReloading();
+		clearChat();
 	}
 	
-	private static void waitForChunkReloading(ClientGameTestContext context,
-		TestClientWorldContext world)
+	private void waitForChunkReloading()
 	{
 		// Wait longer if testing with Sodium, since we can't rely on
 		// waitForChunksRender() to track when Sodium finishes loading chunks

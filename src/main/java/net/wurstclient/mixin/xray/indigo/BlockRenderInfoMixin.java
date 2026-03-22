@@ -35,8 +35,8 @@ public abstract class BlockRenderInfoMixin
 	 * Hides and shows regular blocks when using X-Ray, if Indigo is running
 	 * and Sodium is not installed.
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "shouldDrawSide",
+	@Inject(method = "shouldDrawSide",
+		at = @At("HEAD"),
 		require = 0,
 		cancellable = true)
 	private void onShouldDrawSide(Direction face,

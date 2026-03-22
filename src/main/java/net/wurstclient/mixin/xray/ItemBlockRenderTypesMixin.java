@@ -24,8 +24,9 @@ public abstract class ItemBlockRenderTypesMixin
 	/**
 	 * Puts all blocks on the translucent layer if Opacity X-Ray is enabled.
 	 */
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getChunkRenderType(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private static void onGetBlockLayer(BlockState state,
 		CallbackInfoReturnable<ChunkSectionLayer> cir)
@@ -39,8 +40,9 @@ public abstract class ItemBlockRenderTypesMixin
 	/**
 	 * Puts all fluids on the translucent layer if Opacity X-Ray is enabled.
 	 */
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getRenderLayer(Lnet/minecraft/world/level/material/FluidState;)Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private static void onGetFluidLayer(FluidState state,
 		CallbackInfoReturnable<ChunkSectionLayer> cir)

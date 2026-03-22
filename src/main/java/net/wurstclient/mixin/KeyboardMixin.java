@@ -20,8 +20,8 @@ import net.wurstclient.events.KeyPressListener.KeyPressEvent;
 @Mixin(KeyboardHandler.class)
 public class KeyboardMixin
 {
-	@Inject(at = @At("HEAD"),
-		method = "keyPress(JILnet/minecraft/client/input/KeyEvent;)V")
+	@Inject(method = "keyPress(JILnet/minecraft/client/input/KeyEvent;)V",
+		at = @At("HEAD"))
 	private void onOnKey(long windowHandle, int action, KeyEvent arg,
 		CallbackInfo ci)
 	{
