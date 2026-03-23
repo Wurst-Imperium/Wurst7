@@ -24,6 +24,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
+import net.wurstclient.keybinds.Keybind;
 import net.wurstclient.keybinds.PossibleKeybind;
 
 public class NavigatorNewKeybindScreen extends NavigatorScreen
@@ -35,6 +36,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	private String selectedKey = "key.keyboard.unknown";
 	private String text = "";
 	private Button okButton;
+	private Button cancelButton;
 	private boolean choosingKey;
 	
 	public NavigatorNewKeybindScreen(Set<PossibleKeybind> possibleKeybinds,
@@ -91,11 +93,12 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		okButton.active = selectedCommand != null;
 		addRenderableWidget(okButton);
 		
-		// cancel button
-		addRenderableWidget(Button
+		// Cancel button
+		cancelButton = Button
 			.builder(Component.literal("Cancel"),
 				b -> WurstClient.MC.setScreen(parent))
-			.bounds(width / 2 + 2, height - 65, 149, 18).build());
+			.bounds(width / 2 + 2, height - 65, 149, 18).build();
+		addRenderableWidget(cancelButton);
 	}
 	
 	@Override
@@ -114,7 +117,20 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	@Override
 	protected void onMouseClick(MouseButtonEvent context)
 	{
+		int mouseX = (int)context.x();
+		int mouseY = (int)context.y();
 		int button = context.button();
+		
+		// isMouseOver() returns false when OK button is inactive,
+		// so we have to check at a lower level.
+		if(choosingKey && !okButton.getRectangle().containsPoint(mouseX, mouseY)
+			&& !cancelButton.isMouseOver(mouseX, mouseY))
+		{
+			selectedKey =
+				InputConstants.Type.MOUSE.getOrCreate(button).getName();
+			okButton.active = !selectedKey.equals("key.keyboard.unknown");
+			return;
+		}
 		
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
@@ -137,10 +153,11 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		// text
 		if(choosingKey)
 		{
-			text = "Now press the key that should trigger this keybind.";
+			text =
+				"Now press the key or mouse button that should trigger this keybind.";
 			if(!selectedKey.equals("key.keyboard.unknown"))
 			{
-				text += "\n\nKey: " + selectedKey.replace("key.keyboard.", "");
+				text += "\n\nKey: " + Keybind.getDisplayKey(selectedKey);
 				String commands =
 					WurstClient.INSTANCE.getKeybinds().getCommands(selectedKey);
 				if(commands != null)
