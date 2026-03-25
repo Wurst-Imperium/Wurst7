@@ -48,7 +48,7 @@ public abstract class SingleplayerTest
 		runImpl();
 		assertScreenshotEquals(
 			getClass().getSimpleName().toLowerCase() + "_cleanup",
-			"https://i.imgur.com/i2Nr9is.png");
+			"https://i.imgur.com/XF1SILt.png");
 	}
 	
 	/**
