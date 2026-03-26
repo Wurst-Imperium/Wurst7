@@ -27,7 +27,7 @@ import net.wurstclient.hacks.XRayHack;
 
 /**
  * Last updated for <a href=
- * "https://github.com/CaffeineMC/sodium/tree/367487beb44ee583cd26bb553a9c9e7a27801681">Sodium
+ * "https://github.com/CaffeineMC/sodium/blob/367487beb44ee583cd26bb553a9c9e7a27801681/common/src/main/java/net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/DefaultFluidRenderer.java">Sodium
  * mc1.21.11-0.8.7</a>
  */
 @Pseudo

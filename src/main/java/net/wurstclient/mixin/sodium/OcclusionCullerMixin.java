@@ -17,7 +17,7 @@ import net.wurstclient.events.VisGraphListener.VisGraphEvent;
 
 /**
  * Last updated for <a href=
- * "https://github.com/CaffeineMC/sodium/tree/1d2942a247f87a3cb1ae268166190b6ec267046e">Sodium
+ * "https://github.com/CaffeineMC/sodium/blob/1d2942a247f87a3cb1ae268166190b6ec267046e/common/src/main/java/net/caffeinemc/mods/sodium/client/render/chunk/occlusion/OcclusionCuller.java">Sodium
  * mc1.21.11-0.8.4-fabric</a>.
  */
 @Pseudo
