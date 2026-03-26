@@ -97,8 +97,9 @@ public final class FreecamHackTest extends SingleplayerTest
 		world.waitForChunksRender();
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
+		context.waitTick();
 		assertScreenshotEquals("freecam_moved",
-			"https://i.imgur.com/HxrcHbh.png");
+			"https://i.imgur.com/SQPSG5S.png");
 		
 		// Enable tracer
 		runWurstCommand("setcheckbox Freecam tracer on");

@@ -281,5 +281,4 @@ public enum WurstClientTestHelper
 			return null;
 		}
 	}
-	
 }

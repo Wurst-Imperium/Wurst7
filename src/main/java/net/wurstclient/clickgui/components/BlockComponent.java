@@ -10,7 +10,7 @@ package net.wurstclient.clickgui.components;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -58,7 +58,7 @@ public final class BlockComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -86,7 +86,7 @@ public final class BlockComponent extends Component
 		
 		// text
 		String name = setting.getName() + ":";
-		context.drawString(TR, name, x1, y1 + 2, GUI.getTxtColor(), false);
+		context.text(TR, name, x1, y1 + 2, GUI.getTxtColor(), false);
 		
 		// block
 		ItemStack stack = new ItemStack(setting.getBlock());

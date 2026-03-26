@@ -10,7 +10,7 @@ package net.wurstclient.clickgui.components;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.Component;
@@ -55,7 +55,7 @@ public final class ColorComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -90,8 +90,8 @@ public final class ColorComponent extends Component
 		int valueWidth = TR.width(value);
 		int txtColor = GUI.getTxtColor();
 		context.guiRenderState.up();
-		context.drawString(TR, name, x1, y1 + 2, txtColor, false);
-		context.drawString(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
+		context.text(TR, name, x1, y1 + 2, txtColor, false);
+		context.text(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
 	}
 	
 	private String getColorTooltip()

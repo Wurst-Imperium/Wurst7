@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -214,8 +214,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	protected void onRender(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		int txtColor = gui.getTxtColor();
@@ -226,9 +226,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// search bar
 		if(!clickTimerRunning)
 		{
-			context.drawString(WurstClient.MC.font, "Search: ", middleX - 150,
-				32, txtColor);
-			searchBar.render(context, mouseX, mouseY, partialTicks);
+			context.text(WurstClient.MC.font, "Search: ", middleX - 150, 32,
+				txtColor);
+			searchBar.extractRenderState(context, mouseX, mouseY, partialTicks);
 		}
 		
 		// feature list
@@ -291,13 +291,13 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			// text
 			context.guiRenderState.up();
 			for(int i = 0; i < lines.length; i++)
-				context.drawString(tr, lines[i], xt1 + 2,
-					yt1 + 2 + i * tr.lineHeight, txtColor, false);
+				context.text(tr, lines[i], xt1 + 2, yt1 + 2 + i * tr.lineHeight,
+					txtColor, false);
 		}
 	}
 	
-	private void renderFeature(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks, int i, int x, int y)
+	private void renderFeature(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks, int i, int x, int y)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		boolean clickTimerRunning = clickTimer != -1;
@@ -384,7 +384,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			int bx = area.x + 4;
 			int by = area.y + 4;
 			int txtColor = gui.getTxtColor();
-			context.drawString(tr, buttonText, bx, by, txtColor, false);
+			context.text(tr, buttonText, bx, by, txtColor, false);
 		}
 	}
 	

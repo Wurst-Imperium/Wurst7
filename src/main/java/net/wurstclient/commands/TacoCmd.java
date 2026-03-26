@@ -7,7 +7,7 @@
  */
 package net.wurstclient.commands;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.wurstclient.Category;
@@ -79,7 +79,7 @@ public final class TacoCmd extends Command
 	}
 	
 	@Override
-	public void onRenderGUI(GuiGraphics context, float partialTicks)
+	public void onRenderGUI(GuiGraphicsExtractor context, float partialTicks)
 	{
 		int color = WURST.getHax().rainbowUiHack.isEnabled()
 			? RenderUtils.toIntColor(WURST.getGui().getAcColor(), 1)

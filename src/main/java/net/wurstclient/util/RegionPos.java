@@ -20,7 +20,7 @@ public record RegionPos(int x, int z)
 	
 	public static RegionPos of(ChunkPos pos)
 	{
-		return new RegionPos(pos.x >> 5 << 9, pos.z >> 5 << 9);
+		return new RegionPos(pos.x() >> 5 << 9, pos.z() >> 5 << 9);
 	}
 	
 	public RegionPos negate()

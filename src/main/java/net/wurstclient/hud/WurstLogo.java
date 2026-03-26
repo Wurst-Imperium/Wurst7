@@ -8,7 +8,7 @@
 package net.wurstclient.hud;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.wurstclient.WurstClient;
@@ -21,7 +21,7 @@ public final class WurstLogo
 	private static final Identifier LOGO_TEXTURE =
 		Identifier.fromNamespaceAndPath("wurst", "wurst_128.png");
 	
-	public void render(GuiGraphics context)
+	public void render(GuiGraphicsExtractor context)
 	{
 		WurstLogoOtf otf = WURST.getOtfs().wurstLogoOtf;
 		if(!otf.isVisible())
@@ -41,7 +41,7 @@ public final class WurstLogo
 		context.guiRenderState.up();
 		
 		// version string
-		context.drawString(tr, version, 74, 8, otf.getTextColor(), false);
+		context.text(tr, version, 74, 8, otf.getTextColor(), false);
 		
 		// Wurst logo
 		context.blit(RenderPipelines.GUI_TEXTURED, LOGO_TEXTURE, 0, 3, 0, 0, 72,

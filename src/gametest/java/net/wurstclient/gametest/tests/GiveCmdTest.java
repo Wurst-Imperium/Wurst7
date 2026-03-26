@@ -26,8 +26,8 @@ public final class GiveCmdTest extends SingleplayerTest
 		logger.info("Testing .give command");
 		
 		runWurstCommand("give diamond");
-		clearToasts();
 		context.waitTick();
+		clearToasts();
 		assertOneItemInSlot(0, Items.DIAMOND);
 		context.takeScreenshot("give_command_result");
 		

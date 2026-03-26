@@ -23,7 +23,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.NameTagFeatureRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
@@ -41,7 +41,7 @@ public class LabelCommandRendererMixin
 	List<SubmitNodeStorage.NameTagSubmit> nameTagSubmitsNormal;
 	
 	@WrapOperation(
-		method = "add(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/CameraRenderState;)V",
+		method = "add(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
 		at = @At(value = "INVOKE",
 			target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V"))
 	private void wrapLabelScale(PoseStack matrices, float x, float y, float z,
@@ -69,7 +69,7 @@ public class LabelCommandRendererMixin
 	 * is enabled.
 	 */
 	@ModifyVariable(
-		method = "add(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/CameraRenderState;)V",
+		method = "add(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
 		at = @At("HEAD"),
 		argsOnly = true)
 	private boolean forceNotSneaking(boolean notSneaking)
@@ -84,10 +84,10 @@ public class LabelCommandRendererMixin
 	 * see-through mode.
 	 */
 	@ModifyReceiver(
+		method = "add(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
-			ordinal = 0),
-		method = "add(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/CameraRenderState;)V")
+			ordinal = 0))
 	private List<SubmitNodeStorage.NameTagSubmit> swapFirstList(
 		List<SubmitNodeStorage.NameTagSubmit> originalList, Object labelCommand)
 	{
@@ -106,10 +106,10 @@ public class LabelCommandRendererMixin
 	 * see-through mode.
 	 */
 	@ModifyReceiver(
+		method = "add(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
 		at = @At(value = "INVOKE",
 			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
-			ordinal = 1),
-		method = "add(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/CameraRenderState;)V")
+			ordinal = 1))
 	private List<SubmitNodeStorage.NameTagSubmit> swapSecondList(
 		List<SubmitNodeStorage.NameTagSubmit> originalList, Object labelCommand)
 	{

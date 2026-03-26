@@ -7,7 +7,7 @@
  */
 package net.wurstclient.other_features;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Button.OnPress;
 import net.minecraft.client.gui.components.Tooltip;
@@ -62,7 +62,7 @@ public final class WurstOptionsOtf extends OtherFeature
 			.createNarration(sup -> narration).tooltip(tooltip);
 	}
 	
-	public void drawWurstLogoOnButton(GuiGraphics context,
+	public void drawWurstLogoOnButton(GuiGraphicsExtractor context,
 		Button wurstOptionsButton)
 	{
 		if(wurstOptionsButton == null)

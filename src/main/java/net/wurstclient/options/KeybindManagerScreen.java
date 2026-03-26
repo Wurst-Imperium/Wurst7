@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.Renderable;
@@ -140,20 +140,20 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
-		listGui.render(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
-		context.drawCenteredString(font, "Keybind Manager", width / 2, 8,
+		context.centeredText(font, "Keybind Manager", width / 2, 8,
 			CommonColors.WHITE);
 		
 		int count = WurstClient.INSTANCE.getKeybinds().getAllKeybinds().size();
-		context.drawCenteredString(font, "Keybinds: " + count, width / 2, 20,
+		context.centeredText(font, "Keybinds: " + count, width / 2, 20,
 			CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
@@ -180,8 +180,8 @@ public final class KeybindManagerScreen extends Screen
 		}
 		
 		@Override
-		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
-			boolean hovered, float tickDelta)
+		public void extractContent(GuiGraphicsExtractor context, int mouseX,
+			int mouseY, boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
 			int y = getContentY();
@@ -189,12 +189,12 @@ public final class KeybindManagerScreen extends Screen
 			Font tr = minecraft.font;
 			
 			String keyText = "Key: " + Keybind.getDisplayKey(keybind.getKey());
-			context.drawString(tr, keyText, x + 3, y + 3,
-				WurstColors.VERY_LIGHT_GRAY, false);
+			context.text(tr, keyText, x + 3, y + 3, WurstColors.VERY_LIGHT_GRAY,
+				false);
 			
 			String cmdText = "Commands: " + keybind.getCommands();
-			context.drawString(tr, cmdText, x + 3, y + 15,
-				CommonColors.LIGHT_GRAY, false);
+			context.text(tr, cmdText, x + 3, y + 15, CommonColors.LIGHT_GRAY,
+				false);
 		}
 	}
 	

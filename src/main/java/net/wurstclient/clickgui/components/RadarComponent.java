@@ -9,7 +9,7 @@ package net.wurstclient.clickgui.components;
 
 import org.joml.Matrix3x2fStack;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -39,7 +39,7 @@ public final class RadarComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		// Can't make this a field because RadarComponent is initialized earlier

@@ -94,7 +94,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 			ordinal = 0))
 	private void onTick(CallbackInfo ci)
 	{
-		try(TempRealInput ignore = new TempRealInput())
+		try(TempRealInput _ = new TempRealInput())
 		{
 			EventManager.fire(UpdateEvent.INSTANCE);
 		}

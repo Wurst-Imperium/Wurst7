@@ -7,7 +7,7 @@
  */
 package net.wurstclient.options;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -95,22 +95,22 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
-		context.drawCenteredString(font,
+		context.centeredText(font,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			CommonColors.WHITE);
 		
-		context.drawString(font, "Key: " + Keybind.getDisplayKey(key),
+		context.text(font, "Key: " + Keybind.getDisplayKey(key),
 			width / 2 - 100, 47, WurstColors.VERY_LIGHT_GRAY);
-		context.drawString(font, "Commands (separated by ';')", width / 2 - 100,
-			87, WurstColors.VERY_LIGHT_GRAY);
+		context.text(font, "Commands (separated by ';')", width / 2 - 100, 87,
+			WurstColors.VERY_LIGHT_GRAY);
 		
-		commandField.render(context, mouseX, mouseY, partialTicks);
+		commandField.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

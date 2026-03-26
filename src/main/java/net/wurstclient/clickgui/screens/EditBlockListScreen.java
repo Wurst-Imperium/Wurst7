@@ -15,7 +15,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -137,31 +137,32 @@ public final class EditBlockListScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		Matrix3x2fStack matrixStack = context.pose();
 		
-		listGui.render(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
-		context.drawCenteredString(minecraft.font,
+		context.centeredText(minecraft.font,
 			blockList.getName() + " (" + blockList.size() + ")", width / 2, 12,
 			CommonColors.WHITE);
 		
 		matrixStack.pushMatrix();
 		
-		blockNameField.render(context, mouseX, mouseY, partialTicks);
+		blockNameField.extractRenderState(context, mouseX, mouseY,
+			partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
 		context.guiRenderState.up();
 		matrixStack.pushMatrix();
 		matrixStack.translate(-64 + width / 2 - 152, 0);
 		
 		if(blockNameField.getValue().isEmpty() && !blockNameField.isFocused())
-			context.drawString(minecraft.font, "block name or ID", 68,
-				height - 50, CommonColors.GRAY);
+			context.text(minecraft.font, "block name or ID", 68, height - 50,
+				CommonColors.GRAY);
 		
 		int border = blockNameField.isFocused() ? CommonColors.WHITE
 			: CommonColors.LIGHT_GRAY;
@@ -220,8 +221,8 @@ public final class EditBlockListScreen extends Screen
 		}
 		
 		@Override
-		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
-			boolean hovered, float tickDelta)
+		public void extractContent(GuiGraphicsExtractor context, int mouseX,
+			int mouseY, boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
 			int y = getContentY();
@@ -231,11 +232,11 @@ public final class EditBlockListScreen extends Screen
 			Font tr = minecraft.font;
 			
 			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
-			context.drawString(tr, getDisplayName(stack), x + 28, y,
+			context.text(tr, getDisplayName(stack), x + 28, y,
 				WurstColors.VERY_LIGHT_GRAY, false);
-			context.drawString(tr, blockName, x + 28, y + 9,
-				CommonColors.LIGHT_GRAY, false);
-			context.drawString(tr, getIdText(block), x + 28, y + 18,
+			context.text(tr, blockName, x + 28, y + 9, CommonColors.LIGHT_GRAY,
+				false);
+			context.text(tr, getIdText(block), x + 28, y + 18,
 				CommonColors.LIGHT_GRAY, false);
 		}
 		

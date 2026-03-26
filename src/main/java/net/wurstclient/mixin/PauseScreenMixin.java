@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
@@ -45,9 +45,10 @@ public abstract class PauseScreenMixin extends Screen
 			addWurstOptionsButton();
 	}
 	
-	@Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
+	@Inject(
+		method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
 		at = @At("TAIL"))
-	private void onRender(GuiGraphics context, int mouseX, int mouseY,
+	private void onRender(GuiGraphicsExtractor context, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
@@ -61,7 +62,7 @@ public abstract class PauseScreenMixin extends Screen
 	@Unique
 	private void addWurstOptionsButton()
 	{
-		List<AbstractWidget> buttons = Screens.getButtons(this);
+		List<AbstractWidget> buttons = Screens.getWidgets(this);
 		
 		// Fallback position
 		int buttonX = width / 2 - 102;
@@ -101,7 +102,7 @@ public abstract class PauseScreenMixin extends Screen
 	@Unique
 	private void hideFeedbackReportAndServerLinksButtons()
 	{
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 			if(isTrKey(button, "menu.sendFeedback")
 				|| isTrKey(button, "menu.reportBugs")
 				|| isTrKey(button, "menu.feedback")
@@ -114,7 +115,7 @@ public abstract class PauseScreenMixin extends Screen
 	{
 		// Check if there are any buttons in the way
 		ArrayList<AbstractWidget> buttonsInTheWay = new ArrayList<>();
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 		{
 			if(button.getRight() < x || button.getX() > x + width
 				|| button.getBottom() < y || button.getY() > y + height)

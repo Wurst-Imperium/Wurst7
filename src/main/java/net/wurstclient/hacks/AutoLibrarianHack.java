@@ -28,7 +28,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -244,9 +244,8 @@ public final class AutoLibrarianHack extends Hack
 			MC.getConnection().send(new ServerboundSelectTradePacket(0));
 			
 			// buy whatever the villager is selling
-			MC.gameMode.handleInventoryMouseClick(
-				tradeScreen.getMenu().containerId, 2, 0, ClickType.PICKUP,
-				MC.player);
+			MC.gameMode.handleContainerInput(tradeScreen.getMenu().containerId,
+				2, 0, ContainerInput.PICKUP, MC.player);
 			
 			// close the trade screen
 			closeTradeScreen();
@@ -383,10 +382,7 @@ public final class AutoLibrarianHack extends Hack
 		// click on villager
 		InteractionHand hand = InteractionHand.MAIN_HAND;
 		InteractionResult actionResult =
-			im.interactAt(player, villager, hitResult, hand);
-		
-		if(!actionResult.consumesAction())
-			im.interact(player, villager, hand);
+			im.interact(player, villager, hitResult, hand);
 		
 		// swing hand
 		if(actionResult instanceof InteractionResult.Success success

@@ -13,9 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.mojang.serialization.MapCodec;
-
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -37,10 +34,9 @@ import net.wurstclient.hacks.HandNoClipHack;
 public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 {
 	private BlockStateBaseMixin(WurstClient wurst, Block owner,
-		Reference2ObjectArrayMap<Property<?>, Comparable<?>> propertyMap,
-		MapCodec<BlockState> codec)
+		Property<?>[] properties, Comparable<?>[] values)
 	{
-		super(owner, propertyMap, codec);
+		super(owner, properties, values);
 	}
 	
 	@Inject(

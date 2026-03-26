@@ -16,7 +16,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.KeyEvent;
@@ -82,12 +82,12 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			}
 			
 			@Override
-			protected void renderContents(GuiGraphics drawContext, int i, int j,
-				float f)
+			protected void extractContents(GuiGraphicsExtractor drawContext,
+				int i, int j, float f)
 			{
-				renderDefaultSprite(drawContext);
-				renderDefaultLabel(drawContext.textRendererForWidget(this,
-					GuiGraphics.HoveredTextEffects.NONE));
+				extractDefaultSprite(drawContext);
+				extractDefaultLabel(drawContext.textRendererForWidget(this,
+					GuiGraphicsExtractor.HoveredTextEffects.NONE));
 			}
 		};
 		okButton.active = selectedCommand != null;
@@ -182,22 +182,22 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	protected void onRender(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		Font tr = minecraft.font;
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		context.drawCenteredString(tr, "New Keybind", middleX, 32, txtColor);
+		context.centeredText(tr, "New Keybind", middleX, 32, txtColor);
 		
 		// background
 		int bgx1 = middleX - 154;
 		int bgx2 = middleX + 154;
 		int bgy1 = 60;
 		int bgy2 = height - 43;
-		boolean noButtons = Screens.getButtons(this).isEmpty();
+		boolean noButtons = Screens.getWidgets(this).isEmpty();
 		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		
 		context.enableScissor(bgx1, bgy1, bgx2, bgy3);
@@ -237,9 +237,9 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				
 				// text
 				context.guiRenderState.up();
-				context.drawString(tr, pkb.getDescription(), x1 + 1, y1 + 1,
+				context.text(tr, pkb.getDescription(), x1 + 1, y1 + 1,
 					txtColor);
-				context.drawString(tr, pkb.getCommand(), x1 + 1,
+				context.text(tr, pkb.getCommand(), x1 + 1,
 					y1 + 1 + tr.lineHeight, txtColor);
 			}
 		}
@@ -249,14 +249,14 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		context.guiRenderState.up();
 		for(String line : text.split("\n"))
 		{
-			context.drawString(tr, line, bgx1 + 2, textY, txtColor);
+			context.text(tr, line, bgx1 + 2, textY, txtColor);
 			textY += tr.lineHeight;
 		}
 		
 		context.disableScissor();
 		
 		// buttons below scissor box
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 		{
 			// positions
 			int x1 = button.getX();
@@ -279,7 +279,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			
 			// text
 			context.guiRenderState.up();
-			context.drawCenteredString(tr, button.getMessage().getString(),
+			context.centeredText(tr, button.getMessage().getString(),
 				(x1 + x2) / 2, y1 + 5, txtColor);
 		}
 	}
