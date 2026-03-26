@@ -13,13 +13,14 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.XRayHack;
 
 /**
  * Last updated for <a href=
- * "https://github.com/CaffeineMC/sodium/blob/1ddf7faacbf7be60aff3f00b49d90d199fdd706a/common/src/main/java/net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderer.java">Sodium
- * mc1.21.11-0.8.0</a>
+ * "https://github.com/CaffeineMC/sodium/blob/148316fbfca6c3c88274ad79e1010310c6a3749b/common/src/main/java/net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderer.java">Sodium
+ * mc26.1-0.8.7</a>
  */
 @Pseudo
 @Mixin(targets = {
@@ -27,6 +28,24 @@ import net.wurstclient.hacks.XRayHack;
 	remap = false)
 public class BlockRendererMixin extends AbstractBlockRenderContextMixin
 {
+	/**
+	 * Forces hidden blocks onto the translucent render layer in X-Ray opacity
+	 * mode.
+	 */
+	@ModifyExpressionValue(method = "processQuad",
+		at = @At(value = "INVOKE",
+			target = "Lnet/caffeinemc/mods/sodium/client/render/model/MutableQuadViewImpl;getRenderType()Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;"),
+		require = 0)
+	private ChunkSectionLayer onProcessQuadRenderType(
+		ChunkSectionLayer original)
+	{
+		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
+		if(!xray.isOpacityMode() || xray.isVisible(state.getBlock(), pos))
+			return original;
+		
+		return ChunkSectionLayer.TRANSLUCENT;
+	}
+	
 	/**
 	 * Modifies opacity of blocks when using X-Ray with Sodium installed.
 	 */

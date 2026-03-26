@@ -23,8 +23,8 @@ import net.wurstclient.hacks.XRayHack;
 
 /**
  * Last updated for <a href=
- * "https://github.com/CaffeineMC/sodium/blob/1ddf7faacbf7be60aff3f00b49d90d199fdd706a/common/src/main/java/net/caffeinemc/mods/sodium/client/render/model/AbstractBlockRenderContext.java">Sodium
- * mc1.21.11-0.8.0</a>
+ * "https://github.com/CaffeineMC/sodium/blob/148316fbfca6c3c88274ad79e1010310c6a3749b/common/src/main/java/net/caffeinemc/mods/sodium/client/render/model/AbstractBlockRenderContext.java">Sodium
+ * mc26.1-0.8.7</a>
  */
 @Pseudo
 @Mixin(targets = {
@@ -40,7 +40,7 @@ public class AbstractBlockRenderContextMixin
 	/**
 	 * Hides and shows blocks when using X-Ray with Sodium installed.
 	 */
-	@Inject(method = "isFaceCulled(Lnet/minecraft/class_2350;)Z",
+	@Inject(method = "isFaceCulled(Lnet/minecraft/core/Direction;)Z",
 		at = @At("HEAD"),
 		cancellable = true,
 		remap = false,
