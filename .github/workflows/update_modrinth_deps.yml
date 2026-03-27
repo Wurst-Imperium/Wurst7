@@ -5,10 +5,6 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
-permissions:
-  # Needed to edit gradle.properties on the PR branches
-  contents: write
-
 jobs:
   update-deps:
     runs-on: ubuntu-latest
@@ -17,12 +13,8 @@ jobs:
       matrix:
         branch: ["master", "26.1", "1.21.10", "1.21.8"]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ matrix.branch }}
-
       - name: Update Modrinth Dependencies
         uses: Wurst-Imperium/update-modrinth-deps@v1
         with:
+          ref: ${{ matrix.branch }}
           token: ${{ secrets.UMD_PR_TOKEN }}
