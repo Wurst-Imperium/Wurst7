@@ -7,11 +7,12 @@ on:
 
 jobs:
   update-deps:
+    if: ${{ github.event_name != 'schedule' || github.repository == 'Wurst-Imperium/Wurst7' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        branch: ["master", "26.1", "1.21.10", "1.21.8"]
+        branch: ["master", "1.21.11", "1.21.10", "1.21.8"]
     steps:
       - name: Update Modrinth Dependencies
         uses: Wurst-Imperium/update-modrinth-deps@v1
