@@ -7,6 +7,7 @@ on:
 
 jobs:
   update-deps:
+    if: ${{ github.event_name != 'schedule' || github.repository == 'Wurst-Imperium/Wurst7' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
