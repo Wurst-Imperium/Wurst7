@@ -48,6 +48,7 @@ public final class ModifyCmdTest extends SingleplayerTest
 		
 		// Clean up
 		clearInventory();
+		context.waitTick();
 		clearChat();
 		waitForHandSwing();
 	}
