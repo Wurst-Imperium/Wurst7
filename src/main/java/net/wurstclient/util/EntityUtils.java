@@ -98,4 +98,18 @@ public enum EntityUtils
 		Vec3 offset = getLerpedPos(e, partialTicks).subtract(e.position());
 		return e.getBoundingBox().move(offset);
 	}
+	
+	public static double distanceToHitboxSq(Entity e)
+	{
+		return distanceToHitboxSqr(RotationUtils.getEyesPos(), e);
+	}
+	
+	public static double distanceToHitboxSqr(Vec3 point, Entity e)
+	{
+		AABB box = e.getBoundingBox();
+		double x = Mth.clamp(point.x, box.minX, box.maxX);
+		double y = Mth.clamp(point.y, box.minY, box.maxY);
+		double z = Mth.clamp(point.z, box.minZ, box.maxZ);
+		return point.distanceToSqr(new Vec3(x, y, z));
+	}
 }

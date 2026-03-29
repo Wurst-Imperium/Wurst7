@@ -109,12 +109,11 @@ public final class FeedAuraHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		LocalPlayer player = MC.player;
-		ItemStack heldStack = player.getInventory().getSelectedItem();
+		ItemStack heldStack = MC.player.getInventory().getSelectedItem();
 		
 		double rangeSq = range.getValueSq();
 		Stream<Animal> stream = EntityUtils.getValidAnimals()
-			.filter(e -> player.distanceToSqr(e) <= rangeSq)
+			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
 			.filter(e -> e.isFood(heldStack)).filter(Animal::canFallInLove);
 		
 		if(filterBabies.isChecked())

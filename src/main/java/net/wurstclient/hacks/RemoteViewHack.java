@@ -24,6 +24,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filterlists.RemoteViewFilterList;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.FakePlayerEntity;
 
 @SearchTags({"remote view"})
@@ -64,7 +65,7 @@ public final class RemoteViewHack extends Hack
 			
 			entity = stream
 				.min(
-					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
+					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 				.orElse(null);
 			
 			// check if entity was found
@@ -134,7 +135,7 @@ public final class RemoteViewHack extends Hack
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.filter(e -> viewName.equalsIgnoreCase(e.getName().getString()))
 				.min(
-					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
+					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 				.orElse(null);
 			
 			if(entity == null)

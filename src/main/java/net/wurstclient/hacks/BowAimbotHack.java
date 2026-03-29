@@ -231,7 +231,7 @@ public final class BowAimbotHack extends Hack
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", e -> MC.player.distanceToSqr(e)),
+		DISTANCE("Distance", EntityUtils::distanceToHitboxSq),
 		
 		ANGLE("Angle",
 			e -> RotationUtils
@@ -241,7 +241,7 @@ public final class BowAimbotHack extends Hack
 			e -> Math
 				.pow(RotationUtils
 					.getAngleToLookVec(e.getBoundingBox().getCenter()), 2)
-				+ MC.player.distanceToSqr(e)),
+				+ EntityUtils.distanceToHitboxSq(e)),
 		
 		HEALTH("Health", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
