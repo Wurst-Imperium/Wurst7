@@ -361,7 +361,7 @@ public final class AutoLibrarianHack extends Hack
 		MultiPlayerGameMode im = MC.gameMode;
 		LocalPlayer player = MC.player;
 		
-		if(player.distanceToSqr(villager) > range.getValueSq())
+		if(EntityUtils.distanceToHitboxSq(villager) > range.getValueSq())
 		{
 			ChatUtils.error("Villager is out of range. Consider trapping"
 				+ " the villager so it doesn't wander away.");
@@ -435,22 +435,21 @@ public final class AutoLibrarianHack extends Hack
 	
 	private void setTargetVillager()
 	{
-		LocalPlayer player = MC.player;
 		double rangeSq = range.getValueSq();
 		
 		Stream<Villager> stream = StreamSupport
 			.stream(MC.level.entitiesForRendering().spliterator(), true)
 			.filter(e -> !e.isRemoved()).filter(Villager.class::isInstance)
 			.map(e -> (Villager)e).filter(e -> e.getHealth() > 0)
-			.filter(e -> player.distanceToSqr(e) <= rangeSq)
+			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
 			.filter(e -> e.getVillagerData().profession().unwrapKey()
 				.orElse(null) == VillagerProfession.LIBRARIAN)
 			.filter(e -> e.getVillagerData().level() == 1)
 			.filter(e -> !experiencedVillagers.contains(e));
 		
-		villager =
-			stream.min(Comparator.comparingDouble(e -> player.distanceToSqr(e)))
-				.orElse(null);
+		villager = stream
+			.min(Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
+			.orElse(null);
 		
 		if(villager == null)
 		{
