@@ -51,7 +51,7 @@ public enum WurstClient
 	public static Minecraft MC;
 	public static IMinecraftClient IMC;
 	
-	public static final String VERSION = "7.53";
+	public static final String VERSION = "7.53.1";
 	public static final String MC_VERSION = "1.21.11";
 	
 	private PlausibleAnalytics plausible;
