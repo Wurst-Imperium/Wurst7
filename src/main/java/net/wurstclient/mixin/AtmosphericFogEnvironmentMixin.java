@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.fog.environment.AtmosphericFogEnvironment;
 import net.wurstclient.WurstClient;
 
 @Mixin(AtmosphericFogEnvironment.class)
-public class AtmosphericFogModifierMixin
+public class AtmosphericFogEnvironmentMixin
 {
 	/**
 	 * Removes the foggy overlay in the Overworld (including rain fog), if

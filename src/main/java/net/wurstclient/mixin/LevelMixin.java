@@ -20,7 +20,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NoWeatherHack;
 
 @Mixin(Level.class)
-public abstract class WorldMixin implements LevelAccessor, AutoCloseable
+public abstract class LevelMixin implements LevelAccessor, AutoCloseable
 {
 	@Inject(method = "getRainLevel(F)F", at = @At("HEAD"), cancellable = true)
 	private void onGetRainGradient(float delta,

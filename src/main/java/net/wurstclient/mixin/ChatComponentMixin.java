@@ -30,7 +30,7 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.ChatInputListener.ChatInputEvent;
 
 @Mixin(ChatComponent.class)
-public class ChatHudMixin
+public class ChatComponentMixin
 {
 	@Shadow
 	@Final

@@ -39,7 +39,7 @@ import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
 import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 
 @Mixin(MultiPlayerGameMode.class)
-public abstract class ClientPlayerInteractionManagerMixin
+public abstract class MultiPlayerGameModeMixin
 	implements IClientPlayerInteractionManager
 {
 	@Shadow

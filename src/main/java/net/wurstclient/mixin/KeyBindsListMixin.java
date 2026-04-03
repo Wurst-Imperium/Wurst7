@@ -22,11 +22,11 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.wurstclient.WurstClient;
 
 @Mixin(KeyBindsList.class)
-public abstract class ControlsListWidgetMixin
+public abstract class KeyBindsListMixin
 	extends ContainerObjectSelectionList<KeyBindsList.Entry>
 {
-	public ControlsListWidgetMixin(WurstClient wurst, Minecraft client,
-		int width, int height, int y, int itemHeight)
+	public KeyBindsListMixin(WurstClient wurst, Minecraft client, int width,
+		int height, int y, int itemHeight)
 	{
 		super(client, width, height, y, itemHeight);
 	}

@@ -7,35 +7,31 @@
  */
 package net.wurstclient.mixin;
 
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.screens.DirectJoinServerScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
-import net.wurstclient.util.LastServerRememberer;
 
-@Mixin(DirectJoinServerScreen.class)
-public class DirectConnectScreenMixin extends Screen
+@Mixin(PackSelectionScreen.class)
+public class PackSelectionScreenMixin extends Screen
 {
-	@Shadow
-	@Final
-	private ServerData serverData;
-	
-	private DirectConnectScreenMixin(WurstClient wurst, Component title)
+	private PackSelectionScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}
 	
-	@Inject(method = "onSelect()V", at = @At("TAIL"))
-	private void onSaveAndClose(CallbackInfo ci)
+	/**
+	 * Scans for problematic resource packs (currently just VanillaTweaks
+	 * Twinkling Stars) whenever the resource pack screen is closed.
+	 */
+	@Inject(method = "onClose()V", at = @At("HEAD"))
+	public void onClose(CallbackInfo ci)
 	{
-		LastServerRememberer.setLastServer(serverData);
+		WurstClient.INSTANCE.getProblematicPackDetector().start();
 	}
 }

@@ -24,7 +24,7 @@ import net.minecraft.client.multiplayer.resolver.ServerRedirectHandler;
 import net.wurstclient.WurstClient;
 
 @Mixin(ServerNameResolver.class)
-public class AllowedAddressResolverMixin
+public class ServerNameResolverMixin
 {
 	@Shadow
 	@Final

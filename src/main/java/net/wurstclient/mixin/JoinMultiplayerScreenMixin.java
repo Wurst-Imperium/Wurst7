@@ -27,11 +27,11 @@ import net.wurstclient.serverfinder.ServerFinderScreen;
 import net.wurstclient.util.LastServerRememberer;
 
 @Mixin(JoinMultiplayerScreen.class)
-public class MultiplayerScreenMixin extends Screen
+public class JoinMultiplayerScreenMixin extends Screen
 {
 	private Button lastServerButton;
 	
-	private MultiplayerScreenMixin(WurstClient wurst, Component title)
+	private JoinMultiplayerScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
 	}

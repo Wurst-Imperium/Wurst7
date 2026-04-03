@@ -26,7 +26,7 @@ import net.wurstclient.events.ConnectionPacketOutputListener.ConnectionPacketOut
 import net.wurstclient.events.PacketInputListener.PacketInputEvent;
 
 @Mixin(Connection.class)
-public abstract class ClientConnectionMixin
+public abstract class ConnectionMixin
 	extends SimpleChannelInboundHandler<Packet<?>>
 {
 	private ConcurrentLinkedQueue<ConnectionPacketOutputEvent> events =

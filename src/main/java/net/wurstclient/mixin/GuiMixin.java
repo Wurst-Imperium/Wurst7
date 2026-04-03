@@ -23,10 +23,10 @@ import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 import net.wurstclient.hack.HackList;
 
 @Mixin(Gui.class)
-public class IngameHudMixin
+public class GuiMixin
 {
-	// runs after renderScoreboardSidebar()
-	// and before playerListHud.setVisible()
+	// runs after extractScoreboardSidebar()
+	// and before tabList.setVisible()
 	@Inject(
 		method = "renderTabList(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V",
 		at = @At("HEAD"))

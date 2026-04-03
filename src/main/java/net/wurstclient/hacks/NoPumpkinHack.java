@@ -20,5 +20,5 @@ public final class NoPumpkinHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See IngameHudMixin.onRenderOverlay()
+	// See GuiMixin.onRenderOverlay()
 }

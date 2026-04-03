@@ -21,10 +21,10 @@ import net.minecraft.world.entity.player.Player;
 import net.wurstclient.WurstClient;
 
 @Mixin(CreativeModeInventoryScreen.class)
-public abstract class CreativeInventoryScreenMixin
+public abstract class CreativeModeInventoryScreenMixin
 	extends AbstractContainerScreen<CreativeModeInventoryScreen.ItemPickerMenu>
 {
-	private CreativeInventoryScreenMixin(WurstClient wurst,
+	private CreativeModeInventoryScreenMixin(WurstClient wurst,
 		ItemPickerMenu screenHandler, Inventory inventory, Component title)
 	{
 		super(screenHandler, inventory, title);

@@ -44,7 +44,7 @@ import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
 @Mixin(Minecraft.class)
-public abstract class MinecraftClientMixin
+public abstract class MinecraftMixin
 	extends ReentrantBlockableEventLoop<Runnable>
 	implements WindowEventHandler, IMinecraftClient
 {
@@ -62,7 +62,7 @@ public abstract class MinecraftClientMixin
 	private User wurstSession;
 	private ProfileKeyPairManager wurstProfileKeys;
 	
-	private MinecraftClientMixin(WurstClient wurst, String name)
+	private MinecraftMixin(WurstClient wurst, String name)
 	{
 		super(name);
 	}

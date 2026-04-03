@@ -18,7 +18,7 @@ import net.minecraft.client.DeltaTracker;
 import net.wurstclient.WurstClient;
 
 @Mixin(DeltaTracker.Timer.class)
-public abstract class RenderTickCounterDynamicMixin
+public abstract class DeltaTrackerTimerMixin
 {
 	@Shadow
 	public float deltaTicks;

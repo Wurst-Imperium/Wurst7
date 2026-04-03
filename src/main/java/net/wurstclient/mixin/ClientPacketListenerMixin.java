@@ -30,11 +30,11 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.util.ChatUtils;
 
 @Mixin(ClientPacketListener.class)
-public abstract class ClientPlayNetworkHandlerMixin
+public abstract class ClientPacketListenerMixin
 	extends ClientCommonPacketListenerImpl
 	implements TickablePacketListener, ClientGamePacketListener
 {
-	private ClientPlayNetworkHandlerMixin(WurstClient wurst, Minecraft client,
+	private ClientPacketListenerMixin(WurstClient wurst, Minecraft client,
 		Connection connection, CommonListenerCookie connectionState)
 	{
 		super(client, connection, connectionState);
