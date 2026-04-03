@@ -24,7 +24,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoCompleteHack;
 
 @Mixin(CommandSuggestions.class)
-public abstract class ChatInputSuggestorMixin
+public abstract class CommandSuggestionsMixin
 {
 	@Shadow
 	@Final

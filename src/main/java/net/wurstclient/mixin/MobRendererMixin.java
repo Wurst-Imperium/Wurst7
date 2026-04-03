@@ -17,7 +17,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.wurstclient.WurstClient;
 
 @Mixin(MobRenderer.class)
-public abstract class MobEntityRendererMixin
+public abstract class MobRendererMixin
 {
 	/**
 	 * Makes name-tagged mobs always show their name tags if configured in

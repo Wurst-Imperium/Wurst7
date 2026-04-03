@@ -15,7 +15,7 @@ import net.minecraft.util.StringDecomposer;
 import net.wurstclient.WurstClient;
 
 @Mixin(StringDecomposer.class)
-public abstract class TextVisitFactoryMixin
+public abstract class StringDecomposerMixin
 {
 	@ModifyArg(
 		method = "iterateFormatted(Ljava/lang/String;ILnet/minecraft/network/chat/Style;Lnet/minecraft/util/FormattedCharSink;)Z",

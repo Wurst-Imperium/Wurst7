@@ -30,7 +30,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NameTagsHack;
 
 @Mixin(NameTagFeatureRenderer.Storage.class)
-public class LabelCommandRendererMixin
+public class StorageMixin
 {
 	@Shadow
 	@Final

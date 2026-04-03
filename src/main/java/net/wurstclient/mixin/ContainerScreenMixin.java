@@ -22,7 +22,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
 
 @Mixin(ContainerScreen.class)
-public abstract class GenericContainerScreenMixin
+public abstract class ContainerScreenMixin
 	extends AbstractContainerScreen<ChestMenu>
 {
 	@Shadow
@@ -33,7 +33,7 @@ public abstract class GenericContainerScreenMixin
 	private final AutoStealHack autoSteal =
 		WurstClient.INSTANCE.getHax().autoStealHack;
 	
-	public GenericContainerScreenMixin(WurstClient wurst, ChestMenu container,
+	public ContainerScreenMixin(WurstClient wurst, ChestMenu container,
 		Inventory playerInventory, Component name)
 	{
 		super(container, playerInventory, name);

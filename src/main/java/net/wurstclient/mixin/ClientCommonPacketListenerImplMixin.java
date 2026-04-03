@@ -21,7 +21,7 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 
 @Mixin(ClientCommonPacketListenerImpl.class)
-public abstract class ClientCommonNetworkHandlerMixin
+public abstract class ClientCommonPacketListenerImplMixin
 	implements ClientCommonPacketListener
 {
 	@WrapOperation(method = "send(Lnet/minecraft/network/protocol/Packet;)V",

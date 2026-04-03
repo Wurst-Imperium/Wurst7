@@ -102,5 +102,5 @@ public final class AutoStealHack extends Hack
 		return buttons.isChecked();
 	}
 	
-	// See GenericContainerScreenMixin and ShulkerBoxScreenMixin
+	// See ContainerScreenMixin and ShulkerBoxScreenMixin
 }

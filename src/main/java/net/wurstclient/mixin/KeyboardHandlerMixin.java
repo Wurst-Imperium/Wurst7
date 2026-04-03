@@ -12,19 +12,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.world.effect.MobEffectInstance;
-import net.wurstclient.WurstClient;
+import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.input.KeyEvent;
+import net.wurstclient.event.EventManager;
+import net.wurstclient.events.KeyPressListener.KeyPressEvent;
 
-@Mixin(MobEffectInstance.class)
-public abstract class StatusEffectInstanceMixin
-	implements Comparable<MobEffectInstance>
+@Mixin(KeyboardHandler.class)
+public class KeyboardHandlerMixin
 {
-	@Inject(method = "tickDownDuration()V",
-		at = @At("HEAD"),
-		cancellable = true)
-	private void onUpdateDuration(CallbackInfo ci)
+	@Inject(method = "keyPress(JILnet/minecraft/client/input/KeyEvent;)V",
+		at = @At("HEAD"))
+	private void onOnKey(long windowHandle, int action, KeyEvent arg,
+		CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().potionSaverHack.isFrozen())
-			ci.cancel();
+		EventManager.fire(new KeyPressEvent(arg.key(), arg.scancode(), action,
+			arg.modifiers()));
 	}
 }

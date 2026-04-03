@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.wurstclient.WurstClient;
 
 @Mixin(ScreenEffectRenderer.class)
-public class InGameOverlayRendererMixin
+public class ScreenEffectRendererMixin
 {
 	@ModifyConstant(
 		method = "renderFire(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V",

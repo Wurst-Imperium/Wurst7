@@ -19,7 +19,7 @@ import net.minecraft.client.OptionInstance;
 import net.wurstclient.mixinterface.ISimpleOption;
 
 @Mixin(OptionInstance.class)
-public class SimpleOptionMixin<T> implements ISimpleOption<T>
+public class OptionInstanceMixin<T> implements ISimpleOption<T>
 {
 	@Shadow
 	T value;

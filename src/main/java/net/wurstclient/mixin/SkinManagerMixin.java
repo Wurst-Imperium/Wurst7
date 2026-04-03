@@ -30,7 +30,7 @@ import net.wurstclient.util.json.JsonUtils;
 import net.wurstclient.util.json.WsonObject;
 
 @Mixin(SkinManager.class)
-public abstract class PlayerSkinProviderMixin
+public abstract class SkinManagerMixin
 {
 	@Unique
 	private static HashMap<String, String> capes;

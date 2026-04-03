@@ -17,7 +17,7 @@ import net.minecraft.client.telemetry.TelemetryEventSender;
 import net.wurstclient.WurstClient;
 
 @Mixin(ClientTelemetryManager.class)
-public class TelemetryManagerMixin
+public class ClientTelemetryManagerMixin
 {
 	@Inject(
 		method = "getOutsideSessionSender()Lnet/minecraft/client/telemetry/TelemetryEventSender;",
