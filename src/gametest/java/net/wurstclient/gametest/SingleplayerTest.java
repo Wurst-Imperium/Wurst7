@@ -100,6 +100,7 @@ public abstract class SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_T);
 		input.typeChars("/clear");
 		input.pressKey(GLFW.GLFW_KEY_ENTER);
+		context.waitTicks(2);
 	}
 	
 	protected final void clearParticles()

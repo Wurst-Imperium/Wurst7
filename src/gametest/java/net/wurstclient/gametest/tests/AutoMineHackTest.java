@@ -40,7 +40,6 @@ public final class AutoMineHackTest extends SingleplayerTest
 		runCommand("gamemode creative");
 		runCommand("kill @e[type=item]");
 		clearInventory();
-		context.waitTick();
 		clearParticles();
 		clearChat();
 		context.waitTick();
