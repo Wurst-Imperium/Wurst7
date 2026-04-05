@@ -34,3 +34,4 @@ public final class ReachHack extends Hack
 	// See LocalPlayerMixin.blockInteractionRange() and
 	// LocalPlayerMixin.entityInteractionRange()
 }
+
