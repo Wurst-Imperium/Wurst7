@@ -16,6 +16,8 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"EasyElytra", "extra elytra", "easy elytra"})
 public final class ExtraElytraHack extends Hack implements UpdateListener
@@ -27,13 +29,23 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		"Speed control", "Control your speed with the Forward and Back keys.\n"
 			+ "(default: W and S)\n" + "No fireworks needed!",
 		true);
-	
+	private final SliderSetting horizontalVelocity =
+		new SliderSetting("Horizontal velocity",
+			"description.wurst.setting.extra_elytra.horizontal_velocity", 0.05,
+			0.01, 1, 0.01, ValueDisplay.DECIMAL.withSuffix(" blocks/tick"));
 	private final CheckboxSetting heightCtrl =
 		new CheckboxSetting("Height control",
 			"Control your height with the Jump and Sneak keys.\n"
 				+ "(default: Spacebar and Shift)\n" + "No fireworks needed!",
 			false);
-	
+	private final SliderSetting upwardVelocity =
+		new SliderSetting("Upward velocity",
+			"description.wurst.setting.extra_elytra.upward_velocity", 0.08,
+			0.01, 1, 0.01, ValueDisplay.DECIMAL.withSuffix(" blocks/tick"));
+	private final SliderSetting downwardVelocity =
+		new SliderSetting("Downward velocity",
+			"description.wurst.setting.extra_elytra.downward_velocity", 0.04,
+			0.01, 1, 0.01, ValueDisplay.DECIMAL.withSuffix(" blocks/tick"));
 	private final CheckboxSetting stopInWater =
 		new CheckboxSetting("Stop flying in water", true);
 	
@@ -45,7 +57,10 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 		setCategory(Category.MOVEMENT);
 		addSetting(instantFly);
 		addSetting(speedCtrl);
+		addSetting(horizontalVelocity);
 		addSetting(heightCtrl);
+		addSetting(upwardVelocity);
+		addSetting(downwardVelocity);
 		addSetting(stopInWater);
 	}
 	
@@ -111,9 +126,11 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 			MC.options.keyShift.setDown(false);
 		
 		if(jump && !sneak)
-			MC.player.setDeltaMovement(v.x, v.y + 0.08, v.z);
+			MC.player.setDeltaMovement(v.x, v.y + upwardVelocity.getValue(),
+				v.z);
 		else if(sneak && !jump)
-			MC.player.setDeltaMovement(v.x, v.y - 0.04, v.z);
+			MC.player.setDeltaMovement(v.x, v.y - downwardVelocity.getValue(),
+				v.z);
 	}
 	
 	private void controlSpeed()
@@ -122,7 +139,8 @@ public final class ExtraElytraHack extends Hack implements UpdateListener
 			return;
 		
 		float yaw = (float)Math.toRadians(MC.player.getYRot());
-		Vec3 forward = new Vec3(-Mth.sin(yaw) * 0.05, 0, Mth.cos(yaw) * 0.05);
+		Vec3 forward = new Vec3(-Mth.sin(yaw) * horizontalVelocity.getValue(),
+			0, Mth.cos(yaw) * horizontalVelocity.getValue());
 		
 		Vec3 v = MC.player.getDeltaMovement();
 		
