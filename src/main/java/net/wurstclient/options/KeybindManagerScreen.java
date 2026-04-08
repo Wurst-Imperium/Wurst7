@@ -49,10 +49,13 @@ public final class KeybindManagerScreen extends Screen
 		listGui = new ListGui(minecraft, this);
 		addWidget(listGui);
 		
-		addRenderableWidget(addButton = Button
-			.builder(Component.literal("Add"),
-				b -> minecraft.setScreen(new KeybindEditorScreen(this)))
-			.bounds(width / 2 - 102, height - 52, 100, 20).build());
+		addRenderableWidget(
+			addButton =
+				Button
+					.builder(Component.literal("Add"),
+						b -> minecraft.gui
+							.setScreen(new KeybindEditorScreen(this)))
+					.bounds(width / 2 - 102, height - 52, 100, 20).build());
 		
 		addRenderableWidget(
 			editButton = Button.builder(Component.literal("Edit"), b -> edit())
@@ -64,24 +67,26 @@ public final class KeybindManagerScreen extends Screen
 		
 		addRenderableWidget(backButton = Button
 			.builder(Component.literal("Back"),
-				b -> minecraft.setScreen(prevScreen))
+				b -> minecraft.gui.setScreen(prevScreen))
 			.bounds(width / 2 + 2, height - 28, 100, 20).build());
 		
 		addRenderableWidget(Button.builder(Component.literal("Reset Keybinds"),
-			b -> minecraft.setScreen(new ConfirmScreen(confirmed -> {
+			b -> minecraft.gui.setScreen(new ConfirmScreen(confirmed -> {
 				if(confirmed)
 					WurstClient.INSTANCE.getKeybinds()
 						.setKeybinds(KeybindList.DEFAULT_KEYBINDS);
-				minecraft.setScreen(this);
+				minecraft.gui.setScreen(this);
 			}, Component
 				.literal("Are you sure you want to reset your keybinds?"),
 				Component.literal("This cannot be undone!"))))
 			.bounds(8, 8, 100, 20).build());
 		
-		addRenderableWidget(Button
-			.builder(Component.literal("Profiles..."),
-				b -> minecraft.setScreen(new KeybindProfilesScreen(this)))
-			.bounds(width - 108, 8, 100, 20).build());
+		addRenderableWidget(
+			Button
+				.builder(Component.literal("Profiles..."),
+					b -> minecraft.gui
+						.setScreen(new KeybindProfilesScreen(this)))
+				.bounds(width - 108, 8, 100, 20).build());
 	}
 	
 	private void edit()
@@ -90,7 +95,7 @@ public final class KeybindManagerScreen extends Screen
 		if(keybind == null)
 			return;
 		
-		minecraft.setScreen(new KeybindEditorScreen(this, keybind.getKey(),
+		minecraft.gui.setScreen(new KeybindEditorScreen(this, keybind.getKey(),
 			keybind.getCommands()));
 	}
 	
@@ -101,7 +106,7 @@ public final class KeybindManagerScreen extends Screen
 			return;
 		
 		WurstClient.INSTANCE.getKeybinds().remove(keybind.getKey());
-		minecraft.setScreen(this);
+		minecraft.gui.setScreen(this);
 	}
 	
 	@Override

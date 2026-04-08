@@ -225,7 +225,7 @@ public final class XRayHack extends Hack
 	
 	public void openBlockListEditor(Screen prevScreen)
 	{
-		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
+		MC.gui.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
 	
 	/**

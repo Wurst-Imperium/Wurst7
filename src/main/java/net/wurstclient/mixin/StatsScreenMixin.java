@@ -89,7 +89,7 @@ public abstract class StatsScreenMixin extends Screen
 	@Unique
 	private void openWurstOptions(Button button)
 	{
-		minecraft.setScreen(new WurstOptionsScreen(this));
+		minecraft.gui.setScreen(new WurstOptionsScreen(this));
 	}
 	
 	@Unique

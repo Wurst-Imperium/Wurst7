@@ -92,7 +92,7 @@ public abstract class SingleplayerTest
 	
 	protected final void clearChat()
 	{
-		context.runOnClient(mc -> mc.gui.getChat().clearMessages(true));
+		context.runOnClient(mc -> mc.gui.hud.getChat().clearMessages(true));
 	}
 	
 	protected final void clearInventory()
@@ -110,7 +110,7 @@ public abstract class SingleplayerTest
 	
 	protected final void clearToasts()
 	{
-		context.runOnClient(mc -> mc.getToastManager().clear());
+		context.runOnClient(mc -> mc.gui.toastManager().clear());
 	}
 	
 	protected final void assertOneItemInSlot(int slot, Item item)

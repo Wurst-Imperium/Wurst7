@@ -187,7 +187,7 @@ public final class AutoLibrarianHack extends Hack
 			return;
 		}
 		
-		if(!(MC.screen instanceof MerchantScreen tradeScreen))
+		if(!(MC.gui.screen() instanceof MerchantScreen tradeScreen))
 		{
 			openTradeScreen();
 			return;

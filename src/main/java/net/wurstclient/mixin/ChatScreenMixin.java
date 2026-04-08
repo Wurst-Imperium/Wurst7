@@ -66,7 +66,7 @@ public abstract class ChatScreenMixin extends Screen
 		// Otherwise the up/down arrows won't work correctly
 		String newMessage = event.getMessage();
 		if(addToHistory)
-			minecraft.gui.getChat().addRecentChat(newMessage);
+			minecraft.gui.hud.getChat().addRecentChat(newMessage);
 		
 		// If the event isn't cancelled, send the modified message
 		if(!cancelled)

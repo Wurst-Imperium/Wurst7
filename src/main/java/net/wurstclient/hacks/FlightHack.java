@@ -159,7 +159,7 @@ public final class FlightHack extends Hack implements UpdateListener,
 	public boolean isControllingScrollEvents()
 	{
 		return isEnabled() && scrollToChangeSpeed.isChecked()
-			&& MC.screen == null
+			&& MC.gui.screen() == null
 			&& !WURST.getOtfs().zoomOtf.isControllingScrollEvents()
 			&& !WURST.getHax().freecamHack.isMovingCamera();
 	}

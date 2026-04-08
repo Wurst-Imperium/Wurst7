@@ -40,14 +40,14 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 		
 		addRenderableWidget(Button
 			.builder(Component.literal("Back"),
-				b -> minecraft.setScreen(prevScreen))
+				b -> minecraft.gui.setScreen(prevScreen))
 			.bounds(width / 2 - 100, height / 4 + 144 - 16, 200, 20).build());
 		
 		addRenderableWidget(Button
 			.builder(
 				Component.literal("Zoom Key: ")
 					.append(zoom.getTranslatedKeybindName()),
-				b -> minecraft.setScreen(new PressAKeyScreen(this)))
+				b -> minecraft.gui.setScreen(new PressAKeyScreen(this)))
 			.bounds(width / 2 - 79, height / 4 + 24 - 16, 158, 20).build());
 		
 		addRenderableWidget(Button
@@ -90,7 +90,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	@Override
 	public void onClose()
 	{
-		minecraft.setScreen(prevScreen);
+		minecraft.gui.setScreen(prevScreen);
 	}
 	
 	@Override

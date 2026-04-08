@@ -42,7 +42,7 @@ public final class InGameMenuTest extends SingleplayerTest
 		for(int i = 0; i < 2; i++)
 			input.pressKey(GLFW.GLFW_KEY_TAB);
 		input.pressKey(GLFW.GLFW_KEY_ENTER);
-		context.waitFor(mc -> mc.screen instanceof StatsScreen statsScreen
+		context.waitFor(mc -> mc.gui.screen() instanceof StatsScreen statsScreen
 			&& !statsScreen.isLoading);
 		assertScreenshotEquals("statistics_screen",
 			"https://i.imgur.com/CPMAfzO.png");
@@ -66,7 +66,7 @@ public final class InGameMenuTest extends SingleplayerTest
 		for(int i = 0; i < 3; i++)
 			input.pressKey(GLFW.GLFW_KEY_TAB);
 		input.pressKey(GLFW.GLFW_KEY_ENTER);
-		context.waitFor(mc -> mc.screen instanceof StatsScreen statsScreen
+		context.waitFor(mc -> mc.gui.screen() instanceof StatsScreen statsScreen
 			&& !statsScreen.isLoading);
 		assertScreenshotEquals("statistics_screen_alt",
 			"https://i.imgur.com/e8q4hJo.png");

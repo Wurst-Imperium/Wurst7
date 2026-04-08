@@ -52,7 +52,7 @@ public abstract class ClientPacketListenerMixin
 		// Remove Mojang's dishonest warning toast on safe servers
 		if(!packet.enforcesSecureChat())
 		{
-			minecraft.getToastManager().queued.removeIf(toast -> toast
+			minecraft.gui.toastManager().queued.removeIf(toast -> toast
 				.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING);
 			return;
 		}
@@ -63,9 +63,9 @@ public abstract class ClientPacketListenerMixin
 		MutableComponent message = Component.literal(
 			wurst.translate("toast.wurst.nochatreports.unsafe_server.message"));
 		
-		SystemToast systemToast = SystemToast.multiline(minecraft,
+		SystemToast systemToast = new SystemToast(
 			SystemToast.SystemToastId.UNSECURE_SERVER_WARNING, title, message);
-		minecraft.getToastManager().addToast(systemToast);
+		minecraft.gui.toastManager().addToast(systemToast);
 	}
 	
 	@Inject(

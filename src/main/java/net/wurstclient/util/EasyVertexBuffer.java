@@ -22,10 +22,10 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.MeshData.DrawState;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
@@ -51,7 +51,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 		VertexFormat format, Consumer<VertexConsumer> callback)
 	{
 		BufferBuilder bufferBuilder =
-			Tesselator.getInstance().begin(drawMode, format);
+			new BufferBuilder(new ByteBufferBuilder(256), drawMode, format);
 		callback.accept(bufferBuilder);
 		
 		try(MeshData buffer = bufferBuilder.build())
@@ -120,9 +120,9 @@ public final class EasyVertexBuffer implements AutoCloseable
 		modelViewStack.mul(matrixStack.last().pose());
 		
 		GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms()
-			.writeTransform(RenderSystem.getModelViewMatrix(),
+			.writeTransform(RenderSystem.getModelViewMatrixCopy(),
 				new Vector4f(red, green, blue, alpha), new Vector3f(),
-				TextureTransform.DEFAULT_TEXTURING.getMatrix());
+				TextureTransform.DEFAULT_TEXTURING.createMatrix());
 		
 		RenderTarget framebuffer =
 			OutputTarget.ITEM_ENTITY_TARGET.getRenderTarget();

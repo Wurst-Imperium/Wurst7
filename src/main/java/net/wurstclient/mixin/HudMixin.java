@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.wurstclient.WurstClient;
@@ -22,8 +22,8 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 import net.wurstclient.hack.HackList;
 
-@Mixin(Gui.class)
-public class GuiMixin
+@Mixin(Hud.class)
+public class HudMixin
 {
 	// runs after extractScoreboardSidebar()
 	// and before tabList.setVisible()

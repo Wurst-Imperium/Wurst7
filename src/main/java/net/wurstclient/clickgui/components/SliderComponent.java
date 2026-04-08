@@ -47,7 +47,8 @@ public final class SliderComponent extends Component
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
 			if(hasControlDown)
-				MC.setScreen(new EditSliderScreen(MC.screen, setting));
+				MC.gui
+					.setScreen(new EditSliderScreen(MC.gui.screen(), setting));
 			else
 				dragging = true;
 			break;

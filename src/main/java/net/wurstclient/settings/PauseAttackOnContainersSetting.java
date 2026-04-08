@@ -33,7 +33,7 @@ public final class PauseAttackOnContainersSetting extends CheckboxSetting
 		if(!isChecked())
 			return false;
 		
-		Screen screen = WurstClient.MC.screen;
+		Screen screen = WurstClient.MC.gui.screen();
 		
 		return screen instanceof AbstractContainerScreen
 			&& !(screen instanceof InventoryScreen

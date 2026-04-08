@@ -72,7 +72,7 @@ public final class InvWalkHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		Screen screen = MC.screen;
+		Screen screen = MC.gui.screen();
 		if(screen == null)
 			return;
 		

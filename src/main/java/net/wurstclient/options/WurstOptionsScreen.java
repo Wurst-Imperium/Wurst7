@@ -47,7 +47,7 @@ public class WurstOptionsScreen extends Screen
 	{
 		addRenderableWidget(Button
 			.builder(Component.literal("Back"),
-				b -> minecraft.setScreen(prevScreen))
+				b -> minecraft.gui.setScreen(prevScreen))
 			.bounds(width / 2 - 100, height / 4 + 144 - 16, 200, 20).build());
 		
 		addSettingButtons();
@@ -104,7 +104,7 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-50, 24, () -> "Keybinds",
 			"Keybinds allow you to toggle any hack or command by simply"
 				+ " pressing a button.",
-			b -> minecraft.setScreen(new KeybindManagerScreen(this)));
+			b -> minecraft.gui.setScreen(new KeybindManagerScreen(this)));
 		
 		new WurstOptionsButton(-50, 48, () -> "X-Ray Blocks",
 			"Manager for the blocks that X-Ray will show.",
@@ -113,7 +113,7 @@ public class WurstOptionsScreen extends Screen
 		new WurstOptionsButton(-50, 72, () -> "Zoom",
 			"The Zoom Manager allows you to change the zoom key and how far it"
 				+ " will zoom in.",
-			b -> minecraft.setScreen(new ZoomManagerScreen(this)));
+			b -> minecraft.gui.setScreen(new ZoomManagerScreen(this)));
 	}
 	
 	private void addLinkButtons()
@@ -145,7 +145,7 @@ public class WurstOptionsScreen extends Screen
 	@Override
 	public void onClose()
 	{
-		minecraft.setScreen(prevScreen);
+		minecraft.gui.setScreen(prevScreen);
 	}
 	
 	@Override

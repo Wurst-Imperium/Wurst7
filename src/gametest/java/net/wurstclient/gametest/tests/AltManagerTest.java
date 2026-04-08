@@ -26,7 +26,7 @@ public enum AltManagerTest
 		WurstTest.LOGGER.info("Checking AltManager button position");
 		
 		context.runOnClient(mc -> {
-			if(!(mc.screen instanceof TitleScreen))
+			if(!(mc.gui.screen() instanceof TitleScreen))
 				throw new RuntimeException("Not on the title screen");
 			
 			Button multiplayerButton = findButton(mc, "menu.multiplayer");
@@ -50,7 +50,7 @@ public enum AltManagerTest
 	{
 		String message = I18n.get(translationKey);
 		
-		for(Renderable drawable : mc.screen.renderables)
+		for(Renderable drawable : mc.gui.screen().renderables)
 			if(drawable instanceof Button button
 				&& button.getMessage().getString().equals(message))
 				return button;

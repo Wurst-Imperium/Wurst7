@@ -31,7 +31,7 @@
     "EnvironmentAttributeSystemMixin",
     "FogRendererMixin",
     "GameRendererMixin",
-    "GuiMixin",
+    "HudMixin",
     "ItemInHandRendererMixin",
     "JoinMultiplayerScreenMixin",
     "KeyBindsListMixin",

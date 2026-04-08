@@ -157,8 +157,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// add keybind
-						WurstClient.MC.setScreen(new NavigatorNewKeybindScreen(
-							possibleKeybinds, NavigatorFeatureScreen.this));
+						WurstClient.MC.gui.setScreen(
+							new NavigatorNewKeybindScreen(possibleKeybinds,
+								NavigatorFeatureScreen.this));
 					}
 				};
 			buttonDatas.add(addKeybindButton);
@@ -219,8 +220,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						// remove keybind
-						minecraft.setScreen(new NavigatorRemoveKeybindScreen(
-							existingKeybinds, NavigatorFeatureScreen.this));
+						minecraft.gui.setScreen(
+							new NavigatorRemoveKeybindScreen(existingKeybinds,
+								NavigatorFeatureScreen.this));
 					}
 				});
 				addKeybindButton.x -= 16;
@@ -285,7 +287,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	private void goBack()
 	{
 		parent.setExpanding(false);
-		minecraft.setScreen(parent);
+		minecraft.gui.setScreen(parent);
 	}
 	
 	@Override

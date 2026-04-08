@@ -166,7 +166,7 @@ public final class FreecamHack extends Hack
 		}
 		lastHealth = currentHealth;
 		
-		if(!isMovingCamera() || MC.screen != null)
+		if(!isMovingCamera() || MC.gui.screen() != null)
 		{
 			prevCamPos = camPos;
 			return;
@@ -218,7 +218,7 @@ public final class FreecamHack extends Hack
 	public boolean isControllingScrollEvents()
 	{
 		return isMovingCamera() && scrollToChangeSpeed.isChecked()
-			&& MC.screen == null
+			&& MC.gui.screen() == null
 			&& !WURST.getOtfs().zoomOtf.isControllingScrollEvents();
 	}
 	

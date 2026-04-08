@@ -47,7 +47,7 @@ public final class TextFieldEditButton extends Component
 		switch(mouseButton)
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
-			MC.setScreen(new EditTextFieldScreen(MC.screen, setting));
+			MC.gui.setScreen(new EditTextFieldScreen(MC.gui.screen(), setting));
 			break;
 			
 			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:

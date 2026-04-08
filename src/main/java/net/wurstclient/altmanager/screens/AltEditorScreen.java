@@ -272,6 +272,6 @@ public abstract class AltEditorScreen extends Screen
 	@Override
 	public final void onClose()
 	{
-		minecraft.setScreen(prevScreen);
+		minecraft.gui.setScreen(prevScreen);
 	}
 }
