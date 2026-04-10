@@ -12,7 +12,7 @@ import java.util.Objects;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Style;
 import net.wurstclient.clickgui.ClickGui;
@@ -57,7 +57,7 @@ public final class TextFieldEditButton extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor context, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		float[] bgColor = GUI.getBgColor();
@@ -90,14 +90,14 @@ public final class TextFieldEditButton extends Component
 		// text
 		int txtColor = GUI.getTxtColor();
 		context.guiRenderState.up();
-		context.drawString(TR, setting.getName(), x1, y1 + 2, txtColor, false);
+		context.text(TR, setting.getName(), x1, y1 + 2, txtColor, false);
 		String value = setting.getValue();
 		int maxWidth = getWidth() - TR.width("...") - 2;
 		int maxLength =
 			TR.getSplitter().plainIndexAtWidth(value, maxWidth, Style.EMPTY);
 		if(maxLength < value.length())
 			value = value.substring(0, maxLength) + "...";
-		context.drawString(TR, value, x1 + 2, y3 + 2, txtColor, false);
+		context.text(TR, value, x1 + 2, y3 + 2, txtColor, false);
 	}
 	
 	@Override

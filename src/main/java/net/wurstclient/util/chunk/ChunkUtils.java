@@ -36,7 +36,7 @@ public enum ChunkUtils
 	
 	public static int getManhattanDistance(ChunkPos a, ChunkPos b)
 	{
-		return Math.abs(a.x - b.x) + Math.abs(a.z - b.z);
+		return Math.abs(a.x() - b.x()) + Math.abs(a.z() - b.z());
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public enum ChunkUtils
 	public static ChunkPos getAffectedChunk(Packet<?> packet)
 	{
 		if(packet instanceof ClientboundBlockUpdatePacket p)
-			return new ChunkPos(p.getPos());
+			return ChunkPos.containing(p.getPos());
 		if(packet instanceof ClientboundSectionBlocksUpdatePacket p)
 			return p.sectionPos.chunk();
 		if(packet instanceof ClientboundLevelChunkWithLightPacket p)
@@ -67,29 +67,30 @@ public enum ChunkUtils
 		int diameter = radius * 2 + 1;
 		
 		ChunkPos center = MC.player.chunkPosition();
-		ChunkPos min = new ChunkPos(center.x - radius, center.z - radius);
-		ChunkPos max = new ChunkPos(center.x + radius, center.z + radius);
+		ChunkPos min = new ChunkPos(center.x() - radius, center.z() - radius);
+		ChunkPos max = new ChunkPos(center.x() + radius, center.z() + radius);
 		
 		Stream<LevelChunk> stream = Stream.<ChunkPos> iterate(min, pos -> {
 			
-			int x = pos.x;
-			int z = pos.z;
+			int x = pos.x();
+			int z = pos.z();
 			
 			x++;
 			
-			if(x > max.x)
+			if(x > max.x())
 			{
-				x = min.x;
+				x = min.x();
 				z++;
 			}
 			
-			if(z > max.z)
+			if(z > max.z())
 				throw new IllegalStateException("Stream limit didn't work.");
 			
 			return new ChunkPos(x, z);
 			
-		}).limit(diameter * diameter).filter(c -> MC.level.hasChunk(c.x, c.z))
-			.map(c -> MC.level.getChunk(c.x, c.z)).filter(Objects::nonNull);
+		}).limit(diameter * diameter)
+			.filter(c -> MC.level.hasChunk(c.x(), c.z()))
+			.map(c -> MC.level.getChunk(c.x(), c.z())).filter(Objects::nonNull);
 		
 		return stream;
 	}

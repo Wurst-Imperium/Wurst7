@@ -31,7 +31,7 @@ import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -409,10 +409,10 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
-		listGui.render(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
 		// skin preview
 		Alt alt = listGui.getSelectedAlt();
@@ -426,11 +426,11 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		// title text
-		context.drawCenteredString(font, "Alt Manager", width / 2, 4,
+		context.centeredText(font, "Alt Manager", width / 2, 4,
 			CommonColors.WHITE);
-		context.drawCenteredString(font, "Alts: " + altManager.getList().size(),
+		context.centeredText(font, "Alts: " + altManager.getList().size(),
 			width / 2, 14, CommonColors.LIGHT_GRAY);
-		context.drawCenteredString(font,
+		context.centeredText(font,
 			"premium: " + altManager.getNumPremium() + ", cracked: "
 				+ altManager.getNumCracked(),
 			width / 2, 24, CommonColors.LIGHT_GRAY);
@@ -445,13 +445,14 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
 		renderButtonTooltip(context, mouseX, mouseY);
 		renderAltTooltip(context, mouseX, mouseY);
 	}
 	
-	private void renderAltTooltip(GuiGraphics context, int mouseX, int mouseY)
+	private void renderAltTooltip(GuiGraphicsExtractor context, int mouseX,
+		int mouseY)
 	{
 		if(!listGui.isMouseOver(mouseX, mouseY))
 			return;
@@ -494,10 +495,10 @@ public final class AltManagerScreen extends Screen
 		context.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(GuiGraphics context, int mouseX,
+	private void renderButtonTooltip(GuiGraphicsExtractor context, int mouseX,
 		int mouseY)
 	{
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 		{
 			if(!button.isHoveredOrFocused())
 				continue;
@@ -577,8 +578,8 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
-			boolean hovered, float tickDelta)
+		public void extractContent(GuiGraphicsExtractor context, int mouseX,
+			int mouseY, boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
 			int y = getContentY();
@@ -601,11 +602,11 @@ public final class AltManagerScreen extends Screen
 			Font tr = minecraft.font;
 			
 			// name / email
-			context.drawString(tr, "Name: " + alt.getDisplayName(), x + 31,
-				y + 3, CommonColors.LIGHT_GRAY, false);
+			context.text(tr, "Name: " + alt.getDisplayName(), x + 31, y + 3,
+				CommonColors.LIGHT_GRAY, false);
 			
 			// status
-			context.drawString(tr, getBottomText(), x + 31, y + 15,
+			context.text(tr, getBottomText(), x + 31, y + 15,
 				CommonColors.LIGHT_GRAY, false);
 		}
 		

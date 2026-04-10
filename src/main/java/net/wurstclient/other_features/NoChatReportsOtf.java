@@ -10,11 +10,11 @@ package net.wurstclient.other_features;
 import java.net.URI;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
-import net.minecraft.client.GuiMessageTag;
-import net.minecraft.client.GuiMessageTag.Icon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag.Icon;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -159,6 +159,6 @@ public final class NoChatReportsOtf extends OtherFeature
 		return Category.CHAT;
 	}
 	
-	// See ChatHudMixin, ClientPlayNetworkHandlerMixin.onOnServerMetadata(),
-	// MinecraftClientMixin.onGetProfileKeys()
+	// See ChatComponentMixin, ClientPacketListenerMixin.onOnGameJoin(),
+	// MinecraftMixin.onGetProfileKeys()
 }

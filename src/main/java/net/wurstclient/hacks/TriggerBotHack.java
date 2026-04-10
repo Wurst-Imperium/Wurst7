@@ -174,7 +174,7 @@ public final class TriggerBotHack extends Hack
 		if(!EntityUtils.IS_ATTACKABLE.test(entity))
 			return false;
 		
-		if(MC.player.distanceToSqr(entity) > range.getValueSq())
+		if(EntityUtils.distanceToHitboxSq(entity) > range.getValueSq())
 			return false;
 		
 		return entityFilters.testOne(entity);

@@ -11,7 +11,7 @@ import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -71,43 +71,32 @@ public final class EditBookOfferScreen extends Screen
 			Component.literal(""));
 		addWidget(levelField);
 		levelField.setMaxLength(2);
-		levelField.setFilter(t -> {
-			if(t.isEmpty())
-				return true;
-			
-			if(!MathUtils.isInteger(t))
-				return false;
-			
-			int level = Integer.parseInt(t);
-			if(level < 1 || level > 10)
-				return false;
-			
-			if(offerToSave == null)
-				return true;
-			
-			Enchantment enchantment = offerToSave.getEnchantment();
-			return level <= enchantment.getMaxLevel();
-		});
 		levelField.setResponder(t -> {
-			if(!MathUtils.isInteger(t))
+			if(!isValidLevel(t))
+			{
+				levelField.setTextColor(WurstColors.LIGHT_RED);
 				return;
+			}
 			
-			int level = Integer.parseInt(t);
-			updateLevel(level, false);
+			levelField.setTextColor(EditBox.DEFAULT_TEXT_COLOR);
+			if(!t.isEmpty())
+				updateLevel(Integer.parseInt(t), false);
 		});
 		
 		priceField = new EditBox(minecraft.font, width / 2 - 32, 126, 28, 12,
 			Component.literal(""));
 		addWidget(priceField);
 		priceField.setMaxLength(2);
-		priceField.setFilter(t -> t.isEmpty() || MathUtils.isInteger(t)
-			&& Integer.parseInt(t) >= 1 && Integer.parseInt(t) <= 64);
 		priceField.setResponder(t -> {
-			if(!MathUtils.isInteger(t))
+			if(!isValidPrice(t))
+			{
+				priceField.setTextColor(WurstColors.LIGHT_RED);
 				return;
+			}
 			
-			int price = Integer.parseInt(t);
-			updatePrice(price, false);
+			priceField.setTextColor(EditBox.DEFAULT_TEXT_COLOR);
+			if(!t.isEmpty())
+				updatePrice(Integer.parseInt(t), false);
 		});
 		
 		addRenderableWidget(levelPlusButton =
@@ -207,6 +196,31 @@ public final class EditBookOfferScreen extends Screen
 		}
 	}
 	
+	private boolean isValidLevel(String t)
+	{
+		if(t.isEmpty())
+			return true;
+		
+		if(!MathUtils.isInteger(t))
+			return false;
+		
+		int level = Integer.parseInt(t);
+		if(level < 1 || level > 10)
+			return false;
+		
+		if(offerToSave == null)
+			return true;
+		
+		Enchantment enchantment = offerToSave.getEnchantment();
+		return level <= enchantment.getMaxLevel();
+	}
+	
+	private boolean isValidPrice(String t)
+	{
+		return t.isEmpty() || MathUtils.isInteger(t) && Integer.parseInt(t) >= 1
+			&& Integer.parseInt(t) <= 64;
+	}
+	
 	@Override
 	public boolean mouseClicked(MouseButtonEvent context, boolean doubleClick)
 	{
@@ -257,8 +271,8 @@ public final class EditBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		Matrix3x2fStack matrixStack = context.pose();
 		
@@ -266,8 +280,7 @@ public final class EditBookOfferScreen extends Screen
 		
 		Font tr = minecraft.font;
 		String titleText = "Edit Book Offer";
-		context.drawCenteredString(tr, titleText, width / 2, 12,
-			CommonColors.WHITE);
+		context.centeredText(tr, titleText, width / 2, 12, CommonColors.WHITE);
 		
 		int x = width / 2 - 100;
 		int y = 64;
@@ -283,10 +296,10 @@ public final class EditBookOfferScreen extends Screen
 		Holder<Enchantment> enchantment = bookOffer.getEnchantmentEntry().get();
 		int nameColor = enchantment.is(EnchantmentTags.CURSE)
 			? WurstColors.LIGHT_RED : CommonColors.WHITE;
-		context.drawString(tr, name, x + 28, y, nameColor);
+		context.text(tr, name, x + 28, y, nameColor);
 		
-		context.drawString(tr, bookOffer.id(), x + 28, y + 9,
-			CommonColors.LIGHT_GRAY, false);
+		context.text(tr, bookOffer.id(), x + 28, y + 9, CommonColors.LIGHT_GRAY,
+			false);
 		
 		String price;
 		if(bookOffer.price() >= 64)
@@ -298,26 +311,24 @@ public final class EditBookOfferScreen extends Screen
 				x + 28 + tr.width(price), y + 16, false);
 		}
 		
-		context.drawString(tr, price, x + 28, y + 18, CommonColors.LIGHT_GRAY,
-			false);
+		context.text(tr, price, x + 28, y + 18, CommonColors.LIGHT_GRAY, false);
 		
-		levelField.render(context, mouseX, mouseY, partialTicks);
-		priceField.render(context, mouseX, mouseY, partialTicks);
+		levelField.extractRenderState(context, mouseX, mouseY, partialTicks);
+		priceField.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
 		matrixStack.translate(width / 2 - 100, 112);
 		
-		context.drawString(tr, "Level:", 0, 0, WurstColors.VERY_LIGHT_GRAY);
-		context.drawString(tr, "Max price:", 0, 16,
-			WurstColors.VERY_LIGHT_GRAY);
+		context.text(tr, "Level:", 0, 0, WurstColors.VERY_LIGHT_GRAY);
+		context.text(tr, "Max price:", 0, 16, WurstColors.VERY_LIGHT_GRAY);
 		
 		if(alreadyAdded && offerToSave != null)
 		{
 			String errorText = offerToSave.getEnchantmentNameWithLevel()
 				+ " is already on your list!";
-			context.drawString(tr, errorText, 0, 32, WurstColors.LIGHT_RED);
+			context.text(tr, errorText, 0, 32, WurstColors.LIGHT_RED);
 		}
 		
 		matrixStack.popMatrix();

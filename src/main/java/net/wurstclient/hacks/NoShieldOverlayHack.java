@@ -45,5 +45,5 @@ public final class NoShieldOverlayHack extends Hack
 			matrixStack.translate(0, -nonBlockingOffset.getValue(), 0);
 	}
 	
-	// See HeldItemRendererMixin
+	// See ItemInHandRendererMixin
 }

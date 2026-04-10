@@ -16,7 +16,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.KeyEvent;
@@ -126,22 +126,22 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	protected void onRender(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
 		Font tr = minecraft.font;
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		context.drawCenteredString(tr, "Remove Keybind", middleX, 32, txtColor);
+		context.centeredText(tr, "Remove Keybind", middleX, 32, txtColor);
 		
 		// background
 		int bgx1 = middleX - 154;
 		int bgx2 = middleX + 154;
 		int bgy1 = 60;
 		int bgy2 = height - 43;
-		boolean noButtons = Screens.getButtons(this).isEmpty();
+		boolean noButtons = Screens.getWidgets(this).isEmpty();
 		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		
 		context.enableScissor(bgx1, bgy1, bgx2, bgy3);
@@ -180,9 +180,9 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			
 			// text
 			context.guiRenderState.up();
-			context.drawString(tr, key.replace("key.keyboard.", "") + ": "
+			context.text(tr, key.replace("key.keyboard.", "") + ": "
 				+ keybind.getDescription(), x1 + 1, y1 + 1, txtColor);
-			context.drawString(tr, keybind.getCommand(), x1 + 1,
+			context.text(tr, keybind.getCommand(), x1 + 1,
 				y1 + 1 + tr.lineHeight, txtColor);
 		}
 		
@@ -191,14 +191,14 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		context.guiRenderState.up();
 		for(String line : text.split("\n"))
 		{
-			context.drawString(tr, line, bgx1 + 2, textY, txtColor);
+			context.text(tr, line, bgx1 + 2, textY, txtColor);
 			textY += tr.lineHeight;
 		}
 		
 		context.disableScissor();
 		
 		// buttons below scissor box
-		for(AbstractWidget button : Screens.getButtons(this))
+		for(AbstractWidget button : Screens.getWidgets(this))
 		{
 			// positions
 			int x1 = button.getX();
@@ -222,7 +222,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			// text
 			String buttonText = button.getMessage().getString();
 			context.guiRenderState.up();
-			context.drawCenteredString(tr, buttonText, (x1 + x2) / 2, y1 + 5,
+			context.centeredText(tr, buttonText, (x1 + x2) / 2, y1 + 5,
 				txtColor);
 		}
 	}

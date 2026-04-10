@@ -34,6 +34,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filterlists.FollowFilterList;
 import net.wurstclient.util.ChatUtils;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.FakePlayerEntity;
 
 @DontSaveState
@@ -95,7 +96,7 @@ public final class FollowHack extends Hack
 			
 			entity = stream
 				.min(
-					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
+					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 				.orElse(null);
 			
 			if(entity == null)
@@ -156,7 +157,7 @@ public final class FollowHack extends Hack
 				.filter(e -> entity.getName().getString()
 					.equalsIgnoreCase(e.getName().getString()))
 				.min(
-					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
+					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 				.orElse(null);
 			
 			if(entity == null)
@@ -232,7 +233,7 @@ public final class FollowHack extends Hack
 			// follow entity
 			WURST.getRotationFaker()
 				.faceVectorClient(entity.getBoundingBox().getCenter());
-			double distanceSq = Math.pow(distance.getValue(), 2);
+			double distanceSq = distance.getValueSq();
 			MC.options.keyUp.setDown(MC.player.distanceToSqr(entity.getX(),
 				MC.player.getY(), entity.getZ()) > distanceSq);
 		}

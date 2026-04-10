@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.gui.ActiveTextCollector;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -106,21 +106,21 @@ public final class ForcedChatReportsScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - font.lineHeight * 2;
 		
-		context.drawCenteredString(font, title, centerX, titleY,
+		context.centeredText(font, title, centerX, titleY,
 			CommonColors.LIGHT_GRAY);
 		ActiveTextCollector otherContext = context.textRenderer();
 		reasonFormatted.visitLines(TextAlignment.CENTER, centerX, reasonY, 9,
 			otherContext);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

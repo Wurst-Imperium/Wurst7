@@ -1,0 +1,21 @@
+name: Update Modrinth Dependencies
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  update-deps:
+    if: ${{ github.event_name != 'schedule' || github.repository == 'Wurst-Imperium/Wurst7' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ["master", "1.21.11"]
+    steps:
+      - name: Update Modrinth Dependencies
+        uses: Wurst-Imperium/update-modrinth-deps@v1
+        with:
+          ref: ${{ matrix.branch }}
+          token: ${{ secrets.UMD_PR_TOKEN }}

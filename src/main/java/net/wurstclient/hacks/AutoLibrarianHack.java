@@ -28,7 +28,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -244,9 +244,8 @@ public final class AutoLibrarianHack extends Hack
 			MC.getConnection().send(new ServerboundSelectTradePacket(0));
 			
 			// buy whatever the villager is selling
-			MC.gameMode.handleInventoryMouseClick(
-				tradeScreen.getMenu().containerId, 2, 0, ClickType.PICKUP,
-				MC.player);
+			MC.gameMode.handleContainerInput(tradeScreen.getMenu().containerId,
+				2, 0, ContainerInput.PICKUP, MC.player);
 			
 			// close the trade screen
 			closeTradeScreen();
@@ -362,7 +361,7 @@ public final class AutoLibrarianHack extends Hack
 		MultiPlayerGameMode im = MC.gameMode;
 		LocalPlayer player = MC.player;
 		
-		if(player.distanceToSqr(villager) > range.getValueSq())
+		if(EntityUtils.distanceToHitboxSq(villager) > range.getValueSq())
 		{
 			ChatUtils.error("Villager is out of range. Consider trapping"
 				+ " the villager so it doesn't wander away.");
@@ -383,10 +382,7 @@ public final class AutoLibrarianHack extends Hack
 		// click on villager
 		InteractionHand hand = InteractionHand.MAIN_HAND;
 		InteractionResult actionResult =
-			im.interactAt(player, villager, hitResult, hand);
-		
-		if(!actionResult.consumesAction())
-			im.interact(player, villager, hand);
+			im.interact(player, villager, hitResult, hand);
 		
 		// swing hand
 		if(actionResult instanceof InteractionResult.Success success
@@ -439,22 +435,21 @@ public final class AutoLibrarianHack extends Hack
 	
 	private void setTargetVillager()
 	{
-		LocalPlayer player = MC.player;
 		double rangeSq = range.getValueSq();
 		
 		Stream<Villager> stream = StreamSupport
 			.stream(MC.level.entitiesForRendering().spliterator(), true)
 			.filter(e -> !e.isRemoved()).filter(Villager.class::isInstance)
 			.map(e -> (Villager)e).filter(e -> e.getHealth() > 0)
-			.filter(e -> player.distanceToSqr(e) <= rangeSq)
+			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
 			.filter(e -> e.getVillagerData().profession().unwrapKey()
 				.orElse(null) == VillagerProfession.LIBRARIAN)
 			.filter(e -> e.getVillagerData().level() == 1)
 			.filter(e -> !experiencedVillagers.contains(e));
 		
-		villager =
-			stream.min(Comparator.comparingDouble(e -> player.distanceToSqr(e)))
-				.orElse(null);
+		villager = stream
+			.min(Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
+			.orElse(null);
 		
 		if(villager == null)
 		{

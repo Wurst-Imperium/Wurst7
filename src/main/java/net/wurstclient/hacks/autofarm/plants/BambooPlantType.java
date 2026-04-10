@@ -30,14 +30,13 @@ public final class BambooPlantType extends AutoFarmPlantType
 		
 		BlockState floor = BlockUtils.getState(pos.below());
 		return !floor.is(Blocks.BAMBOO) && !floor.is(Blocks.BAMBOO_SAPLING)
-			&& floor.is(BlockTags.BAMBOO_PLANTABLE_ON);
+			&& floor.is(BlockTags.SUPPORTS_BAMBOO);
 	}
 	
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.below())
-			.is(BlockTags.BAMBOO_PLANTABLE_ON);
+		return BlockUtils.getState(pos.below()).is(BlockTags.SUPPORTS_BAMBOO);
 	}
 	
 	@Override

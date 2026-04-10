@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   stale:
+    if: ${{ github.event_name != 'schedule' || github.repository == 'Wurst-Imperium/Wurst7' }}
     runs-on: ubuntu-latest
     steps:
 

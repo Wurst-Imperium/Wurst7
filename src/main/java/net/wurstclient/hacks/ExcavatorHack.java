@@ -20,7 +20,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
@@ -216,7 +216,7 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(GuiGraphics context, float partialTicks)
+	public void onRenderGUI(GuiGraphicsExtractor context, float partialTicks)
 	{
 		String message;
 		if(step.selectPos && step.pos != null)
@@ -236,8 +236,8 @@ public final class ExcavatorHack extends Hack
 		context.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
 		
 		// text
-		context.drawString(tr, message, msgX1 + 2, msgY1 + 1,
-			CommonColors.WHITE, false);
+		context.text(tr, message, msgX1 + 2, msgY1 + 1, CommonColors.WHITE,
+			false);
 	}
 	
 	public void enableWithArea(BlockPos pos1, BlockPos pos2)

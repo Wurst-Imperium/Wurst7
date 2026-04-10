@@ -16,7 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 import net.wurstclient.mixinterface.IMinecraftClient;
 
 public enum InventoryUtils
@@ -207,7 +207,7 @@ public enum InventoryUtils
 	public static boolean selectItem(int slot)
 	{
 		Inventory inventory = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		IMultiPlayerGameMode im = IMC.getInteractionManager();
 		
 		// if the slot is negative, abort and return false
 		if(slot < 0)

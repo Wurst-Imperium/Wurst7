@@ -25,8 +25,9 @@ public abstract class ItemInHandRendererMixin
 	/**
 	 * Makes the "Hide hand" setting in Freecam work.
 	 */
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "renderHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/player/LocalPlayer;I)V",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onRenderHandsWithItems(float tickProgress, PoseStack matrices,
 		SubmitNodeCollector entityRenderCommandQueue, LocalPlayer player,
