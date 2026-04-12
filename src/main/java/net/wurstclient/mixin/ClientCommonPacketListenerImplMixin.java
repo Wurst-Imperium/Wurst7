@@ -8,7 +8,10 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -17,6 +20,9 @@ import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
+import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
+import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
+import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 
@@ -24,6 +30,10 @@ import net.wurstclient.events.PacketOutputListener.PacketOutputEvent;
 public abstract class ClientCommonPacketListenerImplMixin
 	implements ClientCommonPacketListener
 {
+	
+	@Shadow
+	protected Connection connection;
+	
 	@WrapOperation(method = "send(Lnet/minecraft/network/protocol/Packet;)V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V"))
@@ -36,4 +46,23 @@ public abstract class ClientCommonPacketListenerImplMixin
 		if(!event.isCancelled())
 			original.call(connection, event.getPacket());
 	}
+	
+	@Inject(
+		method = "handleResourcePackPush(Lnet/minecraft/network/protocol/common/ClientboundResourcePackPushPacket;)V",
+		at = @At("HEAD"),
+		cancellable = true)
+	private void onHandleResourcePackPush(
+		ClientboundResourcePackPushPacket packet, CallbackInfo ci)
+	{
+		if(!WurstClient.INSTANCE.getHax().resourceSpoofHack.isEnabled())
+			return;
+		
+		connection.send(new ServerboundResourcePackPacket(packet.id(),
+			ServerboundResourcePackPacket.Action.ACCEPTED));
+		connection.send(new ServerboundResourcePackPacket(packet.id(),
+			ServerboundResourcePackPacket.Action.SUCCESSFULLY_LOADED));
+		
+		ci.cancel();
+	}
+	
 }
