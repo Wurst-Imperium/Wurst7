@@ -144,7 +144,7 @@ public final class AutoFishDebugDraw
 				playerPos.subtract(camPos), bobberPos.subtract(camPos), color,
 				0.1F);
 			
-			vcp.endBatch(WurstRenderLayers.ESP_LINES);
+			vcp.uploadAndDraw();
 		}
 	}
 	

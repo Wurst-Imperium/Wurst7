@@ -64,7 +64,7 @@ public enum RenderUtils
 	
 	public static Vec3 getCameraPos()
 	{
-		Camera camera = WurstClient.MC.gameRenderer.getMainCamera();
+		Camera camera = WurstClient.MC.gameRenderer.mainCamera();
 		if(camera == null)
 			return Vec3.ZERO;
 		
@@ -73,7 +73,7 @@ public enum RenderUtils
 	
 	public static Rotation getCameraRotation()
 	{
-		Camera camera = WurstClient.MC.gameRenderer.getMainCamera();
+		Camera camera = WurstClient.MC.gameRenderer.mainCamera();
 		if(camera == null)
 			return new Rotation(0, 0);
 		
@@ -82,7 +82,7 @@ public enum RenderUtils
 	
 	public static BlockPos getCameraBlockPos()
 	{
-		Camera camera = WurstClient.MC.gameRenderer.getMainCamera();
+		Camera camera = WurstClient.MC.gameRenderer.mainCamera();
 		if(camera == null)
 			return BlockPos.ZERO;
 		
@@ -96,7 +96,7 @@ public enum RenderUtils
 	
 	public static MultiBufferSource.BufferSource getVCP()
 	{
-		return WurstClient.MC.renderBuffers().bufferSource();
+		return WurstClient.MC.gameRenderer.renderBuffers().bufferSource();
 	}
 	
 	public static float[] getRainbowColor()
@@ -129,7 +129,7 @@ public enum RenderUtils
 		Vec3 offset = getCameraPos().reverse();
 		drawLine(matrices, buffer, start.add(offset), end.add(offset), color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	private static Vec3 getTracerOrigin(float partialTicks)
@@ -148,7 +148,7 @@ public enum RenderUtils
 		Vec3 offset = getCameraPos().reverse();
 		drawLine(matrices, buffer, start, end.add(offset), color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawTracers(PoseStack matrices, float partialTicks,
@@ -163,7 +163,7 @@ public enum RenderUtils
 		for(Vec3 end : ends)
 			drawLine(matrices, buffer, start, end.add(offset), color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawTracers(PoseStack matrices, float partialTicks,
@@ -179,7 +179,7 @@ public enum RenderUtils
 			drawLine(matrices, buffer, start, end.point().add(offset),
 				end.color());
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawLine(PoseStack matrices, VertexConsumer buffer,
@@ -240,7 +240,7 @@ public enum RenderUtils
 		List<Vec3> points2 = points.stream().map(v -> v.add(offset)).toList();
 		drawCurvedLine(matrices, buffer, points2, color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawCurvedLine(PoseStack matrices, VertexConsumer buffer,
@@ -273,7 +273,7 @@ public enum RenderUtils
 		drawSolidBox(matrices, buffer, box.move(getCameraPos().reverse()),
 			color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawSolidBoxes(PoseStack matrices, List<AABB> boxes,
@@ -287,7 +287,7 @@ public enum RenderUtils
 		for(AABB box : boxes)
 			drawSolidBox(matrices, buffer, box.move(camOffset), color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawSolidBoxes(PoseStack matrices,
@@ -302,7 +302,7 @@ public enum RenderUtils
 			drawSolidBox(matrices, buffer, box.box().move(camOffset),
 				box.color());
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawSolidBox(VertexConsumer buffer, AABB box, int color)
@@ -362,7 +362,7 @@ public enum RenderUtils
 		drawOutlinedBox(matrices, buffer, box.move(getCameraPos().reverse()),
 			color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawOutlinedBoxes(PoseStack matrices, List<AABB> boxes,
@@ -376,7 +376,7 @@ public enum RenderUtils
 		for(AABB box : boxes)
 			drawOutlinedBox(matrices, buffer, box.move(camOffset), color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawOutlinedBoxes(PoseStack matrices,
@@ -391,7 +391,7 @@ public enum RenderUtils
 			drawOutlinedBox(matrices, buffer, box.box().move(camOffset),
 				box.color());
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawOutlinedBox(VertexConsumer buffer, AABB box,
@@ -476,7 +476,7 @@ public enum RenderUtils
 		drawCrossBox(matrices, buffer, box.move(getCameraPos().reverse()),
 			color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawCrossBoxes(PoseStack matrices, List<AABB> boxes,
@@ -490,7 +490,7 @@ public enum RenderUtils
 		for(AABB box : boxes)
 			drawCrossBox(matrices, buffer, box.move(camOffset), color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawCrossBoxes(PoseStack matrices,
@@ -505,7 +505,7 @@ public enum RenderUtils
 			drawCrossBox(matrices, buffer, box.box().move(camOffset),
 				box.color());
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawCrossBox(VertexConsumer buffer, AABB box, int color)
@@ -594,7 +594,7 @@ public enum RenderUtils
 		
 		drawNode(matrices, buffer, box.move(getCameraPos().reverse()), color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawNodes(PoseStack matrices, List<AABB> boxes,
@@ -608,7 +608,7 @@ public enum RenderUtils
 		for(AABB box : boxes)
 			drawNode(matrices, buffer, box.move(camOffset), color);
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawNodes(PoseStack matrices, List<ColoredBox> boxes,
@@ -622,7 +622,7 @@ public enum RenderUtils
 		for(ColoredBox box : boxes)
 			drawNode(matrices, buffer, box.box().move(camOffset), box.color());
 		
-		vcp.endBatch(layer);
+		vcp.uploadAndDraw();
 	}
 	
 	public static void drawNode(VertexConsumer buffer, AABB box, int color)

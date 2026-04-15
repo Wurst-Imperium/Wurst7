@@ -544,7 +544,8 @@ public class PathFinder
 	public void renderPath(PoseStack matrixStack, boolean debugMode,
 		boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = MC.renderBuffers().bufferSource();
+		MultiBufferSource.BufferSource vcp =
+			MC.gameRenderer.renderBuffers().bufferSource();
 		VertexConsumer buffer =
 			vcp.getBuffer(WurstRenderLayers.getLines(depthTest));
 		
@@ -592,7 +593,7 @@ public class PathFinder
 		
 		matrixStack.popPose();
 		
-		vcp.endLastBatch();
+		vcp.uploadAndDraw();
 	}
 	
 	public boolean isPathStillValid(int index)

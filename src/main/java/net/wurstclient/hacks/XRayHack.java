@@ -123,7 +123,7 @@ public final class XRayHack extends Hack
 		EVENTS.add(VisGraphListener.class, this);
 		
 		// reload chunks
-		MC.levelRenderer.allChanged();
+		MC.levelExtractor.allChanged();
 		
 		// display warning if OptiFine is detected
 		if(optiFineWarning != null)
@@ -138,7 +138,7 @@ public final class XRayHack extends Hack
 		EVENTS.remove(VisGraphListener.class, this);
 		
 		// reload chunks
-		MC.levelRenderer.allChanged();
+		MC.levelExtractor.allChanged();
 		
 		// reset gamma
 		FullbrightHack fullbright = WURST.getHax().fullbrightHack;

@@ -17,7 +17,7 @@ import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LightLayer;
@@ -143,7 +143,7 @@ public final class MobSpawnEspHack extends Hack
 	{
 		// Check for solid blocks, fluids, redstone, prevent_spawning tags, etc.
 		// See SpawnLocationTypes.ON_GROUND
-		if(!SpawnPlacements.isSpawnPositionOk(EntityType.CREEPER, MC.level,
+		if(!SpawnPlacements.isSpawnPositionOk(EntityTypes.CREEPER, MC.level,
 			pos))
 			return false;
 		

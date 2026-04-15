@@ -7,13 +7,13 @@
  */
 package net.wurstclient;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
 import java.util.Optional;
 
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderPipeline.Snippet;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
@@ -28,8 +28,7 @@ public enum WurstShaderPipelines
 	 * Similar to the RENDERTYPE_LINES Snippet, but without fog.
 	 */
 	public static final Snippet FOGLESS_LINES_SNIPPET = RenderPipeline
-		.builder(RenderPipelines.MATRICES_FOG_SNIPPET,
-			RenderPipelines.GLOBALS_SNIPPET)
+		.builder(RenderPipelines.LINES_SNIPPET)
 		.withVertexShader(Identifier.parse("wurst:core/fogless_lines"))
 		.withFragmentShader(Identifier.parse("wurst:core/fogless_lines"))
 		.withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
@@ -53,7 +52,7 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline ESP_LINES =
 		RenderPipelines.register(RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
 			.withLocation(Identifier.parse("wurst:pipeline/wurst_esp_lines"))
-			.build());
+			.withDepthStencilState(Optional.empty()).build());
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with culling enabled.

@@ -8,7 +8,6 @@
 package net.wurstclient.mixin;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,7 +25,7 @@ public class OptionInstanceMixin<T> implements ISimpleOption<T>
 	
 	@Shadow
 	@Final
-	private Consumer<T> onValueUpdate;
+	private OptionInstance.ValueUpdateListener<? super T> onValueUpdate;
 	
 	@Override
 	public void forceSetValue(T newValue)
@@ -40,7 +39,7 @@ public class OptionInstanceMixin<T> implements ISimpleOption<T>
 		if(!Objects.equals(value, newValue))
 		{
 			value = newValue;
-			onValueUpdate.accept(value);
+			onValueUpdate.valueChanged(value);
 		}
 	}
 }
