@@ -29,10 +29,9 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.InventoryUtils;
 
-@SearchTags({"attribute swap", "weapon swap", "auto breach swap", "breach swap",
-	"mace swap", "auto swap", "auto shield break", "auto mace", "shield break",
-	"disable shield", "item swap", "hotbar swap", "item saver",
-	"durability saver"})
+@SearchTags({"attribute swap", "weapon swap", "auto breach swap", "mace swap",
+	"auto swap", "auto shield break", "auto mace", "disable shield",
+	"item swap", "hotbar swap", "item saver", "durability saver"})
 public final class AttributeSwapHack extends Hack
 	implements PlayerAttacksEntityListener, UpdateListener
 {
