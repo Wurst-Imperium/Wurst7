@@ -60,7 +60,7 @@ public final class AttributeSwapHack extends Hack
 		true);
 	
 	private final CheckboxSetting onlyWithKillAura = new CheckboxSetting(
-		"Only with KillAura", "Only activate when KillAura is enabled.", false);
+		"Only with Killaura", "Only activate when Killaura is enabled.", false);
 	
 	private int backTimer;
 	private boolean awaitingBack;
