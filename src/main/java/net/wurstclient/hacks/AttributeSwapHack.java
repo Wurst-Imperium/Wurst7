@@ -7,9 +7,15 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MaceItem;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.wurstclient.Category;
@@ -33,7 +39,7 @@ public final class AttributeSwapHack extends Hack
 	private final EnumSetting<Mode> mode = new EnumSetting<>("Mode",
 		"Simple: swaps to a fixed hotbar slot on attack.\n"
 			+ "Smart: checks target and picks the best item automatically.",
-		Mode.values(), Mode.Simple);
+		Mode.values(), Mode.SIMPLE);
 	
 	private final SliderSetting targetSlot = new SliderSetting("Target slot",
 		"Hotbar slot to swap to (Simple mode).", 1, 1, 9, 1,
@@ -70,7 +76,6 @@ public final class AttributeSwapHack extends Hack
 	{
 		super("AttributeSwap");
 		setCategory(Category.COMBAT);
-		
 		addSetting(mode);
 		addSetting(targetSlot);
 		addSetting(swapBack);
@@ -87,6 +92,7 @@ public final class AttributeSwapHack extends Hack
 		backTimer = 0;
 		awaitingBack = false;
 		originalSlot = -1;
+		
 		EVENTS.add(PlayerAttacksEntityListener.class, this);
 		EVENTS.add(UpdateListener.class, this);
 	}
@@ -109,7 +115,6 @@ public final class AttributeSwapHack extends Hack
 	@Override
 	public void onPlayerAttacksEntity(Entity target)
 	{
-		
 		if(onlyWithKillAura.isChecked()
 			&& !WURST.getHax().killauraHack.isEnabled())
 			return;
@@ -124,6 +129,7 @@ public final class AttributeSwapHack extends Hack
 			return;
 		if(backTimer-- > 0)
 			return;
+		
 		doSwapBack();
 		awaitingBack = false;
 	}
@@ -133,9 +139,9 @@ public final class AttributeSwapHack extends Hack
 		if(awaitingBack)
 			return;
 		
-		if(mode.getSelected() == Mode.Simple)
+		if(mode.getSelected() == Mode.SIMPLE)
 		{
-			doSwap((int)targetSlot.getValue() - 1);
+			doSwap(targetSlot.getValueI() - 1);
 			return;
 		}
 		
@@ -159,7 +165,7 @@ public final class AttributeSwapHack extends Hack
 		if(swapBack.isChecked())
 		{
 			awaitingBack = true;
-			backTimer = (int)swapBackDelay.getValue();
+			backTimer = swapBackDelay.getValueI();
 		}
 	}
 	
@@ -167,6 +173,7 @@ public final class AttributeSwapHack extends Hack
 	{
 		if(originalSlot >= 0 && originalSlot <= 8)
 			MC.player.getInventory().setSelectedSlot(originalSlot);
+		
 		originalSlot = -1;
 	}
 	
@@ -179,58 +186,50 @@ public final class AttributeSwapHack extends Hack
 		{
 			if(current.getItem() instanceof AxeItem)
 				return -1;
+			
 			int axeSlot =
 				InventoryUtils.indexOf(s -> s.getItem() instanceof AxeItem, 9);
 			if(axeSlot != -1)
 				return axeSlot;
 		}
 		
-		if(target instanceof LivingEntity living && breachSwapping.isChecked())
+		if(breachSwapping.isChecked() && target instanceof LivingEntity le
+			&& le.getAttributes().getValue(Attributes.ARMOR) > 0)
 		{
-			double armor = living.getAttributeValue(
-				net.minecraft.world.entity.ai.attributes.Attributes.ARMOR);
-			if(armor > 0)
-			{
-				int breachSlot =
-					InventoryUtils
-						.indexOf(
-							s -> s.getItem() instanceof MaceItem
-								&& getEnchantLevel(s, Enchantments.BREACH) > 0,
-							9);
-				if(breachSlot != -1)
-					return breachSlot;
-			}
+			int breachSlot =
+				InventoryUtils.indexOf(s -> s.getItem() instanceof MaceItem
+					&& getEnchantLevel(s, Enchantments.BREACH) > 0, 9);
+			
+			if(breachSlot != -1)
+				return breachSlot;
 		}
 		
-		boolean durability = itemSaver.isChecked();
-		
 		int bestSlot = -1;
-		double bestScore = getDurabilityScore(current, durability);
+		int bestScore = getDurabilityScore(current);
 		
-		for(int i = 0; i < 9; i++)
+		for(int slot = 0; slot < 9; slot++)
 		{
-			if(i == MC.player.getInventory().getSelectedSlot())
+			if(slot == MC.player.getInventory().getSelectedSlot())
 				continue;
 			
-			ItemStack stack = MC.player.getInventory().getItem(i);
+			ItemStack stack = MC.player.getInventory().getItem(slot);
 			if(stack.isEmpty())
 				continue;
 			
-			double score = getDurabilityScore(stack, durability);
-			
+			int score = getDurabilityScore(stack);
 			if(score > bestScore)
 			{
 				bestScore = score;
-				bestSlot = i;
+				bestSlot = slot;
 			}
 		}
 		
 		return bestSlot;
 	}
 	
-	private double getDurabilityScore(ItemStack stack, boolean durability)
+	private int getDurabilityScore(ItemStack stack)
 	{
-		if(!durability)
+		if(!itemSaver.isChecked())
 			return 0;
 		if(!stack.isDamageableItem())
 			return 4;
@@ -238,27 +237,25 @@ public final class AttributeSwapHack extends Hack
 		return 0;
 	}
 	
-	private int getEnchantLevel(ItemStack stack,
-		net.minecraft.resources.ResourceKey<net.minecraft.world.item.enchantment.Enchantment> key)
+	private int getEnchantLevel(ItemStack stack, ResourceKey<Enchantment> key)
 	{
 		if(MC.level == null)
 			return 0;
 		
-		return MC.level.registryAccess()
-			.lookup(net.minecraft.core.registries.Registries.ENCHANTMENT)
+		return MC.level.registryAccess().lookup(Registries.ENCHANTMENT)
 			.flatMap(reg -> reg.get(key)).map(holder -> EnchantmentHelper
 				.getItemEnchantmentLevel(holder, stack))
 			.orElse(0);
 	}
 	
-	public enum Mode
+	private enum Mode
 	{
-		Simple("Simple"),
-		Smart("Smart");
+		SIMPLE("Simple"),
+		SMART("Smart");
 		
 		private final String name;
 		
-		Mode(String name)
+		private Mode(String name)
 		{
 			this.name = name;
 		}
