@@ -144,7 +144,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		runCommand("setblock 0 -56 1 lever[face=wall,facing=north]");
 		runCommand("setblock 0 -56 3 lever[face=wall,facing=south]");
 		waitForBlock(0, 1, 3, Blocks.LEVER);
-		context.waitTicks(WurstTest.IS_MOD_COMPAT_TEST ? 5 : 1);
+		context.waitTicks(WurstTest.IS_SODIUM_INSTALLED ? 5 : 1);
 		world.waitForChunksRender();
 		context.takeScreenshot("freecam_interact_setup");
 		

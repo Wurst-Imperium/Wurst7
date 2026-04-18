@@ -53,7 +53,7 @@ public final class XRayHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading();
 		assertScreenshotEquals("xray_opacity",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/hXdzoDB.png"
+			WurstTest.IS_SODIUM_INSTALLED ? "https://i.imgur.com/hXdzoDB.png"
 				: "https://i.imgur.com/oZqevTx.png");
 		
 		// Exposed only + opacity
@@ -63,7 +63,7 @@ public final class XRayHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		waitForChunkReloading();
 		assertScreenshotEquals("xray_exposed_only_opacity",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/ZwIARSr.png"
+			WurstTest.IS_SODIUM_INSTALLED ? "https://i.imgur.com/ZwIARSr.png"
 				: "https://i.imgur.com/3DLxNuS.png");
 		
 		// Clean up
@@ -111,7 +111,7 @@ public final class XRayHackTest extends SingleplayerTest
 	{
 		// Wait longer if testing with Sodium, since we can't rely on
 		// waitForChunksRender() to track when Sodium finishes loading chunks
-		context.waitTicks(WurstTest.IS_MOD_COMPAT_TEST ? 5 : 1);
+		context.waitTicks(WurstTest.IS_SODIUM_INSTALLED ? 5 : 1);
 		world.waitForChunksRender();
 	}
 }

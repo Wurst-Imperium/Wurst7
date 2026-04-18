@@ -1,4 +1,5 @@
 {
+  "better_block_entities_version": "better-block-entities",
   "fabric_api_version": "fabric-api",
   "sodium_version": "sodium"
 }
