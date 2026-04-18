@@ -33,6 +33,9 @@
   "suggests": {
     "mo_glass": "*"
   },
+  "conflicts": {
+    "betterblockentities": ">=1.3.2"
+  },
   "breaks": {
     "wi_zoom": "*",
     "wi-zoom": "*",
