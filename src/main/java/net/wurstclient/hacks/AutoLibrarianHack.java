@@ -91,6 +91,9 @@ public final class AutoLibrarianHack extends Hack
 	
 	private final UpdateBooksSetting updateBooks = new UpdateBooksSetting();
 	
+	private final CheckboxSetting antiSpam = new CheckboxSetting("Anti Spam",
+		"Hide book offer messages to prevent chat spam.", false);
+	
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
@@ -115,6 +118,8 @@ public final class AutoLibrarianHack extends Hack
 	private boolean placingJobSite;
 	private boolean breakingJobSite;
 	
+	private boolean waitingForVillagerToLoseJob;
+	
 	public AutoLibrarianHack()
 	{
 		super("AutoLibrarian");
@@ -122,6 +127,7 @@ public final class AutoLibrarianHack extends Hack
 		addSetting(wantedBooks);
 		addSetting(lockInTrade);
 		addSetting(updateBooks);
+		addSetting(antiSpam);
 		addSetting(range);
 		addSetting(faceTarget);
 		addSetting(swingHand);
@@ -153,7 +159,14 @@ public final class AutoLibrarianHack extends Hack
 		jobSite = null;
 		placingJobSite = false;
 		breakingJobSite = false;
+		waitingForVillagerToLoseJob = false;
 		experiencedVillagers.clear();
+	}
+	
+	private void spamMessage(String message)
+	{
+		if(!antiSpam.isChecked())
+			ChatUtils.message(message);
 	}
 	
 	@Override
@@ -174,6 +187,12 @@ public final class AutoLibrarianHack extends Hack
 		if(placingJobSite && breakingJobSite)
 			throw new IllegalStateException(
 				"Trying to place and break job site at the same time. Something is wrong.");
+		
+		if(waitingForVillagerToLoseJob)
+		{
+			waitForVillagerToLoseJob();
+			return;
+		}
 		
 		if(placingJobSite)
 		{
@@ -215,14 +234,14 @@ public final class AutoLibrarianHack extends Hack
 		
 		if(bookOffer == null)
 		{
-			ChatUtils.message("Villager is not selling an enchanted book.");
+			spamMessage("Villager is not selling an enchanted book.");
 			closeTradeScreen();
 			breakingJobSite = true;
 			System.out.println("Breaking job site...");
 			return;
 		}
 		
-		ChatUtils.message(
+		spamMessage(
 			"Villager is selling " + bookOffer.getEnchantmentNameWithLevel()
 				+ " for " + bookOffer.getFormattedPrice() + ".");
 		
@@ -268,9 +287,9 @@ public final class AutoLibrarianHack extends Hack
 		
 		if(params == null || BlockUtils.getState(jobSite).canBeReplaced())
 		{
-			System.out.println("Job site has been broken. Replacing...");
+			System.out.println("Job site has been broken.");
 			breakingJobSite = false;
-			placingJobSite = true;
+			waitingForVillagerToLoseJob = true;
 			return;
 		}
 		
@@ -287,6 +306,24 @@ public final class AutoLibrarianHack extends Hack
 		
 		// update progress
 		overlay.updateProgress();
+	}
+	
+	private void waitForVillagerToLoseJob()
+	{
+		if(villager == null)
+			throw new IllegalStateException("Villager is null.");
+		
+		// dont place job site until villager is not longer librarian.
+		boolean isStillLibrarian = villager.getVillagerData().profession()
+			.unwrapKey().orElse(null) == VillagerProfession.LIBRARIAN;
+		
+		if(!isStillLibrarian)
+		{
+			System.out
+				.println("Villager has lost its job. Placing job site...");
+			waitingForVillagerToLoseJob = false;
+			placingJobSite = true;
+		}
 	}
 	
 	private void placeJobSite()
