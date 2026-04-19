@@ -149,6 +149,22 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		return original.call(instance);
 	}
 	
+	/**
+	 * Allows sprinting to start while using an item when NoSlowdown is enabled.
+	 */
+	@WrapOperation(method = "canStartSprinting()Z",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;isSlowDueToUsingItem()Z",
+			ordinal = 0))
+	private boolean wrapCanStartSprintingItemUse(LocalPlayer instance,
+		Operation<Boolean> original)
+	{
+		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
+			return false;
+		
+		return original.call(instance);
+	}
+	
 	@Inject(method = "sendPosition()V", at = @At("HEAD"))
 	private void onSendMovementPacketsHEAD(CallbackInfo ci)
 	{
