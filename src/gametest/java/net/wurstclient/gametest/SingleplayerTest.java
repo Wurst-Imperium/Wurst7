@@ -46,7 +46,7 @@ public abstract class SingleplayerTest
 	public final void run()
 	{
 		runImpl();
-		assertScreenshotEquals(
+		waitForScreenshotMatch(
 			getClass().getSimpleName().toLowerCase() + "_cleanup",
 			"https://i.imgur.com/XF1SILt.png");
 	}
@@ -128,6 +128,13 @@ public abstract class SingleplayerTest
 		String templateUrl)
 	{
 		WurstClientTestHelper.assertScreenshotEquals(context, fileName,
+			templateUrl);
+	}
+	
+	protected final void waitForScreenshotMatch(String fileName,
+		String templateUrl)
+	{
+		WurstClientTestHelper.waitForScreenshotMatch(context, fileName,
 			templateUrl);
 	}
 	
