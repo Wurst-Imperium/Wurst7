@@ -183,6 +183,7 @@ public final class HackList implements UpdateListener
 	public final TpAuraHack tpAuraHack = new TpAuraHack();
 	public final TrajectoriesHack trajectoriesHack = new TrajectoriesHack();
 	public final TreeBotHack treeBotHack = new TreeBotHack();
+	public final TridentBoostHack tridentBoostHack = new TridentBoostHack();
 	public final TriggerBotHack triggerBotHack = new TriggerBotHack();
 	public final TrollPotionHack trollPotionHack = new TrollPotionHack();
 	public final TrueSightHack trueSightHack = new TrueSightHack();

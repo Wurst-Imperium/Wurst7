@@ -62,6 +62,7 @@
     "StorageMixin",
     "StringDecomposerMixin",
     "TitleScreenMixin",
+    "TridentItemMixin",
     "freecam.CameraMixin",
     "freecam.ItemInHandRendererMixin",
     "freecam.LocalPlayerMixin",
