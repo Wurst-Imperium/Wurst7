@@ -53,31 +53,62 @@ public enum WurstClientTestHelper
 		String fileName, String templateUrl)
 	{
 		ThreadingImpl.checkOnGametestThread("assertScreenshotEquals");
+		waitForScreenshotMatchImpl(context, fileName, templateUrl, 1);
+	}
+	
+	/**
+	 * Same as
+	 * {@link #assertScreenshotEquals(ClientGameTestContext, String, String)},
+	 * but retries for up to 10 seconds to get a matching screenshot.
+	 *
+	 * <p>
+	 * Useful for cases where you're waiting for recent movements to settle
+	 * (e.g. chunk reloads, hand animation), where it can otherwise be tricky to
+	 * get the timing right. Not useful for anything that's still in motion,
+	 * where delaying the screenshot would only cause it to drift further away
+	 * from the expected image.
+	 */
+	public static void waitForScreenshotMatch(ClientGameTestContext context,
+		String fileName, String templateUrl)
+	{
+		ThreadingImpl.checkOnGametestThread("waitForScreenshotMatch");
+		waitForScreenshotMatchImpl(context, fileName, templateUrl,
+			ClientGameTestContext.DEFAULT_TIMEOUT);
+	}
+	
+	private static void waitForScreenshotMatchImpl(
+		ClientGameTestContext context, String fileName, String templateUrl,
+		int maxAttempts)
+	{
+		NativeImage nativeImageTemplate = downloadImage(templateUrl);
+		boolean[][] mask = alphaChannelToMask(nativeImageTemplate);
+		RawImage<int[]> rawTemplate =
+			RawImageImpl.fromColorNativeImage(nativeImageTemplate);
+		RawImage<int[]> maskedTemplate = applyMask(rawTemplate, mask);
 		
-		NativeImage nativeTemplateImage = downloadImage(templateUrl);
-		boolean[][] mask = alphaChannelToMask(nativeTemplateImage);
-		RawImage<int[]> rawTemplateImage =
-			RawImageImpl.fromColorNativeImage(nativeTemplateImage);
-		RawImage<int[]> maskedTemplateImage = applyMask(rawTemplateImage, mask);
-		
-		Path screenshotPath = context.takeScreenshot(fileName);
-		RawImage<int[]> rawScreenshotImage =
-			RawImageImpl.fromColorNativeImage(loadImageFile(screenshotPath));
-		RawImage<int[]> maskedScreenshotImage =
-			applyMask(rawScreenshotImage, mask);
-		
-		if(maskedScreenshotImage.width() != maskedTemplateImage.width()
-			|| maskedScreenshotImage.height() != maskedTemplateImage.height())
-			throw new AssertionError(
-				"Screenshot and template dimensions do not match");
-		
-		TestScreenshotComparisonAlgorithm algo =
-			TestScreenshotComparisonAlgorithm.meanSquaredDifference(3e-4F);
-		
-		Vector2i result =
-			algo.findColor(maskedScreenshotImage, maskedTemplateImage);
-		if(result != null)
-			return;
+		Path screenshotPath = null;
+		for(int i = 0; i < maxAttempts; i++)
+		{
+			if(i > 0)
+				context.waitTick();
+			
+			screenshotPath = context.takeScreenshot(fileName);
+			RawImage<int[]> rawScreenshot = RawImageImpl
+				.fromColorNativeImage(loadImageFile(screenshotPath));
+			RawImage<int[]> maskedScreenshot = applyMask(rawScreenshot, mask);
+			
+			if(maskedScreenshot.width() != maskedTemplate.width()
+				|| maskedScreenshot.height() != maskedTemplate.height())
+				throw new AssertionError(
+					"Screenshot and template dimensions do not match");
+			
+			TestScreenshotComparisonAlgorithm algo =
+				TestScreenshotComparisonAlgorithm.meanSquaredDifference(3e-4F);
+			
+			Vector2i result = algo.findColor(maskedScreenshot, maskedTemplate);
+			if(result != null)
+				return;
+		}
 		
 		ghSummary("### Screenshot " + fileName + " does not match template");
 		ghSummary("Expected:");
