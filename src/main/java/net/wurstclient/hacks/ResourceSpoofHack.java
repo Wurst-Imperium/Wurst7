@@ -9,7 +9,9 @@ package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"resource pack", "pack spoof", "ResourceSpoof"})
 public final class ResourceSpoofHack extends Hack
@@ -19,4 +21,15 @@ public final class ResourceSpoofHack extends Hack
 		super("ResourceSpoof");
 		setCategory(Category.OTHER);
 	}
+	
+	public void notifyBypassed(boolean required)
+	{
+		if(required)
+			WurstClient.MC.execute(() -> ChatUtils.warning(
+				"ResourceSpoof bypassed a \u00a7lREQUIRED\u00a7r resource pack from the server."));
+		else
+			WurstClient.MC.execute(() -> ChatUtils.warning(
+				"ResourceSpoof bypassed an \u00a7lOPTIONAL\u00a7r resource pack from the server."));
+	}
+	
 }
