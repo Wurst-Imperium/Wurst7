@@ -9,6 +9,7 @@ package net.wurstclient.hacks;
 
 import java.util.List;
 
+import net.minecraft.util.RandomSource;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -19,8 +20,8 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.text.WText;
 
-@SearchTags({"auto spam", "message spam", "chat spam", "auto message",
-	"chat flood", "spammer", "auto command"})
+@SearchTags({"auto spam", "chat spam", "auto message", "spammer",
+	"auto command"})
 public final class AutoSpamHack extends Hack implements UpdateListener
 {
 	private static final String FANCY_BLACKLIST = "(){}[]|";
@@ -34,11 +35,17 @@ public final class AutoSpamHack extends Hack implements UpdateListener
 		new SliderSetting("Delay", "description.wurst.setting.autospam.delay",
 			20, 0, 400, 1, ValueDisplay.INTEGER.withSuffix(" ticks"));
 	
-	private final CheckboxSetting random = new CheckboxSetting("Random order",
-		"description.wurst.setting.autospam.random", false);
+	private final CheckboxSetting randomise = new CheckboxSetting("Randomise",
+		"description.wurst.setting.autospam.randomise", false);
 	
 	private final CheckboxSetting fancyFont = new CheckboxSetting("Fancy font",
 		"description.wurst.setting.autospam.fancy_font", false);
+	
+	private final SliderSetting randomText = new SliderSetting("Random text",
+		"description.wurst.setting.autospam.random_text", 0, 0, 256, 1,
+		ValueDisplay.INTEGER.withLabel(0, "off"));
+	
+	private final RandomSource rng = RandomSource.createThreadLocalInstance();
 	
 	private int messageIndex;
 	private int timer;
@@ -49,8 +56,9 @@ public final class AutoSpamHack extends Hack implements UpdateListener
 		setCategory(Category.CHAT);
 		addSetting(messages);
 		addSetting(delay);
-		addSetting(random);
+		addSetting(randomise);
 		addSetting(fancyFont);
+		addSetting(randomText);
 	}
 	
 	@Override
@@ -81,9 +89,9 @@ public final class AutoSpamHack extends Hack implements UpdateListener
 		}
 		
 		int i;
-		if(random.isChecked())
+		if(randomise.isChecked())
 		{
-			i = (int)(Math.random() * msgs.size());
+			i = rng.nextInt(msgs.size());
 		}else
 		{
 			if(messageIndex >= msgs.size())
@@ -92,6 +100,16 @@ public final class AutoSpamHack extends Hack implements UpdateListener
 		}
 		
 		String msg = msgs.get(i);
+		
+		int numRandText = randomText.getValueI();
+		if(numRandText > 0)
+		{
+			StringBuilder suffix = new StringBuilder(" ");
+			for(int j = 0; j < numRandText; j++)
+				suffix.append((char)(0x61 + rng.nextInt(26)));
+			msg += suffix.toString();
+		}
+		
 		if(msg.length() > 256)
 			msg = msg.substring(0, 256);
 		
