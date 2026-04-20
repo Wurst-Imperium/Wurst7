@@ -62,6 +62,9 @@ public abstract class ClientCommonPacketListenerImplMixin
 		connection.send(new ServerboundResourcePackPacket(packet.id(),
 			ServerboundResourcePackPacket.Action.SUCCESSFULLY_LOADED));
 		
+		WurstClient.INSTANCE.getHax().resourceSpoofHack
+			.notifyBypassed(packet.required());
+		
 		ci.cancel();
 	}
 	
