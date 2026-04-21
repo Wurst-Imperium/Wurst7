@@ -32,7 +32,7 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	 * Disables the nametag distance limit if configured in NameTags.
 	 */
 	@WrapOperation(
-		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V",
+		method = "extractNameplates(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;FDD)V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;distanceToSqr(Lnet/minecraft/world/entity/Entity;)D"))
 	private double fakeSquaredDistanceToCamera(
@@ -53,10 +53,11 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 	 * might rely on it.
 	 */
 	@Inject(
-		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;F)V",
+		method = "extractNameplates(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/entity/state/EntityRenderState;FDD)V",
 		at = @At("TAIL"))
 	private void restoreSquaredDistanceToCamera(T entity, S state,
-		float tickDelta, CallbackInfo ci,
+		float tickDelta, double nameplateDistance, double belowNameDistance,
+		CallbackInfo ci,
 		@Share("actualDistanceSq") LocalDoubleRef actualDistanceSq)
 	{
 		state.distanceToCameraSq = actualDistanceSq.get();
