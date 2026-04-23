@@ -55,6 +55,11 @@ public final class NoShieldOverlayHackTest extends SingleplayerTest
 		// moving the item up and down and creating particles.
 		testItem(referencePath, "bread",
 			"bread[consumable={consume_seconds:999999}]", false);
+		
+		// Clean up
+		runWurstCommand("setslider NoShieldOverlay blocking_offset 0.5");
+		clearInventory();
+		waitForHandSwing();
 	}
 	
 	private void moveHandOutOfView()
@@ -66,7 +71,6 @@ public final class NoShieldOverlayHackTest extends SingleplayerTest
 	private void testItem(Path referencePath, String name, String giveArg,
 		boolean shouldBeLowered)
 	{
-		logger.info("Testing NoShieldOverlay with " + name + ".");
 		String nameForFiles = name.replace(" ", "_");
 		
 		// Give item
@@ -106,10 +110,6 @@ public final class NoShieldOverlayHackTest extends SingleplayerTest
 			offBlockingPath, onBlockingPath);
 		input.releaseMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
 		runWurstCommand("t NoShieldOverlay off");
-		
-		// Clean up
-		clearInventory();
-		waitForHandSwing();
 	}
 	
 	private void assertItemMovement(String name, String scenario,
