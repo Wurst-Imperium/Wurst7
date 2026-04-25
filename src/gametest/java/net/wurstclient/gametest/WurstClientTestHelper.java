@@ -37,9 +37,6 @@ import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotCompari
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 
 public enum WurstClientTestHelper
 {
@@ -56,31 +53,62 @@ public enum WurstClientTestHelper
 		String fileName, String templateUrl)
 	{
 		ThreadingImpl.checkOnGametestThread("assertScreenshotEquals");
+		waitForScreenshotMatchImpl(context, fileName, templateUrl, 1);
+	}
+	
+	/**
+	 * Same as
+	 * {@link #assertScreenshotEquals(ClientGameTestContext, String, String)},
+	 * but retries for up to 10 seconds to get a matching screenshot.
+	 *
+	 * <p>
+	 * Useful for cases where you're waiting for recent movements to settle
+	 * (e.g. chunk reloads, hand animation), where it can otherwise be tricky to
+	 * get the timing right. Not useful for anything that's still in motion,
+	 * where delaying the screenshot would only cause it to drift further away
+	 * from the expected image.
+	 */
+	public static void waitForScreenshotMatch(ClientGameTestContext context,
+		String fileName, String templateUrl)
+	{
+		ThreadingImpl.checkOnGametestThread("waitForScreenshotMatch");
+		waitForScreenshotMatchImpl(context, fileName, templateUrl,
+			ClientGameTestContext.DEFAULT_TIMEOUT);
+	}
+	
+	private static void waitForScreenshotMatchImpl(
+		ClientGameTestContext context, String fileName, String templateUrl,
+		int maxAttempts)
+	{
+		NativeImage nativeImageTemplate = downloadImage(templateUrl);
+		boolean[][] mask = alphaChannelToMask(nativeImageTemplate);
+		RawImage<int[]> rawTemplate =
+			RawImageImpl.fromColorNativeImage(nativeImageTemplate);
+		RawImage<int[]> maskedTemplate = applyMask(rawTemplate, mask);
 		
-		NativeImage nativeTemplateImage = downloadImage(templateUrl);
-		boolean[][] mask = alphaChannelToMask(nativeTemplateImage);
-		RawImage<int[]> rawTemplateImage =
-			RawImageImpl.fromColorNativeImage(nativeTemplateImage);
-		RawImage<int[]> maskedTemplateImage = applyMask(rawTemplateImage, mask);
-		
-		Path screenshotPath = context.takeScreenshot(fileName);
-		RawImage<int[]> rawScreenshotImage =
-			RawImageImpl.fromColorNativeImage(loadImageFile(screenshotPath));
-		RawImage<int[]> maskedScreenshotImage =
-			applyMask(rawScreenshotImage, mask);
-		
-		if(maskedScreenshotImage.width() != maskedTemplateImage.width()
-			|| maskedScreenshotImage.height() != maskedTemplateImage.height())
-			throw new AssertionError(
-				"Screenshot and template dimensions do not match");
-		
-		TestScreenshotComparisonAlgorithm algo =
-			TestScreenshotComparisonAlgorithm.meanSquaredDifference(3e-4F);
-		
-		Vector2i result =
-			algo.findColor(maskedScreenshotImage, maskedTemplateImage);
-		if(result != null)
-			return;
+		Path screenshotPath = null;
+		for(int i = 0; i < maxAttempts; i++)
+		{
+			if(i > 0)
+				context.waitTick();
+			
+			screenshotPath = context.takeScreenshot(fileName);
+			RawImage<int[]> rawScreenshot = RawImageImpl
+				.fromColorNativeImage(loadImageFile(screenshotPath));
+			RawImage<int[]> maskedScreenshot = applyMask(rawScreenshot, mask);
+			
+			if(maskedScreenshot.width() != maskedTemplate.width()
+				|| maskedScreenshot.height() != maskedTemplate.height())
+				throw new AssertionError(
+					"Screenshot and template dimensions do not match");
+			
+			TestScreenshotComparisonAlgorithm algo =
+				TestScreenshotComparisonAlgorithm.meanSquaredDifference(3e-4F);
+			
+			Vector2i result = algo.findColor(maskedScreenshot, maskedTemplate);
+			if(result != null)
+				return;
+		}
 		
 		ghSummary("### Screenshot " + fileName + " does not match template");
 		ghSummary("Expected:");
@@ -283,59 +311,5 @@ public enum WurstClientTestHelper
 			e.printStackTrace();
 			return null;
 		}
-	}
-	
-	public static void waitForBlock(ClientGameTestContext context, int relX,
-		int relY, int relZ, Block block)
-	{
-		context.waitFor(mc -> mc.level
-			.getBlockState(mc.player.blockPosition().offset(relX, relY, relZ))
-			.getBlock() == block);
-	}
-	
-	public static void clearChat(ClientGameTestContext context)
-	{
-		context.runOnClient(mc -> mc.gui.getChat().clearMessages(true));
-	}
-	
-	public static void clearInventory(ClientGameTestContext context)
-	{
-		TestInput input = context.getInput();
-		input.pressKey(GLFW.GLFW_KEY_T);
-		input.typeChars("/clear");
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
-	}
-	
-	public static void clearParticles(ClientGameTestContext context)
-	{
-		context.runOnClient(mc -> mc.particleEngine.clearParticles());
-	}
-	
-	public static void clearToasts(ClientGameTestContext context)
-	{
-		context.runOnClient(mc -> mc.getToastManager().clear());
-	}
-	
-	public static void assertOneItemInSlot(ClientGameTestContext context,
-		int slot, Item item)
-	{
-		ItemStack stack = context
-			.computeOnClient(mc -> mc.player.getInventory().getItem(slot));
-		if(!stack.is(item) || stack.getCount() != 1)
-			throw new RuntimeException(
-				"Expected 1 " + item.getName().getString() + " at slot " + slot
-					+ ", found " + stack.getCount() + " "
-					+ stack.getItem().getName().getString() + " instead");
-	}
-	
-	public static void assertNoItemInSlot(ClientGameTestContext context,
-		int slot)
-	{
-		ItemStack stack = context
-			.computeOnClient(mc -> mc.player.getInventory().getItem(slot));
-		if(!stack.isEmpty())
-			throw new RuntimeException("Expected no item in slot " + slot
-				+ ", found " + stack.getCount() + " "
-				+ stack.getItem().getName().getString() + " instead");
 	}
 }

@@ -24,8 +24,8 @@ public class LivingEntityMixin
 	/**
 	 * Stops the other darkness effect in caves when AntiBlind is enabled.
 	 */
-	@Inject(at = @At("HEAD"),
-		method = "getEffectBlendFactor(Lnet/minecraft/core/Holder;F)F",
+	@Inject(method = "getEffectBlendFactor(Lnet/minecraft/core/Holder;F)F",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetEffectFadeFactor(Holder<MobEffect> registryEntry,
 		float delta, CallbackInfoReturnable<Float> cir)

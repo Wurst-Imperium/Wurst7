@@ -173,7 +173,8 @@ public final class AimAssistHack extends Hack
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		
 		double rangeSq = range.getValueSq();
-		stream = stream.filter(e -> MC.player.distanceToSqr(e) <= rangeSq);
+		stream =
+			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
 			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(

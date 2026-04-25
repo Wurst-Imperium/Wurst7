@@ -31,7 +31,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.events.BlockBreakingProgressListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -224,7 +224,7 @@ public final class AutoToolHack extends Hack
 	{
 		Inventory inv = MC.player.getInventory();
 		int selectedSlot = inv.getSelectedSlot();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		IMultiPlayerGameMode im = IMC.getInteractionManager();
 		
 		// If there's an empty slot in the main inventory,
 		// shift-click the damaged item out of the hotbar

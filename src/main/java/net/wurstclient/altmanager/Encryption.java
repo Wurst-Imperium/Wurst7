@@ -180,7 +180,7 @@ public final class Encryption
 	
 	public JsonElement parseFile(Path path) throws IOException, JsonException
 	{
-		try(BufferedReader reader = Files.newBufferedReader(path))
+		try(BufferedReader _ = Files.newBufferedReader(path))
 		{
 			return JsonParser.parseString(loadEncryptedFile(path));
 			

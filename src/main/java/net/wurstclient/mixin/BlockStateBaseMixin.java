@@ -13,9 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.mojang.serialization.MapCodec;
-
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -37,14 +34,14 @@ import net.wurstclient.hacks.HandNoClipHack;
 public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 {
 	private BlockStateBaseMixin(WurstClient wurst, Block owner,
-		Reference2ObjectArrayMap<Property<?>, Comparable<?>> propertyMap,
-		MapCodec<BlockState> codec)
+		Property<?>[] properties, Comparable<?>[] values)
 	{
-		super(owner, propertyMap, codec);
+		super(owner, properties, values);
 	}
 	
-	@Inject(at = @At("TAIL"),
+	@Inject(
 		method = "isCollisionShapeFullBlock(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Z",
+		at = @At("TAIL"),
 		cancellable = true)
 	private void onIsFullCube(BlockGetter world, BlockPos pos,
 		CallbackInfoReturnable<Boolean> cir)
@@ -55,8 +52,9 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 		cir.setReturnValue(cir.getReturnValue() && !event.isCancelled());
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetOutlineShape(BlockGetter view, BlockPos pos,
 		CollisionContext context, CallbackInfoReturnable<VoxelShape> cir)
@@ -75,8 +73,9 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 		cir.setReturnValue(Shapes.empty());
 	}
 	
-	@Inject(at = @At("HEAD"),
+	@Inject(
 		method = "getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetCollisionShape(BlockGetter world, BlockPos pos,
 		CollisionContext context, CallbackInfoReturnable<VoxelShape> cir)

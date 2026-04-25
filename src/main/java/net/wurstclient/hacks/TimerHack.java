@@ -34,4 +34,6 @@ public final class TimerHack extends Hack
 	{
 		return isEnabled() ? speed.getValueF() : 1;
 	}
+	
+	// See DeltaTrackerTimerMixin
 }

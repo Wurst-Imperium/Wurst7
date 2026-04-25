@@ -20,5 +20,5 @@ public final class NoFogHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See BackgroundRendererMixin
+	// See FogRendererMixin and AtmosphericFogEnvironmentMixin
 }

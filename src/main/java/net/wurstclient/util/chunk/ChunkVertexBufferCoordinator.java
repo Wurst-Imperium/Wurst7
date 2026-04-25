@@ -50,8 +50,8 @@ public final class ChunkVertexBufferCoordinator extends AbstractChunkCoordinator
 		if(center == null)
 			return;
 		
-		for(int x = center.x - 1; x <= center.x + 1; x++)
-			for(int z = center.z - 1; z <= center.z + 1; z++)
+		for(int x = center.x() - 1; x <= center.x() + 1; x++)
+			for(int z = center.z() - 1; z <= center.z() + 1; z++)
 				chunksToUpdate.add(new ChunkPos(x, z));
 	}
 	

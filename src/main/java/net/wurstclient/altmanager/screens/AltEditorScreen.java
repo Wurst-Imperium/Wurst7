@@ -16,7 +16,7 @@ import java.nio.file.StandardCopyOption;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -225,8 +225,8 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		// skin preview
 		AltRenderer.drawAltBack(context, nameOrEmailBox.getValue(),
@@ -237,23 +237,24 @@ public abstract class AltEditorScreen extends Screen
 		String accountType = getPassword().isEmpty() ? "cracked" : "premium";
 		
 		// text
-		context.drawString(font, "Name (for cracked alts), or", width / 2 - 100,
-			37, CommonColors.LIGHT_GRAY);
-		context.drawString(font, "E-Mail (for premium alts)", width / 2 - 100,
-			47, CommonColors.LIGHT_GRAY);
-		context.drawString(font, "Password (for premium alts)", width / 2 - 100,
-			87, CommonColors.LIGHT_GRAY);
-		context.drawString(font, "Account type: " + accountType,
-			width / 2 - 100, 127, CommonColors.LIGHT_GRAY);
+		context.text(font, "Name (for cracked alts), or", width / 2 - 100, 37,
+			CommonColors.LIGHT_GRAY);
+		context.text(font, "E-Mail (for premium alts)", width / 2 - 100, 47,
+			CommonColors.LIGHT_GRAY);
+		context.text(font, "Password (for premium alts)", width / 2 - 100, 87,
+			CommonColors.LIGHT_GRAY);
+		context.text(font, "Account type: " + accountType, width / 2 - 100, 127,
+			CommonColors.LIGHT_GRAY);
 		
 		String[] lines = message.split("\n");
 		for(int i = 0; i < lines.length; i++)
-			context.drawCenteredString(font, lines[i], width / 2, 142 + 10 * i,
+			context.centeredText(font, lines[i], width / 2, 142 + 10 * i,
 				CommonColors.WHITE);
 		
 		// text boxes
-		nameOrEmailBox.render(context, mouseX, mouseY, partialTicks);
-		passwordBox.render(context, mouseX, mouseY, partialTicks);
+		nameOrEmailBox.extractRenderState(context, mouseX, mouseY,
+			partialTicks);
+		passwordBox.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
 		// red flash for errors
 		if(errorTimer > 0)
@@ -265,7 +266,7 @@ public abstract class AltEditorScreen extends Screen
 		}
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

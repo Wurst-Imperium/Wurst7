@@ -7,73 +7,70 @@
  */
 package net.wurstclient.gametest.tests;
 
-import static net.wurstclient.gametest.WurstClientTestHelper.*;
-
 import java.util.function.Predicate;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
-import net.wurstclient.gametest.WurstTest;
+import net.wurstclient.gametest.SingleplayerTest;
 
-public enum NoFallHackTest
+public final class NoFallHackTest extends SingleplayerTest
 {
-	;
-	
-	public static void testNoFallHack(ClientGameTestContext context,
+	public NoFallHackTest(ClientGameTestContext context,
 		TestSingleplayerContext spContext)
 	{
-		WurstTest.LOGGER.info("Testing NoFall hack");
-		TestInput input = context.getInput();
-		TestServerContext server = spContext.getServer();
+		super(context, spContext);
+	}
+	
+	@Override
+	protected void runImpl()
+	{
+		logger.info("Testing NoFall hack");
 		
 		input.pressKey(GLFW.GLFW_KEY_F5);
-		runCommand(server, "gamemode survival");
+		runCommand("gamemode survival");
 		if(!context.computeOnClient(mc -> mc.player.onGround()))
 			throw new RuntimeException("Player is not on ground");
-		assertPlayerHealth(context, health -> health == 20);
+		assertPlayerHealth(health -> health == 20);
 		
 		// Fall 5 blocks with NoFall enabled
-		WurstTest.LOGGER.info("Falling 5 blocks with NoFall enabled");
-		runWurstCommand(context, "t NoFall on");
-		fall5Blocks(context, server);
+		logger.info("Falling 5 blocks with NoFall enabled");
+		runWurstCommand("t NoFall on");
+		fall5Blocks();
 		context.takeScreenshot("nofall_on_5_blocks");
-		assertPlayerHealth(context, health -> health == 20);
+		assertPlayerHealth(health -> health == 20);
 		
 		// Fall 5 blocks with NoFall disabled
-		WurstTest.LOGGER.info("Falling 5 blocks with NoFall disabled");
-		runWurstCommand(context, "t NoFall off");
-		fall5Blocks(context, server);
+		logger.info("Falling 5 blocks with NoFall disabled");
+		runWurstCommand("t NoFall off");
+		fall5Blocks();
 		context.takeScreenshot("nofall_off_5_blocks");
-		assertPlayerHealth(context, health -> health < 20);
+		assertPlayerHealth(health -> health < 20);
 		
 		// Clean up
 		context.runOnClient(mc -> mc.player.heal(999));
-		runCommand(server, "gamemode creative");
+		runCommand("gamemode creative");
 		input.pressKey(GLFW.GLFW_KEY_F5);
 		input.pressKey(GLFW.GLFW_KEY_F5);
-		clearChat(context);
+		clearChat();
+		context.waitTicks(5);
 	}
 	
-	private static void fall5Blocks(ClientGameTestContext context,
-		TestServerContext server)
+	private void fall5Blocks()
 	{
-		runCommand(server, "tp ~ ~5 ~");
+		runCommand("tp ~ ~5 ~");
 		context.waitFor(mc -> !mc.player.onGround());
 		context.waitFor(mc -> mc.player.onGround());
 		context.waitTick();
 	}
 	
-	private static void assertPlayerHealth(ClientGameTestContext context,
-		Predicate<Integer> healthCheck)
+	private void assertPlayerHealth(Predicate<Integer> healthCheck)
 	{
 		int health = context.computeOnClient(mc -> (int)mc.player.getHealth());
 		if(!healthCheck.test(health))
 			throw new RuntimeException("Player's health is wrong: " + health);
 		
-		WurstTest.LOGGER.info("Player's health is correct: " + health);
+		logger.info("Player's health is correct: " + health);
 	}
 }

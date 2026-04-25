@@ -144,7 +144,7 @@ public final class ProtectHack extends Hack
 				.filter(e -> !(e instanceof FakePlayerEntity));
 			friend = stream
 				.min(
-					Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
+					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 				.orElse(null);
 		}
 		
@@ -197,18 +197,18 @@ public final class ProtectHack extends Hack
 		
 		// set enemy
 		Stream<Entity> stream = EntityUtils.getAttackableEntities()
-			.filter(e -> MC.player.distanceToSqr(e) <= 36)
+			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= 36)
 			.filter(e -> e != friend);
 		
 		stream = entityFilters.applyTo(stream);
 		
 		enemy = stream
-			.min(Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
+			.min(Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 			.orElse(null);
 		
 		Entity target =
-			enemy == null || MC.player.distanceToSqr(friend) >= 24 * 24 ? friend
-				: enemy;
+			enemy == null || EntityUtils.distanceToHitboxSq(friend) >= 24 * 24
+				? friend : enemy;
 		
 		double distance = target == enemy ? distanceE : distanceF;
 		

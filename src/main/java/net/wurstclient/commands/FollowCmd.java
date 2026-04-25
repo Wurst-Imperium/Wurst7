@@ -17,6 +17,7 @@ import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.hacks.FollowHack;
+import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.FakePlayerEntity;
 
 public final class FollowCmd extends Command
@@ -44,7 +45,7 @@ public final class FollowCmd extends Command
 			.filter(e -> e != MC.player)
 			.filter(e -> !(e instanceof FakePlayerEntity))
 			.filter(e -> args[0].equalsIgnoreCase(e.getName().getString()))
-			.min(Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
+			.min(Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 			.orElse(null);
 		
 		if(entity == null)

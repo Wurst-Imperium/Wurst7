@@ -132,7 +132,7 @@ public final class FightBotHack extends Hack
 		stream = entityFilters.applyTo(stream);
 		
 		Entity entity = stream
-			.min(Comparator.comparingDouble(e -> MC.player.distanceToSqr(e)))
+			.min(Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 			.orElse(null);
 		if(entity == null)
 			return;
@@ -208,7 +208,7 @@ public final class FightBotHack extends Hack
 			return;
 		
 		// check range
-		if(MC.player.distanceToSqr(entity) > Math.pow(range.getValue(), 2))
+		if(EntityUtils.distanceToHitboxSq(entity) > range.getValueSq())
 			return;
 		
 		// attack entity

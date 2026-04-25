@@ -11,7 +11,7 @@ import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -95,19 +95,19 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
-		float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+		int mouseY, float partialTicks)
 	{
 		Matrix3x2fStack matrixStack = context.pose();
 		Font tr = minecraft.font;
 		
-		context.drawCenteredString(tr, setting.getName(), width / 2, 20,
+		context.centeredText(tr, setting.getName(), width / 2, 20,
 			CommonColors.WHITE);
 		
-		blockField.render(context, mouseX, mouseY, partialTicks);
+		blockField.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
 		
 		context.guiRenderState.up();
 		matrixStack.pushMatrix();
@@ -121,7 +121,7 @@ public final class EditBlockScreen extends Screen
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor =
 			lblAbove ? WurstColors.VERY_LIGHT_GRAY : CommonColors.GRAY;
-		context.drawString(tr, lblText, lblX, lblY, lblColor);
+		context.text(tr, lblText, lblX, lblY, lblColor);
 		
 		int border = blockField.isFocused() ? CommonColors.WHITE
 			: CommonColors.LIGHT_GRAY;

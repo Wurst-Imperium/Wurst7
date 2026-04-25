@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -38,9 +38,10 @@ public abstract class StatsScreenMixin extends Screen
 		super(title);
 	}
 	
-	@WrapOperation(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/client/gui/layouts/HeaderAndFooterLayout;addToFooter(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;",
-		ordinal = 0), method = "init()V")
+	@WrapOperation(method = "init()V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/layouts/HeaderAndFooterLayout;addToFooter(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;",
+			ordinal = 0))
 	private <T extends LayoutElement> T onAddToFooter(
 		HeaderAndFooterLayout layout, T doneWidget, Operation<T> original)
 	{
@@ -75,9 +76,10 @@ public abstract class StatsScreenMixin extends Screen
 		return original.call(layout, vLayout);
 	}
 	
-	@Inject(at = @At("TAIL"),
-		method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V")
-	private void onRender(GuiGraphics context, int mouseX, int mouseY,
+	@Inject(
+		method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
+		at = @At("TAIL"))
+	private void onRender(GuiGraphicsExtractor context, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getOtfs().wurstOptionsOtf

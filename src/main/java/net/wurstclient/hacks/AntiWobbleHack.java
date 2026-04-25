@@ -21,5 +21,5 @@ public final class AntiWobbleHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See GameRendererMixin.wurstNauseaLerp()
+	// See GameRendererMixin.onRenderWorldNauseaLerp()
 }

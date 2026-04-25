@@ -28,6 +28,8 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.freecam.FreecamInitialPosSetting;
 import net.wurstclient.hacks.freecam.FreecamInputSetting;
 import net.wurstclient.hacks.freecam.FreecamInputSetting.ApplyInputTo;
+import net.wurstclient.hacks.freecam.FreecamInteractionSetting;
+import net.wurstclient.hacks.freecam.FreecamInteractionSetting.InteractFrom;
 import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
@@ -44,6 +46,9 @@ public final class FreecamHack extends Hack
 	CameraTransformViewBobbingListener, RenderListener, MouseScrollListener
 {
 	private final FreecamInputSetting applyInputTo = new FreecamInputSetting();
+	
+	private final FreecamInteractionSetting interactFrom =
+		new FreecamInteractionSetting();
 	
 	private final SliderSetting horizontalSpeed =
 		new SliderSetting("Horizontal speed",
@@ -79,6 +84,10 @@ public final class FreecamHack extends Hack
 		new CheckboxSetting("Disable on damage",
 			"description.wurst.setting.freecam.disable_on_damage", true);
 	
+	private final CheckboxSetting reloadChunks =
+		new CheckboxSetting("Reload chunks",
+			"description.wurst.setting.freecam.reload_chunks", true);
+	
 	private Vec3 camPos;
 	private Vec3 prevCamPos;
 	private float camYaw;
@@ -90,6 +99,7 @@ public final class FreecamHack extends Hack
 		super("Freecam");
 		setCategory(Category.RENDER);
 		addSetting(applyInputTo);
+		addSetting(interactFrom);
 		addSetting(horizontalSpeed);
 		addSetting(verticalSpeed);
 		addSetting(scrollToChangeSpeed);
@@ -99,6 +109,7 @@ public final class FreecamHack extends Hack
 		addSetting(color);
 		addSetting(hideHand);
 		addSetting(disableOnDamage);
+		addSetting(reloadChunks);
 	}
 	
 	@Override
@@ -137,7 +148,8 @@ public final class FreecamHack extends Hack
 		EVENTS.remove(RenderListener.class, this);
 		EVENTS.remove(MouseScrollListener.class, this);
 		
-		MC.levelRenderer.allChanged();
+		if(reloadChunks.isChecked())
+			MC.levelRenderer.allChanged();
 	}
 	
 	@Override
@@ -215,6 +227,11 @@ public final class FreecamHack extends Hack
 		return isEnabled() && applyInputTo.getSelected() == ApplyInputTo.CAMERA;
 	}
 	
+	public boolean isClickingFromCamera()
+	{
+		return isEnabled() && interactFrom.getSelected() == InteractFrom.CAMERA;
+	}
+	
 	@Override
 	public void onVisGraph(VisGraphEvent event)
 	{
@@ -273,5 +290,10 @@ public final class FreecamHack extends Hack
 	public float getCamPitch()
 	{
 		return camPitch;
+	}
+	
+	public Vec3 getScaledCamDir(double scale)
+	{
+		return Vec3.directionFromRotation(camPitch, camYaw).scale(scale);
 	}
 }
