@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
 import net.wurstclient.WurstClient;
+import net.wurstclient.addon.HackAddon;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hacks.*;
@@ -192,6 +194,7 @@ public final class HackList implements UpdateListener
 	
 	private final TreeMap<String, Hack> hax =
 		new TreeMap<>(String::compareToIgnoreCase);
+	private final List<HackAddon> hackAddons = new ArrayList<>();
 	
 	private final EnabledHacksFile enabledHacksFile;
 	private final Path profilesFolder =
@@ -250,6 +253,33 @@ public final class HackList implements UpdateListener
 	public int countHax()
 	{
 		return hax.size();
+	}
+	
+	/**
+	 * Registers an addon that provides hacks.
+	 */
+	public void registerHackAddon(HackAddon addon)
+	{
+		hackAddons.add(addon);
+		
+		for(Hack hack : addon.getHacks())
+		{
+			if(hax.containsKey(hack.getName()))
+				throw new IllegalArgumentException(
+					"[Wurst] Addon '" + addon.getAddonName()
+						+ "' tried to register duplicate hack '"
+						+ hack.getName() + "'.");
+			
+			hax.put(hack.getName(), hack);
+		}
+	}
+	
+	/**
+	 * Gets all registered hack addons.
+	 */
+	public List<HackAddon> getHackAddons()
+	{
+		return new ArrayList<>(hackAddons);
 	}
 	
 	public ArrayList<Path> listProfiles()
