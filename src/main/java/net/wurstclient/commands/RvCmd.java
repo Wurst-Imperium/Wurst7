@@ -25,9 +25,10 @@ public final class RvCmd extends Command
 	{
 		RemoteViewHack remoteView = WURST.getHax().remoteViewHack;
 		
-		if(args.length != 1)
+		if(args.length < 1)
 			throw new CmdSyntaxError();
 		
-		remoteView.onToggledByCommand(args[0]);
+		String viewName = String.join(" ", args);
+		remoteView.onToggledByCommand(viewName);
 	}
 }
