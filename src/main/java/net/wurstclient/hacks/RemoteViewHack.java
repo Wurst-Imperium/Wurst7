@@ -154,7 +154,9 @@ public final class RemoteViewHack extends Hack
 	public void onUpdate()
 	{
 		// validate entity
-		if(entity.isRemoved() || ((LivingEntity)entity).getHealth() <= 0)
+		if(entity == null || entity.isRemoved()
+			|| MC.level.getEntity(entity.getUUID()) == null
+			|| ((LivingEntity)entity).getHealth() <= 0)
 		{
 			setEnabled(false);
 			return;

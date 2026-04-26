@@ -185,6 +185,7 @@ public final class ProtectHack extends Hack
 		
 		// check if player died, friend died or disappeared
 		if(friend == null || friend.isRemoved()
+			|| MC.level.getEntity(friend.getUUID()) == null
 			|| !(friend instanceof LivingEntity)
 			|| ((LivingEntity)friend).getHealth() <= 0
 			|| MC.player.getHealth() <= 0)
