@@ -237,7 +237,7 @@
   "description.wurst.hack.potionsaver": "Tạm dừng toàn bộ hiệu ứng thuốc khi bạn đứng yên.",
   "description.wurst.hack.prophuntesp": "Cho phép bạn nhìn thấy khối giả trong Prophunt.\nĐược làm cho Mineplex Prophunt. Có thể không hoạt động trên máy chủ khác.",
   "description.wurst.hack.protect": "Bot đi theo thực thể gần nhất và bảo vệ nó khỏi các thực thể khác.\nDùng .protect để bảo vệ một thực thể cụ thể thay vì thực thể gần nhất.",
-  "description.wurst.hack.radar": "Hiển thị vị trí của các thực thể ở gần.\n§cred§r - người chơi\n§6orange§r - quái vật\n§agreen§r - động vật\n§7gray§r - khác",
+  "description.wurst.hack.radar": "Hiển thị vị trí của các thực thể ở gần.\n§cđỏ§r - người chơi\n§6cam§r - quái vật\n§axanh lá§r - động vật\n§7xám§r - khác",
   "description.wurst.hack.rainbowui": "&cC&aầ&9u &cv&aồ&9n&cg&a.",
   "description.wurst.hack.reach": "Cho phép bạn với xa hơn.",
   "description.wurst.hack.remoteview": "Cho phép bạn nhìn thế giới như người khác.\nDùng lệnh .rv để nhắm vào một thực thể cụ thể.",
