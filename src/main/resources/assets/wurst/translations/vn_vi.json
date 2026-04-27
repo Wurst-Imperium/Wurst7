@@ -335,7 +335,7 @@
   "description.wurst.setting.generic.swing_hand.server": "Vung tay ở phía máy chủ, nhưng không phát hoạt ảnh ở phía client.",
   "description.wurst.setting.generic.swing_hand.client": "Vung tay ở phía client. Đây là lựa chọn hợp lệ nhất.",
   "description.wurst.setting.generic.take_items_from.hands": "Chỉ dùng các vật phẩm đã có sẵn trên tay bạn. Sẽ không di chuyển vật phẩm nào.",
-  "description.wurst.setting.generic.take_items_from.thanh công cụ": "Tìm vật phẩm trong thanh công cụ của bạn. Nếu thấy, chúng sẽ được chọn tự động.",
+  "description.wurst.setting.generic.take_items_from.hotbar": "Tìm vật phẩm trong thanh công cụ của bạn. Nếu thấy, chúng sẽ được chọn tự động.",
   "description.wurst.setting.generic.take_items_from.inventory": "Tìm vật phẩm trong toàn bộ kho đồ của bạn. Nếu thấy, chúng sẽ được chuyển vào thanh công cụ rồi được chọn.",
   "description.wurst.altmanager.premium": "Tài khoản phụ này có mật khẩu và có thể vào mọi máy chủ.",
   "description.wurst.altmanager.cracked": "Tài khoản phụ này không có mật khẩu và chỉ hoạt động trên máy chủ cracked.",
