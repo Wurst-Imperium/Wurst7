@@ -98,6 +98,10 @@ def optionalCompatMods = [
 	better_block_entities: [
 		artifact: "better-block-entities",
 		property: "better_block_entities_version"
+	],
+	badoptimizations: [
+		artifact: "badoptimizations",
+		property: "badoptimizations_version"
 	]
 ]
 
