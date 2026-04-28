@@ -45,6 +45,9 @@ public abstract class ClientPacketListenerMixin
 		at = @At("TAIL"))
 	public void onOnGameJoin(ClientboundLoginPacket packet, CallbackInfo ci)
 	{
+		
+		WurstClient.INSTANCE.getHax().autoSpamHack.setEnabled(false);
+		
 		WurstClient wurst = WurstClient.INSTANCE;
 		if(!wurst.isEnabled())
 			return;
@@ -97,4 +100,5 @@ public abstract class ClientPacketListenerMixin
 			(pos, state) -> WurstClient.INSTANCE.getHax().newChunksHack
 				.afterUpdateBlock(pos));
 	}
+	
 }
