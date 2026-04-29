@@ -17,7 +17,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.wurstclient.util.WurstBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.*;
@@ -544,10 +544,9 @@ public class PathFinder
 	public void renderPath(PoseStack matrixStack, boolean debugMode,
 		boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp =
-			MC.gameRenderer.renderBuffers().bufferSource();
+		WurstBufferSource bs = new WurstBufferSource();
 		VertexConsumer buffer =
-			vcp.getBuffer(WurstRenderLayers.getLines(depthTest));
+			bs.getBuffer(WurstRenderLayers.getLines(depthTest));
 		
 		matrixStack.pushPose();
 		
@@ -593,7 +592,7 @@ public class PathFinder
 		
 		matrixStack.popPose();
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public boolean isPathStillValid(int index)

@@ -22,7 +22,6 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -94,11 +93,6 @@ public enum RenderUtils
 		return RegionPos.of(getCameraBlockPos());
 	}
 	
-	public static MultiBufferSource.BufferSource getVCP()
-	{
-		return WurstClient.MC.gameRenderer.renderBuffers().bufferSource();
-	}
-	
 	public static float[] getRainbowColor()
 	{
 		float x = System.currentTimeMillis() % 2000 / 1000F;
@@ -122,14 +116,14 @@ public enum RenderUtils
 	public static void drawLine(PoseStack matrices, Vec3 start, Vec3 end,
 		int color, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 offset = getCameraPos().reverse();
 		drawLine(matrices, buffer, start.add(offset), end.add(offset), color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	private static Vec3 getTracerOrigin(float partialTicks)
@@ -140,38 +134,38 @@ public enum RenderUtils
 	public static void drawTracer(PoseStack matrices, float partialTicks,
 		Vec3 end, int color, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 start = getTracerOrigin(partialTicks);
 		Vec3 offset = getCameraPos().reverse();
 		drawLine(matrices, buffer, start, end.add(offset), color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawTracers(PoseStack matrices, float partialTicks,
 		List<Vec3> ends, int color, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 start = getTracerOrigin(partialTicks);
 		Vec3 offset = getCameraPos().reverse();
 		for(Vec3 end : ends)
 			drawLine(matrices, buffer, start, end.add(offset), color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawTracers(PoseStack matrices, float partialTicks,
 		List<ColoredPoint> ends, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 start = getTracerOrigin(partialTicks);
 		Vec3 offset = getCameraPos().reverse();
@@ -179,7 +173,7 @@ public enum RenderUtils
 			drawLine(matrices, buffer, start, end.point().add(offset),
 				end.color());
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawLine(PoseStack matrices, VertexConsumer buffer,
@@ -232,15 +226,15 @@ public enum RenderUtils
 	public static void drawCurvedLine(PoseStack matrices, List<Vec3> points,
 		int color, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 offset = getCameraPos().reverse();
 		List<Vec3> points2 = points.stream().map(v -> v.add(offset)).toList();
 		drawCurvedLine(matrices, buffer, points2, color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawCurvedLine(PoseStack matrices, VertexConsumer buffer,
@@ -266,43 +260,43 @@ public enum RenderUtils
 	public static void drawSolidBox(PoseStack matrices, AABB box, int color,
 		boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getQuads(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		drawSolidBox(matrices, buffer, box.move(getCameraPos().reverse()),
 			color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawSolidBoxes(PoseStack matrices, List<AABB> boxes,
 		int color, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getQuads(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 camOffset = getCameraPos().reverse();
 		for(AABB box : boxes)
 			drawSolidBox(matrices, buffer, box.move(camOffset), color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawSolidBoxes(PoseStack matrices,
 		List<ColoredBox> boxes, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getQuads(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 camOffset = getCameraPos().reverse();
 		for(ColoredBox box : boxes)
 			drawSolidBox(matrices, buffer, box.box().move(camOffset),
 				box.color());
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawSolidBox(VertexConsumer buffer, AABB box, int color)
@@ -355,43 +349,43 @@ public enum RenderUtils
 	public static void drawOutlinedBox(PoseStack matrices, AABB box, int color,
 		boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		drawOutlinedBox(matrices, buffer, box.move(getCameraPos().reverse()),
 			color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawOutlinedBoxes(PoseStack matrices, List<AABB> boxes,
 		int color, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 camOffset = getCameraPos().reverse();
 		for(AABB box : boxes)
 			drawOutlinedBox(matrices, buffer, box.move(camOffset), color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawOutlinedBoxes(PoseStack matrices,
 		List<ColoredBox> boxes, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 camOffset = getCameraPos().reverse();
 		for(ColoredBox box : boxes)
 			drawOutlinedBox(matrices, buffer, box.box().move(camOffset),
 				box.color());
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawOutlinedBox(VertexConsumer buffer, AABB box,
@@ -469,43 +463,43 @@ public enum RenderUtils
 	public static void drawCrossBox(PoseStack matrices, AABB box, int color,
 		boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		drawCrossBox(matrices, buffer, box.move(getCameraPos().reverse()),
 			color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawCrossBoxes(PoseStack matrices, List<AABB> boxes,
 		int color, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 camOffset = getCameraPos().reverse();
 		for(AABB box : boxes)
 			drawCrossBox(matrices, buffer, box.move(camOffset), color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawCrossBoxes(PoseStack matrices,
 		List<ColoredBox> boxes, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 camOffset = getCameraPos().reverse();
 		for(ColoredBox box : boxes)
 			drawCrossBox(matrices, buffer, box.box().move(camOffset),
 				box.color());
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawCrossBox(VertexConsumer buffer, AABB box, int color)
@@ -588,41 +582,41 @@ public enum RenderUtils
 	public static void drawNode(PoseStack matrices, AABB box, int color,
 		boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		drawNode(matrices, buffer, box.move(getCameraPos().reverse()), color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawNodes(PoseStack matrices, List<AABB> boxes,
 		int color, boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 camOffset = getCameraPos().reverse();
 		for(AABB box : boxes)
 			drawNode(matrices, buffer, box.move(camOffset), color);
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawNodes(PoseStack matrices, List<ColoredBox> boxes,
 		boolean depthTest)
 	{
-		MultiBufferSource.BufferSource vcp = getVCP();
+		WurstBufferSource bs = new WurstBufferSource();
 		RenderType layer = WurstRenderLayers.getLines(depthTest);
-		VertexConsumer buffer = vcp.getBuffer(layer);
+		VertexConsumer buffer = bs.getBuffer(layer);
 		
 		Vec3 camOffset = getCameraPos().reverse();
 		for(ColoredBox box : boxes)
 			drawNode(matrices, buffer, box.box().move(camOffset), box.color());
 		
-		vcp.uploadAndDraw();
+		bs.uploadAndDraw();
 	}
 	
 	public static void drawNode(VertexConsumer buffer, AABB box, int color)
