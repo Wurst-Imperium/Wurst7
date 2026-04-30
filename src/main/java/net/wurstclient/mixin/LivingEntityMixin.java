@@ -9,7 +9,9 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.core.Holder;
@@ -21,6 +23,7 @@ import net.wurstclient.WurstClient;
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin
 {
+	
 	/**
 	 * Stops the other darkness effect in caves when AntiBlind is enabled.
 	 */
@@ -36,4 +39,14 @@ public class LivingEntityMixin
 		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
 			cir.setReturnValue(0F);
 	}
+	
+	@ModifyConstant(method = "aiStep",
+		constant = @Constant(intValue = 10, ordinal = 0))
+	private int removeJumpDelay(int original)
+	{
+		if(WurstClient.INSTANCE.getHax().noJumpDelayHack.isEnabled())
+			return 0;
+		return original;
+	}
+	
 }
