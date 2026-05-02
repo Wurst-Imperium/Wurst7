@@ -33,6 +33,8 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.wurstclient.gametest.tests.*;
+import net.wurstclient.gametest.tests.filters.FilterBabiesTest;
+import net.wurstclient.gametest.tests.filters.FilterPassiveWaterTest;
 
 public class WurstTest implements FabricClientGameTest
 {
@@ -118,7 +120,10 @@ public class WurstTest implements FabricClientGameTest
 		runWurstCommand(context, "setcheckbox HackList animations off");
 		
 		new InGameMenuTest(context, spContext).run();
-		new EntityFilterTest(context, spContext).run();
+		
+		// Test entity filters
+		new FilterBabiesTest(context, spContext).run();
+		new FilterPassiveWaterTest(context, spContext).run();
 		
 		// TODO: Open ClickGUI and Navigator
 		
