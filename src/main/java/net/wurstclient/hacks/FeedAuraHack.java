@@ -24,7 +24,6 @@ import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleInputListener;
@@ -37,7 +36,6 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filters.FilterBabiesSetting;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"feed aura", "BreedAura", "breed aura", "AutoBreeder",
 	"auto breeder"})
@@ -147,24 +145,17 @@ public final class FeedAuraHack extends Hack
 		if(target == null)
 			return;
 		
-		MultiPlayerGameMode im = MC.gameMode;
+		MultiPlayerGameMode gm = MC.gameMode;
 		LocalPlayer player = MC.player;
-		InteractionHand hand = InteractionHand.MAIN_HAND;
 		
-		if(im.isDestroying() || player.isHandsBusy())
+		if(gm.isDestroying() || player.isHandsBusy())
 			return;
 		
-		// create realistic hit result
-		AABB box = target.getBoundingBox();
-		Vec3 start = RotationUtils.getEyesPos();
-		Vec3 end = box.getCenter();
-		Vec3 hitVec = box.clip(start, end).orElse(start);
-		EntityHitResult hitResult = new EntityHitResult(target, hitVec);
+		EntityHitResult hitResult = EntityUtils.createHitResult(target);
+		InteractionHand hand = InteractionHand.MAIN_HAND;
+		InteractionResult result = gm.interact(player, target, hitResult, hand);
 		
-		InteractionResult actionResult =
-			im.interact(player, target, hitResult, hand);
-		
-		if(actionResult instanceof InteractionResult.Success success
+		if(result instanceof InteractionResult.Success success
 			&& success.swingSource() == InteractionResult.SwingSource.CLIENT)
 			player.swing(hand);
 		

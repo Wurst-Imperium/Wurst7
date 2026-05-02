@@ -19,6 +19,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 
@@ -107,5 +108,14 @@ public enum EntityUtils
 		double y = Mth.clamp(start.y, box.minY, box.maxY);
 		double z = Mth.clamp(start.z, box.minZ, box.maxZ);
 		return start.distanceToSqr(new Vec3(x, y, z));
+	}
+	
+	public static EntityHitResult createHitResult(Entity e)
+	{
+		AABB box = e.getBoundingBox();
+		Vec3 start = RotationUtils.getEyesPos();
+		Vec3 end = box.getCenter();
+		Vec3 hitVec = box.clip(start, end).orElse(start);
+		return new EntityHitResult(e, hitVec);
 	}
 }
