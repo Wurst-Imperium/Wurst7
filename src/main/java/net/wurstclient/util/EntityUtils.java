@@ -101,15 +101,11 @@ public enum EntityUtils
 	
 	public static double distanceToHitboxSq(Entity e)
 	{
-		return distanceToHitboxSqr(RotationUtils.getEyesPos(), e);
-	}
-	
-	public static double distanceToHitboxSqr(Vec3 point, Entity e)
-	{
+		Vec3 start = RotationUtils.getEyesPos();
 		AABB box = e.getBoundingBox();
-		double x = Mth.clamp(point.x, box.minX, box.maxX);
-		double y = Mth.clamp(point.y, box.minY, box.maxY);
-		double z = Mth.clamp(point.z, box.minZ, box.maxZ);
-		return point.distanceToSqr(new Vec3(x, y, z));
+		double x = Mth.clamp(start.x, box.minX, box.maxX);
+		double y = Mth.clamp(start.y, box.minY, box.maxY);
+		double z = Mth.clamp(start.z, box.minZ, box.maxZ);
+		return start.distanceToSqr(new Vec3(x, y, z));
 	}
 }
