@@ -118,6 +118,7 @@ public class WurstTest implements FabricClientGameTest
 		runWurstCommand(context, "setcheckbox HackList animations off");
 		
 		new InGameMenuTest(context, spContext).run();
+		new EntityFilterTest(context, spContext).run();
 		
 		// TODO: Open ClickGUI and Navigator
 		
