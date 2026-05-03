@@ -21,8 +21,8 @@ public final class FilterPetsSetting extends EntityFilterCheckbox
 	@Override
 	public boolean test(Entity e)
 	{
-		return !(e instanceof TamableAnimal && ((TamableAnimal)e).isTame())
-			&& !(e instanceof AbstractHorse && ((AbstractHorse)e).isTamed());
+		return !(e instanceof TamableAnimal tamable && tamable.isTame())
+			&& !(e instanceof AbstractHorse horse && horse.isTamed());
 	}
 	
 	public static FilterPetsSetting genericCombat(boolean checked)
