@@ -8,8 +8,10 @@ accessible	method	net/minecraft/client/MouseHandler	onButton	(JLnet/minecraft/cl
 accessible	method	net/minecraft/client/renderer/GameRenderer	setPostEffect	(Lnet/minecraft/resources/Identifier;)V
 accessible	method	net/minecraft/client/renderer/rendertype/RenderType	create	(Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;
 accessible	method	net/minecraft/core/component/DataComponentMap$Builder	setUnchecked	(Lnet/minecraft/core/component/DataComponentType;Ljava/lang/Object;)V
+accessible	method	net/minecraft/world/entity/animal/feline/Ocelot	isTrusting	()Z
 accessible	method	net/minecraft/world/entity/animal/feline/Ocelot	setTrusting	(Z)V
 accessible	method	net/minecraft/world/entity/animal/fox/Fox	addTrustedEntity	(Lnet/minecraft/world/entity/LivingEntity;)V
+accessible	method	net/minecraft/world/entity/animal/fox/Fox	getTrustedEntities	()Ljava/util/stream/Stream;
 accessible	method	net/minecraft/world/entity/player/Player	canGlide	()Z
 accessible	method	net/minecraft/world/entity/projectile/FishingHook	calculateOpenWater	(Lnet/minecraft/core/BlockPos;)Z
 accessible	field	net/minecraft/client/Minecraft	rightClickDelay	I
