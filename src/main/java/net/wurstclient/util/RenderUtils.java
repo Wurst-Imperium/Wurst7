@@ -660,8 +660,9 @@ public enum RenderUtils
 	public static void drawArrow(PoseStack matrices, VertexConsumer buffer,
 		BlockPos from, BlockPos to, RegionPos region, int color)
 	{
-		Vec3 fromVec = from.getCenter().subtract(region.x(), 0, region.z());
-		Vec3 toVec = to.getCenter().subtract(region.x(), 0, region.z());
+		Vec3 fromVec =
+			Vec3.atCenterOf(from).subtract(region.x(), 0, region.z());
+		Vec3 toVec = Vec3.atCenterOf(to).subtract(region.x(), 0, region.z());
 		drawArrow(matrices, buffer, fromVec, toVec, color, 1 / 16F);
 	}
 	

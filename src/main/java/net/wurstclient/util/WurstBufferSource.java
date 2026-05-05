@@ -33,9 +33,10 @@ public final class WurstBufferSource
 			&& renderType.canConsolidateConsecutiveGeometry())
 			return stagedBuffer.getVertexBuilder(draws.getLast());
 		
-		StagedVertexBuffer.Draw draw = stagedBuffer.appendDraw(
-			renderType.format(), renderType.mode(), renderType.sortOnUpload()
-				? RenderSystem.getProjectionType().vertexSorting() : null);
+		StagedVertexBuffer.Draw draw =
+			stagedBuffer.appendDraw(renderType.format(),
+				renderType.primitiveTopology(), renderType.sortOnUpload()
+					? RenderSystem.getProjectionType().vertexSorting() : null);
 		
 		draws.add(draw);
 		drawTypes.add(renderType);

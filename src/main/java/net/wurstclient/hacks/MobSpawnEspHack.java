@@ -10,10 +10,10 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.Map.Entry;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
@@ -66,7 +66,8 @@ public final class MobSpawnEspHack extends Hack
 	private final HitboxCheckSetting hitboxCheck = new HitboxCheckSetting();
 	
 	private final ChunkVertexBufferCoordinator coordinator =
-		new ChunkVertexBufferCoordinator(this::isSpawnable, Mode.LINES,
+		new ChunkVertexBufferCoordinator(this::isSpawnable,
+			PrimitiveTopology.LINES,
 			DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH,
 			this::buildBuffer, drawDistance);
 	

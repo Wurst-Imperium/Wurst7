@@ -9,13 +9,13 @@ package net.wurstclient;
 
 import java.util.Optional;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderPipeline.Snippet;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
@@ -33,9 +33,9 @@ public enum WurstShaderPipelines
 		.withFragmentShader(Identifier.parse("wurst:core/fogless_lines"))
 		.withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
 		.withCull(false)
-		.withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH,
-			Mode.LINES)
-		.buildSnippet();
+		.withVertexBinding(0,
+			DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH)
+		.withPrimitiveTopology(PrimitiveTopology.LINES).buildSnippet();
 	
 	/**
 	 * Similar to the LINES ShaderPipeline, but with no fog.
