@@ -7,6 +7,7 @@ buildscript {
 plugins {
 	id "net.fabricmc.fabric-loom" version "${loom_version}"
 	id "com.diffplug.spotless" version "8.6.0"
+	id "net.wimods.github-compile-summary" version "0.1.1"
 }
 
 def ENV = System.getenv()
