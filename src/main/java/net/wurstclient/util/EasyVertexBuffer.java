@@ -141,7 +141,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 			renderPass.setUniform("DynamicTransforms", gpuBufferSlice);
 			renderPass.setVertexBuffer(0, vertexBuffer.slice());
 			renderPass.setIndexBuffer(indexBuffer, shapeIndexBuffer.type());
-			renderPass.drawIndexed(0, 0, indexCount, 1);
+			renderPass.drawIndexed(indexCount, 1, 0, 0, 0);
 		}
 		
 		modelViewStack.popMatrix();

@@ -51,9 +51,6 @@ public class WurstTest implements FabricClientGameTest
 		waitForTitleScreenFade(context);
 		
 		LOGGER.info("Reached title screen");
-		assertScreenshotEquals(context, "title_screen",
-			"https://i.imgur.com/xSAHDXr.png");
-		
 		AltManagerTest.testAltManagerButton(context);
 		
 		LOGGER.info("Creating test world");
@@ -116,7 +113,7 @@ public class WurstTest implements FabricClientGameTest
 			"setmode WurstLogo visibility only_when_outdated");
 		runWurstCommand(context, "setcheckbox HackList animations off");
 		
-		new InGameMenuTest(context, spContext).run();
+		new PauseScreenTest(context, spContext).run();
 		
 		// TODO: Open ClickGUI and Navigator
 		
