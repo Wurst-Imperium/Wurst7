@@ -132,3 +132,15 @@ jobs:
       with:
         name: crash-reports
         path: build/run/*/crash-reports
+
+    - name: Process [release] marker
+      if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[release]') && !contains(github.ref_name, '/') && github.ref_name != 'master' }}
+      env:
+        GH_TOKEN: ${{ secrets.WIMODS_NET_PUBLISH_TOKEN }}
+      run: |
+        mc_version=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')
+        gh workflow run publish_snapshot_ports.yml \
+          --repo Wurst-Imperium/wimods.net \
+          --ref master \
+          -f mc_version="$mc_version" \
+          -f mods="wurst"
