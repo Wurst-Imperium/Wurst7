@@ -16,6 +16,14 @@ on:
         description: "Publish to GitHub"
         type: boolean
         default: true
+      publish_curseforge:
+        description: "Dummy input. Does nothing."
+        type: boolean
+        default: false
+      publish_modrinth:
+        description: "Dummy input. Does nothing."
+        type: boolean
+        default: false
       update_website:
         description: "Update WurstClient.net post (only works if there already is one)"
         type: boolean

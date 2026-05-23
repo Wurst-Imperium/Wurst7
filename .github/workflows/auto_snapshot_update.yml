@@ -16,6 +16,9 @@ on:
       fapi_version:
         description: "Fabric API version"
         required: true
+      cf_game_version:
+        description: "Dummy input. Does nothing."
+        required: false
       distinct_id:
         required: false
 
