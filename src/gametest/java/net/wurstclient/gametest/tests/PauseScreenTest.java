@@ -60,7 +60,7 @@ public final class PauseScreenTest extends SingleplayerTest
 		logger.info("Opening game menu without Wurst Options");
 		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
 		assertScreenshotEquals("game_menu_alt",
-			"https://i.imgur.com/tta0D1z.png");
+			"https://i.imgur.com/NLV7X4p.png");
 		
 		logger.info("Opening statistics screen with Wurst Options");
 		for(int i = 0; i < 3; i++)
