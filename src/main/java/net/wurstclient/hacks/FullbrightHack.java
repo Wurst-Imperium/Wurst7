@@ -13,6 +13,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.hacks.fullbright.BadOptimizationsLightmapHook;
 import net.wurstclient.mixinterface.ISimpleOption;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
@@ -132,6 +133,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	
 	private void updateNightVision()
 	{
+		float oldNightVisionStrength = nightVisionStrength;
 		boolean shouldGiveNightVision =
 			isEnabled() && method.getSelected() == Method.NIGHT_VISION;
 		
@@ -148,6 +150,9 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			nightVisionStrength = 1;
 		else
 			nightVisionStrength = 0;
+		
+		if(oldNightVisionStrength != nightVisionStrength)
+			BadOptimizationsLightmapHook.markForUpdate();
 	}
 	
 	public boolean isNightVisionActive()

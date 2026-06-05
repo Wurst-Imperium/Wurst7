@@ -18,7 +18,7 @@ public final class FreecamInteractionSetting
 	public FreecamInteractionSetting()
 	{
 		super("Interact from", DESCRIPTION, InteractFrom.values(),
-			InteractFrom.PLAYER);
+			InteractFrom.CAMERA);
 	}
 	
 	private static WText buildDescription()

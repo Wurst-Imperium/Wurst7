@@ -33,12 +33,18 @@
   "suggests": {
     "mo_glass": "*"
   },
+  "conflicts": {
+    "betterblockentities": ">=1.3.2 <1.3.4"
+  },
   "breaks": {
     "wi_zoom": "*",
     "wi-zoom": "*",
     "vulkanmod": "*"
   },
   "custom": {
+    "badoptimizations:cache_hooks": {
+      "lightmap": "net.wurstclient.hacks.fullbright.BadOptimizationsLightmapHook"
+    },
     "modmenu": {
       "links": {
         "modmenu.donate": "https://www.wurstclient.net/modmenu-donate/",
