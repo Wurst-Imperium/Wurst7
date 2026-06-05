@@ -42,7 +42,6 @@ dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 	
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
@@ -94,8 +93,32 @@ configurations {
 	}
 }
 
+def optionalCompatMods = [
+	sodium: [artifact: "sodium", property: "sodium_version"],
+	better_block_entities: [
+		artifact: "better-block-entities",
+		property: "better_block_entities_version"
+	],
+	badoptimizations: [
+		artifact: "badoptimizations",
+		property: "badoptimizations_version"
+	]
+]
+
+def compatModVersions = optionalCompatMods.collectEntries { id, mod ->
+	[(id): providers.gradleProperty(mod.property).orElse("")]
+}
+
 dependencies {
-	testMods "maven.modrinth:sodium:${project.sodium_version}"
+	optionalCompatMods.each { id, mod ->
+		def version = compatModVersions[id].get().trim()
+		if(!version.isEmpty())
+			testMods "maven.modrinth:${mod.artifact}:${version}"
+	}
+}
+
+def hasCompatMods = providers.provider {
+	compatModVersions.values().any { !it.get().trim().isEmpty() }
 }
 
 def cleanClientWithMods = tasks.register("cleanClientWithMods", Delete) {
@@ -108,6 +131,7 @@ def prepareClientWithMods = tasks.register("prepareClientWithMods", Sync) {
 }
 
 tasks.named("runClientWithMods") {
+	onlyIf { hasCompatMods.get() }
 	dependsOn prepareClientWithMods
 	finalizedBy cleanClientWithMods
 }
@@ -122,9 +146,8 @@ def prepareClientGameTestWithMods = tasks.register("prepareClientGameTestWithMod
 	into layout.buildDirectory.dir("run/clientGameTestWithMods/mods")
 }
 
-def doModCompatTest = providers.gradleProperty("do_mod_compat_test").map { it.toBoolean() }.orElse(false)
 tasks.named("runClientGameTestWithMods") {
-	onlyIf { doModCompatTest.get() }
+	onlyIf { hasCompatMods.get() }
 	dependsOn prepareClientGameTestWithMods
 }
 
@@ -182,10 +205,6 @@ spotless {
 		target("src/**/*.json", "src/**/*.mcmeta")
 		gson().indentWithSpaces(2).version("2.11.0")
 	}
-}
-
-test {
-	useJUnitPlatform()
 }
 
 def getGhVersion() {

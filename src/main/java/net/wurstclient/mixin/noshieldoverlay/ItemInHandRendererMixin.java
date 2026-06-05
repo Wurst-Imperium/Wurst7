@@ -19,14 +19,15 @@ import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.wurstclient.WurstClient;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin
 {
 	/**
-	 * Lowers the shield when blocking if NoShieldOverlay is enabled.
+	 * Lowers the shield (including custom shield items from datapacks) when
+	 * blocking if NoShieldOverlay is enabled.
 	 */
 	@Inject(
 		method = "submitArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
@@ -39,8 +40,8 @@ public abstract class ItemInHandRendererMixin
 		PoseStack matrices, SubmitNodeCollector entityRenderCommandQueue,
 		int light, CallbackInfo ci)
 	{
-		// Check if item is a shield
-		if(item.getItem() != Items.SHIELD)
+		// Check if item has block animation component
+		if(item.getUseAnimation() != ItemUseAnimation.BLOCK)
 			return;
 		
 		// Lower the shield
@@ -49,7 +50,8 @@ public abstract class ItemInHandRendererMixin
 	}
 	
 	/**
-	 * Lowers the shield when NOT blocking if NoShieldOverlay is enabled.
+	 * Lowers the shield (including custom shield items from datapacks) when
+	 * NOT blocking if NoShieldOverlay is enabled.
 	 */
 	@Inject(
 		method = "submitArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
@@ -61,8 +63,8 @@ public abstract class ItemInHandRendererMixin
 		PoseStack matrices, SubmitNodeCollector entityRenderCommandQueue,
 		int light, CallbackInfo ci)
 	{
-		// Check if item is a shield
-		if(item.getItem() != Items.SHIELD)
+		// Check if item has block animation component
+		if(item.getUseAnimation() != ItemUseAnimation.BLOCK)
 			return;
 		
 		// Lower the shield

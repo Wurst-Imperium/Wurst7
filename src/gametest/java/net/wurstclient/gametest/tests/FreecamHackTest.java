@@ -144,7 +144,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		runCommand("setblock 0 -56 1 lever[face=wall,facing=north]");
 		runCommand("setblock 0 -56 3 lever[face=wall,facing=south]");
 		waitForBlock(0, 1, 3, Blocks.LEVER);
-		context.waitTicks(WurstTest.IS_MOD_COMPAT_TEST ? 5 : 1);
+		context.waitTicks(WurstTest.IS_SODIUM_INSTALLED ? 5 : 1);
 		world.waitForChunksRender();
 		context.takeScreenshot("freecam_interact_setup");
 		
@@ -164,18 +164,18 @@ public final class FreecamHackTest extends SingleplayerTest
 		world.waitForChunksRender();
 		context.takeScreenshot("freecam_interact_side_view");
 		
+		// Right click with "Interact from: Camera"
+		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+		context.waitTick();
+		assertLeverState(0, -56, 1, false, "near lever, camera mode");
+		assertLeverState(0, -56, 3, true, "far lever, camera mode");
+		
 		// Right click with "Interact from: Player"
+		runWurstCommand("setmode Freecam interact_from player");
 		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
 		context.waitTick();
 		assertLeverState(0, -56, 1, true, "near lever, player mode");
-		assertLeverState(0, -56, 3, false, "far lever, player mode");
-		
-		// Right click with "Interact from: Camera"
-		runWurstCommand("setmode Freecam interact_from camera");
-		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
-		context.waitTick();
-		assertLeverState(0, -56, 3, true, "far lever, camera mode");
-		assertLeverState(0, -56, 1, true, "near lever, camera mode");
+		assertLeverState(0, -56, 3, true, "far lever, player mode");
 		
 		// Replace levers with chickens
 		runCommand("fill 0 -56 1 0 -56 3 air strict");
@@ -184,27 +184,27 @@ public final class FreecamHackTest extends SingleplayerTest
 		clearParticles();
 		context.waitTick();
 		
+		// Left click with "Interact from: Camera"
+		runWurstCommand("setmode Freecam interact_from camera");
+		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT);
+		context.waitTick();
+		assertChickenHealth(nearChicken, false, "near chicken, camera mode");
+		assertChickenHealth(farChicken, true, "far chicken, camera mode");
+		
 		// Left click with "Interact from: Player"
+		farChicken.discard();
+		farChicken = spawnChicken(3.5);
+		context.waitTick();
 		runWurstCommand("setmode Freecam interact_from player");
 		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT);
 		context.waitTick();
 		assertChickenHealth(nearChicken, true, "near chicken, player mode");
 		assertChickenHealth(farChicken, false, "far chicken, player mode");
 		
-		// Left click with "Interact from: Camera"
-		nearChicken.discard();
-		nearChicken = spawnChicken(1.5);
-		context.waitTick();
-		runWurstCommand("setmode Freecam interact_from camera");
-		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT);
-		context.waitTick();
-		assertChickenHealth(farChicken, true, "far chicken, camera mode");
-		assertChickenHealth(nearChicken, false, "near chicken, camera mode");
-		
 		// Clean up
 		nearChicken.discard();
 		farChicken.discard();
-		runWurstCommand("setmode Freecam interact_from player");
+		runWurstCommand("setmode Freecam interact_from camera");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTicks(2);
 	}

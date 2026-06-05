@@ -358,7 +358,7 @@ public final class AutoLibrarianHack extends Hack
 		if(MC.rightClickDelay > 0)
 			return;
 		
-		MultiPlayerGameMode im = MC.gameMode;
+		MultiPlayerGameMode gm = MC.gameMode;
 		LocalPlayer player = MC.player;
 		
 		if(EntityUtils.distanceToHitboxSq(villager) > range.getValueSq())
@@ -369,23 +369,17 @@ public final class AutoLibrarianHack extends Hack
 			return;
 		}
 		
-		// create realistic hit result
-		AABB box = villager.getBoundingBox();
-		Vec3 start = RotationUtils.getEyesPos();
-		Vec3 end = box.getCenter();
-		Vec3 hitVec = box.clip(start, end).orElse(start);
-		EntityHitResult hitResult = new EntityHitResult(villager, hitVec);
-		
-		// face end vector
-		faceTarget.face(end);
+		// face villager
+		faceTarget.face(villager.getBoundingBox().getCenter());
 		
 		// click on villager
+		EntityHitResult hitResult = EntityUtils.createHitResult(villager);
 		InteractionHand hand = InteractionHand.MAIN_HAND;
-		InteractionResult actionResult =
-			im.interact(player, villager, hitResult, hand);
+		InteractionResult result =
+			gm.interact(player, villager, hitResult, hand);
 		
 		// swing hand
-		if(actionResult instanceof InteractionResult.Success success
+		if(result instanceof InteractionResult.Success success
 			&& success.swingSource() == InteractionResult.SwingSource.CLIENT)
 			swingHand.swing(hand);
 		
