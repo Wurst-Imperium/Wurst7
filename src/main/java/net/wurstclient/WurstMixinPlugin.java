@@ -14,8 +14,8 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.wurstclient.mixin.xray.sodium.BlockRendererMixin;
+import net.wurstclient.util.BBEModCompat;
 
 public final class WurstMixinPlugin implements IMixinConfigPlugin
 {
@@ -24,7 +24,7 @@ public final class WurstMixinPlugin implements IMixinConfigPlugin
 		String mixinClassName)
 	{
 		if(BlockRendererMixin.class.getName().equals(mixinClassName)
-			&& FabricLoader.getInstance().isModLoaded("betterblockentities"))
+			&& BBEModCompat.isBrokenBBEInstalled())
 			return false;
 		
 		return true;

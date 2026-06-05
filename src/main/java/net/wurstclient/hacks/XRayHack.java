@@ -32,6 +32,7 @@ import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.BBEModCompat;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 
@@ -251,8 +252,8 @@ public final class XRayHack extends Hack
 	
 	private String checkBBE()
 	{
-		if(FabricLoader.getInstance().isModLoaded("betterblockentities"))
-			return "Better Block Entities (as of v1.3.2) is known to break Opacity X-Ray. If this looks broken, you may need to turn off opacity mode or remove BBE.";
+		if(BBEModCompat.isBrokenBBEInstalled())
+			return "Better Block Entities v1.3.2-v1.3.3 breaks Opacity X-Ray. Update/remove BBE or turn off opacity mode.";
 		
 		return null;
 	}
