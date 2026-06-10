@@ -72,8 +72,7 @@
     "xray.FluidRendererMixin",
     "xray.ModelBlockRendererMixin",
     "xray.SectionCompilerMixin",
-    "xray.indigo.AbstractTerrainRenderContextMixin",
-    "xray.indigo.BlockRenderInfoMixin",
+    "xray.indigo.AltModelBlockRendererImplMixin",
     "xray.sodium.AbstractBlockRenderContextMixin",
     "xray.sodium.BlockRendererMixin",
     "xray.sodium.DefaultFluidRendererMixin"
