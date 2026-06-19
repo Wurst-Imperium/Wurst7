@@ -42,7 +42,7 @@ public final class FileComponent extends Component
 		if(mouseX < getX() + getWidth() - getButtonWidth() - 4)
 			return;
 		
-		MC.setScreen(new SelectFileScreen(MC.screen, setting));
+		MC.gui.setScreen(new SelectFileScreen(MC.gui.screen(), setting));
 	}
 	
 	@Override

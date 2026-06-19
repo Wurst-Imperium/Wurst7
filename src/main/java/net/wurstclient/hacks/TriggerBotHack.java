@@ -138,7 +138,7 @@ public final class TriggerBotHack extends Hack
 			return;
 		
 		// don't attack when a container/inventory screen is open
-		if(MC.screen instanceof AbstractContainerScreen)
+		if(MC.gui.screen() instanceof AbstractContainerScreen)
 			return;
 		
 		LocalPlayer player = MC.player;

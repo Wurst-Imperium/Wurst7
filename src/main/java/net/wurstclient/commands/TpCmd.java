@@ -15,6 +15,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -46,7 +47,7 @@ public final class TpCmd extends Command
 			WURST.getHax().freecamHack.setEnabled(false);
 		
 		// Simple teleport at low distances for better stability
-		if(player.distanceToSqr(pos.getBottomCenter()) < 100)
+		if(player.distanceToSqr(Vec3.atBottomCenterOf(pos)) < 100)
 		{
 			player.setPos(pos.getX(), pos.getY(), pos.getZ());
 			return;

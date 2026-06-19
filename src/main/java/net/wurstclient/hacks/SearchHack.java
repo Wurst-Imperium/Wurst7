@@ -14,9 +14,9 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
@@ -236,7 +236,7 @@ public final class SearchHack extends Hack
 		if(vertexBuffer != null)
 			vertexBuffer.close();
 		
-		vertexBuffer = EasyVertexBuffer.createAndUpload(Mode.QUADS,
+		vertexBuffer = EasyVertexBuffer.createAndUpload(PrimitiveTopology.QUADS,
 			DefaultVertexFormat.POSITION_COLOR, buffer -> {
 				for(int[] vertex : vertices)
 					buffer.addVertex(vertex[0] - region.x(), vertex[1],

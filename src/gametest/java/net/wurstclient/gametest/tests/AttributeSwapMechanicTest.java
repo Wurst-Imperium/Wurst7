@@ -10,7 +10,7 @@ package net.wurstclient.gametest.tests;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.wurstclient.gametest.SingleplayerTest;
 
@@ -71,7 +71,7 @@ public final class AttributeSwapMechanicTest extends SingleplayerTest
 	private IronGolem spawnGolem()
 	{
 		return server.computeOnServer(s -> {
-			IronGolem golem = EntityType.IRON_GOLEM.create(s.overworld(),
+			IronGolem golem = EntityTypes.IRON_GOLEM.create(s.overworld(),
 				EntitySpawnReason.COMMAND);
 			golem.setPos(0.5, -57, 2);
 			golem.setNoAi(true);

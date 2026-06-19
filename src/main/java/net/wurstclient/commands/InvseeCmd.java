@@ -62,7 +62,7 @@ public final class InvseeCmd extends Command implements RenderListener
 				continue;
 			
 			ChatUtils.message("Showing inventory of " + otherPlayerName + ".");
-			MC.setScreen(new InventoryScreen(player));
+			MC.gui.setScreen(new InventoryScreen(player));
 			found = true;
 			break;
 		}

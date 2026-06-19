@@ -80,12 +80,12 @@ public abstract class MinecraftMixin
 	
 	/**
 	 * Runs just before {@link Minecraft#handleKeybinds()}, bypassing
-	 * the <code>overlay == null && currentScreen == null</code> check in
+	 * the <code>gui.overlay() == null && gui.screen() == null</code> check in
 	 * {@link Minecraft#tick()}.
 	 */
 	@Inject(method = "tick()V",
-		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/Minecraft;overlay:Lnet/minecraft/client/gui/screens/Overlay;",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/Gui;overlay()Lnet/minecraft/client/gui/screens/Overlay;",
 			ordinal = 0))
 	private void onHandleInputEvents(CallbackInfo ci)
 	{

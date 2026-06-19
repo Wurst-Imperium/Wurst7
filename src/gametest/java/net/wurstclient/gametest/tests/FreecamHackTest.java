@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
@@ -212,7 +212,7 @@ public final class FreecamHackTest extends SingleplayerTest
 	private Chicken spawnChicken(double z)
 	{
 		return server.computeOnServer(s -> {
-			Chicken c = EntityType.CHICKEN.create(s.overworld(),
+			Chicken c = EntityTypes.CHICKEN.create(s.overworld(),
 				EntitySpawnReason.COMMAND);
 			c.setPos(0.5, -56, z);
 			c.setNoAi(true);

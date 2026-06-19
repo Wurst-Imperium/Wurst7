@@ -126,7 +126,7 @@ public final class XRayHack extends Hack
 		EVENTS.add(VisGraphListener.class, this);
 		
 		// reload chunks
-		MC.levelRenderer.allChanged();
+		MC.levelExtractor.allChanged();
 		
 		// display compatibility warnings
 		if(optiFineWarning != null)
@@ -143,7 +143,7 @@ public final class XRayHack extends Hack
 		EVENTS.remove(VisGraphListener.class, this);
 		
 		// reload chunks
-		MC.levelRenderer.allChanged();
+		MC.levelExtractor.allChanged();
 		
 		// reset gamma
 		FullbrightHack fullbright = WURST.getHax().fullbrightHack;
@@ -230,7 +230,7 @@ public final class XRayHack extends Hack
 	
 	public void openBlockListEditor(Screen prevScreen)
 	{
-		MC.setScreen(new EditBlockListScreen(prevScreen, ores));
+		MC.gui.setScreen(new EditBlockListScreen(prevScreen, ores));
 	}
 	
 	/**

@@ -10,14 +10,14 @@ package net.wurstclient.hacks;
 import java.awt.Color;
 import java.util.Map.Entry;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LightLayer;
@@ -66,7 +66,8 @@ public final class MobSpawnEspHack extends Hack
 	private final HitboxCheckSetting hitboxCheck = new HitboxCheckSetting();
 	
 	private final ChunkVertexBufferCoordinator coordinator =
-		new ChunkVertexBufferCoordinator(this::isSpawnable, Mode.LINES,
+		new ChunkVertexBufferCoordinator(this::isSpawnable,
+			PrimitiveTopology.LINES,
 			DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH,
 			this::buildBuffer, drawDistance);
 	
@@ -143,7 +144,7 @@ public final class MobSpawnEspHack extends Hack
 	{
 		// Check for solid blocks, fluids, redstone, prevent_spawning tags, etc.
 		// See SpawnLocationTypes.ON_GROUND
-		if(!SpawnPlacements.isSpawnPositionOk(EntityType.CREEPER, MC.level,
+		if(!SpawnPlacements.isSpawnPositionOk(EntityTypes.CREEPER, MC.level,
 			pos))
 			return false;
 		

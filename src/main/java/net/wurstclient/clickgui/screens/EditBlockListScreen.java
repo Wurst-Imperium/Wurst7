@@ -67,29 +67,29 @@ public final class EditBlockListScreen extends Screen
 		addRenderableWidget(
 			addButton = Button.builder(Component.literal("Add"), b -> {
 				blockList.add(blockToAdd);
-				minecraft.setScreen(EditBlockListScreen.this);
+				minecraft.gui.setScreen(EditBlockListScreen.this);
 			}).bounds(width / 2 - 2, height - 56, 30, 20).build());
 		
 		addRenderableWidget(removeButton =
 			Button.builder(Component.literal("Remove Selected"), b -> {
 				blockList
 					.remove(blockList.indexOf(listGui.getSelectedBlockName()));
-				minecraft.setScreen(EditBlockListScreen.this);
+				minecraft.gui.setScreen(EditBlockListScreen.this);
 			}).bounds(width / 2 + 52, height - 56, 100, 20).build());
 		
 		addRenderableWidget(
 			Button.builder(Component.literal("Reset to Defaults"),
-				b -> minecraft.setScreen(new ConfirmScreen(b2 -> {
+				b -> minecraft.gui.setScreen(new ConfirmScreen(b2 -> {
 					if(b2)
 						blockList.resetToDefaults();
-					minecraft.setScreen(EditBlockListScreen.this);
+					minecraft.gui.setScreen(EditBlockListScreen.this);
 				}, Component.literal("Reset to Defaults"),
 					Component.literal("Are you sure?"))))
 				.bounds(width - 108, 8, 100, 20).build());
 		
 		addRenderableWidget(doneButton = Button
 			.builder(Component.literal("Done"),
-				b -> minecraft.setScreen(prevScreen))
+				b -> minecraft.gui.setScreen(prevScreen))
 			.bounds(width / 2 - 100, height - 28, 200, 20).build());
 	}
 	

@@ -23,7 +23,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -98,7 +98,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		Vec3 camStart = freecam.getCamPos(1F);
 		Vec3 scaledCamDir = freecam.getScaledCamDir(maxDist);
 		Vec3 camEnd = camStart.add(scaledCamDir);
-		AABB camBounds = EntityType.PLAYER.getDimensions()
+		AABB camBounds = EntityTypes.PLAYER.getDimensions()
 			.makeBoundingBox(camStart).expandTowards(scaledCamDir).inflate(1);
 		
 		return original.call(instance, camStart, camEnd, camBounds, predicate,

@@ -60,7 +60,8 @@ public abstract class MessageCompleter
 		String prompt = "=== Minecraft chat log ===\n";
 		
 		// add chat history
-		List<GuiMessage.Line> chatHistory = MC.gui.getChat().trimmedMessages;
+		List<GuiMessage.Line> chatHistory =
+			MC.gui.hud.getChat().trimmedMessages;
 		int messages = 0;
 		for(int i = chatHistory.size() - 1; i >= 0; i--)
 		{

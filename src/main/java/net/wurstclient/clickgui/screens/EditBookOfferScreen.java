@@ -125,13 +125,13 @@ public final class EditBookOfferScreen extends Screen
 					return;
 				
 				bookOffers.replace(index, offerToSave);
-				minecraft.setScreen(prevScreen);
+				minecraft.gui.setScreen(prevScreen);
 			}).bounds(width / 2 - 102, height / 3 * 2, 100, 20).build());
 		saveButton.active = false;
 		
 		addRenderableWidget(cancelButton = Button
 			.builder(Component.literal("Cancel"),
-				b -> minecraft.setScreen(prevScreen))
+				b -> minecraft.gui.setScreen(prevScreen))
 			.bounds(width / 2 + 2, height / 3 * 2, 100, 20).build());
 		
 		updateSelectedOffer(offerToSave);

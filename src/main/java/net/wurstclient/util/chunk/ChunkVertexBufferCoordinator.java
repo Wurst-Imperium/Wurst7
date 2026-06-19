@@ -15,9 +15,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
@@ -30,11 +30,11 @@ public final class ChunkVertexBufferCoordinator extends AbstractChunkCoordinator
 {
 	private final HashMap<ChunkPos, EasyVertexBuffer> buffers = new HashMap<>();
 	private final Renderer renderer;
-	private final Mode drawMode;
+	private final PrimitiveTopology drawMode;
 	private final VertexFormat format;
 	
 	public ChunkVertexBufferCoordinator(BiPredicate<BlockPos, BlockState> query,
-		Mode drawMode, VertexFormat format, Renderer renderer,
+		PrimitiveTopology drawMode, VertexFormat format, Renderer renderer,
 		ChunkAreaSetting area)
 	{
 		super(query, area);

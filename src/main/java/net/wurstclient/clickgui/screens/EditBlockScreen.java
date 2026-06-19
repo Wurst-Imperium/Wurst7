@@ -74,7 +74,7 @@ public final class EditBlockScreen extends Screen
 		if(block != null)
 			setting.setBlock(block);
 		
-		minecraft.setScreen(prevScreen);
+		minecraft.gui.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -87,7 +87,7 @@ public final class EditBlockScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			minecraft.setScreen(prevScreen);
+			minecraft.gui.setScreen(prevScreen);
 			break;
 		}
 		

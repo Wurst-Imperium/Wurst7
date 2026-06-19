@@ -37,7 +37,7 @@ public final class IngameHUD implements GUIRenderListener
 		tabGui.render(context, partialTicks);
 		
 		// pinned windows
-		if(!(WurstClient.MC.screen instanceof ClickGuiScreen))
+		if(!(WurstClient.MC.gui.screen() instanceof ClickGuiScreen))
 			clickGui.renderPinnedWindows(context, partialTicks);
 	}
 	

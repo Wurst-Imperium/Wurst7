@@ -20,8 +20,8 @@ public record BufferWithLayer(EasyVertexBuffer buffer, RenderType layer)
 	public static BufferWithLayer createAndUpload(RenderType layer,
 		Consumer<VertexConsumer> callback)
 	{
-		return new BufferWithLayer(EasyVertexBuffer
-			.createAndUpload(layer.mode(), layer.format(), callback), layer);
+		return new BufferWithLayer(EasyVertexBuffer.createAndUpload(
+			layer.primitiveTopology(), layer.format(), callback), layer);
 	}
 	
 	public void draw(PoseStack matrixStack)
