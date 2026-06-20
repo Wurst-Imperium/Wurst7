@@ -11,6 +11,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityTypes;
@@ -111,8 +112,14 @@ public final class FreecamHackTest extends SingleplayerTest
 		runWurstCommand("setcheckbox Freecam tracer off");
 		runWurstCommand("setcheckbox Freecam hide_hand off");
 		context.waitTick();
-		assertScreenshotEquals("freecam_with_hand",
-			"https://i.imgur.com/6tahHsE.png");
+		// This is broken in Sodium 0.9.0, see
+		// https://github.com/CaffeineMC/sodium/issues/3745
+		// Remove this special case once that issue is fixed.
+		if(!WurstTest.IS_SODIUM_INSTALLED
+			|| !FabricLoader.getInstance().getModContainer("sodium").get()
+				.getMetadata().getVersion().toString().equals("0.9.0+mc26.2"))
+			assertScreenshotEquals("freecam_with_hand",
+				"https://i.imgur.com/6tahHsE.png");
 		runWurstCommand("setcheckbox Freecam hide_hand on");
 		
 		// Enable player movement, walk forward, and turn around
