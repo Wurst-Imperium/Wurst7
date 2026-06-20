@@ -81,7 +81,6 @@ loom {
 			runDir = "build/run/clientGameTestWithMods"
 			jvmArguments.add("-Dfabric.client.gametest")
 			jvmArguments.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
-			jvmArguments.add("-Dwurst.test.withMods=true")
 			programArguments.add("--username=Wurst-Bot")
 		}
 	}
