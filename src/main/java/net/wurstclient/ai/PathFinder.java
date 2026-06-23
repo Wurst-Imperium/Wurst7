@@ -17,9 +17,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Minecraft;
-import net.wurstclient.util.WurstBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -32,6 +32,7 @@ import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
+import net.wurstclient.util.WurstBufferSource;
 
 public class PathFinder
 {
@@ -270,14 +271,14 @@ public class PathFinder
 		return false;
 	}
 	
-	@SuppressWarnings("deprecation")
 	protected boolean canBeSolid(BlockPos pos)
 	{
 		BlockState state = BlockUtils.getState(pos);
 		Block block = state.getBlock();
 		
-		return state.blocksMotion() && !(block instanceof SignBlock)
-			|| block instanceof LadderBlock || abilities.jesus()
+		return state.is(BlockTags.BLOCKS_MOTION)
+			&& !(block instanceof SignBlock) || block instanceof LadderBlock
+			|| abilities.jesus()
 				&& (block == Blocks.WATER || block == Blocks.LAVA);
 	}
 	
@@ -293,7 +294,7 @@ public class PathFinder
 		// check if solid
 		BlockState state = BlockUtils.getState(pos);
 		Block block = state.getBlock();
-		if(state.blocksMotion() && !(block instanceof SignBlock))
+		if(state.is(BlockTags.BLOCKS_MOTION) && !(block instanceof SignBlock))
 			return false;
 		
 		// check if trapped

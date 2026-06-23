@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackMetadataResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.wurstclient.WurstClient;
@@ -57,11 +57,13 @@ public final class ProblematicResourcePackDetector implements UpdateListener
 			if(!isVanillaTweaks(profile))
 				continue;
 			
-			PackResources pack = profile.open();
-			if(!containsTwinklingStars(pack))
-				continue;
-			
-			return true;
+			try(PackMetadataResources pack = profile.openMetadata())
+			{
+				if(!containsTwinklingStars(pack))
+					continue;
+				
+				return true;
+			}
 		}
 		
 		return false;
@@ -72,7 +74,7 @@ public final class ProblematicResourcePackDetector implements UpdateListener
 		return profile.getDescription().getString().contains("Vanilla Tweaks");
 	}
 	
-	private boolean containsTwinklingStars(PackResources pack)
+	private boolean containsTwinklingStars(PackMetadataResources pack)
 	{
 		try
 		{
