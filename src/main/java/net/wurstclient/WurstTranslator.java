@@ -196,7 +196,7 @@ public class WurstTranslator implements ResourceManagerReloadListener
 			for(Resource resource : manager.getResourceStack(langId))
 				try(InputStream stream = resource.open())
 				{
-					if(isBuiltInWurstResourcePack(resource))
+					if(isTrustedClientResourcePack(resource))
 						Language.loadFromJson(stream, entryConsumer);
 					
 				}catch(IOException | JsonParseException e)
@@ -216,15 +216,14 @@ public class WurstTranslator implements ResourceManagerReloadListener
 	}
 	
 	/**
-	 * Ensures that the given resource is from Wurst's built-in resource pack,
-	 * or at least from another client-side mod pretending to be Wurst, as it
-	 * should be impossible for server-provided resource packs to obtain a
-	 * KnownPack of <code>fabric:wurst</code>.
+	 * Ensures that the given resource is from a known client-side mod resource
+	 * pack. Server-provided packs should not have one of these KnownPack
+	 * namespace combinations.
 	 *
 	 * <p>
 	 * ASSUME THEY CAN BYPASS THIS. CATCH EXCEPTIONS ANYWAY.
 	 */
-	private boolean isBuiltInWurstResourcePack(Resource resource)
+	private boolean isTrustedClientResourcePack(Resource resource)
 	{
 		KnownPack knownPack = Optional.ofNullable(resource)
 			.flatMap(Resource::knownPackInfo).orElse(null);
@@ -233,8 +232,7 @@ public class WurstTranslator implements ResourceManagerReloadListener
 			
 		// Note: Namespace can be "fabric" or "vanilla" depending on
 		// Fabric API version (changed in 0.139.3+1.21.11).
-		return ("fabric".equals(knownPack.namespace())
-			|| "vanilla".equals(knownPack.namespace()))
-			&& "wurst".equals(knownPack.id());
+		return "fabric".equals(knownPack.namespace())
+			|| "vanilla".equals(knownPack.namespace());
 	}
 }

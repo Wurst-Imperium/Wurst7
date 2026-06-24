@@ -8,11 +8,14 @@
 package net.wurstclient.command;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.TreeMap;
 
 import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
+import net.wurstclient.addon.CommandAddon;
 import net.wurstclient.commands.*;
 
 public final class CmdList
@@ -72,6 +75,7 @@ public final class CmdList
 	
 	private final TreeMap<String, Command> cmds =
 		new TreeMap<>(String::compareToIgnoreCase);
+	private final List<CommandAddon> commandAddons = new ArrayList<>();
 	
 	public CmdList()
 	{
@@ -107,5 +111,32 @@ public final class CmdList
 	public int countCmds()
 	{
 		return cmds.size();
+	}
+	
+	/**
+	 * Registers an addon that provides commands.
+	 */
+	public void registerCommandAddon(CommandAddon addon)
+	{
+		commandAddons.add(addon);
+		
+		for(Command cmd : addon.getCommands())
+		{
+			if(cmds.containsKey(cmd.getName()))
+				throw new IllegalArgumentException(
+					"[Wurst] Addon '" + addon.getAddonName()
+						+ "' tried to register duplicate command '"
+						+ cmd.getName() + "'.");
+			
+			cmds.put(cmd.getName(), cmd);
+		}
+	}
+	
+	/**
+	 * Gets all registered command addons.
+	 */
+	public List<CommandAddon> getCommandAddons()
+	{
+		return new ArrayList<>(commandAddons);
 	}
 }
