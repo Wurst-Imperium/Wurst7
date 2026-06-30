@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.AxeItem;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -183,11 +183,11 @@ public final class AttributeSwapHack extends Hack
 		if(target instanceof LivingEntity living && shieldBreaker.isChecked()
 			&& living.isBlocking())
 		{
-			if(current.getItem() instanceof AxeItem)
+			if(current.is(ItemTags.AXES))
 				return -1;
 			
 			int axeSlot =
-				InventoryUtils.indexOf(s -> s.getItem() instanceof AxeItem, 9);
+				InventoryUtils.indexOf(stack -> stack.is(ItemTags.AXES), 9);
 			if(axeSlot != -1)
 				return axeSlot;
 		}

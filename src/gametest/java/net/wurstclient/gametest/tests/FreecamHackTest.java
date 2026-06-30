@@ -38,14 +38,16 @@ public final class FreecamHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
+		// Player lighting is broken in 26.3-snapshot-2.
+		// Revert to 26.3-snapshot-1 templates once fixed.
 		assertScreenshotEquals("freecam_start_inside",
-			"https://i.imgur.com/jdSno3u.png");
+			"https://i.imgur.com/fiFl0Nz.png");
 		
 		// Scroll to change speed
 		input.scroll(1);
 		context.waitTick();
 		assertScreenshotEquals("freecam_speed_scrolled",
-			"https://i.imgur.com/DysLqZw.png");
+			"https://i.imgur.com/Pbq2I1N.png");
 		runWurstCommand("setslider Freecam horizontal_speed 1");
 		if(context.computeOnClient(
 			mc -> mc.player.getInventory().getSelectedSlot()) != 0)
@@ -57,7 +59,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		input.scroll(1);
 		context.waitTick();
 		assertScreenshotEquals("freecam_hotbar_scrolled",
-			"https://i.imgur.com/edjDUxr.png");
+			"https://i.imgur.com/1YXetAu.png");
 		if(context.computeOnClient(
 			mc -> mc.player.getInventory().getSelectedSlot()) != 8)
 			throw new RuntimeException(
@@ -99,20 +101,20 @@ public final class FreecamHackTest extends SingleplayerTest
 		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
 		context.waitTick();
 		assertScreenshotEquals("freecam_moved",
-			"https://i.imgur.com/SQPSG5S.png");
+			"https://i.imgur.com/mCvPopF.png");
 		
 		// Enable tracer
 		runWurstCommand("setcheckbox Freecam tracer on");
 		context.waitTick();
 		assertScreenshotEquals("freecam_tracer",
-			"https://i.imgur.com/z3pQumc.png");
+			"https://i.imgur.com/LaGQmcn.png");
 		
 		// Disable tracer and un-hide hand
 		runWurstCommand("setcheckbox Freecam tracer off");
 		runWurstCommand("setcheckbox Freecam hide_hand off");
 		context.waitTick();
 		assertScreenshotEquals("freecam_with_hand",
-			"https://i.imgur.com/6tahHsE.png");
+			"https://i.imgur.com/5gvHOiD.png");
 		runWurstCommand("setcheckbox Freecam hide_hand on");
 		
 		// Enable player movement, walk forward, and turn around
@@ -126,7 +128,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		}
 		context.waitTick();
 		assertScreenshotEquals("freecam_player_moved",
-			"https://i.imgur.com/mf6NgQl.png");
+			"https://i.imgur.com/21R4ISS.png");
 		runWurstCommand("setmode Freecam apply_input_to camera");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();

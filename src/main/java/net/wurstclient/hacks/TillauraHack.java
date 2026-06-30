@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -88,7 +88,7 @@ public final class TillauraHack extends Hack implements HandleInputListener
 			return;
 		
 		// check held item
-		if(!MC.player.isHolding(stack -> stack.getItem() instanceof HoeItem))
+		if(!MC.player.isHolding(stack -> stack.is(ItemTags.HOES)))
 			return;
 		
 		// get valid blocks

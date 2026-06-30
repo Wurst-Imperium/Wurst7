@@ -30,9 +30,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
-import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.TextureTransform;
+import net.wurstclient.WurstClient;
 
 /**
  * An abstraction of Minecraft 1.21.5's new {@code GpuBuffer} system that makes
@@ -126,7 +126,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 				TextureTransform.DEFAULT_TEXTURING.createMatrix());
 		
 		RenderTarget framebuffer =
-			OutputTarget.ITEM_ENTITY_TARGET.getRenderTarget();
+			WurstClient.MC.gameRenderer.mainRenderTarget();
 		RenderPipeline pipeline = layer.pipeline();
 		GpuBuffer indexBuffer = shapeIndexBuffer.getBuffer(indexCount);
 		
@@ -136,7 +136,7 @@ public final class EasyVertexBuffer implements AutoCloseable
 				Optional.empty(), framebuffer.getDepthTextureView(),
 				OptionalDouble.empty()))
 		{
-			renderPass.setPipeline(pipeline);
+			renderPass.setPipeline(RenderSystem.getCompiledPipeline(pipeline));
 			RenderSystem.bindDefaultUniforms(renderPass);
 			renderPass.setUniform("DynamicTransforms", gpuBufferSlice);
 			renderPass.setVertexBuffer(0, vertexBuffer.slice());

@@ -9,12 +9,17 @@ package net.wurstclient.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalDouble;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.renderer.StagedVertexBuffer;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.wurstclient.WurstClient;
 
 /**
  * Simple wrapper around {@link StagedVertexBuffer} to replace Minecraft's
@@ -51,9 +56,20 @@ public final class WurstBufferSource
 				return;
 			
 			stagedBuffer.upload();
+			RenderTarget renderTarget =
+				WurstClient.MC.gameRenderer.mainRenderTarget();
 			
-			for(int i = 0; i < draws.size(); i++)
-				draw(drawTypes.get(i), draws.get(i));
+			try(RenderPass renderPass = RenderSystem.getDevice()
+				.createCommandEncoder()
+				.createRenderPass(() -> "WurstBufferSource",
+					renderTarget.getColorTextureView(), Optional.empty(),
+					renderTarget.getDepthTextureView(), OptionalDouble.empty()))
+			{
+				RenderSystem.bindDefaultUniforms(renderPass);
+				
+				for(int i = 0; i < draws.size(); i++)
+					draw(drawTypes.get(i), draws.get(i), renderPass);
+			}
 			
 			stagedBuffer.endDraw();
 			
@@ -65,11 +81,12 @@ public final class WurstBufferSource
 		}
 	}
 	
-	private void draw(RenderType type, StagedVertexBuffer.Draw draw)
+	private void draw(RenderType type, StagedVertexBuffer.Draw draw,
+		RenderPass renderPass)
 	{
 		StagedVertexBuffer.ExecuteInfo info = stagedBuffer.getExecuteInfo(draw);
 		
 		if(info != null)
-			type.prepare().drawFromBuffer(info);
+			type.prepare().drawFromBuffer(info, renderPass);
 	}
 }

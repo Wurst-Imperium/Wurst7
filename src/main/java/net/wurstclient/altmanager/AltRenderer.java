@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.yggdrasil.ProfileResult;
+import com.mojang.authlib.services.ProfileResult;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
