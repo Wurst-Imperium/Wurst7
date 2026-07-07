@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.List;
+
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.wurstclient.Category;
@@ -16,6 +18,9 @@ import net.wurstclient.hack.Hack;
 @DontSaveState
 public final class LsdHack extends Hack
 {
+	private static final Identifier LSD_POST_EFFECT =
+		Identifier.fromNamespaceAndPath("wurst", "lsd");
+	
 	public LsdHack()
 	{
 		super("LSD");
@@ -25,23 +30,21 @@ public final class LsdHack extends Hack
 	@Override
 	protected void onEnable()
 	{
-		if(!(MC.getCameraEntity() instanceof Player))
+		if(!(MC.getCameraEntity() instanceof Player) || MC.player == null)
 		{
 			setEnabled(false);
 			return;
 		}
 		
-		if(MC.gameRenderer.currentPostEffect() != null)
-			MC.gameRenderer.clearPostEffect();
-		
-		MC.gameRenderer
-			.setPostEffect(Identifier.fromNamespaceAndPath("wurst", "lsd"));
+		List<Identifier> activePostEffects = MC.player.getActivePostEffects();
+		if(!activePostEffects.contains(LSD_POST_EFFECT))
+			activePostEffects.add(LSD_POST_EFFECT);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		if(MC.gameRenderer.currentPostEffect() != null)
-			MC.gameRenderer.clearPostEffect();
+		if(MC.player != null)
+			MC.player.getActivePostEffects().remove(LSD_POST_EFFECT);
 	}
 }

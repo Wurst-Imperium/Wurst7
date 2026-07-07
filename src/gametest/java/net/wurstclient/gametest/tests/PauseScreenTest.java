@@ -27,14 +27,14 @@ public final class PauseScreenTest extends SingleplayerTest
 	{
 		logger.info("Opening game menu");
 		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
-		assertScreenshotEquals("game_menu", "https://i.imgur.com/ruPsaNz.png");
+		assertScreenshotEquals("game_menu", "https://i.imgur.com/WxuKtG6.png");
 		
 		logger.info("Opening Wurst Options screen");
 		for(int i = 0; i < 7; i++)
 			input.pressKey(GLFW.GLFW_KEY_TAB);
 		input.pressKey(GLFW.GLFW_KEY_ENTER);
 		assertScreenshotEquals("wurst_options_screen",
-			"https://i.imgur.com/ZCt7eiE.png");
+			"https://i.imgur.com/JpzrcP1.png");
 		// TODO: Test manager screens
 		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
 		

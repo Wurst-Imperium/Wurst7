@@ -7,40 +7,61 @@
  */
 package net.wurstclient.mixin;
 
+import java.util.Map.Entry;
+
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
 import net.minecraft.client.ClientClockManager;
+import net.minecraft.client.ClientClockManager.ClientClockInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.world.clock.WorldClock;
 import net.minecraft.world.clock.WorldClocks;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NoWeatherHack;
 
-@Mixin(ClientClockManager.class)
-public abstract class ClientClockManagerMixin
+@Mixin(ClientClockManager.ClientClockInstance.class)
+public abstract class ClientClockInstanceMixin
 {
 	/**
 	 * Modifies the total ticks returned for the overworld clock when NoWeather
 	 * is changing the time. This affects all timeline-based environment
 	 * attributes including sun/moon/star angles, sky colors, fog, etc.
 	 */
-	@ModifyReturnValue(method = "getTotalTicks", at = @At("RETURN"))
-	private long onGetTotalTicks(long original, Holder<WorldClock> definition)
+	@ModifyReturnValue(method = "totalTicks", at = @At("RETURN"))
+	private long onTotalTicks(long original)
 	{
-		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
-		
-		if(!noWeather.isTimeChanged())
+		if(!wurst_isOverworldClock())
 			return original;
 		
-		// Only modify the overworld clock
-		if(!definition.is(WorldClocks.OVERWORLD))
+		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
+		if(!noWeather.isTimeChanged())
 			return original;
 		
 		// Replace the time-of-day while keeping the day number
 		long dayNumber = original / 24000;
 		return dayNumber * 24000 + noWeather.getChangedTime();
+	}
+	
+	@Unique
+	private boolean wurst_isOverworldClock()
+	{
+		if(WurstClient.MC.level == null)
+			return false;
+		
+		ClientClockManager clockManager = WurstClient.MC.level.clockManager();
+		Object self = this;
+		
+		for(Entry<Holder<WorldClock>, ClientClockInstance> entry : clockManager.clocks
+			.entrySet())
+		{
+			if(entry.getValue() == self)
+				return entry.getKey().is(WorldClocks.OVERWORLD);
+		}
+		
+		return false;
 	}
 }

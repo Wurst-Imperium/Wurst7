@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.stream.StreamSupport;
 
-import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 
