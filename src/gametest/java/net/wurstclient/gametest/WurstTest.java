@@ -143,6 +143,7 @@ public class WurstTest implements FabricClientGameTest
 		
 		// Test special cases
 		new AttributeSwapMechanicTest(context, spContext).run();
+		new OcclusionCullingTest(context, spContext).run();
 		new PistonTest(context, spContext).run();
 	}
 	
