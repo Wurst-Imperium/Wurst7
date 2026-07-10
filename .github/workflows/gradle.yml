@@ -35,7 +35,7 @@ jobs:
       run: echo ${{ inputs.distinct_id }}
 
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Set up Java 25
       uses: actions/setup-java@v5
