@@ -44,7 +44,7 @@ public final class ModifyCmdTest extends SingleplayerTest
 		if(!name.equals("\u00a7cRed Name"))
 			throw new RuntimeException("Custom name is wrong: " + name);
 		runWurstCommand("viewcomp type name");
-		context.takeScreenshot("modify_command_result");
+		takeScreenshot("modify_command_result");
 		
 		// Clean up
 		clearInventory();

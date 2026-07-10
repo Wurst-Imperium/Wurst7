@@ -104,7 +104,7 @@ public class WurstTest implements FabricClientGameTest
 		
 		LOGGER.info("Recording debug menu");
 		input.pressKey(GLFW.GLFW_KEY_F3);
-		context.takeScreenshot("debug_menu");
+		takeScreenshot(context, "debug_menu");
 		input.pressKey(GLFW.GLFW_KEY_F3);
 		
 		LOGGER.info("Checking for broken mixins");

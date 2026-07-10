@@ -81,6 +81,7 @@ public final class OcclusionCullingTest extends SingleplayerTest
 			// This is based on the simplified render loop in
 			// ClientGameTestContextImpl.doTakeScreenshot().
 			// Just calling extract() alone can leave the game in a bad state.
+			mc.gameRenderer.update(DeltaTracker.ONE, true);
 			mc.gameRenderer.extract(DeltaTracker.ONE, true);
 			boolean actual = mc.gameRenderer
 				.getGameRenderState().levelRenderState.blockEntityRenderStates

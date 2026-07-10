@@ -154,7 +154,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		waitForBlock(0, 1, 3, Blocks.LEVER);
 		context.waitTicks(WurstTest.IS_SODIUM_INSTALLED ? 5 : 1);
 		world.waitForChunksRender();
-		context.takeScreenshot("freecam_interact_setup");
+		takeScreenshot("freecam_interact_setup");
 		
 		// Enable Freecam and fly to a side view
 		runWurstCommand("setslider Freecam horizontal_speed 0.95");
@@ -170,7 +170,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		context.waitTick();
 		world.waitForChunksRender();
-		context.takeScreenshot("freecam_interact_side_view");
+		takeScreenshot("freecam_interact_side_view");
 		
 		// Right click with "Interact from: Camera"
 		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);

@@ -35,6 +35,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotCompa
 import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotComparisonAlgorithm.RawImage;
 import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotComparisonAlgorithms.RawImageImpl;
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.commands.CommandSourceStack;
 
@@ -78,6 +79,17 @@ public enum WurstClientTestHelper
 			ClientGameTestContext.DEFAULT_TIMEOUT);
 	}
 	
+	public static Path takeScreenshot(ClientGameTestContext context,
+		String fileName)
+	{
+		ThreadingImpl.checkOnGametestThread("takeScreenshot");
+		// Workaround for https://github.com/FabricMC/fabric-api/issues/5466
+		// Remove once fixed.
+		context
+			.runOnClient(mc -> mc.gameRenderer.update(DeltaTracker.ONE, true));
+		return context.takeScreenshot(fileName);
+	}
+	
 	private static int waitForScreenshotMatchImpl(ClientGameTestContext context,
 		String fileName, String templateUrl, int maxAttempts)
 	{
@@ -93,7 +105,7 @@ public enum WurstClientTestHelper
 			if(i > 0)
 				context.waitTick();
 			
-			screenshotPath = context.takeScreenshot(fileName);
+			screenshotPath = takeScreenshot(context, fileName);
 			RawImage<int[]> rawScreenshot = RawImageImpl
 				.fromColorNativeImage(loadImageFile(screenshotPath));
 			RawImage<int[]> maskedScreenshot = applyMask(rawScreenshot, mask);

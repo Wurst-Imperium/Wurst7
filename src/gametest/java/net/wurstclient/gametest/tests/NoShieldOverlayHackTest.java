@@ -35,8 +35,7 @@ public final class NoShieldOverlayHackTest extends SingleplayerTest
 		
 		// Reference screenshot with no item or hand
 		moveHandOutOfView();
-		Path referencePath =
-			context.takeScreenshot("noshieldoverlay_reference");
+		Path referencePath = takeScreenshot("noshieldoverlay_reference");
 		
 		// Vanilla shield, should be lowered
 		testItem(referencePath, "normal shield", "shield", true);
@@ -80,13 +79,13 @@ public final class NoShieldOverlayHackTest extends SingleplayerTest
 		waitForHandSwing();
 		
 		// Hack off + idle
-		Path offIdlePath = context
-			.takeScreenshot("noshieldoverlay_" + nameForFiles + "_off_idle");
+		Path offIdlePath =
+			takeScreenshot("noshieldoverlay_" + nameForFiles + "_off_idle");
 		runWurstCommand("t NoShieldOverlay on");
 		
 		// Hack on + idle
-		Path onIdlePath = context
-			.takeScreenshot("noshieldoverlay_" + nameForFiles + "_on_idle");
+		Path onIdlePath =
+			takeScreenshot("noshieldoverlay_" + nameForFiles + "_on_idle");
 		assertItemMovement(name, "idle", shouldBeLowered, referencePath,
 			offIdlePath, onIdlePath);
 		runWurstCommand("t NoShieldOverlay off");
@@ -95,8 +94,8 @@ public final class NoShieldOverlayHackTest extends SingleplayerTest
 		input.holdMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
 		context.waitTick();
 		waitForHandSwing();
-		Path offBlockingPath = context.takeScreenshot(
-			"noshieldoverlay_" + nameForFiles + "_off_blocking");
+		Path offBlockingPath =
+			takeScreenshot("noshieldoverlay_" + nameForFiles + "_off_blocking");
 		input.releaseMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
 		
 		// Hack on + blocking
@@ -104,8 +103,8 @@ public final class NoShieldOverlayHackTest extends SingleplayerTest
 		input.holdMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
 		context.waitTick();
 		waitForHandSwing();
-		Path onBlockingPath = context
-			.takeScreenshot("noshieldoverlay_" + nameForFiles + "_on_blocking");
+		Path onBlockingPath =
+			takeScreenshot("noshieldoverlay_" + nameForFiles + "_on_blocking");
 		assertItemMovement(name, "blocking", shouldBeLowered, referencePath,
 			offBlockingPath, onBlockingPath);
 		input.releaseMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);

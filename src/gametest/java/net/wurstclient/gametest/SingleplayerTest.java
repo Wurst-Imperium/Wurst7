@@ -208,10 +208,15 @@ public abstract class SingleplayerTest
 			templateUrl);
 	}
 	
+	protected final Path takeScreenshot(String fileName)
+	{
+		return WurstClientTestHelper.takeScreenshot(context, fileName);
+	}
+	
 	protected final void failWithScreenshot(String fileName, String title,
 		String errorMessage)
 	{
-		Path screenshotPath = context.takeScreenshot(fileName);
+		Path screenshotPath = takeScreenshot(fileName);
 		
 		WurstClientTestHelper
 			.ghSummary("### " + title + "\n" + errorMessage + "\n");

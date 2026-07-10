@@ -38,14 +38,14 @@ public final class NoFallHackTest extends SingleplayerTest
 		logger.info("Falling 5 blocks with NoFall enabled");
 		runWurstCommand("t NoFall on");
 		fall5Blocks();
-		context.takeScreenshot("nofall_on_5_blocks");
+		takeScreenshot("nofall_on_5_blocks");
 		assertPlayerHealth(health -> health == 20);
 		
 		// Fall 5 blocks with NoFall disabled
 		logger.info("Falling 5 blocks with NoFall disabled");
 		runWurstCommand("t NoFall off");
 		fall5Blocks();
-		context.takeScreenshot("nofall_off_5_blocks");
+		takeScreenshot("nofall_off_5_blocks");
 		assertPlayerHealth(health -> health < 20);
 		
 		// Clean up
