@@ -6,6 +6,7 @@ accessible	method	net/minecraft/client/KeyboardHandler	keyPress	(JILnet/minecraf
 accessible	method	net/minecraft/client/Minecraft	startUseItem	()V
 accessible	method	net/minecraft/client/MouseHandler	onButton	(JLnet/minecraft/client/input/MouseButtonInfo;I)V
 accessible	method	net/minecraft/client/renderer/GameRenderer	setPostEffect	(Lnet/minecraft/resources/Identifier;)V
+accessible	method	net/minecraft/client/renderer/LevelRenderer	extractVisibleBlockEntities	(Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/state/LevelRenderState;)V
 accessible	method	net/minecraft/client/renderer/rendertype/RenderType	create	(Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;
 accessible	method	net/minecraft/core/component/DataComponentMap$Builder	setUnchecked	(Lnet/minecraft/core/component/DataComponentType;Ljava/lang/Object;)V
 accessible	method	net/minecraft/world/entity/animal/feline/Ocelot	isTrusting	()Z
