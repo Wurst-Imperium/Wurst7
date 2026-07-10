@@ -69,7 +69,7 @@ loom {
 	
 	runs {
 		clientGameTest {
-			vmArgs.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
+			jvmArguments.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
 		}
 		
 		clientWithMods {
@@ -80,9 +80,9 @@ loom {
 			inherit client
 			source = sourceSets.gametest
 			runDir = "build/run/clientGameTestWithMods"
-			vmArgs.add("-Dfabric.client.gametest")
-			vmArgs.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
-			programArgs.add("--username=Wurst-Bot")
+			jvmArguments.add("-Dfabric.client.gametest")
+			jvmArguments.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
+			programArguments.add("--username=Wurst-Bot")
 		}
 	}
 }
