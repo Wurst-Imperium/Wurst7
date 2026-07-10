@@ -34,7 +34,8 @@
     "mo_glass": "*"
   },
   "conflicts": {
-    "betterblockentities": ">=1.3.2 <1.3.4"
+    "betterblockentities": ">=1.3.2 <1.3.4",
+    "sodium": "<0.9.1-beta.3"
   },
   "breaks": {
     "wi_zoom": "*",
