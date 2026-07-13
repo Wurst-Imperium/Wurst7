@@ -1,2 +1,5 @@
 # Disable LF normalization
 * -text
+
+# Require LF for GitHub Actions workflows
+.github/workflows/*.yml text eol=lf
