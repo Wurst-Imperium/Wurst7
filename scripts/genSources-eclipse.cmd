@@ -10,5 +10,5 @@ echo.
 echo Generating sources and setting up Eclipse...
 cd ..
 call gradlew.bat genSources
-call gradlew.bat eclipse
+call gradlew.bat genEclipseRuns
 pause
