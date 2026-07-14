@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
 	id "net.fabricmc.fabric-loom" version "${loom_version}"
-	id "com.diffplug.spotless" version "8.6.0"
+	id "com.diffplug.spotless" version "8.8.0"
 	id "net.wimods.github-compile-summary" version "0.1.1"
 }
 
@@ -81,7 +81,6 @@ loom {
 			runDir = "build/run/clientGameTestWithMods"
 			jvmArguments.add("-Dfabric.client.gametest")
 			jvmArguments.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
-			jvmArguments.add("-Dwurst.test.withMods=true")
 			programArguments.add("--username=Wurst-Bot")
 		}
 	}
