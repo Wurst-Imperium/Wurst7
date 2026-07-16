@@ -38,7 +38,7 @@ public final class CactusPlantType extends AutoFarmPlantType
 	{
 		BlockPos floorPos = pos.below();
 		BlockState floor = BlockUtils.getState(floorPos);
-		if(!floor.is(BlockTags.SAND))
+		if(!floor.is(BlockTags.SUPPORTS_CACTUS))
 			return false;
 		
 		return Direction.Plane.HORIZONTAL.stream().map(pos::relative)

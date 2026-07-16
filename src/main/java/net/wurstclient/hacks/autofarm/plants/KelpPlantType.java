@@ -9,6 +9,7 @@ package net.wurstclient.hacks.autofarm.plants;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -44,7 +45,7 @@ public final class KelpPlantType extends AutoFarmPlantType
 			return false;
 		
 		BlockState floor = BlockUtils.getState(pos.below());
-		return !floor.is(Blocks.MAGMA_BLOCK)
+		return !floor.is(BlockTags.CANNOT_SUPPORT_KELP)
 			&& floor.isFaceSturdy(WurstClient.MC.level, pos, Direction.UP);
 	}
 	

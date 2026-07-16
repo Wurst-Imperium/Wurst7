@@ -31,7 +31,7 @@ public final class CocoaBeanPlantType extends AutoFarmPlantType
 	{
 		return Direction.Plane.HORIZONTAL.stream().map(pos::relative)
 			.map(BlockUtils::getState)
-			.anyMatch(neighbor -> neighbor.is(BlockTags.JUNGLE_LOGS));
+			.anyMatch(neighbor -> neighbor.is(BlockTags.SUPPORTS_COCOA));
 	}
 	
 	@Override

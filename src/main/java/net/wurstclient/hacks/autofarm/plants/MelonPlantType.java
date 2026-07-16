@@ -8,6 +8,7 @@
 package net.wurstclient.hacks.autofarm.plants;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -28,7 +29,8 @@ public final class MelonPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.below()).is(Blocks.FARMLAND);
+		return BlockUtils.getState(pos.below())
+			.is(BlockTags.SUPPORTS_MELON_STEM);
 	}
 	
 	@Override
