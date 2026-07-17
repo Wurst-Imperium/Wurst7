@@ -172,7 +172,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		target = null;
 		
 		// don't attack when a container/inventory screen is open
-		if(MC.screen instanceof AbstractContainerScreen)
+		if(MC.gui.screen() instanceof AbstractContainerScreen)
 			return;
 		
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();

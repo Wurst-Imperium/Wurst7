@@ -48,7 +48,7 @@ public final class BlockComponent extends Component
 		switch(mouseButton)
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
-			MC.setScreen(new EditBlockScreen(MC.screen, setting));
+			MC.gui.setScreen(new EditBlockScreen(MC.gui.screen(), setting));
 			break;
 			
 			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:

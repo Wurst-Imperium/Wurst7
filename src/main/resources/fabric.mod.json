@@ -26,12 +26,15 @@
   "accessWidener": "wurst.accesswidener",
   "depends": {
     "fabricloader": ">=0.18.3",
-    "fabric-api": ">=0.145.1",
-    "minecraft": "~26.1-pre.1",
+    "fabric-api": ">=0.150.3",
+    "minecraft": "~26.2-pre.4",
     "java": ">=25"
   },
   "suggests": {
     "mo_glass": "*"
+  },
+  "conflicts": {
+    "betterblockentities": ">=1.3.2 <1.3.4"
   },
   "breaks": {
     "wi_zoom": "*",
@@ -39,6 +42,9 @@
     "vulkanmod": "*"
   },
   "custom": {
+    "badoptimizations:cache_hooks": {
+      "lightmap": "net.wurstclient.hacks.fullbright.BadOptimizationsLightmapHook"
+    },
     "modmenu": {
       "links": {
         "modmenu.donate": "https://www.wurstclient.net/modmenu-donate/",

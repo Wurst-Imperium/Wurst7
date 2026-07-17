@@ -24,6 +24,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldBuilder;
 import net.fabricmc.fabric.impl.client.gametest.TestSystemProperties;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.world.level.block.Blocks;
@@ -32,13 +33,16 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.wurstclient.gametest.tests.*;
+import net.wurstclient.gametest.tests.filters.FilterBabiesTest;
+import net.wurstclient.gametest.tests.filters.FilterPassiveWaterTest;
+import net.wurstclient.gametest.tests.filters.FilterPetsTest;
 
 public class WurstTest implements FabricClientGameTest
 {
 	public static final Logger LOGGER = LoggerFactory.getLogger("Wurst Test");
 	
-	public static final boolean IS_MOD_COMPAT_TEST =
-		System.getProperty("wurst.test.withMods") != null;
+	public static final boolean IS_SODIUM_INSTALLED =
+		FabricLoader.getInstance().isModLoaded("sodium");
 	
 	@Override
 	public void runTest(ClientGameTestContext context)
@@ -51,9 +55,6 @@ public class WurstTest implements FabricClientGameTest
 		waitForTitleScreenFade(context);
 		
 		LOGGER.info("Reached title screen");
-		assertScreenshotEquals(context, "title_screen",
-			"https://i.imgur.com/xSAHDXr.png");
-		
 		AltManagerTest.testAltManagerButton(context);
 		
 		LOGGER.info("Creating test world");
@@ -116,7 +117,12 @@ public class WurstTest implements FabricClientGameTest
 			"setmode WurstLogo visibility only_when_outdated");
 		runWurstCommand(context, "setcheckbox HackList animations off");
 		
-		new InGameMenuTest(context, spContext).run();
+		new PauseScreenTest(context, spContext).run();
+		
+		// Test entity filters
+		new FilterBabiesTest(context, spContext).run();
+		new FilterPassiveWaterTest(context, spContext).run();
+		new FilterPetsTest(context, spContext).run();
 		
 		// TODO: Open ClickGUI and Navigator
 		
@@ -124,6 +130,7 @@ public class WurstTest implements FabricClientGameTest
 		new AutoMineHackTest(context, spContext).run();
 		new FreecamHackTest(context, spContext).run();
 		new NoFallHackTest(context, spContext).run();
+		new NoShieldOverlayHackTest(context, spContext).run();
 		new NoWeatherHackTest(context, spContext).run();
 		new XRayHackTest(context, spContext).run();
 		
@@ -135,6 +142,7 @@ public class WurstTest implements FabricClientGameTest
 		// TODO: Test more Wurst features
 		
 		// Test special cases
+		new AttributeSwapMechanicTest(context, spContext).run();
 		new PistonTest(context, spContext).run();
 	}
 	

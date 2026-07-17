@@ -96,8 +96,8 @@ public final class AutoArmorHack extends Hack
 		}
 		
 		// check screen
-		if(MC.screen instanceof AbstractContainerScreen
-			&& !(MC.screen instanceof InventoryScreen))
+		if(MC.gui.screen() instanceof AbstractContainerScreen
+			&& !(MC.gui.screen() instanceof InventoryScreen))
 			return;
 		
 		LocalPlayer player = MC.player;

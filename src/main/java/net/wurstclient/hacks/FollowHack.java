@@ -144,8 +144,10 @@ public final class FollowHack extends Hack
 		}
 		
 		// check if entity died or disappeared
-		if(entity.isRemoved() || entity instanceof LivingEntity
-			&& ((LivingEntity)entity).getHealth() <= 0)
+		if(entity == null || entity.isRemoved()
+			|| MC.level.getEntity(entity.getUUID()) == null
+			|| entity instanceof LivingEntity
+				&& ((LivingEntity)entity).getHealth() <= 0)
 		{
 			entity = StreamSupport
 				.stream(MC.level.entitiesForRendering().spliterator(), true)

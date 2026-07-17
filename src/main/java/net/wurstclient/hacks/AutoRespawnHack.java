@@ -44,7 +44,7 @@ public final class AutoRespawnHack extends Hack implements DeathListener
 	public void onDeath()
 	{
 		MC.player.respawn();
-		MC.setScreen(null);
+		MC.gui.setScreen(null);
 	}
 	
 	public boolean shouldShowButton()

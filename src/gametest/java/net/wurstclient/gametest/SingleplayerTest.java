@@ -46,9 +46,19 @@ public abstract class SingleplayerTest
 	public final void run()
 	{
 		runImpl();
-		waitForScreenshotMatch(
-			getClass().getSimpleName().toLowerCase() + "_cleanup",
-			"https://i.imgur.com/XF1SILt.png");
+		
+		String testName = getClass().getSimpleName();
+		int retries =
+			waitForScreenshotMatch(testName.toLowerCase() + "_cleanup",
+				"https://i.imgur.com/XF1SILt.png");
+		
+		if(retries > 0)
+			logger.warn(testName + " needed " + retries
+				+ " retries to get a valid cleanup screenshot. First view ALL"
+				+ " screenshots from " + testName + " to understand what"
+				+ " happened, then optionally retest. If this keeps happening,"
+				+ " your timings are probably wrong. Otherwise it's likely a"
+				+ " fluke, especially if you didn't change any gametest code.");
 	}
 	
 	/**
@@ -92,7 +102,7 @@ public abstract class SingleplayerTest
 	
 	protected final void clearChat()
 	{
-		context.runOnClient(mc -> mc.gui.getChat().clearMessages(true));
+		context.runOnClient(mc -> mc.gui.hud.getChat().clearMessages(true));
 	}
 	
 	protected final void clearInventory()
@@ -110,7 +120,7 @@ public abstract class SingleplayerTest
 	
 	protected final void clearToasts()
 	{
-		context.runOnClient(mc -> mc.getToastManager().clear());
+		context.runOnClient(mc -> mc.gui.toastManager().clear());
 	}
 	
 	protected final void assertOneItemInSlot(int slot, Item item)
@@ -131,10 +141,10 @@ public abstract class SingleplayerTest
 			templateUrl);
 	}
 	
-	protected final void waitForScreenshotMatch(String fileName,
+	protected final int waitForScreenshotMatch(String fileName,
 		String templateUrl)
 	{
-		WurstClientTestHelper.waitForScreenshotMatch(context, fileName,
+		return WurstClientTestHelper.waitForScreenshotMatch(context, fileName,
 			templateUrl);
 	}
 	

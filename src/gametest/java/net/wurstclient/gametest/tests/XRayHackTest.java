@@ -53,7 +53,7 @@ public final class XRayHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		world.waitForChunksRender();
 		waitForScreenshotMatch("xray_opacity",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/hXdzoDB.png"
+			WurstTest.IS_SODIUM_INSTALLED ? "https://i.imgur.com/hXdzoDB.png"
 				: "https://i.imgur.com/oZqevTx.png");
 		
 		// Exposed only + opacity
@@ -63,7 +63,7 @@ public final class XRayHackTest extends SingleplayerTest
 		input.pressKey(GLFW.GLFW_KEY_X);
 		world.waitForChunksRender();
 		waitForScreenshotMatch("xray_exposed_only_opacity",
-			WurstTest.IS_MOD_COMPAT_TEST ? "https://i.imgur.com/ZwIARSr.png"
+			WurstTest.IS_SODIUM_INSTALLED ? "https://i.imgur.com/ZwIARSr.png"
 				: "https://i.imgur.com/3DLxNuS.png");
 		
 		// Clean up

@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
 import net.minecraft.core.BlockPos;
 import net.wurstclient.Category;
@@ -177,12 +177,15 @@ public final class BaseFinderHack extends Hack
 			if(vertexBuffer != null)
 				vertexBuffer.close();
 			
-			vertexBuffer = EasyVertexBuffer.createAndUpload(Mode.QUADS,
-				DefaultVertexFormat.POSITION_COLOR, buffer -> {
-					for(int[] vertex : vertices)
-						buffer.addVertex(vertex[0] - region.x(), vertex[1],
-							vertex[2] - region.z()).setColor(0xFFFFFFFF);
-				});
+			vertexBuffer =
+				EasyVertexBuffer.createAndUpload(PrimitiveTopology.QUADS,
+					DefaultVertexFormat.POSITION_COLOR, buffer -> {
+						for(int[] vertex : vertices)
+							buffer
+								.addVertex(vertex[0] - region.x(), vertex[1],
+									vertex[2] - region.z())
+								.setColor(0xFFFFFFFF);
+					});
 			
 			lastRegion = region;
 		}

@@ -95,7 +95,7 @@ public final class ForcedChatReportsScreen extends Screen
 		
 		addRenderableWidget(Button
 			.builder(Component.translatable("gui.toMenu"),
-				b -> minecraft.setScreen(prevScreen))
+				b -> minecraft.gui.setScreen(prevScreen))
 			.bounds(buttonX, backButtonY, 200, 20).build());
 	}
 	

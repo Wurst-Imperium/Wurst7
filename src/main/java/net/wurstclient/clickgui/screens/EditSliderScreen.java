@@ -68,7 +68,7 @@ public final class EditSliderScreen extends Screen
 		if(MathUtils.isDouble(value))
 			slider.setValue(Double.parseDouble(value));
 		
-		minecraft.setScreen(prevScreen);
+		minecraft.gui.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -81,7 +81,7 @@ public final class EditSliderScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			minecraft.setScreen(prevScreen);
+			minecraft.gui.setScreen(prevScreen);
 			break;
 		}
 		

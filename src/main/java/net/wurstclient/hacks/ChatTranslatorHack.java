@@ -110,7 +110,7 @@ public final class ChatTranslatorHack extends Hack
 			fromLang.getValue(), toLang.getValue());
 		
 		if(translated != null)
-			MC.gui.getChat()
+			MC.gui.hud.getChat()
 				.addClientSystemMessage(toLang.prefixText(translated));
 	}
 	
