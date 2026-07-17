@@ -7,9 +7,9 @@
  */
 package net.wurstclient.gametest.tests;
 
-import java.util.function.Predicate;
+import com.mojang.blaze3d.platform.InputConstants;
 
-import org.lwjgl.glfw.GLFW;
+import java.util.function.Predicate;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -28,7 +28,7 @@ public final class NoFallHackTest extends SingleplayerTest
 	{
 		logger.info("Testing NoFall hack");
 		
-		input.pressKey(GLFW.GLFW_KEY_F5);
+		input.pressKey(InputConstants.KEY_F5);
 		runCommand("gamemode survival");
 		if(!context.computeOnClient(mc -> mc.player.onGround()))
 			throw new RuntimeException("Player is not on ground");
@@ -51,8 +51,8 @@ public final class NoFallHackTest extends SingleplayerTest
 		// Clean up
 		context.runOnClient(mc -> mc.player.heal(999));
 		runCommand("gamemode creative");
-		input.pressKey(GLFW.GLFW_KEY_F5);
-		input.pressKey(GLFW.GLFW_KEY_F5);
+		input.pressKey(InputConstants.KEY_F5);
+		input.pressKey(InputConstants.KEY_F5);
 		clearChat();
 		context.waitTicks(5);
 	}

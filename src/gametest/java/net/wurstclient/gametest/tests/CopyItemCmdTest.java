@@ -7,7 +7,7 @@
  */
 package net.wurstclient.gametest.tests;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -27,8 +27,8 @@ public final class CopyItemCmdTest extends SingleplayerTest
 	{
 		logger.info("Testing .copyitem command");
 		
-		input.pressKey(GLFW.GLFW_KEY_F5);
-		input.pressKey(GLFW.GLFW_KEY_F5);
+		input.pressKey(InputConstants.KEY_F5);
+		input.pressKey(InputConstants.KEY_F5);
 		clearInventory();
 		clearChat();
 		context.waitTick();
@@ -50,7 +50,7 @@ public final class CopyItemCmdTest extends SingleplayerTest
 		assertOneItemInSlot(39, Items.GOLDEN_HELMET);
 		
 		// Clean up
-		input.pressKey(GLFW.GLFW_KEY_F5);
+		input.pressKey(InputConstants.KEY_F5);
 		clearInventory();
 		clearChat();
 		waitForHandSwing();

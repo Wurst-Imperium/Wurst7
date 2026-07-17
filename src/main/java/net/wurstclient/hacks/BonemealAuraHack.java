@@ -207,7 +207,8 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		BlockState state = BlockUtils.getState(pos);
 		
 		if(!(block instanceof BonemealableBlock bmBlock)
-			|| !bmBlock.isValidBonemealTarget(MC.level, pos, state))
+			|| !bmBlock.isValidBonemealTarget(MC.level, pos, state,
+				BonemealSource.INTERACTION))
 			return false;
 		
 		if(block instanceof GrassBlock)

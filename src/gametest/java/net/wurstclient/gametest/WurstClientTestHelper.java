@@ -7,6 +7,8 @@
  */
 package net.wurstclient.gametest;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -21,7 +23,6 @@ import java.util.Base64;
 import java.util.UUID;
 
 import org.joml.Vector2i;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
 import com.mojang.blaze3d.platform.NativeImage;
@@ -245,9 +246,9 @@ public enum WurstClientTestHelper
 		String command)
 	{
 		TestInput input = context.getInput();
-		input.pressKey(GLFW.GLFW_KEY_T);
+		input.pressKey(InputConstants.KEY_T);
 		input.typeChars("." + command);
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
+		input.pressKey(InputConstants.KEY_RETURN);
 	}
 	
 	public static void ghSummary(String s)

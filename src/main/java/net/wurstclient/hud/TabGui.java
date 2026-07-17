@@ -7,11 +7,12 @@
  */
 package net.wurstclient.hud;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -77,7 +78,7 @@ public final class TabGui implements KeyPressListener
 	@Override
 	public void onKeyPress(KeyPressEvent event)
 	{
-		if(event.getAction() != GLFW.GLFW_PRESS)
+		if(event.getAction() != InputConstants.PRESS)
 			return;
 		
 		if(tabGuiOtf.isHidden())
@@ -86,7 +87,7 @@ public final class TabGui implements KeyPressListener
 		if(tabOpened)
 			switch(event.getKeyCode())
 			{
-				case GLFW.GLFW_KEY_LEFT:
+				case InputConstants.KEY_LEFT:
 				tabOpened = false;
 				break;
 				
@@ -97,21 +98,21 @@ public final class TabGui implements KeyPressListener
 		else
 			switch(event.getKeyCode())
 			{
-				case GLFW.GLFW_KEY_DOWN:
+				case InputConstants.KEY_DOWN:
 				if(selected < tabs.size() - 1)
 					selected++;
 				else
 					selected = 0;
 				break;
 				
-				case GLFW.GLFW_KEY_UP:
+				case InputConstants.KEY_UP:
 				if(selected > 0)
 					selected--;
 				else
 					selected = tabs.size() - 1;
 				break;
 				
-				case GLFW.GLFW_KEY_RIGHT:
+				case InputConstants.KEY_RIGHT:
 				tabOpened = true;
 				break;
 			}
@@ -221,21 +222,21 @@ public final class TabGui implements KeyPressListener
 		{
 			switch(keyCode)
 			{
-				case GLFW.GLFW_KEY_DOWN:
+				case InputConstants.KEY_DOWN:
 				if(selected < features.size() - 1)
 					selected++;
 				else
 					selected = 0;
 				break;
 				
-				case GLFW.GLFW_KEY_UP:
+				case InputConstants.KEY_UP:
 				if(selected > 0)
 					selected--;
 				else
 					selected = features.size() - 1;
 				break;
 				
-				case GLFW.GLFW_KEY_ENTER:
+				case InputConstants.KEY_RETURN:
 				onEnter();
 				break;
 			}

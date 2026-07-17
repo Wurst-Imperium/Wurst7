@@ -7,8 +7,6 @@
  */
 package net.wurstclient.options;
 
-import org.lwjgl.glfw.GLFW;
-
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -36,7 +34,7 @@ public class PressAKeyScreen extends Screen
 	@Override
 	public boolean keyPressed(KeyEvent event)
 	{
-		if(event.key() != GLFW.GLFW_KEY_ESCAPE)
+		if(event.key() != InputConstants.KEY_ESCAPE)
 			prevScreen.setKey(InputConstants.getKey(event).getName());
 		
 		minecraft.gui.setScreen((Screen)prevScreen);

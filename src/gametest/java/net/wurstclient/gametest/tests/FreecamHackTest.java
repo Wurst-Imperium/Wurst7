@@ -7,7 +7,7 @@
  */
 package net.wurstclient.gametest.tests;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -35,7 +35,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		logger.info("Testing Freecam hack");
 		
 		// Enable Freecam with default settings
-		input.pressKey(GLFW.GLFW_KEY_U);
+		input.pressKey(InputConstants.KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
 		assertScreenshotEquals("freecam_start_inside",
@@ -64,39 +64,39 @@ public final class FreecamHackTest extends SingleplayerTest
 				"Scrolling while using Freecam with \"Scroll to change speed\" disabled didn't change the selected slot.");
 		context.runOnClient(mc -> mc.player.getInventory().setSelectedSlot(0));
 		runWurstCommand("setcheckbox Freecam scroll_to_change_speed on");
-		input.pressKey(GLFW.GLFW_KEY_U);
+		input.pressKey(InputConstants.KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
 		
 		// Enable Freecam with initial position in front
 		runWurstCommand("setmode Freecam initial_position in_front");
-		input.pressKey(GLFW.GLFW_KEY_U);
+		input.pressKey(InputConstants.KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
 		assertScreenshotEquals("freecam_start_in_front",
 			"https://i.imgur.com/nrMP191.png");
-		input.pressKey(GLFW.GLFW_KEY_U);
+		input.pressKey(InputConstants.KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
 		
 		// Enable Freecam with initial position above
 		runWurstCommand("setmode Freecam initial_position above");
-		input.pressKey(GLFW.GLFW_KEY_U);
+		input.pressKey(InputConstants.KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
 		assertScreenshotEquals("freecam_start_above",
 			"https://i.imgur.com/3LbAtRj.png");
-		input.pressKey(GLFW.GLFW_KEY_U);
+		input.pressKey(InputConstants.KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
 		
 		// Revert to inside, then fly back and up a bit
 		runWurstCommand("setmode Freecam initial_position inside");
-		input.pressKey(GLFW.GLFW_KEY_U);
+		input.pressKey(InputConstants.KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
-		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
-		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
+		input.holdKeyFor(InputConstants.KEY_S, 2);
+		input.holdKeyFor(InputConstants.KEY_SPACE, 1);
 		context.waitTick();
 		assertScreenshotEquals("freecam_moved",
 			"https://i.imgur.com/SQPSG5S.png");
@@ -118,7 +118,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		// Enable player movement, walk forward, and turn around
 		runCommand("fill 0 -58 1 0 -58 2 smooth_stone");
 		runWurstCommand("setmode Freecam apply_input_to player");
-		input.holdKeyFor(GLFW.GLFW_KEY_W, 10);
+		input.holdKeyFor(InputConstants.KEY_W, 10);
 		for(int i = 0; i < 10; i++)
 		{
 			input.moveCursor(120, 0);
@@ -126,8 +126,8 @@ public final class FreecamHackTest extends SingleplayerTest
 		}
 		context.waitTick();
 		// Open and close chat to reset cursor position
-		input.pressKey(GLFW.GLFW_KEY_T);
-		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
+		input.pressKey(InputConstants.KEY_T);
+		input.pressKey(InputConstants.KEY_ESCAPE);
 		// Freeze the player's idle arm bob for a deterministic screenshot.
 		int playerTickCount =
 			context.computeOnClient(mc -> mc.player.tickCount);
@@ -136,7 +136,7 @@ public final class FreecamHackTest extends SingleplayerTest
 			"https://i.imgur.com/7LBoiaq.png");
 		context.runOnClient(mc -> mc.player.tickCount = playerTickCount);
 		runWurstCommand("setmode Freecam apply_input_to camera");
-		input.pressKey(GLFW.GLFW_KEY_U);
+		input.pressKey(InputConstants.KEY_U);
 		context.waitTick();
 		world.waitForChunksRender();
 		
@@ -158,8 +158,8 @@ public final class FreecamHackTest extends SingleplayerTest
 		
 		// Enable Freecam and fly to a side view
 		runWurstCommand("setslider Freecam horizontal_speed 0.95");
-		input.pressKey(GLFW.GLFW_KEY_U);
-		input.holdKeyFor(GLFW.GLFW_KEY_W, 3);
+		input.pressKey(InputConstants.KEY_U);
+		input.holdKeyFor(InputConstants.KEY_W, 3);
 		context.waitTick();
 		runWurstCommand("setslider Freecam horizontal_speed 1");
 		for(int i = 0; i < 6; i++)
@@ -167,20 +167,20 @@ public final class FreecamHackTest extends SingleplayerTest
 			input.moveCursor(120, 0);
 			context.waitTick();
 		}
-		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
+		input.holdKeyFor(InputConstants.KEY_S, 2);
 		context.waitTick();
 		world.waitForChunksRender();
 		context.takeScreenshot("freecam_interact_side_view");
 		
 		// Right click with "Interact from: Camera"
-		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+		input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT);
 		context.waitTick();
 		assertLeverState(0, -56, 1, false, "near lever, camera mode");
 		assertLeverState(0, -56, 3, true, "far lever, camera mode");
 		
 		// Right click with "Interact from: Player"
 		runWurstCommand("setmode Freecam interact_from player");
-		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+		input.pressMouse(InputConstants.MOUSE_BUTTON_RIGHT);
 		context.waitTick();
 		assertLeverState(0, -56, 1, true, "near lever, player mode");
 		assertLeverState(0, -56, 3, true, "far lever, player mode");
@@ -194,7 +194,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		
 		// Left click with "Interact from: Camera"
 		runWurstCommand("setmode Freecam interact_from camera");
-		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT);
+		input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT);
 		context.waitTick();
 		assertChickenHealth(nearChicken, false, "near chicken, camera mode");
 		assertChickenHealth(farChicken, true, "far chicken, camera mode");
@@ -204,7 +204,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		farChicken = spawnChicken(3.5);
 		context.waitTick();
 		runWurstCommand("setmode Freecam interact_from player");
-		input.pressMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT);
+		input.pressMouse(InputConstants.MOUSE_BUTTON_LEFT);
 		context.waitTick();
 		assertChickenHealth(nearChicken, true, "near chicken, player mode");
 		assertChickenHealth(farChicken, false, "far chicken, player mode");
@@ -213,7 +213,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		nearChicken.discard();
 		farChicken.discard();
 		runWurstCommand("setmode Freecam interact_from camera");
-		input.pressKey(GLFW.GLFW_KEY_U);
+		input.pressKey(InputConstants.KEY_U);
 		context.waitTicks(2);
 	}
 	

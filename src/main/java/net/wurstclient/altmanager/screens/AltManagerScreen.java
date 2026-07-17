@@ -7,6 +7,8 @@
  */
 package net.wurstclient.altmanager.screens;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,7 +25,6 @@ import java.util.Optional;
 import java.util.StringJoiner;
 
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonObject;
 
@@ -185,7 +186,7 @@ public final class AltManagerScreen extends Screen
 	@Override
 	public boolean keyPressed(KeyEvent context)
 	{
-		if(context.key() == GLFW.GLFW_KEY_ENTER)
+		if(context.key() == InputConstants.KEY_RETURN)
 			useButton.onPress(context);
 		
 		return super.keyPressed(context);
@@ -194,7 +195,7 @@ public final class AltManagerScreen extends Screen
 	@Override
 	public boolean mouseClicked(MouseButtonEvent context, boolean doubleClick)
 	{
-		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.button() == InputConstants.MOUSE_BUTTON_4)
 		{
 			onClose();
 			return true;
@@ -564,7 +565,7 @@ public final class AltManagerScreen extends Screen
 		public boolean mouseClicked(MouseButtonEvent context,
 			boolean doubleClick)
 		{
-			if(context.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+			if(context.button() != InputConstants.MOUSE_BUTTON_LEFT)
 				return false;
 			
 			long timeSinceLastClick = Util.getMillis() - lastClickTime;

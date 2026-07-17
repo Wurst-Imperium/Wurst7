@@ -7,11 +7,12 @@
  */
 package net.wurstclient.gametest;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import static net.wurstclient.gametest.WurstClientTestHelper.*;
 
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.MixinEnvironment;
@@ -100,18 +101,18 @@ public class WurstTest implements FabricClientGameTest
 			"https://i.imgur.com/EfzN9Cd.png");
 		
 		LOGGER.info("Recording debug menu");
-		input.pressKey(GLFW.GLFW_KEY_F3);
+		input.pressKey(InputConstants.KEY_F3);
 		context.takeScreenshot("debug_menu");
-		input.pressKey(GLFW.GLFW_KEY_F3);
+		input.pressKey(InputConstants.KEY_F3);
 		
 		LOGGER.info("Checking for broken mixins");
 		MixinEnvironment.getCurrentEnvironment().audit();
 		
 		LOGGER.info("Opening inventory");
-		input.pressKey(GLFW.GLFW_KEY_E);
+		input.pressKey(InputConstants.KEY_E);
 		assertScreenshotEquals(context, "inventory",
 			"https://i.imgur.com/LyQ5FSD.png");
-		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
+		input.pressKey(InputConstants.KEY_ESCAPE);
 		
 		runWurstCommand(context,
 			"setmode WurstLogo visibility only_when_outdated");

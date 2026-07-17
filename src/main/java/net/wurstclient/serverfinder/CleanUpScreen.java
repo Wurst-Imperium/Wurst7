@@ -7,11 +7,11 @@
  */
 package net.wurstclient.serverfinder;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-
-import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.SharedConstants;
@@ -195,7 +195,7 @@ public class CleanUpScreen extends Screen
 	@Override
 	public boolean keyPressed(KeyEvent context)
 	{
-		if(context.key() == GLFW.GLFW_KEY_ENTER)
+		if(context.key() == InputConstants.KEY_RETURN)
 			cleanUpButton.onPress(context);
 		
 		return super.keyPressed(context);
@@ -204,7 +204,7 @@ public class CleanUpScreen extends Screen
 	@Override
 	public boolean mouseClicked(MouseButtonEvent context, boolean doubleClick)
 	{
-		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.button() == InputConstants.MOUSE_BUTTON_4)
 		{
 			onClose();
 			return true;

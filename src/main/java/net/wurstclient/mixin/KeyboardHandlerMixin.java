@@ -25,7 +25,7 @@ public class KeyboardHandlerMixin
 	private void onOnKey(long windowHandle, int action, KeyEvent arg,
 		CallbackInfo ci)
 	{
-		EventManager.fire(new KeyPressEvent(arg.key(), arg.scancode(), action,
+		EventManager.fire(new KeyPressEvent(arg.key(), arg.keycode(), action,
 			arg.modifiers()));
 	}
 }

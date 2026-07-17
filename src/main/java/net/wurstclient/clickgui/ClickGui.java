@@ -7,6 +7,8 @@
  */
 package net.wurstclient.clickgui;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -19,7 +21,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -197,7 +198,7 @@ public final class ClickGui
 		int mouseX = (int)context.x();
 		int mouseY = (int)context.y();
 		int mouseButton = context.button();
-		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+		if(mouseButton == InputConstants.MOUSE_BUTTON_LEFT)
 			leftMouseButtonPressed = true;
 		
 		boolean popupClicked =
@@ -215,7 +216,7 @@ public final class ClickGui
 	public void handleMouseRelease(double mouseX, double mouseY,
 		int mouseButton)
 	{
-		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+		if(mouseButton == InputConstants.MOUSE_BUTTON_LEFT)
 			leftMouseButtonPressed = false;
 	}
 	
@@ -252,7 +253,7 @@ public final class ClickGui
 	public void handleNavigatorMouseClick(double cMouseX, double cMouseY,
 		int mouseButton, Window window, MouseButtonEvent context)
 	{
-		if(mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+		if(mouseButton == InputConstants.MOUSE_BUTTON_LEFT)
 			leftMouseButtonPressed = true;
 		
 		handleComponentMouseClick(window, cMouseX, cMouseY, mouseButton,
@@ -404,7 +405,7 @@ public final class ClickGui
 	private void handleTitleBarMouseClick(Window window, int mouseX, int mouseY,
 		int mouseButton)
 	{
-		if(mouseButton != 0)
+		if(mouseButton != InputConstants.MOUSE_BUTTON_LEFT)
 			return;
 		
 		if(mouseY < window.getY() + 2 || mouseY >= window.getY() + 11)
@@ -453,7 +454,7 @@ public final class ClickGui
 	private void handleScrollbarMouseClick(Window window, int mouseX,
 		int mouseY, int mouseButton)
 	{
-		if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+		if(mouseButton != InputConstants.MOUSE_BUTTON_LEFT)
 			return;
 		
 		if(mouseX >= window.getWidth() - 1)

@@ -7,8 +7,6 @@
  */
 package net.wurstclient.hacks.templatetool;
 
-import org.lwjgl.glfw.GLFW;
-
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -51,7 +49,7 @@ public abstract class SelectPositionState extends TemplateToolState
 	
 	private boolean isPressingEnter()
 	{
-		return InputConstants.isKeyDown(MC.getWindow(), GLFW.GLFW_KEY_ENTER);
+		return InputConstants.isKeyDown(InputConstants.KEY_RETURN);
 	}
 	
 	@Override

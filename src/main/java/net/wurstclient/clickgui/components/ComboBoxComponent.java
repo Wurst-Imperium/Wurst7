@@ -7,9 +7,9 @@
  */
 package net.wurstclient.clickgui.components;
 
-import java.util.Arrays;
+import com.mojang.blaze3d.platform.InputConstants;
 
-import org.lwjgl.glfw.GLFW;
+import java.util.Arrays;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -51,11 +51,11 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		
 		switch(mouseButton)
 		{
-			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
+			case InputConstants.MOUSE_BUTTON_LEFT:
 			handleLeftClick();
 			break;
 			
-			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
+			case InputConstants.MOUSE_BUTTON_RIGHT:
 			handleRightClick();
 			break;
 		}

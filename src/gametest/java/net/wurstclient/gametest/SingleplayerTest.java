@@ -7,9 +7,10 @@
  */
 package net.wurstclient.gametest;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.nio.file.Path;
 
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
@@ -107,9 +108,9 @@ public abstract class SingleplayerTest
 	
 	protected final void clearInventory()
 	{
-		input.pressKey(GLFW.GLFW_KEY_T);
+		input.pressKey(InputConstants.KEY_T);
 		input.typeChars("/clear");
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
+		input.pressKey(InputConstants.KEY_RETURN);
 		context.waitTicks(2);
 	}
 	

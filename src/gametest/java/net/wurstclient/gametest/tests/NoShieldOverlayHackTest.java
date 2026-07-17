@@ -7,11 +7,11 @@
  */
 package net.wurstclient.gametest.tests;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import static net.wurstclient.gametest.WurstClientTestHelper.*;
 
 import java.nio.file.Path;
-
-import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.platform.NativeImage;
 
@@ -92,23 +92,23 @@ public final class NoShieldOverlayHackTest extends SingleplayerTest
 		runWurstCommand("t NoShieldOverlay off");
 		
 		// Hack off + blocking
-		input.holdMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+		input.holdMouse(InputConstants.MOUSE_BUTTON_RIGHT);
 		context.waitTick();
 		waitForHandSwing();
 		Path offBlockingPath = context.takeScreenshot(
 			"noshieldoverlay_" + nameForFiles + "_off_blocking");
-		input.releaseMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+		input.releaseMouse(InputConstants.MOUSE_BUTTON_RIGHT);
 		
 		// Hack on + blocking
 		runWurstCommand("t NoShieldOverlay on");
-		input.holdMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+		input.holdMouse(InputConstants.MOUSE_BUTTON_RIGHT);
 		context.waitTick();
 		waitForHandSwing();
 		Path onBlockingPath = context
 			.takeScreenshot("noshieldoverlay_" + nameForFiles + "_on_blocking");
 		assertItemMovement(name, "blocking", shouldBeLowered, referencePath,
 			offBlockingPath, onBlockingPath);
-		input.releaseMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+		input.releaseMouse(InputConstants.MOUSE_BUTTON_RIGHT);
 		runWurstCommand("t NoShieldOverlay off");
 	}
 	

@@ -23,7 +23,6 @@ public final class AntiBlindHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See CameraMixin.onExtractRenderState(),
-	// LivingEntityMixin.onGetEffectFadeFactor(),
+	// See LivingEntityMixin.onGetEffectFadeFactor(),
 	// LocalPlayerMixin.hasEffect()
 }

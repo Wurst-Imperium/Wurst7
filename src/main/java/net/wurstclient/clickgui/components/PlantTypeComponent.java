@@ -7,7 +7,7 @@
  */
 package net.wurstclient.clickgui.components;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -52,14 +52,14 @@ public final class PlantTypeComponent extends Component
 		
 		switch(mouseButton)
 		{
-			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
+			case InputConstants.MOUSE_BUTTON_LEFT:
 			if(hHarvest)
 				setting.toggleHarvestingEnabled();
 			else
 				setting.toggleReplantingEnabled();
 			break;
 			
-			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
+			case InputConstants.MOUSE_BUTTON_RIGHT:
 			if(hHarvest)
 				setting.resetHarvestingEnabled();
 			else

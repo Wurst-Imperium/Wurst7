@@ -10,8 +10,6 @@ package net.wurstclient.navigator;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
-
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -109,8 +107,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			selectedKey = InputConstants.getKey(context).getName();
 			okButton.active = !selectedKey.equals("key.keyboard.unknown");
 			
-		}else if(context.key() == GLFW.GLFW_KEY_ESCAPE
-			|| context.key() == GLFW.GLFW_KEY_BACKSPACE)
+		}else if(context.key() == InputConstants.KEY_ESCAPE
+			|| context.key() == InputConstants.KEY_BACKSPACE)
 			minecraft.gui.setScreen(parent);
 	}
 	
@@ -133,7 +131,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		}
 		
 		// back button
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(button == InputConstants.MOUSE_BUTTON_4)
 		{
 			minecraft.gui.setScreen(parent);
 			return;

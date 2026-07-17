@@ -7,6 +7,8 @@
  */
 package net.wurstclient.navigator;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -16,7 +18,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -238,8 +239,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	{
 		int keyCode = context.key();
 		
-		if(keyCode == GLFW.GLFW_KEY_ESCAPE
-			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
+		if(keyCode == InputConstants.KEY_ESCAPE
+			|| keyCode == InputConstants.KEY_BACKSPACE)
 			goBack();
 	}
 	
@@ -255,7 +256,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 			return;
 		
 		// back button
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(button == InputConstants.MOUSE_BUTTON_4)
 		{
 			goBack();
 			return;
@@ -495,8 +496,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 	public void onClose()
 	{
 		window.close();
-		WurstClient.INSTANCE.getGui().handleMouseClick(new MouseButtonEvent(
-			Double.MIN_VALUE, Double.MIN_VALUE, new MouseButtonInfo(0, 0)));
+		WurstClient.INSTANCE.getGui().handleMouseClick(
+			new MouseButtonEvent(Double.MIN_VALUE, Double.MIN_VALUE,
+				new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)));
 	}
 	
 	public Feature getFeature()

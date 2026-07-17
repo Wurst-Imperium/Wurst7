@@ -72,7 +72,6 @@
     "xray.FluidRendererMixin",
     "xray.ModelBlockRendererMixin",
     "xray.SectionCompilerMixin",
-    "xray.indigo.AltModelBlockRendererImplMixin",
     "xray.sodium.AbstractBlockRenderContextMixin",
     "xray.sodium.BlockRendererMixin",
     "xray.sodium.DefaultFluidRendererMixin"

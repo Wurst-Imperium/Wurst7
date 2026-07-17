@@ -7,7 +7,7 @@
  */
 package net.wurstclient.gametest.tests;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -32,7 +32,7 @@ public final class XRayHackTest extends SingleplayerTest
 		// Enable X-Ray with default settings
 		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand("setslider X-Ray opacity 0");
-		input.pressKey(GLFW.GLFW_KEY_X);
+		input.pressKey(InputConstants.KEY_X);
 		world.waitForChunksRender();
 		waitForScreenshotMatch("xray_default",
 			"https://i.imgur.com/Dftamqv.png");
@@ -40,8 +40,8 @@ public final class XRayHackTest extends SingleplayerTest
 		// Exposed only
 		runWurstCommand("setcheckbox X-Ray only_show_exposed on");
 		runWurstCommand("setslider X-Ray opacity 0");
-		input.pressKey(GLFW.GLFW_KEY_X);
-		input.pressKey(GLFW.GLFW_KEY_X);
+		input.pressKey(InputConstants.KEY_X);
+		input.pressKey(InputConstants.KEY_X);
 		world.waitForChunksRender();
 		waitForScreenshotMatch("xray_exposed_only",
 			"https://i.imgur.com/QlEpQTu.png");
@@ -49,8 +49,8 @@ public final class XRayHackTest extends SingleplayerTest
 		// Opacity mode
 		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand("setslider X-Ray opacity 0.5");
-		input.pressKey(GLFW.GLFW_KEY_X);
-		input.pressKey(GLFW.GLFW_KEY_X);
+		input.pressKey(InputConstants.KEY_X);
+		input.pressKey(InputConstants.KEY_X);
 		world.waitForChunksRender();
 		waitForScreenshotMatch("xray_opacity",
 			WurstTest.IS_SODIUM_INSTALLED ? "https://i.imgur.com/hXdzoDB.png"
@@ -59,8 +59,8 @@ public final class XRayHackTest extends SingleplayerTest
 		// Exposed only + opacity
 		runWurstCommand("setcheckbox X-Ray only_show_exposed on");
 		runWurstCommand("setslider X-Ray opacity 0.5");
-		input.pressKey(GLFW.GLFW_KEY_X);
-		input.pressKey(GLFW.GLFW_KEY_X);
+		input.pressKey(InputConstants.KEY_X);
+		input.pressKey(InputConstants.KEY_X);
 		world.waitForChunksRender();
 		waitForScreenshotMatch("xray_exposed_only_opacity",
 			WurstTest.IS_SODIUM_INSTALLED ? "https://i.imgur.com/ZwIARSr.png"
@@ -71,7 +71,7 @@ public final class XRayHackTest extends SingleplayerTest
 		waitForBlock(5, 5, 7, Blocks.AIR);
 		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand("setslider X-Ray opacity 0");
-		input.pressKey(GLFW.GLFW_KEY_X);
+		input.pressKey(InputConstants.KEY_X);
 		world.waitForChunksRender();
 		clearChat();
 	}
