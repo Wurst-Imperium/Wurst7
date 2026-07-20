@@ -30,10 +30,11 @@ public final class WeepingVinesPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		BlockState ceiling = BlockUtils.getState(pos.above());
-		return !ceiling.is(Blocks.WEEPING_VINES)
-			&& !ceiling.is(Blocks.WEEPING_VINES_PLANT)
-			&& ceiling.isFaceSturdy(WurstClient.MC.level, pos, Direction.DOWN);
+		BlockPos ceilPos = pos.above();
+		BlockState ceilState = BlockUtils.getState(ceilPos);
+		return !ceilState.is(Blocks.WEEPING_VINES)
+			&& !ceilState.is(Blocks.WEEPING_VINES_PLANT) && ceilState
+				.isFaceSturdy(WurstClient.MC.level, ceilPos, Direction.DOWN);
 	}
 	
 	@Override
