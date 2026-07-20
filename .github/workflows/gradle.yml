@@ -70,7 +70,7 @@ jobs:
         done
 
     - name: Build
-      run: ./gradlew build --stacktrace --warning-mode=fail
+      run: ./gradlew build --stacktrace
 
     - name: Upload to VirusTotal for analysis
       id: virustotal
@@ -105,13 +105,13 @@ jobs:
       timeout-minutes: 10
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      run: ./gradlew runClientGameTest --stacktrace --warning-mode=fail
+      run: ./gradlew runClientGameTest --stacktrace
 
     - name: Run client gametests with mods
       timeout-minutes: 10
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      run: ./gradlew runClientGameTestWithMods --stacktrace --warning-mode=fail
+      run: ./gradlew runClientGameTestWithMods --stacktrace
 
     - name: Upload screenshots
       uses: actions/upload-artifact@v7

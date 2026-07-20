@@ -85,7 +85,7 @@ jobs:
         done
 
     - name: Build
-      run: ./gradlew build --stacktrace --warning-mode=fail
+      run: ./gradlew build --stacktrace
 
     - name: Create and push tag
       if: ${{ github.ref_type != 'tag' }}

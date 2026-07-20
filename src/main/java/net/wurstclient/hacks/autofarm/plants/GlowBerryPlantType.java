@@ -29,9 +29,10 @@ public final class GlowBerryPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		BlockState ceiling = BlockUtils.getState(pos.above());
-		return !(ceiling.getBlock() instanceof CaveVines)
-			&& ceiling.isFaceSturdy(WurstClient.MC.level, pos, Direction.DOWN);
+		BlockPos ceilPos = pos.above();
+		BlockState ceilState = BlockUtils.getState(ceilPos);
+		return !(ceilState.getBlock() instanceof CaveVines) && ceilState
+			.isFaceSturdy(WurstClient.MC.level, ceilPos, Direction.DOWN);
 	}
 	
 	@Override

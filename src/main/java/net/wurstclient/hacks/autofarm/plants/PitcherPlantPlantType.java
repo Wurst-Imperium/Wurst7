@@ -43,7 +43,6 @@ public final class PitcherPlantPlantType extends AutoFarmPlantType
 	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
-		// field_43240 is MAX_AGE
 		return state.is(Blocks.PITCHER_CROP)
 			&& state.getValue(PitcherCropBlock.AGE) >= PitcherCropBlock.MAX_AGE;
 	}
