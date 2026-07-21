@@ -130,6 +130,7 @@ public class WurstTest implements FabricClientGameTest
 		new AutoMineHackTest(context, spContext).run();
 		new BlinkHackSmokeTest(context, spContext).run();
 		new FreecamHackTest(context, spContext).run();
+		new LsdHackTest(context, spContext).run();
 		new NoFallHackTest(context, spContext).run();
 		new NoShieldOverlayHackTest(context, spContext).run();
 		new NoWeatherHackTest(context, spContext).run();
