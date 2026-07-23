@@ -175,11 +175,10 @@ public abstract class SingleplayerTest
 		}
 	}
 	
-	protected final void waitForBlock(int relX, int relY, int relZ, Block block)
+	protected final void waitForBlock(int x, int y, int z, Block block)
 	{
-		context.waitFor(mc -> mc.level
-			.getBlockState(mc.player.blockPosition().offset(relX, relY, relZ))
-			.getBlock() == block);
+		BlockPos pos = new BlockPos(x, y, z);
+		context.waitFor(mc -> mc.level.getBlockState(pos).getBlock() == block);
 	}
 	
 	/**

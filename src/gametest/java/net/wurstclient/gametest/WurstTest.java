@@ -89,8 +89,8 @@ public class WurstTest implements FabricClientGameTest
 		
 		runCommand(server, "time set noon");
 		runCommand(server, "tp 0 -57 0");
-		runCommand(server, "fill ~ ~-3 ~ ~ ~-1 ~ smooth_stone");
-		runCommand(server, "fill ~-12 ~-3 ~10 ~12 ~9 ~10 smooth_stone");
+		runCommand(server, "fill 0 -60 0 0 -58 0 smooth_stone");
+		runCommand(server, "fill -12 -60 10 12 -48 10 smooth_stone");
 		
 		LOGGER.info("Loading chunks");
 		context.waitTicks(2);

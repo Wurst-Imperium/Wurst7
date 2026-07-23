@@ -27,10 +27,9 @@ public final class AutoMineHackTest extends SingleplayerTest
 		runCommand("gamemode survival");
 		
 		// Break a dirt block in survival mode
-		runCommand("setblock ~ ~1 ~2 minecraft:dirt");
-		waitForBlock(0, 1, 2, Blocks.DIRT);
+		setBlocksAndWait(blocks -> blocks.set(0, -56, 2, Blocks.DIRT));
 		runWurstCommand("t AutoMine on");
-		waitForBlock(0, 1, 2, Blocks.AIR);
+		waitForBlock(0, -56, 2, Blocks.AIR);
 		context.waitTick();
 		world.waitForChunksRender();
 		context.takeScreenshot("automine_survival");
