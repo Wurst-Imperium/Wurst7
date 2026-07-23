@@ -34,7 +34,8 @@ public final class LsdHackTest extends SingleplayerTest
 		
 		// Swap gray smooth stone background with red wool so that
 		// the hue shift is easy to detect
-		fillAndWait(-12, -60, 10, 12, -48, 10, Blocks.WOOL.red());
+		setBlocksAndWait(blocks -> blocks.fill(-12, -60, 10, 12, -48, 10,
+			Blocks.WOOL.red()));
 		context.waitTick();
 		Path disabledPath = context.takeScreenshot("lsd_disabled");
 		
@@ -53,7 +54,8 @@ public final class LsdHackTest extends SingleplayerTest
 		runWurstCommand("t LSD off");
 		waitFor(mc -> mc.gameRenderer.currentPostEffect() == null,
 			"LSD post-effect did not deactivate.");
-		fillAndWait(-12, -60, 10, 12, -48, 10, Blocks.SMOOTH_STONE);
+		setBlocksAndWait(blocks -> blocks.fill(-12, -60, 10, 12, -48, 10,
+			Blocks.SMOOTH_STONE));
 	}
 	
 	private void assertLsdChangedImage(Path disabledPath, Path enabledPath)

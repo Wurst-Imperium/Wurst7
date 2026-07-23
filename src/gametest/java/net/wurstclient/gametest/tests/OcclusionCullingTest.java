@@ -34,8 +34,8 @@ public final class OcclusionCullingTest extends SingleplayerTest
 		// Prepare test rig
 		logger.info("Testing occlusion culling in Freecam");
 		teleportPlayer(200, -60, 200);
-		setBlockAndWait(200, -56, 248, Blocks.CHEST.defaultBlockState()
-			.setValue(ChestBlock.FACING, Direction.NORTH));
+		setBlocksAndWait(blocks -> blocks.set(200, -56, 248, Blocks.CHEST
+			.defaultBlockState().setValue(ChestBlock.FACING, Direction.NORTH)));
 		fillSurroundingSections(Blocks.SMOOTH_STONE);
 		
 		// Test that the chest is hidden without Freecam
@@ -51,7 +51,7 @@ public final class OcclusionCullingTest extends SingleplayerTest
 		// Clean up
 		context.runOnClient(
 			_ -> WurstClient.INSTANCE.getHax().freecamHack.setEnabled(false));
-		setBlockAndWait(200, -56, 248, Blocks.AIR);
+		setBlocksAndWait(blocks -> blocks.set(200, -56, 248, Blocks.AIR));
 		fillSurroundingSections(Blocks.AIR);
 		teleportPlayer(0, -57, 0);
 	}
@@ -66,11 +66,13 @@ public final class OcclusionCullingTest extends SingleplayerTest
 	
 	private void fillSurroundingSections(Block block)
 	{
-		fillAndWait(192, -60, 208, 207, -49, 223, block);
-		fillAndWait(192, -60, 176, 207, -49, 191, block);
-		fillAndWait(208, -60, 192, 223, -49, 207, block);
-		fillAndWait(176, -60, 192, 191, -49, 207, block);
-		fillAndWait(192, -48, 192, 207, -33, 207, block);
+		setBlocksAndWait(blocks -> {
+			blocks.fill(192, -60, 208, 207, -49, 223, block);
+			blocks.fill(192, -60, 176, 207, -49, 191, block);
+			blocks.fill(208, -60, 192, 223, -49, 207, block);
+			blocks.fill(176, -60, 192, 191, -49, 207, block);
+			blocks.fill(192, -48, 192, 207, -33, 207, block);
+		});
 	}
 	
 	private void assertChestVisibility(boolean expected, String errorMsg)
