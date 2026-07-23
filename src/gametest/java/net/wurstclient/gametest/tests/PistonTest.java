@@ -10,9 +10,9 @@ package net.wurstclient.gametest.tests;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.piston.PistonBaseBlock;
-import net.wurstclient.gametest.BlockTestHelper;
 import net.wurstclient.gametest.SingleplayerTest;
 
 public final class PistonTest extends SingleplayerTest
@@ -29,19 +29,23 @@ public final class PistonTest extends SingleplayerTest
 		logger.info(
 			"Testing that a piston can extend and retract without crashing the game");
 		
-		// Place a redstone block and piston
+		// Place a piston and power it
 		setBlocksAndWait(
 			blocks -> blocks.set(0, -56, 2, Blocks.PISTON.defaultBlockState()
 				.setValue(PistonBaseBlock.FACING, Direction.UP)));
-		runCommand("setblock 0 -57 2 minecraft:redstone_block");
-		BlockTestHelper.waitForBlock(context, 0, -57, 2, Blocks.REDSTONE_BLOCK);
+		setBlocksAndWait(blocks -> {
+			blocks.setUpdateFlags(Block.UPDATE_ALL);
+			blocks.set(0, -57, 2, Blocks.REDSTONE_BLOCK);
+		});
 		context.waitTicks(3);
 		world.waitForChunksRender();
 		context.takeScreenshot("piston_extended");
 		
-		// Destroy the redstone block
-		runCommand("setblock 0 -57 2 minecraft:air");
-		BlockTestHelper.waitForBlock(context, 0, -57, 2, Blocks.AIR);
+		// Unpower the piston
+		setBlocksAndWait(blocks -> {
+			blocks.setUpdateFlags(Block.UPDATE_ALL);
+			blocks.set(0, -57, 2, Blocks.AIR);
+		});
 		context.waitTicks(3);
 		world.waitForChunksRender();
 		context.takeScreenshot("piston_retracted");

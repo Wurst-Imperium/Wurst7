@@ -48,7 +48,7 @@ public enum BlockTestHelper
 		
 		server.runOnServer(mc -> batch.blocks
 			.forEach((pos, state) -> mc.getLevel(Level.OVERWORLD).setBlock(pos,
-				state, Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_CLIENTS)));
+				state, batch.updateFlags)));
 		context.waitFor(
 			mc -> batch.blocks.entrySet().stream().allMatch(entry -> mc.level
 				.getBlockState(entry.getKey()) == entry.getValue()));
@@ -59,6 +59,8 @@ public enum BlockTestHelper
 	{
 		private final LinkedHashMap<BlockPos, BlockState> blocks =
 			new LinkedHashMap<>();
+		private int updateFlags =
+			Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_CLIENTS;
 		
 		public void set(BlockPos pos, BlockState state)
 		{
@@ -100,6 +102,15 @@ public enum BlockTestHelper
 			Block block)
 		{
 			fill(x1, y1, z1, x2, y2, z2, block.defaultBlockState());
+		}
+		
+		public void setUpdateFlags(int updateFlags)
+		{
+			if((updateFlags & Block.UPDATE_CLIENTS) == 0)
+				throw new IllegalArgumentException(
+					"Update flags must include Block.UPDATE_CLIENTS");
+			
+			this.updateFlags = updateFlags;
 		}
 	}
 }
