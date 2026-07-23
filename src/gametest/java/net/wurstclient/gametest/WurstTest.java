@@ -89,8 +89,10 @@ public class WurstTest implements FabricClientGameTest
 		
 		runCommand(server, "time set noon");
 		runCommand(server, "tp 0 -57 0");
-		runCommand(server, "fill 0 -60 0 0 -58 0 smooth_stone");
-		runCommand(server, "fill -12 -60 10 12 -48 10 smooth_stone");
+		BlockTestHelper.setBlocksAndWait(context, spContext, blocks -> {
+			blocks.fill(0, -60, 0, 0, -58, 0, Blocks.SMOOTH_STONE);
+			blocks.fill(-12, -60, 10, 12, -48, 10, Blocks.SMOOTH_STONE);
+		});
 		
 		LOGGER.info("Loading chunks");
 		context.waitTicks(2);

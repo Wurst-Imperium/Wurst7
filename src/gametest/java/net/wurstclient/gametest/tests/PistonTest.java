@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.piston.PistonBaseBlock;
+import net.wurstclient.gametest.BlockTestHelper;
 import net.wurstclient.gametest.SingleplayerTest;
 
 public final class PistonTest extends SingleplayerTest
@@ -33,14 +34,14 @@ public final class PistonTest extends SingleplayerTest
 			blocks -> blocks.set(0, -56, 2, Blocks.PISTON.defaultBlockState()
 				.setValue(PistonBaseBlock.FACING, Direction.UP)));
 		runCommand("setblock 0 -57 2 minecraft:redstone_block");
-		waitForBlock(0, -57, 2, Blocks.REDSTONE_BLOCK);
+		BlockTestHelper.waitForBlock(context, 0, -57, 2, Blocks.REDSTONE_BLOCK);
 		context.waitTicks(3);
 		world.waitForChunksRender();
 		context.takeScreenshot("piston_extended");
 		
 		// Destroy the redstone block
 		runCommand("setblock 0 -57 2 minecraft:air");
-		waitForBlock(0, -57, 2, Blocks.AIR);
+		BlockTestHelper.waitForBlock(context, 0, -57, 2, Blocks.AIR);
 		context.waitTicks(3);
 		world.waitForChunksRender();
 		context.takeScreenshot("piston_retracted");
