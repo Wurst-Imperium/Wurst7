@@ -174,6 +174,20 @@ public enum WurstClientTestHelper
 		return new RawImageImpl<>(width, height, outData);
 	}
 	
+	public static int getColorDifference(int color1, int color2)
+	{
+		int red1 = color1 & 0xFF;
+		int green1 = color1 >> 8 & 0xFF;
+		int blue1 = color1 >> 16 & 0xFF;
+		
+		int red2 = color2 & 0xFF;
+		int green2 = color2 >> 8 & 0xFF;
+		int blue2 = color2 >> 16 & 0xFF;
+		
+		return Math.abs(red1 - red2) + Math.abs(green1 - green2)
+			+ Math.abs(blue1 - blue2);
+	}
+	
 	public static NativeImage loadImageFile(Path path)
 	{
 		try(InputStream inputStream = Files.newInputStream(path))

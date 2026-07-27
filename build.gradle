@@ -102,6 +102,14 @@ def optionalCompatMods = [
 	badoptimizations: [
 		artifact: "badoptimizations",
 		property: "badoptimizations_version"
+	],
+	shoulder_surfing: [
+		artifact: "shoulder-surfing-reloaded",
+		property: "shoulder_surfing_version"
+	],
+	forge_config_api_port: [
+		artifact: "forge-config-api-port",
+		property: "forge_config_api_port_version"
 	]
 ]
 
