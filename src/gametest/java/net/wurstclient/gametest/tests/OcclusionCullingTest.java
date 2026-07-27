@@ -32,27 +32,24 @@ public final class OcclusionCullingTest extends SingleplayerTest
 		// Prepare test rig
 		logger.info("Testing occlusion culling in Freecam");
 		teleportPlayer(200, -60, 200);
-		setBlockAndWait(200, -56, 248, Blocks.CHEST.defaultBlockState()
-			.setValue(ChestBlock.FACING, Direction.NORTH));
+		setBlocksAndWait(blocks -> blocks.set(200, -56, 248, Blocks.CHEST
+			.defaultBlockState().setValue(ChestBlock.FACING, Direction.NORTH)));
 		fillSurroundingSections(Blocks.SMOOTH_STONE);
 		
 		// Test that the chest is hidden without Freecam
-		// Changing FOV makes the visibility graph refresh.
-		context.runOnClient(mc -> mc.options.fov().set(71));
 		assertChestVisibility(false,
 			"Occlusion culling did not hide the test chest");
 		
 		// Test that the chest becomes visible with Freecam
 		context.runOnClient(
 			_ -> WurstClient.INSTANCE.getHax().freecamHack.setEnabled(true));
-		context.runOnClient(mc -> mc.options.fov().set(70));
 		assertChestVisibility(true,
 			"Occlusion culling was not disabled in Freecam");
 		
 		// Clean up
 		context.runOnClient(
 			_ -> WurstClient.INSTANCE.getHax().freecamHack.setEnabled(false));
-		setBlockAndWait(200, -56, 248, Blocks.AIR);
+		setBlocksAndWait(blocks -> blocks.set(200, -56, 248, Blocks.AIR));
 		fillSurroundingSections(Blocks.AIR);
 		teleportPlayer(0, -57, 0);
 	}
@@ -67,17 +64,24 @@ public final class OcclusionCullingTest extends SingleplayerTest
 	
 	private void fillSurroundingSections(Block block)
 	{
-		fillAndWait(192, -60, 208, 207, -49, 223, block);
-		fillAndWait(192, -60, 176, 207, -49, 191, block);
-		fillAndWait(208, -60, 192, 223, -49, 207, block);
-		fillAndWait(176, -60, 192, 191, -49, 207, block);
-		fillAndWait(192, -48, 192, 207, -33, 207, block);
+		setBlocksAndWait(blocks -> {
+			blocks.fill(192, -60, 208, 207, -49, 223, block);
+			blocks.fill(192, -60, 176, 207, -49, 191, block);
+			blocks.fill(208, -60, 192, 223, -49, 207, block);
+			blocks.fill(176, -60, 192, 191, -49, 207, block);
+			blocks.fill(192, -48, 192, 207, -33, 207, block);
+		});
 	}
 	
 	private void assertChestVisibility(boolean expected, String errorMsg)
 	{
 		BlockPos chestPos = new BlockPos(200, -56, 248);
 		waitFor(mc -> {
+			// Changing FOV makes the visibility graph refresh. Alternate it on
+			// every attempt so retries can recover from a premature refresh.
+			int fov = mc.options.fov().get();
+			mc.options.fov().set(fov == 70 ? 71 : 70);
+			
 			// This is based on the simplified render loop in
 			// ClientGameTestContextImpl.doTakeScreenshot().
 			// Just calling extract() alone can leave the game in a bad state.
@@ -90,5 +94,6 @@ public final class OcclusionCullingTest extends SingleplayerTest
 			mc.gameRenderer.render(DeltaTracker.ONE, true);
 			return actual == expected;
 		}, 20, errorMsg);
+		context.runOnClient(mc -> mc.options.fov().set(70));
 	}
 }
