@@ -67,10 +67,6 @@ loom {
 	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
 	
 	runs {
-		clientGameTest {
-			jvmArguments.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
-		}
-		
 		clientWithMods {
 			inherit client
 		}
@@ -80,7 +76,6 @@ loom {
 			source = sourceSets.gametest
 			runDir = "build/run/clientGameTestWithMods"
 			jvmArguments.add("-Dfabric.client.gametest")
-			jvmArguments.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
 			programArguments.add("--username=Wurst-Bot")
 		}
 	}
