@@ -33,7 +33,7 @@ public final class XRayHackTest extends SingleplayerTest
 		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand("setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		waitForScreenshotMatch("xray_default",
 			"https://i.imgur.com/Dftamqv.png");
 		
@@ -42,7 +42,7 @@ public final class XRayHackTest extends SingleplayerTest
 		runWurstCommand("setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		input.pressKey(GLFW.GLFW_KEY_X);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		waitForScreenshotMatch("xray_exposed_only",
 			"https://i.imgur.com/QlEpQTu.png");
 		
@@ -51,7 +51,7 @@ public final class XRayHackTest extends SingleplayerTest
 		runWurstCommand("setslider X-Ray opacity 0.5");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		input.pressKey(GLFW.GLFW_KEY_X);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		waitForScreenshotMatch("xray_opacity",
 			WurstTest.IS_SODIUM_INSTALLED ? "https://i.imgur.com/hXdzoDB.png"
 				: "https://i.imgur.com/oZqevTx.png");
@@ -61,7 +61,7 @@ public final class XRayHackTest extends SingleplayerTest
 		runWurstCommand("setslider X-Ray opacity 0.5");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		input.pressKey(GLFW.GLFW_KEY_X);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		waitForScreenshotMatch("xray_exposed_only_opacity",
 			WurstTest.IS_SODIUM_INSTALLED ? "https://i.imgur.com/ZwIARSr.png"
 				: "https://i.imgur.com/3DLxNuS.png");
@@ -72,7 +72,7 @@ public final class XRayHackTest extends SingleplayerTest
 		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand("setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		clearChat();
 	}
 	

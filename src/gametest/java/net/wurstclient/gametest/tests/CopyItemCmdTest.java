@@ -37,7 +37,7 @@ public final class CopyItemCmdTest extends SingleplayerTest
 		runCommand("item replace entity @s armor.head with golden_helmet");
 		clearToasts();
 		context.waitTicks(2);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		context.takeScreenshot("copyitem_command_setup");
 		assertNoItemInSlot(0);
 		assertOneItemInSlot(39, Items.GOLDEN_HELMET);

@@ -32,14 +32,14 @@ public final class PistonTest extends SingleplayerTest
 		runCommand("setblock ~ ~ ~2 minecraft:redstone_block");
 		waitForBlock(0, 0, 2, Blocks.REDSTONE_BLOCK);
 		context.waitTicks(3);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		context.takeScreenshot("piston_extended");
 		
 		// Destroy the redstone block
 		runCommand("setblock ~ ~ ~2 minecraft:air");
 		waitForBlock(0, 0, 2, Blocks.AIR);
 		context.waitTicks(3);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		context.takeScreenshot("piston_retracted");
 		
 		// Clean up
@@ -47,6 +47,6 @@ public final class PistonTest extends SingleplayerTest
 		waitForBlock(0, 1, 2, Blocks.AIR);
 		clearChat();
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 	}
 }

@@ -19,11 +19,10 @@ import org.spongepowered.asm.mixin.MixinEnvironment;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldBuilder;
-import net.fabricmc.fabric.impl.client.gametest.TestSystemProperties;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
@@ -47,9 +46,6 @@ public class WurstTest implements FabricClientGameTest
 	@Override
 	public void runTest(ClientGameTestContext context)
 	{
-		if(!TestSystemProperties.DISABLE_NETWORK_SYNCHRONIZER)
-			throw new RuntimeException("Network synchronizer is not disabled");
-		
 		LOGGER.info("Starting Wurst Client GameTest");
 		hideSplashTexts(context);
 		waitForTitleScreenFade(context);
@@ -81,7 +77,7 @@ public class WurstTest implements FabricClientGameTest
 		TestSingleplayerContext spContext)
 	{
 		TestInput input = context.getInput();
-		TestClientLevelContext world = spContext.getClientLevel();
+		TestServerConnection connection = spContext.getConnection();
 		TestServerContext server = spContext.getServer();
 		
 		// Disable chunk fade
@@ -94,7 +90,7 @@ public class WurstTest implements FabricClientGameTest
 		
 		LOGGER.info("Loading chunks");
 		context.waitTicks(2);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		
 		assertScreenshotEquals(context, "in_game",
 			"https://i.imgur.com/EfzN9Cd.png");
