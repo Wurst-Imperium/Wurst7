@@ -21,14 +21,12 @@ import java.util.Base64;
 import java.util.UUID;
 
 import org.joml.Vector2i;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotComparisonAlgorithm;
@@ -37,6 +35,7 @@ import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotCompari
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.commands.CommandSourceStack;
+import net.wurstclient.WurstClient;
 
 public enum WurstClientTestHelper
 {
@@ -258,10 +257,8 @@ public enum WurstClientTestHelper
 	public static void runWurstCommand(ClientGameTestContext context,
 		String command)
 	{
-		TestInput input = context.getInput();
-		input.pressKey(GLFW.GLFW_KEY_T);
-		input.typeChars("." + command);
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
+		context.runOnClient(
+			_ -> WurstClient.INSTANCE.getCmdProcessor().process(command));
 	}
 	
 	public static void ghSummary(String s)
