@@ -29,7 +29,6 @@ import net.wurstclient.gametest.SingleplayerTest;
 import net.wurstclient.hacks.ChestEspHack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
-import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.settings.Setting;
 
 public final class ChestEspRenderingTest extends SingleplayerTest
@@ -84,14 +83,7 @@ public final class ChestEspRenderingTest extends SingleplayerTest
 		context.runOnClient(_ -> {
 			chestEsp.setEnabled(false);
 			for(Setting setting : chestEsp.getSettings().values())
-			{
-				if(setting instanceof CheckboxSetting checkbox)
-					checkbox.setChecked(checkbox.isCheckedByDefault());
-				else if(setting instanceof ColorSetting color)
-					color.setColor(color.getDefaultColor());
-				else if(setting instanceof EspStyleSetting style)
-					style.setSelected(style.getDefaultSelected());
-			}
+				setting.resetToDefault();
 		});
 		removeVehicles(vehicles);
 		setBlocksAndWait(

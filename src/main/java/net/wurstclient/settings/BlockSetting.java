@@ -100,6 +100,7 @@ public final class BlockSetting extends Setting
 		setBlock(block);
 	}
 	
+	@Override
 	public void resetToDefault()
 	{
 		blockName = defaultName;

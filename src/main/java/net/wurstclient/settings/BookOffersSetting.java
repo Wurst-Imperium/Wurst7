@@ -135,7 +135,8 @@ public final class BookOffersSetting extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
-	public void resetToDefaults()
+	@Override
+	public void resetToDefault()
 	{
 		offers.clear();
 		offers.addAll(Arrays.asList(defaultOffers));
@@ -172,7 +173,7 @@ public final class BookOffersSetting extends Setting
 		{
 			System.out.println("Invalid book offer list: " + json);
 			e.printStackTrace();
-			resetToDefaults();
+			resetToDefault();
 		}
 	}
 	

@@ -64,7 +64,7 @@ public final class BlockListCmd extends Command
 			break;
 			
 			case "reset":
-			setting.resetToDefaults();
+			setting.resetToDefault();
 			break;
 			
 			default:

@@ -49,7 +49,7 @@ public final class ColorComponent extends Component
 			break;
 			
 			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
-			setting.setColor(setting.getDefaultColor());
+			setting.resetToDefault();
 			break;
 		}
 	}
