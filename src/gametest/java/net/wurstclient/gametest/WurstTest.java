@@ -43,6 +43,8 @@ public class WurstTest implements FabricClientGameTest
 	
 	public static final boolean IS_SODIUM_INSTALLED =
 		FabricLoader.getInstance().isModLoaded("sodium");
+	public static final boolean IS_LOOTR_INSTALLED =
+		FabricLoader.getInstance().isModLoaded("lootr");
 	
 	@Override
 	public void runTest(ClientGameTestContext context)
@@ -129,6 +131,8 @@ public class WurstTest implements FabricClientGameTest
 		// TODO: Open ClickGUI and Navigator
 		
 		// Test Wurst hacks
+		new ChestEspGroupTest(context, spContext).run();
+		new ChestEspRenderingTest(context, spContext).run();
 		new AutoMineHackTest(context, spContext).run();
 		new BlinkHackSmokeTest(context, spContext).run();
 		new FreecamHackTest(context, spContext).run();
