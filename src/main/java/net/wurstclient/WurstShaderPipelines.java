@@ -57,6 +57,7 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline QUADS = RenderPipelines
 		.register(RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
 			.withLocation(Identifier.parse("wurst:pipeline/wurst_quads"))
+			.withCull(true)
 			.withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
 			.build());
 	
@@ -67,6 +68,7 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline ESP_QUADS = RenderPipelines
 		.register(RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
 			.withLocation(Identifier.parse("wurst:pipeline/wurst_esp_quads"))
+			.withCull(true)
 			.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST).build());
 	
 	/**

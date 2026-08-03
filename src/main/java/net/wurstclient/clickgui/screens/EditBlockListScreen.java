@@ -81,7 +81,7 @@ public final class EditBlockListScreen extends Screen
 			Button.builder(Component.literal("Reset to Defaults"),
 				b -> minecraft.setScreen(new ConfirmScreen(b2 -> {
 					if(b2)
-						blockList.resetToDefaults();
+						blockList.resetToDefault();
 					minecraft.setScreen(EditBlockListScreen.this);
 				}, Component.literal("Reset to Defaults"),
 					Component.literal("Are you sure?"))))

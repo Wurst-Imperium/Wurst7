@@ -16,7 +16,7 @@ public abstract class ChestEspEntityGroup extends ChestEspGroup
 {
 	private final ArrayList<Entity> entities = new ArrayList<>();
 	
-	protected abstract boolean matches(Entity e);
+	public abstract boolean matches(Entity e);
 	
 	public final void addIfMatches(Entity e)
 	{
