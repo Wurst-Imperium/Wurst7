@@ -53,7 +53,7 @@ public final class SliderComponent extends Component
 			break;
 			
 			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
-			setting.setValue(setting.getDefaultValue());
+			setting.resetToDefault();
 			break;
 		}
 	}

@@ -89,7 +89,7 @@ public final class EditBookOffersScreen extends Screen
 			Button.builder(Component.literal("Reset to Defaults"),
 				b -> minecraft.setScreen(new ConfirmScreen(b2 -> {
 					if(b2)
-						bookOffers.resetToDefaults();
+						bookOffers.resetToDefault();
 					minecraft.setScreen(EditBookOffersScreen.this);
 				}, Component.literal("Reset to Defaults"),
 					Component.literal("Are you sure?"))))

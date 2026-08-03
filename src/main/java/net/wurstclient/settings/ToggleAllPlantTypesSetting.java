@@ -110,6 +110,19 @@ public final class ToggleAllPlantTypesSetting extends Setting
 	}
 	
 	@Override
+	public void resetToDefault()
+	{
+		for(PlantTypeSetting type : plantTypes)
+		{
+			type.setHarvestingEnabledWithoutSaving(
+				type.isHarvestingEnabledByDefault());
+			type.setReplantingEnabledWithoutSaving(
+				type.isReplantingEnabledByDefault());
+		}
+		WurstClient.INSTANCE.saveSettings();
+	}
+	
+	@Override
 	public Component getComponent()
 	{
 		return new ToggleAllPlantTypesComponent(this);

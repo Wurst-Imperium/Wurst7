@@ -220,7 +220,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		farChicken.discard();
 		runWurstCommand("setmode Freecam interact_from camera");
 		input.pressKey(GLFW.GLFW_KEY_U);
-		context.waitTicks(2);
+		waitForHandSwing();
 	}
 	
 	private Chicken spawnChicken(double z)

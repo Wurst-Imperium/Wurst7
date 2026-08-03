@@ -105,7 +105,8 @@ public class BlockListSetting extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
-	public void resetToDefaults()
+	@Override
+	public void resetToDefault()
 	{
 		blockNames.clear();
 		blockNames.addAll(Arrays.asList(defaultNames));
@@ -158,7 +159,7 @@ public class BlockListSetting extends Setting
 		}catch(JsonException e)
 		{
 			e.printStackTrace();
-			resetToDefaults();
+			resetToDefault();
 		}
 	}
 	
