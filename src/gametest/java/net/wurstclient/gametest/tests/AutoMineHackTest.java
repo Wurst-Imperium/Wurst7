@@ -32,7 +32,7 @@ public final class AutoMineHackTest extends SingleplayerTest
 		runWurstCommand("t AutoMine on");
 		BlockTestHelper.waitForBlock(context, 0, -56, 2, Blocks.AIR);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		context.takeScreenshot("automine_survival");
 		
 		// Clean up

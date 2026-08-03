@@ -38,7 +38,7 @@ public final class PistonTest extends SingleplayerTest
 			blocks.set(0, -57, 2, Blocks.REDSTONE_BLOCK);
 		});
 		context.waitTicks(3);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		context.takeScreenshot("piston_extended");
 		
 		// Unpower the piston
@@ -47,13 +47,13 @@ public final class PistonTest extends SingleplayerTest
 			blocks.set(0, -57, 2, Blocks.AIR);
 		});
 		context.waitTicks(3);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		context.takeScreenshot("piston_retracted");
 		
 		// Clean up
 		setBlocksAndWait(blocks -> blocks.set(0, -56, 2, Blocks.AIR));
 		clearChat();
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 	}
 }

@@ -61,7 +61,7 @@ public final class OcclusionCullingTest extends SingleplayerTest
 		runCommand("tp @s " + x + " " + y + " " + z + " 0 0");
 		context.waitFor(
 			mc -> mc.player.blockPosition().equals(new BlockPos(x, y, z)));
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 	}
 	
 	private void fillSurroundingSections(Block block)

@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.function.Consumer;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
@@ -41,7 +41,7 @@ public enum BlockTestHelper
 	public static void setBlocksAndWait(ClientGameTestContext context,
 		TestSingleplayerContext spContext, Consumer<BlockBatch> batchBuilder)
 	{
-		TestClientLevelContext world = spContext.getClientLevel();
+		TestServerConnection connection = spContext.getConnection();
 		TestServerContext server = spContext.getServer();
 		BlockBatch batch = new BlockBatch();
 		batchBuilder.accept(batch);
@@ -52,7 +52,7 @@ public enum BlockTestHelper
 		context.waitFor(
 			mc -> batch.blocks.entrySet().stream().allMatch(entry -> mc.level
 				.getBlockState(entry.getKey()) == entry.getValue()));
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 	}
 	
 	public static final class BlockBatch
