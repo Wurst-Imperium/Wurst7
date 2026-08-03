@@ -48,14 +48,14 @@ public final class ChestEspRenderingTest extends SingleplayerTest
 		List<Entity> vehicles = buildTestRig();
 		
 		waitForScreenshotMatch("chestesp_default_settings",
-			"https://i.imgur.com/ECaqWhe.png");
+			"https://i.imgur.com/BmAZ812.png");
 		
 		context.runOnClient(_ -> chestEsp.getSettings().values().stream()
 			.filter(CheckboxSetting.class::isInstance)
 			.map(CheckboxSetting.class::cast)
 			.forEach(checkbox -> checkbox.setChecked(true)));
 		assertScreenshotEquals("chestesp_boxes",
-			"https://i.imgur.com/1LM9l3s.png");
+			"https://i.imgur.com/h0W56OS.png");
 		
 		runWurstCommand("setmode ChestESP style lines_only");
 		assertScreenshotEquals("chestesp_lines",
@@ -63,7 +63,7 @@ public final class ChestEspRenderingTest extends SingleplayerTest
 		
 		runWurstCommand("setmode ChestESP style lines_and_boxes");
 		assertScreenshotEquals("chestesp_lines_and_boxes",
-			"https://i.imgur.com/pLF0om7.png");
+			"https://i.imgur.com/xq2Qes0.png");
 		
 		context.runOnClient(_ -> {
 			List<ColorSetting> colorSettings = chestEsp.getSettings().values()
@@ -77,7 +77,7 @@ public final class ChestEspRenderingTest extends SingleplayerTest
 			}
 		});
 		assertScreenshotEquals("chestesp_custom_colors",
-			"https://i.imgur.com/uixFr49.png");
+			"https://i.imgur.com/UR6gktJ.png");
 		
 		// Clean up
 		context.runOnClient(_ -> {
