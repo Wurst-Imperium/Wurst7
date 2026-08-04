@@ -42,6 +42,8 @@ public class WurstTest implements FabricClientGameTest
 	
 	public static final boolean IS_SODIUM_INSTALLED =
 		FabricLoader.getInstance().isModLoaded("sodium");
+	public static final boolean IS_LOOTR_INSTALLED =
+		FabricLoader.getInstance().isModLoaded("lootr");
 	
 	@Override
 	public void runTest(ClientGameTestContext context)
@@ -85,8 +87,10 @@ public class WurstTest implements FabricClientGameTest
 		
 		runCommand(server, "time set noon");
 		runCommand(server, "tp 0 -57 0");
-		runCommand(server, "fill ~ ~-3 ~ ~ ~-1 ~ smooth_stone");
-		runCommand(server, "fill ~-12 ~-3 ~10 ~12 ~9 ~10 smooth_stone");
+		BlockTestHelper.setBlocksAndWait(context, spContext, blocks -> {
+			blocks.fill(0, -60, 0, 0, -58, 0, Blocks.SMOOTH_STONE);
+			blocks.fill(-12, -60, 10, 12, -48, 10, Blocks.SMOOTH_STONE);
+		});
 		
 		LOGGER.info("Loading chunks");
 		context.waitTicks(2);
@@ -123,8 +127,12 @@ public class WurstTest implements FabricClientGameTest
 		// TODO: Open ClickGUI and Navigator
 		
 		// Test Wurst hacks
+		new ChestEspGroupTest(context, spContext).run();
+		new ChestEspRenderingTest(context, spContext).run();
 		new AutoMineHackTest(context, spContext).run();
+		new BlinkHackSmokeTest(context, spContext).run();
 		new FreecamHackTest(context, spContext).run();
+		new LsdHackTest(context, spContext).run();
 		new NoFallHackTest(context, spContext).run();
 		new NoShieldOverlayHackTest(context, spContext).run();
 		new NoWeatherHackTest(context, spContext).run();
@@ -139,6 +147,7 @@ public class WurstTest implements FabricClientGameTest
 		
 		// Test special cases
 		new AttributeSwapMechanicTest(context, spContext).run();
+		new OcclusionCullingTest(context, spContext).run();
 		new PistonTest(context, spContext).run();
 	}
 	
