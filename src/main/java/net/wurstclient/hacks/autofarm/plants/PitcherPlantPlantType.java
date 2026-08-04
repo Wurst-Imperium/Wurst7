@@ -8,6 +8,7 @@
 package net.wurstclient.hacks.autofarm.plants;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -31,7 +32,7 @@ public final class PitcherPlantPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.below()).is(Blocks.FARMLAND);
+		return BlockUtils.getState(pos.below()).is(BlockTags.SUPPORTS_CROPS);
 	}
 	
 	@Override
@@ -43,7 +44,6 @@ public final class PitcherPlantPlantType extends AutoFarmPlantType
 	@Override
 	public boolean shouldHarvestByMining(BlockPos pos, BlockState state)
 	{
-		// field_43240 is MAX_AGE
 		return state.is(Blocks.PITCHER_CROP)
 			&& state.getValue(PitcherCropBlock.AGE) >= PitcherCropBlock.MAX_AGE;
 	}

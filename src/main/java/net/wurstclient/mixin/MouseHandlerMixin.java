@@ -14,15 +14,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.MouseButtonPressListener.MouseButtonPressEvent;
 import net.wurstclient.events.MouseScrollListener.MouseScrollEvent;
 import net.wurstclient.events.MouseUpdateListener.MouseUpdateEvent;
+import net.wurstclient.hacks.FreecamHack;
 
 @Mixin(MouseHandler.class)
 public abstract class MouseHandlerMixin
@@ -47,6 +51,22 @@ public abstract class MouseHandlerMixin
 		CallbackInfo ci)
 	{
 		EventManager.fire(new MouseScrollEvent(vertical));
+	}
+	
+	@WrapOperation(method = "turnPlayer(D)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;turn(DD)V"))
+	private void wrapTurn(LocalPlayer player, double deltaYaw,
+		double deltaPitch, Operation<Void> original)
+	{
+		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
+		if(freecam.isMovingCamera())
+		{
+			freecam.turn(deltaYaw, deltaPitch);
+			return;
+		}
+		
+		original.call(player, deltaYaw, deltaPitch);
 	}
 	
 	@Inject(method = "handleAccumulatedMovement()V", at = @At("HEAD"))

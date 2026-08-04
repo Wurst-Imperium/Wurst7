@@ -12,6 +12,7 @@ import org.lwjgl.glfw.GLFW;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.chicken.Chicken;
@@ -37,7 +38,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		// Enable Freecam with default settings
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		assertScreenshotEquals("freecam_start_inside",
 			"https://i.imgur.com/jdSno3u.png");
 		
@@ -66,35 +67,35 @@ public final class FreecamHackTest extends SingleplayerTest
 		runWurstCommand("setcheckbox Freecam scroll_to_change_speed on");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		
 		// Enable Freecam with initial position in front
 		runWurstCommand("setmode Freecam initial_position in_front");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		assertScreenshotEquals("freecam_start_in_front",
 			"https://i.imgur.com/nrMP191.png");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		
 		// Enable Freecam with initial position above
 		runWurstCommand("setmode Freecam initial_position above");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		assertScreenshotEquals("freecam_start_above",
 			"https://i.imgur.com/3LbAtRj.png");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		
 		// Revert to inside, then fly back and up a bit
 		runWurstCommand("setmode Freecam initial_position inside");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		input.holdKeyFor(GLFW.GLFW_KEY_SPACE, 1);
 		context.waitTick();
@@ -116,7 +117,8 @@ public final class FreecamHackTest extends SingleplayerTest
 		runWurstCommand("setcheckbox Freecam hide_hand on");
 		
 		// Enable player movement, walk forward, and turn around
-		runCommand("fill 0 -58 1 0 -58 2 smooth_stone");
+		setBlocksAndWait(
+			blocks -> blocks.fill(0, -58, 1, 0, -58, 2, Blocks.SMOOTH_STONE));
 		runWurstCommand("setmode Freecam apply_input_to player");
 		input.holdKeyFor(GLFW.GLFW_KEY_W, 10);
 		for(int i = 0; i < 10; i++)
@@ -138,22 +140,25 @@ public final class FreecamHackTest extends SingleplayerTest
 		runWurstCommand("setmode Freecam apply_input_to camera");
 		input.pressKey(GLFW.GLFW_KEY_U);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		
 		// Reset player and remove walkway
-		runCommand("fill 0 -58 1 0 -58 2 air");
+		setBlocksAndWait(
+			blocks -> blocks.fill(0, -58, 1, 0, -58, 2, Blocks.AIR));
 		runCommand("tp @s 0 -57 0 0 0");
 		// Restore body rotation - /tp only rotates the head as of 1.21.11
 		context.runOnClient(mc -> mc.player.setYBodyRot(0));
 		
 		// Test "Interact from" setting
-		runCommand("setblock 0 -56 2 smooth_stone");
-		waitForBlock(0, 1, 2, Blocks.SMOOTH_STONE);
-		runCommand("setblock 0 -56 1 lever[face=wall,facing=north]");
-		runCommand("setblock 0 -56 3 lever[face=wall,facing=south]");
-		waitForBlock(0, 1, 3, Blocks.LEVER);
+		setBlocksAndWait(blocks -> {
+			blocks.set(0, -56, 2, Blocks.SMOOTH_STONE);
+			blocks.set(0, -56, 1, Blocks.LEVER.defaultBlockState()
+				.setValue(LeverBlock.FACING, Direction.NORTH));
+			blocks.set(0, -56, 3, Blocks.LEVER.defaultBlockState()
+				.setValue(LeverBlock.FACING, Direction.SOUTH));
+		});
 		context.waitTicks(WurstTest.IS_SODIUM_INSTALLED ? 5 : 1);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		context.takeScreenshot("freecam_interact_setup");
 		
 		// Enable Freecam and fly to a side view
@@ -169,7 +174,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		}
 		input.holdKeyFor(GLFW.GLFW_KEY_S, 2);
 		context.waitTick();
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		context.takeScreenshot("freecam_interact_side_view");
 		
 		// Right click with "Interact from: Camera"
@@ -186,7 +191,8 @@ public final class FreecamHackTest extends SingleplayerTest
 		assertLeverState(0, -56, 3, true, "far lever, player mode");
 		
 		// Replace levers with chickens
-		runCommand("fill 0 -56 1 0 -56 3 air strict");
+		setBlocksAndWait(
+			blocks -> blocks.fill(0, -56, 1, 0, -56, 3, Blocks.AIR));
 		Chicken nearChicken = spawnChicken(1.5);
 		Chicken farChicken = spawnChicken(3.5);
 		clearParticles();
@@ -214,7 +220,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		farChicken.discard();
 		runWurstCommand("setmode Freecam interact_from camera");
 		input.pressKey(GLFW.GLFW_KEY_U);
-		context.waitTicks(2);
+		waitForHandSwing();
 	}
 	
 	private Chicken spawnChicken(double z)

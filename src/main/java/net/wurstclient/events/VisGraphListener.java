@@ -15,9 +15,9 @@ import net.wurstclient.event.Listener;
 public interface VisGraphListener extends Listener
 {
 	/**
-	 * Cancel this event to turn off the visibility graph, making things like
-	 * caves become visible that would normally be hidden behind other blocks
-	 * and thus skipped for better rendering performance.
+	 * Cancel this event to turn off smart culling, making things like caves
+	 * become visible that would normally be hidden behind other blocks and
+	 * thus skipped for better rendering performance.
 	 */
 	public void onVisGraph(VisGraphEvent event);
 	
