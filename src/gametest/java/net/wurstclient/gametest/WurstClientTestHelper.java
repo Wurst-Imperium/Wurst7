@@ -7,8 +7,6 @@
  */
 package net.wurstclient.gametest;
 
-import com.mojang.blaze3d.platform.InputConstants;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -29,7 +27,6 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotComparisonAlgorithm;
@@ -38,6 +35,7 @@ import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotCompari
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.commands.CommandSourceStack;
+import net.wurstclient.WurstClient;
 
 public enum WurstClientTestHelper
 {
@@ -175,6 +173,20 @@ public enum WurstClientTestHelper
 		return new RawImageImpl<>(width, height, outData);
 	}
 	
+	public static int getColorDifference(int color1, int color2)
+	{
+		int red1 = color1 & 0xFF;
+		int green1 = color1 >> 8 & 0xFF;
+		int blue1 = color1 >> 16 & 0xFF;
+		
+		int red2 = color2 & 0xFF;
+		int green2 = color2 >> 8 & 0xFF;
+		int blue2 = color2 >> 16 & 0xFF;
+		
+		return Math.abs(red1 - red2) + Math.abs(green1 - green2)
+			+ Math.abs(blue1 - blue2);
+	}
+	
 	public static NativeImage loadImageFile(Path path)
 	{
 		try(InputStream inputStream = Files.newInputStream(path))
@@ -245,10 +257,8 @@ public enum WurstClientTestHelper
 	public static void runWurstCommand(ClientGameTestContext context,
 		String command)
 	{
-		TestInput input = context.getInput();
-		input.pressKey(InputConstants.KEY_T);
-		input.typeChars("." + command);
-		input.pressKey(InputConstants.KEY_RETURN);
+		context.runOnClient(
+			_ -> WurstClient.INSTANCE.getCmdProcessor().process(command));
 	}
 	
 	public static void ghSummary(String s)

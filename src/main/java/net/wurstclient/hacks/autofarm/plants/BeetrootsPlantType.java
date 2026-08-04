@@ -8,10 +8,10 @@
 package net.wurstclient.hacks.autofarm.plants;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BeetrootBlock;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.settings.PlantTypeSetting;
@@ -28,7 +28,7 @@ public final class BeetrootsPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.below()).is(Blocks.FARMLAND);
+		return BlockUtils.getState(pos.below()).is(BlockTags.SUPPORTS_CROPS);
 	}
 	
 	@Override

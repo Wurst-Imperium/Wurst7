@@ -54,7 +54,7 @@ public final class SliderComponent extends Component
 			break;
 			
 			case InputConstants.MOUSE_BUTTON_RIGHT:
-			setting.setValue(setting.getDefaultValue());
+			setting.resetToDefault();
 			break;
 		}
 	}

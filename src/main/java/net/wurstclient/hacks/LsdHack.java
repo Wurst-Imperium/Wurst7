@@ -18,7 +18,7 @@ import net.wurstclient.hack.Hack;
 @DontSaveState
 public final class LsdHack extends Hack
 {
-	private static final Identifier LSD_POST_EFFECT =
+	public static final Identifier LSD_POST_EFFECT =
 		Identifier.fromNamespaceAndPath("wurst", "lsd");
 	
 	public LsdHack()

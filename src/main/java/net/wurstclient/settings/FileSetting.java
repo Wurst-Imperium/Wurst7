@@ -79,6 +79,13 @@ public final class FileSetting extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
+	@Override
+	public void resetToDefault()
+	{
+		setSelectedFileToDefault();
+		WurstClient.INSTANCE.saveSettings();
+	}
+	
 	private void setSelectedFileToDefault()
 	{
 		ArrayList<Path> files = listFiles();
@@ -122,8 +129,7 @@ public final class FileSetting extends Setting
 				throw new RuntimeException(e);
 			}
 		
-		setSelectedFileToDefault();
-		WurstClient.INSTANCE.saveSettings();
+		resetToDefault();
 	}
 	
 	public ArrayList<Path> listFiles()

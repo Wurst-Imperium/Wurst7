@@ -105,6 +105,7 @@ public final class TextFieldSetting extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
+	@Override
 	public void resetToDefault()
 	{
 		value = defaultValue;

@@ -10,6 +10,8 @@ package net.wurstclient.gametest;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import java.nio.file.Path;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 
@@ -18,9 +20,10 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
+import net.wurstclient.gametest.BlockTestHelper.BlockBatch;
 
 public abstract class SingleplayerTest
 {
@@ -79,11 +82,29 @@ public abstract class SingleplayerTest
 		WurstClientTestHelper.runWurstCommand(context, command);
 	}
 	
-	protected final void waitForBlock(int relX, int relY, int relZ, Block block)
+	protected final void waitFor(Predicate<Minecraft> predicate,
+		String errorMsg)
 	{
-		context.waitFor(mc -> mc.level
-			.getBlockState(mc.player.blockPosition().offset(relX, relY, relZ))
-			.getBlock() == block);
+		waitFor(predicate, ClientGameTestContext.DEFAULT_TIMEOUT, errorMsg);
+	}
+	
+	protected final void waitFor(Predicate<Minecraft> predicate, int timeout,
+		String errorMsg)
+	{
+		try
+		{
+			context.waitFor(predicate, timeout);
+			
+		}catch(AssertionError e)
+		{
+			WurstClientTestHelper.ghSummary(errorMsg);
+			throw new AssertionError(errorMsg);
+		}
+	}
+	
+	protected final void setBlocksAndWait(Consumer<BlockBatch> batchBuilder)
+	{
+		BlockTestHelper.setBlocksAndWait(context, spContext, batchBuilder);
 	}
 	
 	/**

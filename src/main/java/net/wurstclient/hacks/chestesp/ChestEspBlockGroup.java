@@ -18,7 +18,7 @@ import net.wurstclient.util.BlockUtils;
 
 public abstract class ChestEspBlockGroup extends ChestEspGroup
 {
-	protected abstract boolean matches(BlockEntity be);
+	public abstract boolean matches(BlockEntity be);
 	
 	public final void addIfMatches(BlockEntity be)
 	{

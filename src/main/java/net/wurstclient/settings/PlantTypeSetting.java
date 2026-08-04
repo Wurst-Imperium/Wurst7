@@ -90,7 +90,7 @@ public final class PlantTypeSetting extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
-	void setHarvestingEnabledWithoutSaving(boolean harvest)
+	protected void setHarvestingEnabledWithoutSaving(boolean harvest)
 	{
 		this.harvest = harvest;
 		update();
@@ -102,7 +102,7 @@ public final class PlantTypeSetting extends Setting
 		WurstClient.INSTANCE.saveSettings();
 	}
 	
-	void setReplantingEnabledWithoutSaving(boolean replant)
+	protected void setReplantingEnabledWithoutSaving(boolean replant)
 	{
 		this.replant = replant;
 		update();
@@ -126,6 +126,14 @@ public final class PlantTypeSetting extends Setting
 	public void resetReplantingEnabled()
 	{
 		setReplantingEnabled(isReplantingEnabledByDefault());
+	}
+	
+	@Override
+	public void resetToDefault()
+	{
+		setHarvestingEnabledWithoutSaving(harvestByDefault);
+		setReplantingEnabledWithoutSaving(replantByDefault);
+		WurstClient.INSTANCE.saveSettings();
 	}
 	
 	@Override
