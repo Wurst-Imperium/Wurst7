@@ -65,7 +65,7 @@
     "freecam.ItemInHandRendererMixin",
     "freecam.LocalPlayerMixin",
     "noshieldoverlay.ItemInHandRendererMixin",
-    "sodium.OcclusionCullerMixin",
+    "sodium.RenderSectionManagerMixin",
     "xray.BlockEntityRenderDispatcherMixin",
     "xray.ItemBlockRenderTypesMixin",
     "xray.BlockStateBaseMixin",

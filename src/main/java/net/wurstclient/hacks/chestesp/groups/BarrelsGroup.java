@@ -32,7 +32,7 @@ public final class BarrelsGroup extends ChestEspBlockGroup
 	}
 	
 	@Override
-	protected boolean matches(BlockEntity be)
+	public boolean matches(BlockEntity be)
 	{
 		return be instanceof BarrelBlockEntity
 			|| LootrModCompat.isLootrBarrel(be);

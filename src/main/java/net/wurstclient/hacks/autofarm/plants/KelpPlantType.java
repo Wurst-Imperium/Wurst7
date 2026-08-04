@@ -43,9 +43,10 @@ public final class KelpPlantType extends AutoFarmPlantType
 		if(!fluid.is(FluidTags.WATER) || fluid.getAmount() != 8)
 			return false;
 		
-		BlockState floor = BlockUtils.getState(pos.below());
-		return !floor.is(Blocks.MAGMA_BLOCK)
-			&& floor.isFaceSturdy(WurstClient.MC.level, pos, Direction.UP);
+		BlockPos floorPos = pos.below();
+		BlockState floorState = BlockUtils.getState(floorPos);
+		return !floorState.is(Blocks.MAGMA_BLOCK) && floorState
+			.isFaceSturdy(WurstClient.MC.level, floorPos, Direction.UP);
 	}
 	
 	@Override

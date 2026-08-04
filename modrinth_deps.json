@@ -1,5 +1,10 @@
 {
   "better_block_entities_version": "better-block-entities",
+  "cloth_config_version": "cloth-config",
   "fabric_api_version": "fabric-api",
+  "lootr_version": {
+    "slug": "lootr",
+    "use_id": true
+  },
   "sodium_version": "sodium"
 }

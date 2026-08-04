@@ -32,7 +32,7 @@ public final class ChestCartsGroup extends ChestEspEntityGroup
 	}
 	
 	@Override
-	protected boolean matches(Entity e)
+	public boolean matches(Entity e)
 	{
 		return e instanceof MinecartChest;
 	}

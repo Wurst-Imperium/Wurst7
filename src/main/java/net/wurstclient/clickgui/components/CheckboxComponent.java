@@ -44,7 +44,7 @@ public final class CheckboxComponent extends Component
 			break;
 			
 			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
-			setting.setChecked(setting.isCheckedByDefault());
+			setting.resetToDefault();
 			break;
 		}
 	}

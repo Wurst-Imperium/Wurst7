@@ -11,9 +11,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * Detects block entities from the Lootr mod for use in ChestESP.
- *
- * <p>
- * Last tested with lootr-fabric-1.21.8-1.16.39.95.
  */
 public enum LootrModCompat
 {

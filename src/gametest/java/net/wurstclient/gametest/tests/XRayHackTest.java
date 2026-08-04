@@ -67,42 +67,39 @@ public final class XRayHackTest extends SingleplayerTest
 				: "https://i.imgur.com/3DLxNuS.png");
 		
 		// Clean up
-		runCommand("fill ~-5 ~-2 ~4 ~5 ~5 ~7 air strict");
-		waitForBlock(5, 5, 7, Blocks.AIR);
+		setBlocksAndWait(
+			blocks -> blocks.fill(-5, -59, 4, 5, -52, 7, Blocks.AIR));
 		runWurstCommand("setcheckbox X-Ray only_show_exposed off");
 		runWurstCommand("setslider X-Ray opacity 0");
 		input.pressKey(GLFW.GLFW_KEY_X);
 		world.waitForChunksRender();
-		clearChat();
 	}
 	
 	private void buildTestRig()
 	{
-		// Stone wall (9 wide, 7 high, 3 deep)
-		runCommand("fill ~-5 ~-2 ~5 ~5 ~5 ~7 stone");
-		
-		// Ores (1 exposed and 1 hidden each)
-		runCommand("fill ~-4 ~1 ~5 ~-4 ~1 ~6 minecraft:coal_ore");
-		runCommand("fill ~-2 ~1 ~5 ~-2 ~1 ~6 minecraft:iron_ore");
-		runCommand("fill ~0 ~1 ~5 ~0 ~1 ~6 minecraft:gold_ore");
-		runCommand("fill ~2 ~1 ~5 ~2 ~1 ~6 minecraft:diamond_ore");
-		runCommand("fill ~4 ~1 ~5 ~4 ~1 ~6 minecraft:emerald_ore");
-		runCommand("fill ~-4 ~3 ~5 ~-4 ~3 ~6 minecraft:lapis_ore");
-		runCommand("fill ~-2 ~3 ~5 ~-2 ~3 ~6 minecraft:redstone_ore");
-		runCommand("fill ~0 ~3 ~5 ~0 ~3 ~6 minecraft:copper_ore");
-		runCommand("fill ~2 ~3 ~5 ~2 ~3 ~6 minecraft:nether_gold_ore");
-		runCommand("fill ~4 ~3 ~5 ~4 ~3 ~6 minecraft:nether_quartz_ore");
-		
-		// Fluids
-		runCommand("setblock ~1 ~0 ~6 minecraft:water");
-		runCommand("setblock ~-1 ~0 ~6 minecraft:lava");
-		
-		// Snow
-		runCommand("fill ~-5 ~-1 ~4 ~5 ~-1 ~4 minecraft:stone");
-		runCommand("fill ~-5 ~0 ~4 ~5 ~0 ~4 minecraft:snow");
-		
-		// Wait for blocks to appear
-		waitForBlock(-1, 0, 6, Blocks.LAVA);
-		clearChat();
+		setBlocksAndWait(blocks -> {
+			// Stone wall (11 wide, 8 high, 3 deep)
+			blocks.fill(-5, -59, 5, 5, -52, 7, Blocks.STONE);
+			
+			// Ores (1 exposed and 1 hidden each)
+			blocks.fill(-4, -56, 5, -4, -56, 6, Blocks.COAL_ORE);
+			blocks.fill(-2, -56, 5, -2, -56, 6, Blocks.IRON_ORE);
+			blocks.fill(0, -56, 5, 0, -56, 6, Blocks.GOLD_ORE);
+			blocks.fill(2, -56, 5, 2, -56, 6, Blocks.DIAMOND_ORE);
+			blocks.fill(4, -56, 5, 4, -56, 6, Blocks.EMERALD_ORE);
+			blocks.fill(-4, -54, 5, -4, -54, 6, Blocks.LAPIS_ORE);
+			blocks.fill(-2, -54, 5, -2, -54, 6, Blocks.REDSTONE_ORE);
+			blocks.fill(0, -54, 5, 0, -54, 6, Blocks.COPPER_ORE);
+			blocks.fill(2, -54, 5, 2, -54, 6, Blocks.NETHER_GOLD_ORE);
+			blocks.fill(4, -54, 5, 4, -54, 6, Blocks.NETHER_QUARTZ_ORE);
+			
+			// Fluids
+			blocks.set(1, -57, 6, Blocks.WATER);
+			blocks.set(-1, -57, 6, Blocks.LAVA);
+			
+			// Snow
+			blocks.fill(-5, -58, 4, 5, -58, 4, Blocks.STONE);
+			blocks.fill(-5, -57, 4, 5, -57, 4, Blocks.SNOW);
+		});
 	}
 }

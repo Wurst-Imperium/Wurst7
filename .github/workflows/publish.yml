@@ -100,7 +100,7 @@ jobs:
       if: ${{ inputs.close_milestone }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
-      run: ./gradlew closeMilestone --stacktrace --no-configuration-cache
+      run: ./gradlew closeMilestone --stacktrace --no-configuration-cache --warning-mode all
 
     - name: Build website update inputs
       id: website_inputs
@@ -123,7 +123,7 @@ jobs:
       if: ${{ inputs.publish_github }}
       env:
         GITHUB_TOKEN: ${{ secrets.OLD_MCX_PUBLISH_TOKEN }}
-      run: ./gradlew github --stacktrace --no-configuration-cache
+      run: ./gradlew github --stacktrace --no-configuration-cache --warning-mode all
 
     - name: Trigger website update
       if: ${{ inputs.update_website }}
