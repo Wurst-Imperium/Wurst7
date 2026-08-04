@@ -38,14 +38,14 @@ public final class CopyItemCmdTest extends SingleplayerTest
 		clearToasts();
 		context.waitTicks(2);
 		world.waitForChunksRender();
-		context.takeScreenshot("copyitem_command_setup");
+		takeScreenshot("copyitem_command_setup");
 		assertNoItemInSlot(0);
 		assertOneItemInSlot(39, Items.GOLDEN_HELMET);
 		
 		// .copyitem the helmet
 		runWurstCommand("copyitem Wurst-Bot head");
 		clearToasts();
-		context.takeScreenshot("copyitem_command_result");
+		takeScreenshot("copyitem_command_result");
 		assertOneItemInSlot(0, Items.GOLDEN_HELMET);
 		assertOneItemInSlot(39, Items.GOLDEN_HELMET);
 		

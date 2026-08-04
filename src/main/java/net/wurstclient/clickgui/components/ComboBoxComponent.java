@@ -79,7 +79,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 		if(isPopupOpen())
 			return;
 		
-		setting.setSelected(setting.getDefaultSelected());
+		setting.resetToDefault();
 	}
 	
 	private boolean isPopupOpen()

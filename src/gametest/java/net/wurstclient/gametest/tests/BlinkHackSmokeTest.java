@@ -1,0 +1,33 @@
+/*
+ * Copyright (c) 2014-2026 Wurst-Imperium and contributors.
+ *
+ * This source code is subject to the terms of the GNU General Public
+ * License, version 3. If a copy of the GPL was not distributed with this
+ * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
+package net.wurstclient.gametest.tests;
+
+import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.wurstclient.WurstClient;
+import net.wurstclient.gametest.SingleplayerTest;
+
+public final class BlinkHackSmokeTest extends SingleplayerTest
+{
+	public BlinkHackSmokeTest(ClientGameTestContext context,
+		TestSingleplayerContext spContext)
+	{
+		super(context, spContext);
+	}
+	
+	@Override
+	protected void runImpl()
+	{
+		logger.info("Testing Blink hack");
+		
+		context.runOnClient(
+			_ -> WurstClient.INSTANCE.getHax().blinkHack.setEnabled(true));
+		context.runOnClient(
+			_ -> WurstClient.INSTANCE.getHax().blinkHack.setEnabled(false));
+	}
+}

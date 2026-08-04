@@ -16,6 +16,9 @@ import net.wurstclient.hack.Hack;
 @DontSaveState
 public final class LsdHack extends Hack
 {
+	public static final Identifier LSD_POST_EFFECT =
+		Identifier.fromNamespaceAndPath("wurst", "lsd");
+	
 	public LsdHack()
 	{
 		super("LSD");
@@ -34,8 +37,7 @@ public final class LsdHack extends Hack
 		if(MC.gameRenderer.currentPostEffect() != null)
 			MC.gameRenderer.clearPostEffect();
 		
-		MC.gameRenderer
-			.setPostEffect(Identifier.fromNamespaceAndPath("wurst", "lsd"));
+		MC.gameRenderer.setPostEffect(LSD_POST_EFFECT);
 	}
 	
 	@Override

@@ -48,19 +48,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 			cir.setReturnValue(false);
 	}
 	
-	@Override
-	public void turn(double deltaYaw, double deltaPitch)
-	{
-		FreecamHack freecam = WurstClient.INSTANCE.getHax().freecamHack;
-		if(freecam.isMovingCamera())
-		{
-			freecam.turn(deltaYaw, deltaPitch);
-			return;
-		}
-		
-		super.turn(deltaYaw, deltaPitch);
-	}
-	
 	@WrapOperation(
 		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;",
 		at = @At(value = "INVOKE",

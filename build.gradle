@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
 	id "net.fabricmc.fabric-loom" version "${loom_version}"
-	id "com.diffplug.spotless" version "8.8.0"
+	id "com.diffplug.spotless" version "8.9.0"
 	id "net.wimods.github-compile-summary" version "0.1.1"
 }
 
@@ -94,6 +94,7 @@ configurations {
 
 def optionalCompatMods = [
 	sodium: [artifact: "sodium", property: "sodium_version"],
+	lootr: [artifact: "lootr", property: "lootr_version"],
 	better_block_entities: [
 		artifact: "better-block-entities",
 		property: "better_block_entities_version"
@@ -101,6 +102,14 @@ def optionalCompatMods = [
 	badoptimizations: [
 		artifact: "badoptimizations",
 		property: "badoptimizations_version"
+	],
+	shoulder_surfing: [
+		artifact: "shoulder-surfing-reloaded",
+		property: "shoulder_surfing_version"
+	],
+	forge_config_api_port: [
+		artifact: "forge-config-api-port",
+		property: "forge_config_api_port_version"
 	]
 ]
 

@@ -59,8 +59,7 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 			.bounds(width / 2 - 25, height / 4 + 72 - 16, 50, 20).build());
 		
 		addRenderableWidget(Button
-			.builder(Component.literal("Default"),
-				b -> level.setValue(level.getDefaultValue()))
+			.builder(Component.literal("Default"), b -> level.resetToDefault())
 			.bounds(width / 2 + 29, height / 4 + 72 - 16, 50, 20).build());
 		
 		addRenderableWidget(scrollButton =

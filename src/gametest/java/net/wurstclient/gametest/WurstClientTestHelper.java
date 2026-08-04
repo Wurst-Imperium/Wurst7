@@ -21,22 +21,22 @@ import java.util.Base64;
 import java.util.UUID;
 
 import org.joml.Vector2i;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotComparisonAlgorithm;
 import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotComparisonAlgorithm.RawImage;
 import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotComparisonAlgorithms.RawImageImpl;
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.commands.CommandSourceStack;
+import net.wurstclient.WurstClient;
 
 public enum WurstClientTestHelper
 {
@@ -78,6 +78,17 @@ public enum WurstClientTestHelper
 			ClientGameTestContext.DEFAULT_TIMEOUT);
 	}
 	
+	public static Path takeScreenshot(ClientGameTestContext context,
+		String fileName)
+	{
+		ThreadingImpl.checkOnGametestThread("takeScreenshot");
+		// Workaround for https://github.com/FabricMC/fabric-api/issues/5466
+		// Remove once fixed.
+		context
+			.runOnClient(mc -> mc.gameRenderer.update(DeltaTracker.ONE, true));
+		return context.takeScreenshot(fileName);
+	}
+	
 	private static int waitForScreenshotMatchImpl(ClientGameTestContext context,
 		String fileName, String templateUrl, int maxAttempts)
 	{
@@ -93,7 +104,7 @@ public enum WurstClientTestHelper
 			if(i > 0)
 				context.waitTick();
 			
-			screenshotPath = context.takeScreenshot(fileName);
+			screenshotPath = takeScreenshot(context, fileName);
 			RawImage<int[]> rawScreenshot = RawImageImpl
 				.fromColorNativeImage(loadImageFile(screenshotPath));
 			RawImage<int[]> maskedScreenshot = applyMask(rawScreenshot, mask);
@@ -174,6 +185,20 @@ public enum WurstClientTestHelper
 		return new RawImageImpl<>(width, height, outData);
 	}
 	
+	public static int getColorDifference(int color1, int color2)
+	{
+		int red1 = color1 & 0xFF;
+		int green1 = color1 >> 8 & 0xFF;
+		int blue1 = color1 >> 16 & 0xFF;
+		
+		int red2 = color2 & 0xFF;
+		int green2 = color2 >> 8 & 0xFF;
+		int blue2 = color2 >> 16 & 0xFF;
+		
+		return Math.abs(red1 - red2) + Math.abs(green1 - green2)
+			+ Math.abs(blue1 - blue2);
+	}
+	
 	public static NativeImage loadImageFile(Path path)
 	{
 		try(InputStream inputStream = Files.newInputStream(path))
@@ -244,10 +269,8 @@ public enum WurstClientTestHelper
 	public static void runWurstCommand(ClientGameTestContext context,
 		String command)
 	{
-		TestInput input = context.getInput();
-		input.pressKey(GLFW.GLFW_KEY_T);
-		input.typeChars("." + command);
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
+		context.runOnClient(
+			_ -> WurstClient.INSTANCE.getCmdProcessor().process(command));
 	}
 	
 	public static void ghSummary(String s)

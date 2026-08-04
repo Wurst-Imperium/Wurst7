@@ -103,6 +103,12 @@ public final class ColorSetting extends Setting
 	}
 	
 	@Override
+	public void resetToDefault()
+	{
+		setColor(defaultColor);
+	}
+	
+	@Override
 	public Component getComponent()
 	{
 		return new ColorComponent(this);
@@ -121,7 +127,7 @@ public final class ColorSetting extends Setting
 		}catch(JsonException e)
 		{
 			e.printStackTrace();
-			setColor(defaultColor);
+			resetToDefault();
 		}
 	}
 	

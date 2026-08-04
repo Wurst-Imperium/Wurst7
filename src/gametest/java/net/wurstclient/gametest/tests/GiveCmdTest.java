@@ -29,7 +29,7 @@ public final class GiveCmdTest extends SingleplayerTest
 		context.waitTick();
 		clearToasts();
 		assertOneItemInSlot(0, Items.DIAMOND);
-		context.takeScreenshot("give_command_result");
+		takeScreenshot("give_command_result");
 		
 		// Clean up
 		clearInventory();
