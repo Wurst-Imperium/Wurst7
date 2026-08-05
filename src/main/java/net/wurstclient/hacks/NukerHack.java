@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.events.LeftClickListener;
@@ -22,10 +21,10 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.nukers.CommonNukerSettings;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockBreakingCache;
@@ -42,8 +41,8 @@ public final class NukerHack extends Hack
 	private final CommonNukerSettings commonSettings =
 		new CommonNukerSettings();
 	
-	private final SwingHandSetting swingHand = new SwingHandSetting(
-		SwingHandSetting.genericMiningDescription(this), SwingHand.SERVER);
+	private final AttackSwingSetting attackSwing = new AttackSwingSetting(
+		AttackSwingSetting.genericMiningDescription(this), AttackSwing.SERVER);
 	
 	private final BlockBreakingCache cache = new BlockBreakingCache();
 	private final OverlayRenderer overlay = new OverlayRenderer();
@@ -55,7 +54,7 @@ public final class NukerHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		commonSettings.getSettings().forEach(this::addSetting);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 	}
 	
 	@Override
@@ -134,7 +133,7 @@ public final class NukerHack extends Hack
 			
 			currentBlock = blocks.get(0);
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			attackSwing.swing();
 			return;
 		}
 		
@@ -159,7 +158,7 @@ public final class NukerHack extends Hack
 		if(!MC.gameMode.continueDestroyBlock(params.pos(), params.side()))
 			return false;
 		
-		swingHand.swing(InteractionHand.MAIN_HAND);
+		attackSwing.swing();
 		return true;
 	}
 	

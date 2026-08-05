@@ -56,7 +56,7 @@ public abstract class ItemInHandRendererMixin
 	@Inject(
 		method = "submitArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
 		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/world/item/ItemStack;getSwingAnimation()Lnet/minecraft/world/item/component/SwingAnimation;"))
+			target = "Lnet/minecraft/client/player/AbstractClientPlayer;getCurrentSwing()Lnet/minecraft/world/entity/LivingEntity$SwingDescription;"))
 	private void onRenderArmWithItemNotBlocking(AbstractClientPlayer player,
 		float tickProgress, float pitch, InteractionHand hand,
 		float swingProgress, ItemStack item, float equipProgress,

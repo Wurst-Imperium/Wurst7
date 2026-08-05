@@ -22,6 +22,7 @@ import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.wurstclient.Category;
@@ -31,6 +32,7 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.InteractSwingSetting.InteractSwing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filters.FilterBabiesSetting;
@@ -153,11 +155,13 @@ public final class FeedAuraHack extends Hack
 		
 		EntityHitResult hitResult = EntityUtils.createHitResult(target);
 		InteractionHand hand = InteractionHand.MAIN_HAND;
+		SwingAnimation swingAnimation =
+			player.getItemInHand(hand).getInteractAnimation();
 		InteractionResult result = gm.interact(player, target, hitResult, hand);
 		
 		if(result instanceof InteractionResult.Success success
-			&& success.swingSource() == InteractionResult.SwingSource.CLIENT)
-			player.swing(hand);
+			&& success.swingSource() == InteractionResult.SwingSource.PREDICTED)
+			InteractSwing.CLIENT.swing(hand, swingAnimation);
 		
 		target = null;
 	}

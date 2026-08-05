@@ -31,6 +31,7 @@ import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -47,14 +48,16 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autolibrarian.BookOffer;
 import net.wurstclient.hacks.autolibrarian.UpdateBooksSetting;
 import net.wurstclient.mixinterface.IKeyMapping;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.BookOffersSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FaceTargetSetting;
 import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
+import net.wurstclient.settings.InteractSwingSetting;
+import net.wurstclient.settings.InteractSwingSetting.InteractSwing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.*;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
@@ -97,8 +100,11 @@ public final class AutoLibrarianHack extends Hack
 	private final FaceTargetSetting faceTarget =
 		FaceTargetSetting.withoutPacketSpam(this, FaceTarget.SERVER);
 	
-	private final SwingHandSetting swingHand =
-		new SwingHandSetting(this, SwingHand.SERVER);
+	private final AttackSwingSetting attackSwing =
+		new AttackSwingSetting(this, AttackSwing.SERVER);
+	
+	private final InteractSwingSetting interactSwing =
+		new InteractSwingSetting(this, InteractSwing.SERVER);
 	
 	private final SliderSetting repairMode = new SliderSetting("Repair mode",
 		"Prevents AutoLibrarian from using your axe when its durability reaches"
@@ -124,7 +130,8 @@ public final class AutoLibrarianHack extends Hack
 		addSetting(updateBooks);
 		addSetting(range);
 		addSetting(faceTarget);
-		addSetting(swingHand);
+		addSetting(attackSwing);
+		addSetting(interactSwing);
 		addSetting(repairMode);
 	}
 	
@@ -283,7 +290,7 @@ public final class AutoLibrarianHack extends Hack
 		
 		// damage block and swing hand
 		if(MC.gameMode.continueDestroyBlock(jobSite, params.side()))
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			attackSwing.swing();
 		
 		// update progress
 		overlay.updateProgress();
@@ -341,13 +348,15 @@ public final class AutoLibrarianHack extends Hack
 		faceTarget.face(params.hitVec());
 		
 		// place block
+		SwingAnimation swingAnimation =
+			MC.player.getItemInHand(hand).getInteractAnimation();
 		InteractionResult result =
 			MC.gameMode.useItemOn(MC.player, hand, params.toHitResult());
 		
 		// swing hand
 		if(result instanceof InteractionResult.Success success
-			&& success.swingSource() == InteractionResult.SwingSource.CLIENT)
-			swingHand.swing(hand);
+			&& success.swingSource() == InteractionResult.SwingSource.PREDICTED)
+			interactSwing.swing(hand, swingAnimation);
 		
 		// reset sneak
 		sneakKey.resetPressedState();
@@ -375,13 +384,15 @@ public final class AutoLibrarianHack extends Hack
 		// click on villager
 		EntityHitResult hitResult = EntityUtils.createHitResult(villager);
 		InteractionHand hand = InteractionHand.MAIN_HAND;
+		SwingAnimation swingAnimation =
+			player.getItemInHand(hand).getInteractAnimation();
 		InteractionResult result =
 			gm.interact(player, villager, hitResult, hand);
 		
 		// swing hand
 		if(result instanceof InteractionResult.Success success
-			&& success.swingSource() == InteractionResult.SwingSource.CLIENT)
-			swingHand.swing(hand);
+			&& success.swingSource() == InteractionResult.SwingSource.PREDICTED)
+			interactSwing.swing(hand, swingAnimation);
 		
 		// set cooldown
 		MC.rightClickDelay = 4;

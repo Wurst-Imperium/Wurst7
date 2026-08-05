@@ -16,7 +16,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -30,10 +29,10 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.nukers.CommonNukerSettings;
 import net.wurstclient.mixinterface.IKeyMapping;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
@@ -50,9 +49,9 @@ public final class NukerLegitHack extends Hack
 	private final CommonNukerSettings commonSettings =
 		new CommonNukerSettings();
 	
-	private final SwingHandSetting swingHand =
-		SwingHandSetting.withoutOffOption(
-			SwingHandSetting.genericMiningDescription(this), SwingHand.CLIENT);
+	private final AttackSwingSetting attackSwing = AttackSwingSetting
+		.withoutOffOption(AttackSwingSetting.genericMiningDescription(this),
+			AttackSwing.CLIENT);
 	
 	private final OverlayRenderer overlay = new OverlayRenderer();
 	private BlockPos currentBlock;
@@ -63,7 +62,7 @@ public final class NukerLegitHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		commonSettings.getSettings().forEach(this::addSetting);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 	}
 	
 	@Override
@@ -189,7 +188,7 @@ public final class NukerLegitHack extends Hack
 		if(im.continueDestroyBlock(pos, side))
 		{
 			MC.level.addBreakingBlockEffect(pos, side);
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			attackSwing.swing();
 			MC.options.keyAttack.setDown(true);
 		}
 		

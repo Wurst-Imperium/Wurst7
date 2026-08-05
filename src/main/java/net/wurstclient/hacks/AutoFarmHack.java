@@ -29,13 +29,15 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantTypeManager;
 import net.wurstclient.hacks.autofarm.AutoFarmRenderer;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FaceTargetSetting;
 import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
+import net.wurstclient.settings.InteractSwingSetting;
+import net.wurstclient.settings.InteractSwingSetting.InteractSwing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.*;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
@@ -54,8 +56,11 @@ public final class AutoFarmHack extends Hack
 	private final FaceTargetSetting faceTarget =
 		FaceTargetSetting.withoutPacketSpam(this, FaceTarget.SERVER);
 	
-	private final SwingHandSetting swingHand =
-		new SwingHandSetting(this, SwingHand.SERVER);
+	private final AttackSwingSetting attackSwing =
+		new AttackSwingSetting(this, AttackSwing.SERVER);
+	
+	private final InteractSwingSetting interactSwing =
+		new InteractSwingSetting(this, InteractSwing.SERVER);
 	
 	private final AutoFarmPlantTypeManager plantTypes =
 		new AutoFarmPlantTypeManager();
@@ -77,7 +82,8 @@ public final class AutoFarmHack extends Hack
 		addSetting(range);
 		addSetting(checkLOS);
 		addSetting(faceTarget);
-		addSetting(swingHand);
+		addSetting(attackSwing);
+		addSetting(interactSwing);
 		renderer.getSettings().forEach(this::addSetting);
 		plantTypes.getSettings().forEach(this::addSetting);
 	}
@@ -226,7 +232,7 @@ public final class AutoFarmHack extends Hack
 				MC.rightClickDelay = 4;
 				faceTarget.face(params.hitVec());
 				InteractionSimulator.rightClickBlock(params.toHitResult(), hand,
-					swingHand.getSelected());
+					interactSwing.getSelected());
 				return true;
 			}
 		}
@@ -274,7 +280,7 @@ public final class AutoFarmHack extends Hack
 			MC.rightClickDelay = 4;
 			faceTarget.face(params.hitVec());
 			InteractionSimulator.rightClickBlock(params.toHitResult(),
-				swingHand.getSelected());
+				interactSwing.getSelected());
 			return true;
 		}
 		
@@ -307,7 +313,7 @@ public final class AutoFarmHack extends Hack
 			
 			currentlyMining = blocks.get(0);
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			attackSwing.swing();
 			return;
 		}
 		
@@ -332,7 +338,7 @@ public final class AutoFarmHack extends Hack
 		if(!MC.gameMode.continueDestroyBlock(params.pos(), params.side()))
 			return false;
 		
-		swingHand.swing(InteractionHand.MAIN_HAND);
+		attackSwing.swing();
 		return true;
 	}
 }

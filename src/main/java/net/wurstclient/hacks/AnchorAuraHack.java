@@ -22,6 +22,7 @@ import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RespawnAnchorBlock;
 import net.minecraft.world.phys.AABB;
@@ -33,10 +34,10 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FaceTargetSetting;
 import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
+import net.wurstclient.settings.InteractSwingSetting;
+import net.wurstclient.settings.InteractSwingSetting.InteractSwing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.TakeItemsFromSetting;
 import net.wurstclient.settings.TakeItemsFromSetting.TakeItemsFrom;
 import net.wurstclient.settings.filterlists.AnchorAuraFilterList;
@@ -66,8 +67,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	private final FaceTargetSetting faceTarget =
 		FaceTargetSetting.withPacketSpam(this, FaceTarget.OFF);
 	
-	private final SwingHandSetting swingHand =
-		new SwingHandSetting(this, SwingHand.CLIENT);
+	private final InteractSwingSetting interactSwing =
+		new InteractSwingSetting(this, InteractSwing.CLIENT);
 	
 	private final TakeItemsFromSetting takeItemsFrom =
 		TakeItemsFromSetting.withoutHands(this, TakeItemsFrom.INVENTORY);
@@ -84,7 +85,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		addSetting(autoPlace);
 		addSetting(checkLOS);
 		addSetting(faceTarget);
-		addSetting(swingHand);
+		addSetting(interactSwing);
 		addSetting(takeItemsFrom);
 		
 		entityFilters.forEach(this::addSetting);
@@ -158,7 +159,6 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	{
 		ArrayList<BlockPos> newAnchors = new ArrayList<>();
 		
-		boolean shouldSwing = false;
 		for(Entity target : targets)
 		{
 			ArrayList<BlockPos> freeBlocks = getFreeBlocksNear(target);
@@ -166,16 +166,12 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			for(BlockPos pos : freeBlocks)
 				if(placeAnchor(pos))
 				{
-					shouldSwing = true;
 					newAnchors.add(pos);
 					
 					// TODO optional speed limit(?)
 					break;
 				}
 		}
-		
-		if(shouldSwing)
-			swingHand.swing(InteractionHand.MAIN_HAND);
 		
 		return newAnchors;
 	}
@@ -190,14 +186,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(MC.player.isHolding(Items.GLOWSTONE))
 			return;
 		
-		boolean shouldSwing = false;
-		
 		for(BlockPos pos : chargedAnchors)
-			if(rightClickBlock(pos))
-				shouldSwing = true;
-			
-		if(shouldSwing)
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			rightClickBlock(pos);
 	}
 	
 	private void charge(ArrayList<BlockPos> unchargedAnchors)
@@ -210,14 +200,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 		if(!MC.player.isHolding(Items.GLOWSTONE))
 			return;
 		
-		boolean shouldSwing = false;
-		
 		for(BlockPos pos : unchargedAnchors)
-			if(rightClickBlock(pos))
-				shouldSwing = true;
-			
-		if(shouldSwing)
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			rightClickBlock(pos);
 	}
 	
 	private boolean rightClickBlock(BlockPos pos)
@@ -247,7 +231,10 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			faceTarget.face(hitVec);
 			
 			// place block
+			SwingAnimation swingAnimation =
+				MC.player.getMainHandItem().getInteractAnimation();
 			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
+			interactSwing.swing(InteractionHand.MAIN_HAND, swingAnimation);
 			
 			return true;
 		}
@@ -293,8 +280,11 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			faceTarget.face(hitVec);
 			
 			// place block
+			SwingAnimation swingAnimation =
+				MC.player.getMainHandItem().getInteractAnimation();
 			IMC.getInteractionManager().rightClickBlock(neighbor,
 				side.getOpposite(), hitVec);
+			interactSwing.swing(InteractionHand.MAIN_HAND, swingAnimation);
 			
 			return true;
 		}

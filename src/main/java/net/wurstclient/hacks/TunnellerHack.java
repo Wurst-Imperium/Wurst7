@@ -22,7 +22,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -42,11 +41,11 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.*;
 
 @DontSaveState
@@ -813,9 +812,6 @@ public final class TunnellerHack extends Hack
 		IMC.getInteractionManager().rightClickBlock(pos.relative(side),
 			side.getOpposite(), hitVec);
 		
-		// swing arm
-		SwingHand.SERVER.swing(InteractionHand.MAIN_HAND);
-		
 		// reset timer
 		MC.rightClickDelay = 4;
 	}
@@ -879,7 +875,7 @@ public final class TunnellerHack extends Hack
 			return false;
 		
 		// swing arm
-		SwingHand.SERVER.swing(InteractionHand.MAIN_HAND);
+		AttackSwing.SERVER.swing();
 		
 		return true;
 	}

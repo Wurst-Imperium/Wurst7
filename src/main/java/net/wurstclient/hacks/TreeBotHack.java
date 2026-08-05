@@ -19,7 +19,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -34,12 +33,12 @@ import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.treebot.Tree;
 import net.wurstclient.hacks.treebot.TreeBotUtils;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.FaceTargetSetting;
 import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
@@ -57,8 +56,8 @@ public final class TreeBotHack extends Hack
 	private final FaceTargetSetting faceTarget =
 		FaceTargetSetting.withoutPacketSpam(this, FaceTarget.SERVER);
 	
-	private final SwingHandSetting swingHand =
-		new SwingHandSetting(this, SwingHand.SERVER);
+	private final AttackSwingSetting attackSwing =
+		new AttackSwingSetting(this, AttackSwing.SERVER);
 	
 	private TreeFinder treeFinder;
 	private AngleFinder angleFinder;
@@ -74,7 +73,7 @@ public final class TreeBotHack extends Hack
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		addSetting(faceTarget);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 	}
 	
 	@Override
@@ -228,7 +227,7 @@ public final class TreeBotHack extends Hack
 		
 		// damage block and swing hand
 		if(MC.gameMode.continueDestroyBlock(pos, params.side()))
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			attackSwing.swing();
 		
 		// update progress
 		overlay.updateProgress();

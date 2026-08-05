@@ -12,7 +12,6 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.Category;
@@ -21,6 +20,7 @@ import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -138,7 +138,7 @@ public final class ClickAuraHack extends Hack
 		
 		// attack entity
 		MC.gameMode.attack(player, target);
-		player.swing(InteractionHand.MAIN_HAND);
+		AttackSwing.CLIENT.swing();
 		speed.resetTimer();
 	}
 	

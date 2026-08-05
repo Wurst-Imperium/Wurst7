@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -22,10 +21,10 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.nukers.CommonNukerSettings;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RotationUtils;
@@ -40,8 +39,8 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 	private final CommonNukerSettings commonSettings =
 		new CommonNukerSettings();
 	
-	private final SwingHandSetting swingHand = new SwingHandSetting(
-		SwingHandSetting.genericMiningDescription(this), SwingHand.OFF);
+	private final AttackSwingSetting attackSwing = new AttackSwingSetting(
+		AttackSwingSetting.genericMiningDescription(this), AttackSwing.OFF);
 	
 	public SpeedNukerHack()
 	{
@@ -49,7 +48,7 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		setCategory(Category.BLOCKS);
 		addSetting(range);
 		commonSettings.getSettings().forEach(this::addSetting);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 	}
 	
 	@Override
@@ -111,6 +110,6 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		
 		WURST.getHax().autoToolHack.equipIfEnabled(blocks.get(0));
 		BlockBreaker.breakBlocksWithPacketSpam(blocks);
-		swingHand.swing(InteractionHand.MAIN_HAND);
+		attackSwing.swing();
 	}
 }

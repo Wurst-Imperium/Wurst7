@@ -117,7 +117,7 @@ public abstract class SingleplayerTest
 		context.waitFor(mc -> {
 			var renderer =
 				mc.getEntityRenderDispatcher().getItemInHandRenderer();
-			return !mc.player.swinging && renderer.mainHandHeight == 1
+			return !mc.player.isSwinging() && renderer.mainHandHeight == 1
 				&& renderer.oMainHandHeight == 1;
 		}, 20);
 	}

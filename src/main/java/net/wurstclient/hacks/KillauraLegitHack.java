@@ -15,7 +15,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -26,12 +25,12 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.BlockUtils;
@@ -74,9 +73,9 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 			+ "360\u00b0 = entities can be attacked all around you.",
 		360, 30, 360, 10, ValueDisplay.DEGREES);
 	
-	private final SwingHandSetting swingHand =
-		SwingHandSetting.withoutOffOption(
-			SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
+	private final AttackSwingSetting attackSwing = AttackSwingSetting
+		.withoutOffOption(AttackSwingSetting.genericCombatDescription(this),
+			AttackSwing.CLIENT);
 	
 	private final CheckboxSetting damageIndicator = new CheckboxSetting(
 		"Damage indicator",
@@ -129,7 +128,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		addSetting(rotationSpeed);
 		addSetting(priority);
 		addSetting(fov);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 		addSetting(damageIndicator);
 		
 		entityFilters.forEach(this::addSetting);
@@ -218,7 +217,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		
 		// attack entity
 		MC.gameMode.attack(MC.player, target);
-		swingHand.swing(InteractionHand.MAIN_HAND);
+		attackSwing.swing();
 		speed.resetTimer(speedRandMS.getValue());
 	}
 	

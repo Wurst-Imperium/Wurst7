@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -25,7 +24,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockUtils;
@@ -96,16 +94,9 @@ public final class TillauraHack extends Hack implements HandleInputListener
 		
 		if(multiTill.isChecked())
 		{
-			boolean shouldSwing = false;
-			
 			// till all valid blocks
 			for(BlockPos pos : validBlocks)
-				if(rightClickBlockSimple(pos))
-					shouldSwing = true;
-				
-			// swing arm
-			if(shouldSwing)
-				MC.player.swing(InteractionHand.MAIN_HAND);
+				rightClickBlockSimple(pos);
 		}else
 			// till next valid block
 			for(BlockPos pos : validBlocks)
@@ -155,18 +146,16 @@ public final class TillauraHack extends Hack implements HandleInputListener
 		return true;
 	}
 	
-	private boolean rightClickBlockSimple(BlockPos pos)
+	private void rightClickBlockSimple(BlockPos pos)
 	{
 		// if this block is unreachable, try the next one
 		BlockBreakingParams params = BlockBreaker.getBlockBreakingParams(pos);
 		if(params == null || params.distanceSq() > range.getValueSq())
-			return false;
+			return;
 		if(checkLOS.isChecked() && !params.lineOfSight())
-			return false;
+			return;
 		
 		// right click the block
-		InteractionSimulator.rightClickBlock(params.toHitResult(),
-			SwingHand.OFF);
-		return true;
+		InteractionSimulator.rightClickBlock(params.toHitResult());
 	}
 }

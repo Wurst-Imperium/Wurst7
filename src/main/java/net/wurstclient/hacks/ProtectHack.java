@@ -15,7 +15,6 @@ import java.util.stream.StreamSupport;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -29,10 +28,10 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.EntityUtils;
@@ -45,8 +44,8 @@ public final class ProtectHack extends Hack
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
 	
-	private final SwingHandSetting swingHand = new SwingHandSetting(
-		SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
+	private final AttackSwingSetting attackSwing = new AttackSwingSetting(
+		AttackSwingSetting.genericCombatDescription(this), AttackSwing.CLIENT);
 	
 	private final CheckboxSetting useAi =
 		new CheckboxSetting("Use AI (experimental)", false);
@@ -100,7 +99,7 @@ public final class ProtectHack extends Hack
 		
 		setCategory(Category.COMBAT);
 		addSetting(speed);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 		addSetting(useAi);
 		addSetting(pauseOnContainers);
 		
@@ -287,7 +286,7 @@ public final class ProtectHack extends Hack
 			
 			// attack enemy
 			MC.gameMode.attack(MC.player, enemy);
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			attackSwing.swing();
 			speed.resetTimer();
 		}
 	}

@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -20,6 +19,7 @@ import net.wurstclient.events.HandleBlockBreakingListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyMapping;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"auto mine", "AutoBreak", "auto break"})
@@ -106,7 +106,7 @@ public final class AutoMineHack extends Hack
 		if(im.continueDestroyBlock(pos, side))
 		{
 			MC.level.addBreakingBlockEffect(pos, side);
-			MC.player.swing(InteractionHand.MAIN_HAND);
+			AttackSwing.CLIENT.swing();
 			MC.options.keyAttack.setDown(true);
 		}
 	}
