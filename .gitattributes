@@ -1,2 +1,7 @@
-# Disable LF normalization
-* -text
+* text=auto eol=lf
+# Allow tab-only Java lines per Spotless/Eclipse config
+*.java text eol=crlf whitespace=-blank-at-eol
+*.json text eol=crlf
+*.mcmeta text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf

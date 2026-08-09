@@ -65,7 +65,7 @@ public final class ItemListCmd extends Command
 			break;
 			
 			case "reset":
-			setting.resetToDefaults();
+			setting.resetToDefault();
 			break;
 			
 			default:

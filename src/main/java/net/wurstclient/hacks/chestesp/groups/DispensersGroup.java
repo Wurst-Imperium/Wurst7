@@ -33,7 +33,7 @@ public final class DispensersGroup extends ChestEspBlockGroup
 	}
 	
 	@Override
-	protected boolean matches(BlockEntity be)
+	public boolean matches(BlockEntity be)
 	{
 		return be instanceof DispenserBlockEntity
 			&& !(be instanceof DropperBlockEntity);

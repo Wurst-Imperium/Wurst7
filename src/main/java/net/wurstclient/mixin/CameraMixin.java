@@ -20,6 +20,8 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.level.material.FogType;
 import net.wurstclient.WurstClient;
+import net.wurstclient.event.EventManager;
+import net.wurstclient.events.VisGraphListener.VisGraphEvent;
 import net.wurstclient.hacks.CameraDistanceHack;
 
 @Mixin(Camera.class)
@@ -54,6 +56,22 @@ public abstract class CameraMixin
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
 			cir.setReturnValue(FogType.NONE);
+	}
+	
+	/**
+	 * Disables smart culling when requested through {@link VisGraphEvent}.
+	 */
+	@Inject(
+		method = "extractRenderState(Lnet/minecraft/client/renderer/state/level/CameraRenderState;F)V",
+		at = @At("RETURN"))
+	private void onExtractVisGraphState(CameraRenderState cameraState,
+		float partialTicks, CallbackInfo ci)
+	{
+		VisGraphEvent event = new VisGraphEvent();
+		EventManager.fire(event);
+		
+		if(event.isCancelled())
+			cameraState.smartCull = false;
 	}
 	
 	/**
