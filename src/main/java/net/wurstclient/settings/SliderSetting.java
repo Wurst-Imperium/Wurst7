@@ -121,6 +121,12 @@ public class SliderSetting extends Setting implements SliderLock
 		setValueIgnoreLock(value);
 	}
 	
+	@Override
+	public final void resetToDefault()
+	{
+		setValue(defaultValue);
+	}
+	
 	private void setValueIgnoreLock(double value)
 	{
 		value = (int)Math.round(value / increment) * increment;

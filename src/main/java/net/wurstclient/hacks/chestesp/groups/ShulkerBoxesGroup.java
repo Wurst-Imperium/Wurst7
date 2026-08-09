@@ -32,7 +32,7 @@ public final class ShulkerBoxesGroup extends ChestEspBlockGroup
 	}
 	
 	@Override
-	protected boolean matches(BlockEntity be)
+	public boolean matches(BlockEntity be)
 	{
 		return be instanceof ShulkerBoxBlockEntity
 			|| LootrModCompat.isLootrShulkerBox(be);
