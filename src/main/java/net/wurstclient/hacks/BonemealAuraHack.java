@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,8 +25,6 @@ import net.wurstclient.settings.FaceTargetSetting;
 import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.TakeItemsFromSetting;
 import net.wurstclient.settings.TakeItemsFromSetting.TakeItemsFrom;
 import net.wurstclient.util.BlockBreaker;
@@ -53,9 +50,6 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	
 	private final FaceTargetSetting faceTarget =
 		FaceTargetSetting.withPacketSpam(this, FaceTarget.SERVER);
-	
-	private final SwingHandSetting swingHand =
-		new SwingHandSetting(this, SwingHand.CLIENT);
 	
 	private final CheckboxSetting fastPlace =
 		new CheckboxSetting("Always FastPlace",
@@ -96,7 +90,6 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		addSetting(multiMeal);
 		addSetting(checkLOS);
 		addSetting(faceTarget);
-		addSetting(swingHand);
 		addSetting(fastPlace);
 		addSetting(useWhileBreaking);
 		addSetting(useWhileRiding);
@@ -154,26 +147,18 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		
 		if(multiMeal.isChecked())
 		{
-			boolean shouldSwing = false;
-			
 			for(BlockBreakingParams params : validBlocks)
 			{
 				faceTarget.face(params.hitVec());
-				InteractionSimulator.rightClickBlock(params.toHitResult(),
-					SwingHand.OFF);
-				shouldSwing = true;
+				InteractionSimulator.rightClickBlock(params.toHitResult());
 			}
-			
-			if(shouldSwing)
-				swingHand.swing(InteractionHand.MAIN_HAND);
 			
 		}else
 		{
 			BlockBreakingParams params = validBlocks.getFirst();
 			MC.rightClickDelay = 4;
 			faceTarget.face(params.hitVec());
-			InteractionSimulator.rightClickBlock(params.toHitResult(),
-				swingHand.getSelected());
+			InteractionSimulator.rightClickBlock(params.toHitResult());
 		}
 	}
 	
