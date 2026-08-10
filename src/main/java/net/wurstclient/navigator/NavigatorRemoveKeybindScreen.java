@@ -54,7 +54,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		
 		addRenderableWidget(Button
 			.builder(Component.literal("Cancel"),
-				b -> minecraft.setScreen(parent))
+				b -> minecraft.gui.setScreen(parent))
 			.bounds(width / 2 + 2, height - 65, 149, 18).build());
 	}
 	
@@ -88,7 +88,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		WurstClient.INSTANCE.getNavigator()
 			.addPreference(parent.getFeature().getName());
 		
-		minecraft.setScreen(parent);
+		minecraft.gui.setScreen(parent);
 	}
 	
 	@Override
@@ -96,7 +96,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	{
 		if(context.key() == GLFW.GLFW_KEY_ESCAPE
 			|| context.key() == GLFW.GLFW_KEY_BACKSPACE)
-			minecraft.setScreen(parent);
+			minecraft.gui.setScreen(parent);
 	}
 	
 	@Override
@@ -107,7 +107,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
-			WurstClient.MC.setScreen(parent);
+			WurstClient.MC.gui.setScreen(parent);
 			return;
 		}
 		

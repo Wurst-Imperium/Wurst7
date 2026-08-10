@@ -39,7 +39,7 @@ public class PressAKeyScreen extends Screen
 		if(event.key() != GLFW.GLFW_KEY_ESCAPE)
 			prevScreen.setKey(InputConstants.getKey(event).getName());
 		
-		minecraft.setScreen((Screen)prevScreen);
+		minecraft.gui.setScreen((Screen)prevScreen);
 		return super.keyPressed(event);
 	}
 	
@@ -48,7 +48,7 @@ public class PressAKeyScreen extends Screen
 	{
 		prevScreen.setKey(
 			InputConstants.Type.MOUSE.getOrCreate(event.button()).getName());
-		minecraft.setScreen((Screen)prevScreen);
+		minecraft.gui.setScreen((Screen)prevScreen);
 		return true;
 	}
 	

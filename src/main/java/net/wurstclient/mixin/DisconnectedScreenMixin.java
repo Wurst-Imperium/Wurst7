@@ -60,13 +60,13 @@ public class DisconnectedScreenMixin extends Screen
 		
 		if(ForcedChatReportsScreen.isCausedByNoChatReports(reason))
 		{
-			minecraft.setScreen(new ForcedChatReportsScreen(parent));
+			minecraft.gui.setScreen(new ForcedChatReportsScreen(parent));
 			return;
 		}
 		
 		if(NcrModRequiredScreen.isCausedByLackOfNCR(reason))
 		{
-			minecraft.setScreen(new NcrModRequiredScreen(parent));
+			minecraft.gui.setScreen(new NcrModRequiredScreen(parent));
 			return;
 		}
 		

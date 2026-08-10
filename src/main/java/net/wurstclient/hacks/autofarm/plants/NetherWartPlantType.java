@@ -8,9 +8,9 @@
 package net.wurstclient.hacks.autofarm.plants;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.NetherWartBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.wurstclient.hacks.autofarm.AutoFarmPlantType;
@@ -28,7 +28,8 @@ public final class NetherWartPlantType extends AutoFarmPlantType
 	@Override
 	public final boolean hasPlantingSurface(BlockPos pos)
 	{
-		return BlockUtils.getState(pos.below()).is(Blocks.SOUL_SAND);
+		return BlockUtils.getState(pos.below())
+			.is(BlockTags.SUPPORTS_NETHER_WART);
 	}
 	
 	@Override

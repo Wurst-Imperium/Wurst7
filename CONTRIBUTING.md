@@ -1,55 +1,57 @@
-# Contributing Guidelines
-Thank you for considering to contribute! Here are some guidelines to help you get started. ![](https://img.wimods.net/github.com/Wurst-Imperium/Wurst7/CONTRIBUTING.md)
+# Contributing to Wurst
+
+This guide exists to save both sides time. ![](https://img.wimods.net/github.com/Wurst-Imperium/Wurst7/CONTRIBUTING.md)
+
+## Priorities
+
+1. **Maintainers first:** architecture, gametests, release workflows, review burden.
+2. **Users second:** features, bugfixes, compatibility, documentation.
+3. **Sponsors third:** advertising, donation perks, monetization.
+
+Happy maintainers ensure happy users, happy users ensure happy sponsors. In that order.
+
+## Issues
+
+- **Search before posting:** Both GitHub issues and [WurstForum](https://wurstforum.net/) might have a post about your bug or feature request already. Find and read that first. Remember that posting duplicates makes it harder for the next person to find the original with all the answers.
+
+- **State the bug or request clearly:** For requests, explain what it is, how it works, and why it matters. For bugs, include repro steps. "idk it's weird sometimes" is not actionable.
+
+- **Include the crash report file:** If the game is crashing and/or it's unclear which versions you're using, I _need_ that file to diagnose the issue. No crash? Hold down <kbd>F3</kbd> + <kbd>C</kbd> for 10 seconds to force one.
+  - Windows: `%APPDATA%/.minecraft/crash-reports/crash-<timestamp>-client.txt`
+  - Linux: `~/.minecraft/crash-reports/crash-<timestamp>-client.txt`
+  - macOS: `~/Library/Application Support/minecraft/crash-reports/crash-<timestamp>-client.txt`
+
+- **If you want to implement the change yourself, say so.**
 
 ## Pull Requests
 
-### 1. Keep Pull Requests Small and Focused
-- **1 PR = 1 change**: Each pull request should address a single issue or add a single feature.
-- **Avoid Bloat**: Aim to keep the diff small and digestible. Don't stuff PRs with unrelated changes.
+- **Communicate first:** Please talk to me before opening a PR. I don't like receiving PRs out of the blue. This is supposed to be a collaborative process.
 
-### 2. Respect the Project's Scope and Vision
-- **Communicate Before Coding**: Open an issue to discuss any major changes before you start working on them. This can save you a lot of time and effort in case your idea is rejected. When in doubt, ask first.
-- **Avoid Breaking Changes**: When modifying existing features, it's usually better to make your changes optional. Your version may work better for you, but other people will often have different use cases that rely on the original behavior.
+- **1 PR = 1 change:** Each pull request should address a single issue or add a single feature. Don't stuff PRs with unrelated changes.
 
-### 3. Ensure Quality and Completeness
-- **Finish the Code**: Submit a PR only when it's complete, tested, and ready for review. Don't use pull requests as a dumping ground for half-baked prototypes.
-- If you need early feedback on a larger change, clearly mark the PR as a draft. You should have already started a discussion and gotten the go-ahead for your idea at this point.
-- **Watch the Checks**: Make sure that all automated checks are passing and that there aren't any merge conflicts. Fix such issues before asking for a review.
+- **Make it easy to review:** Keep the diff small and the code readable. Include any `/give` commands or whatever I need to test your change in the PR description. Remember that review is the bottleneck.
 
-### 4. Follow the Code Style
-- Run Eclipse's Clean Up and Format tools with the settings from the [codestyle folder](codestyle).
-- If you don't use Eclipse, you can run `./gradlew spotlessApply` instead. However, be aware that this isn't as thorough as Eclipse's tools.
-- For anything that these automated tools don't cover, please try to match the existing code style as closely as possible.
+- **Follow the code style:** Run `./gradlew spotlessApply` or Eclipse settings from the [codestyle folder](codestyle). For anything that this doesn't cover, please try to match the existing style as closely as possible.
 
-## Other Ways To Help
+- **Run tests:** `./gradlew check runClientGameTest runClientGameTestWithMods` must pass. Consider adding a gametest for your change. It's not easy, but it helps a lot.
 
-- fixing a typo
-  - in the Wurst Client itself (look for the pen icon at the top right)
-  - on WurstClient.net (scroll all the way down and click "edit this page")
-  - on the Wurst Wiki (login and click "Edit this page")
-- improving an existing bug report
-  - figuring out which Minecraft versions are affected by the bug
-  - Can you figure out how to make the bug happen every time? If so, please let me know.
-    - The ["could not reproduce"](https://github.com/Wurst-Imperium/Wurst7/labels/could%20not%20reproduce) label lists bug reports where I haven't been able to figure this out.
-- reporting a new dupe/exploit in Minecraft that could be added to Wurst
-- helping with a feature request
-  - Can you explain how the feature works?
-  - Can you add the feature in a Pull Request?
-  - Do you know anything else about the feature that hasn't been mentioned?
-- helping with the [Wurst Wiki](https://wurst.wiki/)
-  - translating Wurst Wiki articles to another language
-  - adding screenshots of features where appropriate
-  - making sure that changes from recent Wurst updates are documented
-  - digging through old Wurst updates to find out when exactly a feature was added
-- helping people who can't figure out how to install Wurst
-- making tutorials / how-to videos
-  - how to make [AutoBuild templates](https://wurst.wiki/autobuild#creating_templates)
-  - how to use the [profile system](https://www.wurstclient.net/updates/wurst-7-1/)
-- creating more backups/archives of Wurst
-  - [creating a fork](https://github.com/Wurst-Imperium/Wurst7/fork) / mirror of this repository
-  - adding [WurstClient.net](https://www.wurstclient.net/) pages to the Internet Archive
-  - adding [Wurst Wiki](https://wurst.wiki/) articles to the Internet Archive
-  - archiving old [Wurst releases](https://www.wurstclient.net/download/) & source code in case they are ever taken down
-  - archiving [WiZARDHAX Wurst videos](https://www.youtube.com/c/wizardhax/videos) in case the channel is ever taken down
-- just spreading the word, telling people about Wurst, etc.
-- expanding this list with more things that people can do to help (This is all I could think of for now.)
+- **Sign the CLA:** <https://cla-assistant.io/Wurst-Imperium/Wurst7>. See below for why.
+
+### Why we have a CLA
+
+The CLA basically just restates the important bits of the GPLv3 license:
+
+- Copyright exists. You can't just submit code that you don't have the rights to.
+- You can't request to have your PR "un-merged" later. No takesies-backsies.
+- Anyone can use Wurst, even if it includes your code, to do things you don't like.
+- Anyone can sell or make money from Wurst, even if it includes your code, without having to pay you.
+
+The GPL already enforces these rules. The CLA is just there to draw attention to them, because "I didn't read the license" has happened enough times already.
+
+## Wurst Wiki
+
+Anyone can contribute to the wiki. You don't need permission. You only need an email address to create an account.
+
+See: <https://wurst.wiki/how_to_help>
+
+Note: The wiki has a Cloudflare captcha on the login/registration page to lock out spam bots. Sorry if this is blocked in your country. It's necessary.

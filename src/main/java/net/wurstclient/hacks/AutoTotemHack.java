@@ -107,9 +107,9 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			return;
 		
 		// don't move items while a container is open
-		if(MC.screen instanceof AbstractContainerScreen
-			&& !(MC.screen instanceof InventoryScreen
-				|| MC.screen instanceof CreativeModeInventoryScreen))
+		if(MC.gui.screen() instanceof AbstractContainerScreen
+			&& !(MC.gui.screen() instanceof InventoryScreen
+				|| MC.gui.screen() instanceof CreativeModeInventoryScreen))
 			return;
 		
 		if(timer > 0)

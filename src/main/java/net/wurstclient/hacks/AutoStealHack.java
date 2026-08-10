@@ -84,7 +84,7 @@ public final class AutoStealHack extends Hack
 				
 				Thread.sleep(delay.getValueI());
 				
-				if(MC.screen == null)
+				if(MC.gui.screen() == null)
 					break;
 				
 				screen.slotClicked(slot, slot.index, 0,

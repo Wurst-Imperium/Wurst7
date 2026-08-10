@@ -82,7 +82,7 @@ public final class RestockHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		// Don't mess with the inventory while it's open.
-		if(MC.screen instanceof AbstractContainerScreen)
+		if(MC.gui.screen() instanceof AbstractContainerScreen)
 			return;
 		
 		Inventory inv = MC.player.getInventory();

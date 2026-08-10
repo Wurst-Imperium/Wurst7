@@ -127,7 +127,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 	
 	private boolean isZoomKeyPressed()
 	{
-		if(MC.screen != null && !zoomInScreens.isChecked())
+		if(MC.gui.screen() != null && !zoomInScreens.isChecked())
 			return false;
 		
 		return InputConstants.isKeyDown(MC.getWindow(),

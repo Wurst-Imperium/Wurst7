@@ -117,7 +117,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		// back button
 		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
 		{
-			WurstClient.MC.setScreen((Screen)null);
+			WurstClient.MC.gui.setScreen((Screen)null);
 			return;
 		}
 		
@@ -199,7 +199,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			if(clickTimer < 4)
 				clickTimer++;
 			else
-				WurstClient.MC.setScreen(
+				WurstClient.MC.gui.setScreen(
 					new NavigatorFeatureScreen(expandingFeature, this));
 		else if(!expanding && clickTimer > -1)
 			clickTimer--;
@@ -271,8 +271,8 @@ public final class NavigatorMainScreen extends NavigatorScreen
 				if(lw > tw)
 					tw = lw;
 			}
-			int sw = minecraft.screen.width;
-			int sh = minecraft.screen.height;
+			int sw = minecraft.gui.screen().width;
+			int sh = minecraft.gui.screen().height;
 			
 			int xt1 = mouseX + tw + 11 <= sw ? mouseX + 8 : mouseX - tw - 8;
 			int xt2 = xt1 + tw + 3;

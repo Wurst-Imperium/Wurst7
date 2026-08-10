@@ -8,25 +8,28 @@
 package net.wurstclient.gametest;
 
 import java.nio.file.Path;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
+import net.wurstclient.gametest.BlockTestHelper.BlockBatch;
 
 public abstract class SingleplayerTest
 {
 	protected final ClientGameTestContext context;
 	protected final TestSingleplayerContext spContext;
 	protected final TestInput input;
-	protected final TestClientLevelContext world;
+	protected final TestServerConnection connection;
 	protected final TestServerContext server;
 	protected final Logger logger = WurstTest.LOGGER;
 	
@@ -36,7 +39,7 @@ public abstract class SingleplayerTest
 		this.context = context;
 		this.spContext = spContext;
 		this.input = context.getInput();
-		this.world = spContext.getClientLevel();
+		this.connection = spContext.getConnection();
 		this.server = spContext.getServer();
 	}
 	
@@ -46,9 +49,19 @@ public abstract class SingleplayerTest
 	public final void run()
 	{
 		runImpl();
-		waitForScreenshotMatch(
-			getClass().getSimpleName().toLowerCase() + "_cleanup",
-			"https://i.imgur.com/XF1SILt.png");
+		
+		String testName = getClass().getSimpleName();
+		int retries =
+			waitForScreenshotMatch(testName.toLowerCase() + "_cleanup",
+				"https://i.imgur.com/XF1SILt.png");
+		
+		if(retries > 0)
+			logger.warn(testName + " needed " + retries
+				+ " retries to get a valid cleanup screenshot. First view ALL"
+				+ " screenshots from " + testName + " to understand what"
+				+ " happened, then optionally retest. If this keeps happening,"
+				+ " your timings are probably wrong. Otherwise it's likely a"
+				+ " fluke, especially if you didn't change any gametest code.");
 	}
 	
 	/**
@@ -68,11 +81,29 @@ public abstract class SingleplayerTest
 		WurstClientTestHelper.runWurstCommand(context, command);
 	}
 	
-	protected final void waitForBlock(int relX, int relY, int relZ, Block block)
+	protected final void waitFor(Predicate<Minecraft> predicate,
+		String errorMsg)
 	{
-		context.waitFor(mc -> mc.level
-			.getBlockState(mc.player.blockPosition().offset(relX, relY, relZ))
-			.getBlock() == block);
+		waitFor(predicate, ClientGameTestContext.DEFAULT_TIMEOUT, errorMsg);
+	}
+	
+	protected final void waitFor(Predicate<Minecraft> predicate, int timeout,
+		String errorMsg)
+	{
+		try
+		{
+			context.waitFor(predicate, timeout);
+			
+		}catch(AssertionError e)
+		{
+			WurstClientTestHelper.ghSummary(errorMsg);
+			throw new AssertionError(errorMsg);
+		}
+	}
+	
+	protected final void setBlocksAndWait(Consumer<BlockBatch> batchBuilder)
+	{
+		BlockTestHelper.setBlocksAndWait(context, spContext, batchBuilder);
 	}
 	
 	/**
@@ -92,7 +123,7 @@ public abstract class SingleplayerTest
 	
 	protected final void clearChat()
 	{
-		context.runOnClient(mc -> mc.gui.getChat().clearMessages(true));
+		context.runOnClient(mc -> mc.gui.hud.getChat().clearMessages(true));
 	}
 	
 	protected final void clearInventory()
@@ -110,7 +141,7 @@ public abstract class SingleplayerTest
 	
 	protected final void clearToasts()
 	{
-		context.runOnClient(mc -> mc.getToastManager().clear());
+		context.runOnClient(mc -> mc.gui.toastManager().clear());
 	}
 	
 	protected final void assertOneItemInSlot(int slot, Item item)
@@ -131,10 +162,10 @@ public abstract class SingleplayerTest
 			templateUrl);
 	}
 	
-	protected final void waitForScreenshotMatch(String fileName,
+	protected final int waitForScreenshotMatch(String fileName,
 		String templateUrl)
 	{
-		WurstClientTestHelper.waitForScreenshotMatch(context, fileName,
+		return WurstClientTestHelper.waitForScreenshotMatch(context, fileName,
 			templateUrl);
 	}
 	

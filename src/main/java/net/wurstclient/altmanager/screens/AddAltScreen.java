@@ -40,6 +40,6 @@ public final class AddAltScreen extends AltEditorScreen
 		else
 			altManager.add(new MojangAlt(nameOrEmail, password));
 		
-		minecraft.setScreen(prevScreen);
+		minecraft.gui.setScreen(prevScreen);
 	}
 }

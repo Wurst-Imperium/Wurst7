@@ -149,7 +149,7 @@ public final class FreecamHack extends Hack
 		EVENTS.remove(MouseScrollListener.class, this);
 		
 		if(reloadChunks.isChecked())
-			MC.levelRenderer.allChanged();
+			MC.levelExtractor.allChanged();
 	}
 	
 	@Override
@@ -166,7 +166,7 @@ public final class FreecamHack extends Hack
 		}
 		lastHealth = currentHealth;
 		
-		if(!isMovingCamera() || MC.screen != null)
+		if(!isMovingCamera() || MC.gui.screen() != null)
 		{
 			prevCamPos = camPos;
 			return;
@@ -176,7 +176,7 @@ public final class FreecamHack extends Hack
 		Vec2 moveVector = player.input.getMoveVector();
 		
 		// Convert to world coordinates
-		double yawRad = MC.gameRenderer.getMainCamera().yRot() * Mth.DEG_TO_RAD;
+		double yawRad = MC.gameRenderer.mainCamera().yRot() * Mth.DEG_TO_RAD;
 		double sinYaw = Mth.sin(yawRad);
 		double cosYaw = Mth.cos(yawRad);
 		double offsetX = moveVector.x * cosYaw - moveVector.y * sinYaw;
@@ -218,7 +218,7 @@ public final class FreecamHack extends Hack
 	public boolean isControllingScrollEvents()
 	{
 		return isMovingCamera() && scrollToChangeSpeed.isChecked()
-			&& MC.screen == null
+			&& MC.gui.screen() == null
 			&& !WURST.getOtfs().zoomOtf.isControllingScrollEvents();
 	}
 	

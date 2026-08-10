@@ -97,7 +97,7 @@ public final class AutoCompleteHack extends Hack
 			return;
 		
 		// check if the chat is open
-		if(!(MC.screen instanceof ChatScreen))
+		if(!(MC.gui.screen() instanceof ChatScreen))
 			return;
 		
 		// check if we have a draft message and suggestions updater

@@ -60,7 +60,7 @@ public abstract class GameRendererMixin implements AutoCloseable
 	}
 	
 	@Inject(
-		method = "getNightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
+		method = "nightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
 		at = @At("HEAD"),
 		cancellable = true)
 	private static void onGetNightVisionStrength(LivingEntity entity,

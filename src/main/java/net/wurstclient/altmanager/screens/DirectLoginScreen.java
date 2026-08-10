@@ -49,6 +49,6 @@ public final class DirectLoginScreen extends AltEditorScreen
 			}
 		
 		message = "";
-		minecraft.setScreen(new TitleScreen());
+		minecraft.gui.setScreen(new TitleScreen());
 	}
 }

@@ -56,7 +56,7 @@ public final class KeybindProfilesScreen extends Screen
 		
 		addRenderableWidget(Button
 			.builder(Component.literal("New Profile"),
-				b -> minecraft.setScreen(
+				b -> minecraft.gui.setScreen(
 					new EnterProfileNameScreen(this, this::newProfile)))
 			.bounds(width / 2 - 154, height - 48, 100, 20).build());
 		
@@ -66,7 +66,7 @@ public final class KeybindProfilesScreen extends Screen
 		
 		addRenderableWidget(Button
 			.builder(Component.literal("Cancel"),
-				b -> minecraft.setScreen(prevScreen))
+				b -> minecraft.gui.setScreen(prevScreen))
 			.bounds(width / 2 + 54, height - 48, 100, 20).build());
 	}
 	
@@ -96,7 +96,7 @@ public final class KeybindProfilesScreen extends Screen
 		Path path = listGui.getSelectedPath();
 		if(path == null)
 		{
-			minecraft.setScreen(prevScreen);
+			minecraft.gui.setScreen(prevScreen);
 			return;
 		}
 		
@@ -104,7 +104,7 @@ public final class KeybindProfilesScreen extends Screen
 		{
 			String fileName = "" + path.getFileName();
 			WurstClient.INSTANCE.getKeybinds().loadProfile(fileName);
-			minecraft.setScreen(prevScreen);
+			minecraft.gui.setScreen(prevScreen);
 			
 		}catch(IOException | JsonException e)
 		{
@@ -119,7 +119,7 @@ public final class KeybindProfilesScreen extends Screen
 		if(context.key() == GLFW.GLFW_KEY_ENTER)
 			loadSelected();
 		else if(context.key() == GLFW.GLFW_KEY_ESCAPE)
-			minecraft.setScreen(prevScreen);
+			minecraft.gui.setScreen(prevScreen);
 		
 		return super.keyPressed(context);
 	}

@@ -47,7 +47,7 @@ public enum ChatUtils
 		if(!enabled)
 			return;
 		
-		ChatComponent chatHud = MC.gui.getChat();
+		ChatComponent chatHud = MC.gui.hud.getChat();
 		MutableComponent prefix = Component.literal(WURST_PREFIX);
 		chatHud.addClientSystemMessage(prefix.append(component));
 	}

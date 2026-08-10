@@ -45,11 +45,11 @@ public final class ColorComponent extends Component
 		switch(mouseButton)
 		{
 			case GLFW.GLFW_MOUSE_BUTTON_LEFT:
-			MC.setScreen(new EditColorScreen(MC.screen, setting));
+			MC.gui.setScreen(new EditColorScreen(MC.gui.screen(), setting));
 			break;
 			
 			case GLFW.GLFW_MOUSE_BUTTON_RIGHT:
-			setting.setColor(setting.getDefaultColor());
+			setting.resetToDefault();
 			break;
 		}
 	}

@@ -19,6 +19,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 
@@ -101,15 +102,20 @@ public enum EntityUtils
 	
 	public static double distanceToHitboxSq(Entity e)
 	{
-		return distanceToHitboxSqr(RotationUtils.getEyesPos(), e);
+		Vec3 start = RotationUtils.getEyesPos();
+		AABB box = e.getBoundingBox();
+		double x = Mth.clamp(start.x, box.minX, box.maxX);
+		double y = Mth.clamp(start.y, box.minY, box.maxY);
+		double z = Mth.clamp(start.z, box.minZ, box.maxZ);
+		return start.distanceToSqr(new Vec3(x, y, z));
 	}
 	
-	public static double distanceToHitboxSqr(Vec3 point, Entity e)
+	public static EntityHitResult createHitResult(Entity e)
 	{
 		AABB box = e.getBoundingBox();
-		double x = Mth.clamp(point.x, box.minX, box.maxX);
-		double y = Mth.clamp(point.y, box.minY, box.maxY);
-		double z = Mth.clamp(point.z, box.minZ, box.maxZ);
-		return point.distanceToSqr(new Vec3(x, y, z));
+		Vec3 start = RotationUtils.getEyesPos();
+		Vec3 end = box.getCenter();
+		Vec3 hitVec = box.clip(start, end).orElse(start);
+		return new EntityHitResult(e, hitVec);
 	}
 }

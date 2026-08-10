@@ -157,7 +157,7 @@ public final class EditColorScreen extends Screen
 	private void done()
 	{
 		colorSetting.setColor(color);
-		minecraft.setScreen(prevScreen);
+		minecraft.gui.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -245,7 +245,7 @@ public final class EditColorScreen extends Screen
 			break;
 			
 			case GLFW.GLFW_KEY_ESCAPE:
-			minecraft.setScreen(prevScreen);
+			minecraft.gui.setScreen(prevScreen);
 			break;
 		}
 		

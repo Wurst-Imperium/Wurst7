@@ -63,7 +63,7 @@ public abstract class TitleScreenMixin extends Screen
 		// add AltManager button
 		addRenderableWidget(altsButton = Button
 			.builder(Component.literal("Alt Manager"),
-				b -> minecraft.setScreen(new AltManagerScreen(this,
+				b -> minecraft.gui.setScreen(new AltManagerScreen(this,
 					WurstClient.INSTANCE.getAltManager())))
 			.bounds(width / 2 + 2, realmsButton.getY(), 98, 20).build());
 	}

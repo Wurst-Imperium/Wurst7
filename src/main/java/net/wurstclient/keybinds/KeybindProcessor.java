@@ -79,7 +79,7 @@ public final class KeybindProcessor
 			GLFW.GLFW_KEY_F3))
 			return false;
 		
-		Screen screen = WurstClient.MC.screen;
+		Screen screen = WurstClient.MC.gui.screen();
 		return screen == null || screen instanceof ClickGuiScreen;
 	}
 	

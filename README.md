@@ -46,10 +46,10 @@ Also, this should be obvious, but you do need to have a licensed copy of Minecra
 2. Generate the sources:
 
    ```pwsh
-   ./gradlew genSources eclipse
+   ./gradlew genSources genEclipseRuns
    ```
 
-3. In Eclipse, go to `Import...` > `Existing Projects into Workspace` and select this project.
+3. In Eclipse, go to `Import...` > `Gradle` > `Existing Gradle Project` and select this project.
 
 4. **Optional:** Right-click on the project and select `Properties` > `Java Code Style`. Then under `Clean Up`, `Code Templates`, `Formatter`, import the respective files in the `codestyle` folder.
 
@@ -82,7 +82,7 @@ I don't use or recommend IntelliJ, but the commands to run would be:
 ```pwsh
 git clone https://github.com/Wurst-Imperium/Wurst7.git
 cd Wurst7
-./gradlew genSources idea --no-configuration-cache
+./gradlew genSources ideaSyncTask --no-configuration-cache
 ```
 
 **Note:** IntelliJ IDEA is [not yet compatible](https://github.com/FabricMC/fabric-loom/issues/1349) with Gradle's configuration cache. You will run into issues.

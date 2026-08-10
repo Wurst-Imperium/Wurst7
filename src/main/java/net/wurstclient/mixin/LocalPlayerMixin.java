@@ -149,6 +149,22 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		return original.call(instance);
 	}
 	
+	/**
+	 * Allows sprinting to start while using an item when NoSlowdown is enabled.
+	 */
+	@WrapOperation(method = "canStartSprinting()Z",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;isSlowDueToUsingItem()Z",
+			ordinal = 0))
+	private boolean wrapCanStartSprintingItemUse(LocalPlayer instance,
+		Operation<Boolean> original)
+	{
+		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
+			return false;
+		
+		return original.call(instance);
+	}
+	
 	@Inject(method = "sendPosition()V", at = @At("HEAD"))
 	private void onSendMovementPacketsHEAD(CallbackInfo ci)
 	{
@@ -183,17 +199,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	 * to null to prevent the updateNausea() method from closing it.
 	 */
 	@Inject(method = "handlePortalTransitionEffect(Z)V",
-		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;",
-			opcode = Opcodes.GETFIELD,
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/Gui;screen()Lnet/minecraft/client/gui/screens/Screen;",
 			ordinal = 0))
 	private void beforeTickNausea(boolean fromPortalEffect, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
 			return;
 		
-		tempCurrentScreen = minecraft.screen;
-		minecraft.screen = null;
+		tempCurrentScreen = minecraft.gui.screen();
+		minecraft.gui.setScreen(null);
 	}
 	
 	/**
@@ -210,7 +225,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		if(tempCurrentScreen == null)
 			return;
 		
-		minecraft.screen = tempCurrentScreen;
+		minecraft.gui.setScreen(tempCurrentScreen);
 		tempCurrentScreen = null;
 	}
 	

@@ -59,13 +59,7 @@ jobs:
     needs: prepare
     if: ${{ !fromJson(inputs.dry_run) }}
     strategy:
-      # Each job pushes an automated commit to WurstClient.net@master, so running them all in parallel
-      # would likely cause conflicts. Also, various servers might hit rate limits if we just upload
-      # all of the files at once.
-      max-parallel: 1
-      # If something goes wrong, all published files have to be manually deleted.
-      # Best to fail as early as possible.
-      fail-fast: true
+      fail-fast: false
       matrix:
         branch: ${{ fromJson(needs.prepare.outputs.branches) }}
     steps:

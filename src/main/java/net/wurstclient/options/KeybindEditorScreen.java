@@ -55,7 +55,7 @@ public final class KeybindEditorScreen extends Screen
 	{
 		addRenderableWidget(Button
 			.builder(Component.literal("Change Key"),
-				b -> minecraft.setScreen(new PressAKeyScreen(this)))
+				b -> minecraft.gui.setScreen(new PressAKeyScreen(this)))
 			.bounds(width / 2 - 100, 60, 200, 20).build());
 		
 		addRenderableWidget(
@@ -64,7 +64,7 @@ public final class KeybindEditorScreen extends Screen
 		
 		addRenderableWidget(Button
 			.builder(Component.literal("Cancel"),
-				b -> minecraft.setScreen(prevScreen))
+				b -> minecraft.gui.setScreen(prevScreen))
 			.bounds(width / 2 - 100, height / 4 + 96, 200, 20).build());
 		
 		commandField = new EditBox(font, width / 2 - 100, 100, 200, 20,
@@ -84,7 +84,7 @@ public final class KeybindEditorScreen extends Screen
 			WurstClient.INSTANCE.getKeybinds().remove(oldKey);
 		
 		WurstClient.INSTANCE.getKeybinds().add(key, commandField.getValue());
-		minecraft.setScreen(prevScreen);
+		minecraft.gui.setScreen(prevScreen);
 	}
 	
 	@Override
@@ -116,7 +116,7 @@ public final class KeybindEditorScreen extends Screen
 	@Override
 	public void onClose()
 	{
-		minecraft.setScreen(prevScreen);
+		minecraft.gui.setScreen(prevScreen);
 	}
 	
 	@Override
