@@ -103,10 +103,9 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	/**
 	 * This mixin makes AutoSprint's "Omnidirectional Sprint" setting work.
 	 */
-	@WrapOperation(method = "aiStep()V",
+	@WrapOperation(method = "shouldStopRunSprinting()Z",
 		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/player/ClientInput;hasForwardImpulse()Z",
-			ordinal = 0))
+			target = "Lnet/minecraft/client/player/ClientInput;hasForwardImpulse()Z"))
 	private boolean wrapHasForwardMovement(ClientInput input,
 		Operation<Boolean> original)
 	{
