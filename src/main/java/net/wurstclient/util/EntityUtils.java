@@ -15,7 +15,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
 import net.minecraft.world.phys.AABB;
@@ -44,16 +43,16 @@ public enum EntityUtils
 			&& e != MC.player && !(e instanceof FakePlayerEntity)
 			&& !WURST.getFriends().isFriend(e);
 	
-	public static Stream<Animal> getValidAnimals()
+	public static Stream<LivingEntity> getValidLivingEntities()
 	{
 		return StreamSupport
 			.stream(MC.level.entitiesForRendering().spliterator(), true)
-			.filter(Animal.class::isInstance).map(e -> (Animal)e)
-			.filter(IS_VALID_ANIMAL);
+			.filter(LivingEntity.class::isInstance).map(e -> (LivingEntity)e)
+			.filter(IS_VALID_LIVING_ENTITY);
 	}
 	
-	public static final Predicate<Animal> IS_VALID_ANIMAL =
-		a -> a != null && !a.isRemoved() && a.getHealth() > 0;
+	public static final Predicate<LivingEntity> IS_VALID_LIVING_ENTITY =
+		le -> le != null && !le.isRemoved() && le.getHealth() > 0;
 	
 	/**
 	 * Interpolates (or "lerps") between the entity's position in the previous
