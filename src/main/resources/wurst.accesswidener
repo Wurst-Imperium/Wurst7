@@ -26,6 +26,8 @@ accessible	field	net/minecraft/client/gui/screens/options/controls/KeyBindsList$
 accessible	field	net/minecraft/client/gui/components/CycleButton	name	Lnet/minecraft/network/chat/Component;
 accessible	field	net/minecraft/client/multiplayer/ClientPacketListener	signedMessageEncoder	Lnet/minecraft/network/chat/SignedMessageChain$Encoder;
 accessible	field	net/minecraft/client/multiplayer/ClientPacketListener	chatSession	Lnet/minecraft/network/chat/LocalChatSession;
+accessible	field	net/minecraft/client/player/FirstPersonHandsAndItems	mainHandHeight	F
+accessible	field	net/minecraft/client/player/FirstPersonHandsAndItems	oMainHandHeight	F
 accessible	field	net/minecraft/client/player/LocalPlayer	xRotLast	F
 accessible	field	net/minecraft/client/player/LocalPlayer	yRotLast	F
 accessible	field	net/minecraft/client/multiplayer/MultiPlayerGameMode	destroyDelay	I
@@ -36,6 +38,4 @@ accessible	field	net/minecraft/client/gui/screens/achievement/StatsScreen	isLoad
 accessible	field	net/minecraft/world/entity/Entity	stuckSpeedMultiplier	Lnet/minecraft/world/phys/Vec3;
 accessible	field	net/minecraft/world/entity/LivingEntity	equipment	Lnet/minecraft/world/entity/EntityEquipment;
 accessible	field	net/minecraft/world/entity/LivingEntity	jumping	Z
-accessible	field	net/minecraft/client/renderer/ItemInHandRenderer	mainHandHeight	F
-accessible	field	net/minecraft/client/renderer/ItemInHandRenderer	oMainHandHeight	F
 accessible	field	net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket	sectionPos	Lnet/minecraft/core/SectionPos;

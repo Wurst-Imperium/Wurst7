@@ -64,8 +64,8 @@ public final class NoShieldOverlayHackTest extends SingleplayerTest
 	
 	private void moveHandOutOfView()
 	{
-		context.runOnClient(mc -> mc.getEntityRenderDispatcher()
-			.getItemInHandRenderer().itemUsed(InteractionHand.MAIN_HAND));
+		context
+			.runOnClient(mc -> mc.player.itemUsed(InteractionHand.MAIN_HAND));
 	}
 	
 	private void testItem(Path referencePath, String name, String giveArg,

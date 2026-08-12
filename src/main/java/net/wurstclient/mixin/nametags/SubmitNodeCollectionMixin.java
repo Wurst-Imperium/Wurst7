@@ -21,9 +21,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollection;
-import net.minecraft.client.renderer.feature.NameTagFeatureRenderer;
-import net.minecraft.client.renderer.feature.phase.FeatureRenderPhase;
-import net.minecraft.client.renderer.feature.submit.SubmitNode;
+import net.minecraft.client.renderer.feature.TextFeatureRenderer;
+import net.minecraft.client.renderer.feature.phase.TranslucentFeatureRenderPhase;
 import net.minecraft.client.renderer.feature.submit.TranslucentSubmit;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
@@ -36,7 +35,7 @@ public class SubmitNodeCollectionMixin
 {
 	@Shadow
 	@Final
-	public FeatureRenderPhase<? super TranslucentSubmit> seeThroughNameTags;
+	public TranslucentFeatureRenderPhase seeThrough;
 	
 	@WrapOperation(
 		method = "submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZILnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
@@ -81,9 +80,9 @@ public class SubmitNodeCollectionMixin
 	@WrapOperation(
 		method = "submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZILnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
 		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/SubmitNodeCollection;submitNameTagPart(Lnet/minecraft/client/renderer/feature/NameTagFeatureRenderer$Submit;)V"))
+			target = "Lnet/minecraft/client/renderer/SubmitNodeCollection;submitNameTagPart(Lnet/minecraft/client/renderer/feature/TextFeatureRenderer$Submit;)V"))
 	private void swapNormalNameTagSubmit(SubmitNodeCollection collection,
-		NameTagFeatureRenderer.Submit submit, Operation<Void> original)
+		TextFeatureRenderer.Submit submit, Operation<Void> original)
 	{
 		if(!WurstClient.INSTANCE.getHax().nameTagsHack.isSeeThrough())
 		{
@@ -91,16 +90,16 @@ public class SubmitNodeCollectionMixin
 			return;
 		}
 		
-		seeThroughNameTags
+		seeThrough
 			.submit(copyWithDisplayMode(submit, Font.DisplayMode.SEE_THROUGH));
 	}
 	
 	@WrapOperation(
 		method = "submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZILnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
 		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/feature/phase/FeatureRenderPhase;submit(Lnet/minecraft/client/renderer/feature/submit/SubmitNode;)V"))
+			target = "Lnet/minecraft/client/renderer/feature/phase/TranslucentFeatureRenderPhase;submit(Lnet/minecraft/client/renderer/feature/submit/TranslucentSubmit;)V"))
 	private void swapSeeThroughNameTagSubmit(
-		FeatureRenderPhase<? super TranslucentSubmit> phase, SubmitNode submit,
+		TranslucentFeatureRenderPhase phase, TranslucentSubmit submit,
 		Operation<Void> original)
 	{
 		if(!WurstClient.INSTANCE.getHax().nameTagsHack.isSeeThrough())
@@ -110,19 +109,18 @@ public class SubmitNodeCollectionMixin
 		}
 		
 		submitNameTagPart(copyWithDisplayMode(
-			(NameTagFeatureRenderer.Submit)submit, Font.DisplayMode.NORMAL));
+			(TextFeatureRenderer.Submit)submit, Font.DisplayMode.NORMAL));
 	}
 	
-	private NameTagFeatureRenderer.Submit copyWithDisplayMode(
-		NameTagFeatureRenderer.Submit nameTag, Font.DisplayMode displayMode)
+	private TextFeatureRenderer.Submit copyWithDisplayMode(
+		TextFeatureRenderer.Submit nameTag, Font.DisplayMode displayMode)
 	{
-		return new NameTagFeatureRenderer.Submit(nameTag.pose(), nameTag.x(),
-			nameTag.y(), nameTag.text(), nameTag.lightCoords(), nameTag.color(),
-			nameTag.backgroundColor(), displayMode);
+		return new TextFeatureRenderer.Submit(nameTag.pose(), displayMode,
+			nameTag.lightCoords(), nameTag.content());
 	}
 	
 	@Shadow
-	private void submitNameTagPart(NameTagFeatureRenderer.Submit nameTag)
+	private void submitNameTagPart(TextFeatureRenderer.Submit nameTag)
 	{
 		
 	}

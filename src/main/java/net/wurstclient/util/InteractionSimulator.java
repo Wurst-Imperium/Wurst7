@@ -21,7 +21,7 @@ import net.wurstclient.settings.InteractSwingSetting.InteractSwing;
  * without sacrificing anti-cheat resistance or customizability.
  *
  * <p>
- * Accurately replicates {@link Minecraft#startUseItem()} as of 26.3-snapshot-7
+ * Accurately replicates {@link Minecraft#startUseItem()} as of 26.3-snapshot-8
  * while being much easier to read and adding convenient ways to change parts of
  * the behavior.
  */
@@ -133,7 +133,7 @@ public enum InteractionSimulator
 			
 			if(!stack.isEmpty() && (stack.getCount() != oldCount
 				|| MC.player.hasInfiniteMaterials()))
-				MC.gameRenderer.itemInHandRenderer.itemUsed(hand);
+				MC.player.itemUsed(hand);
 		}
 		
 		return result instanceof InteractionResult.Success
@@ -166,7 +166,7 @@ public enum InteractionSimulator
 			swing.swing(hand, swingAnimation);
 		
 		// notify the item-in-hand renderer
-		MC.gameRenderer.itemInHandRenderer.itemUsed(hand);
+		MC.player.itemUsed(hand);
 		return true;
 	}
 }

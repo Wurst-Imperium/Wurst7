@@ -47,14 +47,12 @@ public abstract class GameRendererMixin implements AutoCloseable
 	}
 	
 	@WrapOperation(method = "renderLevel()V",
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/util/Mth;lerp(FFF)F",
-			ordinal = 0))
-	private float onRenderWorldNauseaLerp(float delta, float start, float end,
-		Operation<Float> original)
+		at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"))
+	private float onCalculateSpinningEffectIntensity(float portalIntensity,
+		float nauseaIntensity, Operation<Float> original)
 	{
 		if(!WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled())
-			return original.call(delta, start, end);
+			return original.call(portalIntensity, nauseaIntensity);
 		
 		return 0;
 	}
