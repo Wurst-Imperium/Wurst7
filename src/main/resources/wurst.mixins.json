@@ -60,6 +60,7 @@
     "StatsScreenMixin",
     "StringDecomposerMixin",
     "TitleScreenMixin",
+    "autosprint.LocalPlayerMixin",
     "freecam.CameraMixin",
     "freecam.ItemInHandRendererMixin",
     "freecam.LocalPlayerMixin",
