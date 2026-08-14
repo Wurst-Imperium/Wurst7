@@ -112,9 +112,10 @@ public final class FeedAuraHack extends Hack
 		ItemStack heldStack = MC.player.getInventory().getSelectedItem();
 		
 		double rangeSq = range.getValueSq();
-		Stream<LivingEntity> stream = EntityUtils.getValidLivingEntities()
-			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-			.filter(e -> canFeed(e, heldStack));
+		Stream<LivingEntity> stream =
+			EntityUtils.getAliveEntities(LivingEntity.class)
+				.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
+				.filter(e -> canFeed(e, heldStack));
 		
 		if(filterBabies.isChecked())
 			stream = stream.filter(filterBabies);

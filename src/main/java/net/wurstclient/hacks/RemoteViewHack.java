@@ -9,7 +9,6 @@ package net.wurstclient.hacks;
 
 import java.util.Comparator;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.entity.Entity;
@@ -53,13 +52,9 @@ public final class RemoteViewHack extends Hack
 		// find entity if not already set
 		if(entity == null)
 		{
-			Stream<Entity> stream = StreamSupport
-				.stream(MC.level.entitiesForRendering().spliterator(), true)
-				.filter(LivingEntity.class::isInstance)
-				.filter(
-					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
-				.filter(e -> e != MC.player)
-				.filter(e -> !(e instanceof FakePlayerEntity));
+			Stream<LivingEntity> stream =
+				EntityUtils.getAliveEntities(LivingEntity.class)
+					.filter(EntityUtils.IS_NOT_SELF);
 			
 			stream = entityFilters.applyTo(stream);
 			
@@ -126,13 +121,8 @@ public final class RemoteViewHack extends Hack
 		// set entity
 		if(!isEnabled() && viewName != null && !viewName.isEmpty())
 		{
-			entity = StreamSupport
-				.stream(MC.level.entitiesForRendering().spliterator(), false)
-				.filter(LivingEntity.class::isInstance)
-				.filter(
-					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
-				.filter(e -> e != MC.player)
-				.filter(e -> !(e instanceof FakePlayerEntity))
+			entity = EntityUtils.getAliveEntities(LivingEntity.class)
+				.filter(EntityUtils.IS_NOT_SELF)
 				.filter(e -> viewName.equalsIgnoreCase(e.getName().getString()))
 				.min(
 					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))

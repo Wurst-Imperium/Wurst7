@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.stream.StreamSupport;
 
 import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -734,9 +733,7 @@ public final class TunnellerHack extends Hack
 		public boolean canRun()
 		{
 			// check for nearby falling blocks
-			return StreamSupport
-				.stream(MC.level.entitiesForRendering().spliterator(), false)
-				.filter(FallingBlockEntity.class::isInstance)
+			return EntityUtils.getEntities(FallingBlockEntity.class)
 				.anyMatch(e -> EntityUtils.distanceToHitboxSq(e) < 36);
 		}
 		

@@ -17,6 +17,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -29,30 +30,57 @@ public enum EntityUtils
 	protected static final WurstClient WURST = WurstClient.INSTANCE;
 	protected static final Minecraft MC = WurstClient.MC;
 	
-	public static Stream<Entity> getAttackableEntities()
+	public static Stream<Entity> getEntities()
 	{
 		return StreamSupport
-			.stream(MC.level.entitiesForRendering().spliterator(), true)
-			.filter(IS_ATTACKABLE);
+			.stream(MC.level.entitiesForRendering().spliterator(), false);
+	}
+	
+	public static <E extends Entity> Stream<E> getEntities(Class<E> entityClass)
+	{
+		return getEntities().filter(entityClass::isInstance)
+			.map(entityClass::cast);
+	}
+	
+	public static Stream<Entity> getAliveEntities()
+	{
+		return getEntities().filter(Entity::isAlive);
+	}
+	
+	public static <E extends Entity> Stream<E> getAliveEntities(
+		Class<E> entityClass)
+	{
+		return getEntities(entityClass).filter(Entity::isAlive);
+	}
+	
+	public static Stream<Entity> getFollowableEntities()
+	{
+		return getAliveEntities().filter(IS_NOT_SELF).filter(
+			e -> e instanceof LivingEntity || e instanceof AbstractMinecart);
+	}
+	
+	public static final Predicate<Entity> IS_NOT_SELF =
+		e -> e != null && e != MC.player && !(e instanceof FakePlayerEntity);
+	
+	public static Stream<Entity> getAttackableEntities()
+	{
+		return getEntities().filter(IS_ATTACKABLE);
+	}
+	
+	/**
+	 * Same as {@link #getAttackableEntities()} but excludes end crystals and
+	 * projectiles.
+	 */
+	public static Stream<LivingEntity> getExplosionWorthyAttackableEntities()
+	{
+		return getEntities(LivingEntity.class).filter(IS_ATTACKABLE);
 	}
 	
 	public static final Predicate<Entity> IS_ATTACKABLE =
-		e -> e != null && !e.isRemoved()
-			&& (e instanceof LivingEntity && ((LivingEntity)e).getHealth() > 0
-				|| e instanceof EndCrystal || e instanceof ShulkerBullet)
-			&& e != MC.player && !(e instanceof FakePlayerEntity)
-			&& !WURST.getFriends().isFriend(e);
-	
-	public static Stream<LivingEntity> getValidLivingEntities()
-	{
-		return StreamSupport
-			.stream(MC.level.entitiesForRendering().spliterator(), true)
-			.filter(LivingEntity.class::isInstance).map(e -> (LivingEntity)e)
-			.filter(IS_VALID_LIVING_ENTITY);
-	}
-	
-	public static final Predicate<LivingEntity> IS_VALID_LIVING_ENTITY =
-		le -> le != null && !le.isRemoved() && le.getHealth() > 0;
+		e -> e != null && e.isAlive()
+			&& (e instanceof LivingEntity || e instanceof EndCrystal
+				|| e instanceof ShulkerBullet)
+			&& IS_NOT_SELF.test(e) && !WURST.getFriends().isFriend(e);
 	
 	/**
 	 * Interpolates (or "lerps") between the entity's position in the previous

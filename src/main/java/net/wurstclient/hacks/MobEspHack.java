@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -100,11 +99,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	{
 		mobs.clear();
 		
-		Stream<LivingEntity> stream = StreamSupport
-			.stream(MC.level.entitiesForRendering().spliterator(), false)
-			.filter(LivingEntity.class::isInstance).map(e -> (LivingEntity)e)
-			.filter(e -> !(e instanceof Player))
-			.filter(e -> !e.isRemoved() && e.getHealth() > 0);
+		Stream<LivingEntity> stream =
+			EntityUtils.getAliveEntities(LivingEntity.class)
+				.filter(e -> !(e instanceof Player));
 		
 		stream = entityFilters.applyTo(stream);
 		
