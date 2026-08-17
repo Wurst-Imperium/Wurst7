@@ -162,7 +162,7 @@ public final class TunnellerHack extends Hack
 		for(Hack hack : incompatibleHax)
 			hack.setEnabled(false);
 		
-		if(hax.freecamHack.isMovingCamera() || hax.remoteViewHack.isEnabled())
+		if(hax.freecamHack.isMovingCamera())
 			return;
 		
 		Options gs = MC.options;

@@ -5,26 +5,24 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.hacks.freecam;
+package net.wurstclient.settings;
 
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.hack.Hack;
 import net.wurstclient.util.text.WText;
 
-public final class FreecamInteractionSetting
-	extends EnumSetting<FreecamInteractionSetting.InteractFrom>
+public final class InteractFromSetting
+	extends EnumSetting<InteractFromSetting.InteractFrom>
 {
-	private static final WText DESCRIPTION = buildDescription();
-	
-	public FreecamInteractionSetting()
+	public InteractFromSetting(Hack hack, InteractFrom selected)
 	{
-		super("Interact from", DESCRIPTION, InteractFrom.values(),
-			InteractFrom.CAMERA);
+		super("Interact from", buildDescription(hack), InteractFrom.values(),
+			selected);
 	}
 	
-	private static WText buildDescription()
+	private static WText buildDescription(Hack hack)
 	{
-		WText text =
-			WText.translated("description.wurst.setting.freecam.interact_from");
+		WText text = WText.translated("description.wurst.setting."
+			+ hack.getName().toLowerCase() + ".interact_from");
 		
 		for(InteractFrom value : InteractFrom.values())
 			text = text
@@ -40,7 +38,7 @@ public final class FreecamInteractionSetting
 		PLAYER("Player");
 		
 		private static final String TRANSLATION_KEY_PREFIX =
-			"description.wurst.setting.freecam.interact_from.";
+			"description.wurst.setting.generic.interact_from.";
 		
 		private final String name;
 		private final WText description;

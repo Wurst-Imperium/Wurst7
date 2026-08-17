@@ -10,46 +10,48 @@ package net.wurstclient.hacks;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.PacketOutputListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.InteractFromSetting;
+import net.wurstclient.settings.InteractFromSetting.InteractFrom;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filterlists.RemoteViewFilterList;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.FakePlayerEntity;
 
 @SearchTags({"remote view"})
 @DontSaveState
-public final class RemoteViewHack extends Hack
-	implements UpdateListener, PacketOutputListener
+public final class RemoteViewHack extends Hack implements UpdateListener
 {
+	private final InteractFromSetting interactFrom =
+		new InteractFromSetting(this, InteractFrom.CAMERA);
+	
+	private final CheckboxSetting hideHand = new CheckboxSetting("Hide hand",
+		"description.wurst.setting.remoteview.hide_hand", true);
+	
 	private final EntityFilterList entityFilters =
 		RemoteViewFilterList.create();
 	
-	private Entity entity = null;
-	private boolean wasInvisible;
-	
-	private FakePlayerEntity fakePlayer;
+	private LivingEntity entity;
 	
 	public RemoteViewHack()
 	{
 		super("RemoteView");
 		setCategory(Category.RENDER);
+		addSetting(interactFrom);
+		addSetting(hideHand);
 		entityFilters.forEach(this::addSetting);
 	}
 	
 	@Override
 	protected void onEnable()
 	{
-		// find entity if not already set
+		// Find entity if not already set
 		if(entity == null)
 		{
 			Stream<LivingEntity> stream =
@@ -62,63 +64,46 @@ public final class RemoteViewHack extends Hack
 				.min(
 					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 				.orElse(null);
-			
-			// check if entity was found
-			if(entity == null)
-			{
-				ChatUtils.error("Could not find a valid entity.");
-				setEnabled(false);
-				return;
-			}
 		}
 		
-		// save old data
-		wasInvisible = entity.isInvisible();
+		// Check if entity was found and is still valid
+		if(!isEntityValid())
+		{
+			entity = null;
+			ChatUtils.error("Could not find a valid entity.");
+			setEnabled(false);
+			return;
+		}
 		
-		// enable NoClip
-		MC.player.noPhysics = true;
+		WURST.getHax().freecamHack.setEnabled(false);
+		WURST.getHax().lsdHack.setEnabled(false);
 		
-		// spawn fake player
-		fakePlayer = new FakePlayerEntity();
-		
-		// success message
+		MC.setCameraEntity(entity);
 		ChatUtils.message("Now viewing " + entity.getName().getString() + ".");
 		
-		// add listener
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(PacketOutputListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		// remove listener
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(PacketOutputListener.class, this);
 		
-		// reset entity
-		if(entity != null)
-		{
-			ChatUtils.message(
-				"No longer viewing " + entity.getName().getString() + ".");
-			entity.setInvisible(wasInvisible);
-			entity = null;
-		}
+		if(entity == null)
+			return;
 		
-		// disable NoClip
-		MC.player.noPhysics = false;
+		ChatUtils
+			.message("No longer viewing " + entity.getName().getString() + ".");
 		
-		// remove fake player
-		if(fakePlayer != null)
-		{
-			fakePlayer.resetPlayerPosition();
-			fakePlayer.despawn();
-		}
+		if(MC.getCameraEntity() == entity)
+			MC.setCameraEntity(MC.player);
+		
+		entity = null;
 	}
 	
 	public void onToggledByCommand(String viewName)
 	{
-		// set entity
+		// Set entity
 		if(!isEnabled() && viewName != null && !viewName.isEmpty())
 		{
 			entity = EntityUtils.getAliveEntities(LivingEntity.class)
@@ -136,39 +121,36 @@ public final class RemoteViewHack extends Hack
 			}
 		}
 		
-		// toggle RemoteView
+		// Toggle RemoteView
 		setEnabled(!isEnabled());
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		// validate entity
-		if(entity == null || entity.isRemoved()
-			|| MC.level.getEntity(entity.getUUID()) == null
-			|| ((LivingEntity)entity).getHealth() <= 0)
-		{
+		if(!isEntityValid() || MC.getCameraEntity() != entity)
 			setEnabled(false);
-			return;
-		}
-		
-		// update position, rotation, etc.
-		MC.player.copyPosition(entity);
-		MC.player.setPosRaw(entity.getX(),
-			entity.getY() - MC.player.getEyeHeight(MC.player.getPose())
-				+ entity.getEyeHeight(entity.getPose()),
-			entity.getZ());
-		MC.player.setOldPosAndRot();
-		MC.player.setDeltaMovement(Vec3.ZERO);
-		
-		// set entity invisible
-		entity.setInvisible(true);
 	}
 	
-	@Override
-	public void onSentPacket(PacketOutputEvent event)
+	private boolean isEntityValid()
 	{
-		if(event.getPacket() instanceof ServerboundMovePlayerPacket)
-			event.cancel();
+		return entity != null && entity.isAlive() && MC.level != null
+			&& MC.level.getEntity(entity.getUUID()) != null;
+	}
+	
+	public boolean isViewingEntity()
+	{
+		return isEnabled() && entity != null && MC.getCameraEntity() == entity;
+	}
+	
+	public boolean isClickingFromPlayer()
+	{
+		return isViewingEntity()
+			&& interactFrom.getSelected() == InteractFrom.PLAYER;
+	}
+	
+	public boolean shouldHideHand()
+	{
+		return isViewingEntity() && hideHand.isChecked();
 	}
 }

@@ -3,6 +3,9 @@
   "package": "net.wurstclient.mixin",
   "plugin": "net.wurstclient.WurstMixinPlugin",
   "compatibilityLevel": "JAVA_25",
+  "mixinextras": {
+    "minVersion": "0.5.4"
+  },
   "mixins": [],
   "client": [
     "AbstractSignEditScreenMixin",
@@ -33,6 +36,7 @@
     "FogRendererMixin",
     "GameRendererMixin",
     "HudMixin",
+    "ItemInHandRendererMixin",
     "JoinMultiplayerScreenMixin",
     "KeyBindsListMixin",
     "KeyMappingMixin",
@@ -62,9 +66,10 @@
     "TitleScreenMixin",
     "autosprint.LocalPlayerMixin",
     "freecam.CameraMixin",
-    "freecam.ItemInHandRendererMixin",
     "freecam.LocalPlayerMixin",
     "nametags.SubmitNodeCollectionMixin",
+    "remoteview.LevelExtractorMixin",
+    "remoteview.LocalPlayerMixin",
     "noshieldoverlay.ItemInHandRendererMixin",
     "xray.BlockEntityRenderDispatcherMixin",
     "xray.BlockStateBaseMixin",
