@@ -8,6 +8,7 @@
 package net.wurstclient.hacks;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 
 import net.minecraft.world.entity.LivingEntity;
@@ -101,28 +102,36 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 		entity = null;
 	}
 	
-	public void onToggledByCommand(String viewName)
+	public void onToggledByCommand(String name)
 	{
-		// Set entity
-		if(!isEnabled() && viewName != null && !viewName.isEmpty())
+		if(name.isEmpty())
 		{
-			entity = EntityUtils.getAliveEntities(LivingEntity.class)
-				.filter(EntityUtils.IS_NOT_SELF)
-				.filter(e -> viewName.equalsIgnoreCase(e.getName().getString()))
-				.min(
-					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
-				.orElse(null);
-			
-			if(entity == null)
-			{
-				ChatUtils
-					.error("Entity \"" + viewName + "\" could not be found.");
-				return;
-			}
+			setEnabled(!isEnabled());
+			return;
 		}
 		
-		// Toggle RemoteView
-		setEnabled(!isEnabled());
+		List<LivingEntity> matches =
+			EntityUtils.getAliveEntities(LivingEntity.class)
+				.filter(EntityUtils.IS_NOT_SELF)
+				.filter(e -> name.equalsIgnoreCase(e.getName().getString()))
+				.sorted(
+					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
+				.toList();
+		
+		if(matches.isEmpty())
+		{
+			ChatUtils.error("Entity \"" + name + "\" could not be found.");
+			return;
+		}
+		
+		LivingEntity newEntity =
+			matches.get((matches.indexOf(entity) + 1) % matches.size());
+		
+		if(isEnabled())
+			setEnabled(false);
+		
+		entity = newEntity;
+		setEnabled(true);
 	}
 	
 	@Override
