@@ -23,7 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import net.wurstclient.WurstClient;
@@ -69,12 +69,15 @@ public abstract class ClientPacketListenerMixin
 	}
 	
 	@Inject(
-		method = "updateLevelChunk(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)V",
-		at = @At("TAIL"))
-	private void onLoadChunk(int x, int z,
-		ClientboundLevelChunkPacketData chunkData, CallbackInfo ci)
+		method = "handleLevelChunkWithLight(Lnet/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket;)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/multiplayer/ClientChunkCache;replaceWithPacketData(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)Lnet/minecraft/world/level/chunk/LevelChunk;",
+			shift = At.Shift.AFTER))
+	private void onLoadChunk(ClientboundLevelChunkWithLightPacket packet,
+		CallbackInfo ci)
 	{
-		WurstClient.INSTANCE.getHax().newChunksHack.afterLoadChunk(x, z);
+		WurstClient.INSTANCE.getHax().newChunksHack.afterLoadChunk(packet.x(),
+			packet.z());
 	}
 	
 	@Inject(

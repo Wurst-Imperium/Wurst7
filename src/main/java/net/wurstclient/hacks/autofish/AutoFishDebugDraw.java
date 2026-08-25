@@ -129,7 +129,7 @@ public final class AutoFishDebugDraw
 			matrices.pushPose();
 			matrices.translate(playerPos.x - camPos.x, playerPos.y - camPos.y,
 				playerPos.z - camPos.z);
-			matrices.mulPose(spot.input().rotation().toQuaternion());
+			matrices.rotate(spot.input().rotation().toQuaternion());
 			
 			RenderUtils.drawOutlinedBox(matrices, lineBuffer, headBox, color);
 			RenderUtils.drawOutlinedBox(matrices, lineBuffer, noseBox, color);
