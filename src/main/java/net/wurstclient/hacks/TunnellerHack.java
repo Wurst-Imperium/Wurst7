@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.stream.StreamSupport;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -163,7 +162,7 @@ public final class TunnellerHack extends Hack
 		for(Hack hack : incompatibleHax)
 			hack.setEnabled(false);
 		
-		if(hax.freecamHack.isMovingCamera() || hax.remoteViewHack.isEnabled())
+		if(hax.freecamHack.isMovingCamera())
 			return;
 		
 		Options gs = MC.options;
@@ -729,9 +728,7 @@ public final class TunnellerHack extends Hack
 		public boolean canRun()
 		{
 			// check for nearby falling blocks
-			return StreamSupport
-				.stream(MC.level.entitiesForRendering().spliterator(), false)
-				.filter(FallingBlockEntity.class::isInstance)
+			return EntityUtils.getEntities(FallingBlockEntity.class)
 				.anyMatch(e -> EntityUtils.distanceToHitboxSq(e) < 36);
 		}
 		

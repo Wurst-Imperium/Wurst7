@@ -7,9 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -18,6 +17,7 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
@@ -63,8 +63,8 @@ public final class FeedAuraHack extends Hack
 		false);
 	
 	private final Random random = new Random();
-	private Animal target;
-	private Animal renderTarget;
+	private LivingEntity target;
+	private LivingEntity renderTarget;
 	
 	public FeedAuraHack()
 	{
@@ -110,9 +110,10 @@ public final class FeedAuraHack extends Hack
 		ItemStack heldStack = MC.player.getInventory().getSelectedItem();
 		
 		double rangeSq = range.getValueSq();
-		Stream<Animal> stream = EntityUtils.getValidAnimals()
-			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-			.filter(e -> e.isFood(heldStack)).filter(Animal::canFallInLove);
+		Stream<LivingEntity> stream =
+			EntityUtils.getAliveEntities(LivingEntity.class)
+				.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
+				.filter(e -> canFeed(e, heldStack));
 		
 		if(filterBabies.isChecked())
 			stream = stream.filter(filterBabies);
@@ -123,11 +124,8 @@ public final class FeedAuraHack extends Hack
 		if(filterHorses.isChecked())
 			stream = stream.filter(e -> !(e instanceof AbstractHorse));
 		
-		// convert targets to list
-		ArrayList<Animal> targets =
-			stream.collect(Collectors.toCollection(ArrayList::new));
-		
-		// pick a target at random
+		// Pick a target at random
+		List<LivingEntity> targets = stream.toList();
 		target = targets.isEmpty() ? null
 			: targets.get(random.nextInt(targets.size()));
 		
@@ -137,6 +135,25 @@ public final class FeedAuraHack extends Hack
 		
 		WURST.getRotationFaker()
 			.faceVectorPacket(target.getBoundingBox().getCenter());
+	}
+	
+	private boolean canFeed(LivingEntity entity, ItemStack stack)
+	{
+		if(entity instanceof Animal animal)
+			return animal.isFood(stack) && animal.canFallInLove();
+		
+		return false;
+	}
+	
+	private boolean isUntamed(LivingEntity e)
+	{
+		if(e instanceof AbstractHorse horse && !horse.isTamed())
+			return true;
+		
+		if(e instanceof TamableAnimal tame && !tame.isTame())
+			return true;
+		
+		return false;
 	}
 	
 	@Override
@@ -184,16 +201,5 @@ public final class FeedAuraHack extends Hack
 		
 		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
 		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);
-	}
-	
-	private boolean isUntamed(Animal e)
-	{
-		if(e instanceof AbstractHorse horse && !horse.isTamed())
-			return true;
-		
-		if(e instanceof TamableAnimal tame && !tame.isTame())
-			return true;
-		
-		return false;
 	}
 }
