@@ -30,7 +30,7 @@ public final class NoWeatherHackTest extends SingleplayerTest
 		setRain(true);
 		context.waitTick();// to update EnvironmentAttributeSystem/Probe cache
 		assertScreenshotEquals("noweather_raining_setup",
-			"https://i.imgur.com/LHBNoxk.png");
+			"https://i.imgur.com/BzKxlc7.png");
 		
 		// Enable NoWeather
 		runWurstCommand("t NoWeather on");
