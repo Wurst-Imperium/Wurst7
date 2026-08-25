@@ -9,15 +9,11 @@ package net.wurstclient.hacks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.ai.PathFinder;
@@ -35,7 +31,6 @@ import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filterlists.FollowFilterList;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.FakePlayerEntity;
 
 @DontSaveState
 public final class FollowHack extends Hack
@@ -83,18 +78,7 @@ public final class FollowHack extends Hack
 		
 		if(entity == null)
 		{
-			Stream<Entity> stream = StreamSupport
-				.stream(MC.level.entitiesForRendering().spliterator(), true)
-				.filter(e -> !e.isRemoved())
-				.filter(e -> e instanceof LivingEntity
-					&& ((LivingEntity)e).getHealth() > 0
-					|| e instanceof AbstractMinecart)
-				.filter(e -> e != MC.player)
-				.filter(e -> !(e instanceof FakePlayerEntity));
-			
-			stream = entityFilters.applyTo(stream);
-			
-			entity = stream
+			entity = entityFilters.applyTo(EntityUtils.getFollowableEntities())
 				.min(
 					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 				.orElse(null);
@@ -144,18 +128,10 @@ public final class FollowHack extends Hack
 		}
 		
 		// check if entity died or disappeared
-		if(entity == null || entity.isRemoved()
-			|| MC.level.getEntity(entity.getUUID()) == null
-			|| entity instanceof LivingEntity
-				&& ((LivingEntity)entity).getHealth() <= 0)
+		if(entity == null || !entity.isAlive()
+			|| MC.level.getEntity(entity.getUUID()) == null)
 		{
-			entity = StreamSupport
-				.stream(MC.level.entitiesForRendering().spliterator(), true)
-				.filter(LivingEntity.class::isInstance)
-				.filter(
-					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
-				.filter(e -> e != MC.player)
-				.filter(e -> !(e instanceof FakePlayerEntity))
+			entity = EntityUtils.getFollowableEntities()
 				.filter(e -> entity.getName().getString()
 					.equalsIgnoreCase(e.getName().getString()))
 				.min(

@@ -11,7 +11,6 @@ import java.awt.Color;
 import java.util.Comparator;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -131,8 +130,7 @@ public final class BowAimbotHack extends Hack
 		
 		// set target
 		if(filterEntities(Stream.of(target)) == null)
-			target = filterEntities(StreamSupport
-				.stream(MC.level.entitiesForRendering().spliterator(), true));
+			target = filterEntities(EntityUtils.getEntities());
 		
 		if(target == null)
 			return;

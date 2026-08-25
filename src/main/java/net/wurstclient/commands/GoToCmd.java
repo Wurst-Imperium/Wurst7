@@ -8,7 +8,6 @@
 package net.wurstclient.commands;
 
 import java.util.Comparator;
-import java.util.stream.StreamSupport;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -24,7 +23,6 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.MathUtils;
 
 public final class GoToCmd extends Command
@@ -89,12 +87,8 @@ public final class GoToCmd extends Command
 	
 	private BlockPos argsToEntityPos(String name) throws CmdError
 	{
-		LivingEntity entity = StreamSupport
-			.stream(MC.level.entitiesForRendering().spliterator(), true)
-			.filter(LivingEntity.class::isInstance).map(e -> (LivingEntity)e)
-			.filter(e -> !e.isRemoved() && e.getHealth() > 0)
-			.filter(e -> e != MC.player)
-			.filter(e -> !(e instanceof FakePlayerEntity))
+		LivingEntity entity = EntityUtils.getAliveEntities(LivingEntity.class)
+			.filter(EntityUtils.IS_NOT_SELF)
 			.filter(e -> name.equalsIgnoreCase(e.getDisplayName().getString()))
 			.min(Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 			.orElse(null);

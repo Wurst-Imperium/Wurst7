@@ -19,7 +19,7 @@
   "description.wurst.setting.autoeat.injury_threshold": "防止輕傷就進食，浪費你嘅食物。AutoEat 功能只會喺你失去至少呢個數嘅血量先會認為你受傷。",
   "description.wurst.setting.autoeat.take_items_from": "AutoEat 功能應該從邊裸你嘅食物。",
   "description.wurst.setting.autoeat.eat_while_walking": "會讓你慢落嚟, 唔推薦。",
-  "description.wurst.setting.autoeat.allow_hunger": "食腐肉時會有一個無害嘅 \"飢餓\" 效果。\n可安全食用，或作應急食品。",
+  "description.wurst.setting.autoeat.allow_hunger": "食腐肉時會有一個無害嘅 「飢餓」 效果。\n可安全食用，或作應急食品。",
   "description.wurst.setting.autoeat.allow_poison": "有毒嘅食物將會隨時間嘅推移造成傷害。\n唔推薦。",
   "description.wurst.setting.autoeat.allow_chorus": "（如果允許）食歌萊果將會傳送你到一個隨機嘅地點。\n唔推薦。",
   "description.wurst.hack.autofarm": "自動收獲並種植農作物。",

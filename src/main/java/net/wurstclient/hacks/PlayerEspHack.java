@@ -31,7 +31,6 @@ import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.settings.filters.FilterSleepingSetting;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.RenderUtils.ColoredBox;
 import net.wurstclient.util.RenderUtils.ColoredPoint;
@@ -84,9 +83,8 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		players.clear();
 		
 		Stream<AbstractClientPlayer> stream = MC.level.players()
-			.parallelStream().filter(e -> !e.isRemoved() && e.getHealth() > 0)
-			.filter(e -> e != MC.player)
-			.filter(e -> !(e instanceof FakePlayerEntity))
+			.parallelStream().filter(AbstractClientPlayer::isAlive)
+			.filter(EntityUtils.IS_NOT_SELF)
 			.filter(e -> Math.abs(e.getY() - MC.player.getY()) <= 1e6);
 		
 		stream = entityFilters.applyTo(stream);

@@ -8,7 +8,6 @@
 package net.wurstclient.mixin.nametags;
 
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.ProjectionType;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
@@ -60,11 +61,14 @@ public class SubmitNodeCollectionMixin
 		}
 		
 		float scale = 0.025F * nameTagsHack.getScale();
-		Matrix4f pose = new Matrix4f(matrices.last().pose());
-		double distance =
-			Math.sqrt(TranslucentSubmit.computeDistanceToCameraSq(pose));
-		if(distance > 10)
-			scale *= distance / 10;
+		
+		if(RenderSystem.getProjectionType() == ProjectionType.PERSPECTIVE)
+		{
+			double distance = Math.sqrt(TranslucentSubmit
+				.computeDistanceToCameraSq(matrices.last().pose()));
+			if(distance > 10)
+				scale *= distance / 10;
+		}
 		
 		original.call(matrices, scale, -scale, scale);
 	}
