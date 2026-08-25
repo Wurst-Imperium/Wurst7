@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin.freecam;
+package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,13 +19,11 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.level.FirstPersonHandsAndItemsRenderState;
 import net.minecraft.client.renderer.state.level.PlayerRenderState;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hack.HackList;
 
 @Mixin(FirstPersonHandsAndItemsRenderer.class)
 public abstract class FirstPersonHandsAndItemsRendererMixin
 {
-	/**
-	 * Makes the "Hide hand" setting in Freecam work.
-	 */
 	@Inject(
 		method = "submitHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/PlayerRenderState;Lnet/minecraft/client/renderer/state/level/FirstPersonHandsAndItemsRenderState;)V",
 		at = @At("HEAD"),
@@ -34,7 +32,9 @@ public abstract class FirstPersonHandsAndItemsRendererMixin
 		SubmitNodeCollector entityRenderCommandQueue, PlayerRenderState player,
 		FirstPersonHandsAndItemsRenderState handsAndItems, CallbackInfo ci)
 	{
-		if(WurstClient.INSTANCE.getHax().freecamHack.shouldHideHand())
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax.freecamHack.shouldHideHand()
+			|| hax.remoteViewHack.shouldHideHand())
 			ci.cancel();
 	}
 }

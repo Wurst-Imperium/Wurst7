@@ -8,7 +8,6 @@
 package net.wurstclient.commands;
 
 import java.util.Comparator;
-import java.util.stream.StreamSupport;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,7 +17,6 @@ import net.wurstclient.command.CmdSyntaxError;
 import net.wurstclient.command.Command;
 import net.wurstclient.hacks.ProtectHack;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.FakePlayerEntity;
 
 public final class ProtectCmd extends Command
 {
@@ -39,12 +37,8 @@ public final class ProtectCmd extends Command
 		if(protectHack.isEnabled())
 			protectHack.setEnabled(false);
 		
-		Entity entity = StreamSupport
-			.stream(MC.level.entitiesForRendering().spliterator(), true)
-			.filter(LivingEntity.class::isInstance)
-			.filter(e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
-			.filter(e -> e != MC.player)
-			.filter(e -> !(e instanceof FakePlayerEntity))
+		Entity entity = EntityUtils.getAliveEntities(LivingEntity.class)
+			.filter(EntityUtils.IS_NOT_SELF)
 			.filter(e -> args[0].equalsIgnoreCase(e.getName().getString()))
 			.min(Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
 			.orElse(null);

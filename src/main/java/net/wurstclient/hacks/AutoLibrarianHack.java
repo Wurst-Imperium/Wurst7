@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -442,10 +441,7 @@ public final class AutoLibrarianHack extends Hack
 	{
 		double rangeSq = range.getValueSq();
 		
-		Stream<Villager> stream = StreamSupport
-			.stream(MC.level.entitiesForRendering().spliterator(), true)
-			.filter(e -> !e.isRemoved()).filter(Villager.class::isInstance)
-			.map(e -> (Villager)e).filter(e -> e.getHealth() > 0)
+		Stream<Villager> stream = EntityUtils.getAliveEntities(Villager.class)
 			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
 			.filter(e -> e.getVillagerData().profession().unwrapKey()
 				.orElse(null) == VillagerProfession.LIBRARIAN)

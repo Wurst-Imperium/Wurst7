@@ -7,9 +7,9 @@
  */
 package net.wurstclient.hacks.freecam;
 
-import static net.wurstclient.WurstClient.*;
-
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.util.text.WText;
@@ -43,32 +43,36 @@ public final class FreecamInitialPosSetting
 		INSIDE("Inside")
 		{
 			@Override
-			public Vec3 getOffset()
+			public Vec3 getPos(Entity cameraEntity)
 			{
-				return Vec3.ZERO;
+				return cameraEntity.getEyePosition();
 			}
 		},
 		
 		IN_FRONT("In Front")
 		{
 			@Override
-			public Vec3 getOffset()
+			public Vec3 getPos(Entity cameraEntity)
 			{
-				double distance = 0.55 * MC.player.getScale();
-				float yawRad = MC.player.getYRot() * Mth.DEG_TO_RAD;
+				float yawRad = cameraEntity.getViewYRot(1) * Mth.DEG_TO_RAD;
+				double distance = 0.55;
+				if(cameraEntity instanceof LivingEntity le)
+					distance *= le.getScale();
 				double offsetX = -Mth.sin(yawRad) * distance;
 				double offsetZ = Mth.cos(yawRad) * distance;
-				return new Vec3(offsetX, 0, offsetZ);
+				return cameraEntity.getEyePosition().add(offsetX, 0, offsetZ);
 			}
 		},
 		
 		ABOVE("Above")
 		{
 			@Override
-			public Vec3 getOffset()
+			public Vec3 getPos(Entity cameraEntity)
 			{
-				double distance = 0.55 * MC.player.getScale();
-				return new Vec3(0, distance, 0);
+				double distance = 0.55;
+				if(cameraEntity instanceof LivingEntity le)
+					distance *= le.getScale();
+				return cameraEntity.getEyePosition().add(0, distance, 0);
 			}
 		};
 		
@@ -85,7 +89,7 @@ public final class FreecamInitialPosSetting
 				WText.translated(TRANSLATION_KEY_PREFIX + name().toLowerCase());
 		}
 		
-		public abstract Vec3 getOffset();
+		public abstract Vec3 getPos(Entity cameraEntity);
 		
 		@Override
 		public String toString()

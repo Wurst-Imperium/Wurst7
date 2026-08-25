@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -35,7 +34,6 @@ import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.EntityUtils;
-import net.wurstclient.util.FakePlayerEntity;
 
 @DontSaveState
 public final class ProtectHack extends Hack
@@ -134,13 +132,9 @@ public final class ProtectHack extends Hack
 		// set friend
 		if(friend == null)
 		{
-			Stream<Entity> stream = StreamSupport
-				.stream(MC.level.entitiesForRendering().spliterator(), true)
-				.filter(LivingEntity.class::isInstance)
-				.filter(
-					e -> !e.isRemoved() && ((LivingEntity)e).getHealth() > 0)
-				.filter(e -> e != MC.player)
-				.filter(e -> !(e instanceof FakePlayerEntity));
+			Stream<LivingEntity> stream =
+				EntityUtils.getAliveEntities(LivingEntity.class)
+					.filter(EntityUtils.IS_NOT_SELF);
 			friend = stream
 				.min(
 					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))

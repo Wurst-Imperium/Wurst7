@@ -23,8 +23,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FaceTargetSetting;
 import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
-import net.wurstclient.settings.InteractSwingSetting;
-import net.wurstclient.settings.InteractSwingSetting.InteractSwing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.TakeItemsFromSetting;
@@ -52,9 +50,6 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 	
 	private final FaceTargetSetting faceTarget =
 		FaceTargetSetting.withPacketSpam(this, FaceTarget.SERVER);
-	
-	private final InteractSwingSetting interactSwing =
-		new InteractSwingSetting(this, InteractSwing.CLIENT);
 	
 	private final CheckboxSetting fastPlace =
 		new CheckboxSetting("Always FastPlace",
@@ -95,7 +90,6 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 		addSetting(multiMeal);
 		addSetting(checkLOS);
 		addSetting(faceTarget);
-		addSetting(interactSwing);
 		addSetting(fastPlace);
 		addSetting(useWhileBreaking);
 		addSetting(useWhileRiding);
@@ -156,16 +150,15 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 			for(BlockBreakingParams params : validBlocks)
 			{
 				faceTarget.face(params.hitVec());
-				InteractionSimulator.rightClickBlock(params.toHitResult(),
-					interactSwing.getSelected());
+				InteractionSimulator.rightClickBlock(params.toHitResult());
 			}
+			
 		}else
 		{
 			BlockBreakingParams params = validBlocks.getFirst();
 			MC.rightClickDelay = 4;
 			faceTarget.face(params.hitVec());
-			InteractionSimulator.rightClickBlock(params.toHitResult(),
-				interactSwing.getSelected());
+			InteractionSimulator.rightClickBlock(params.toHitResult());
 		}
 	}
 	

@@ -30,6 +30,8 @@ public final class LsdHack extends Hack
 	@Override
 	protected void onEnable()
 	{
+		WURST.getHax().remoteViewHack.setEnabled(false);
+		
 		if(!(MC.getCameraEntity() instanceof Player) || MC.player == null)
 		{
 			setEnabled(false);

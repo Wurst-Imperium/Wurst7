@@ -24,7 +24,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
@@ -98,22 +97,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		{
 			EventManager.fire(UpdateEvent.INSTANCE);
 		}
-	}
-	
-	/**
-	 * This mixin makes AutoSprint's "Omnidirectional Sprint" setting work.
-	 */
-	@WrapOperation(method = "aiStep()V",
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/player/ClientInput;hasForwardImpulse()Z",
-			ordinal = 0))
-	private boolean wrapHasForwardMovement(ClientInput input,
-		Operation<Boolean> original)
-	{
-		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldOmniSprint())
-			return input.getMoveVector().length() > 1e-5F;
-		
-		return original.call(input);
 	}
 	
 	/**
@@ -227,20 +210,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		
 		minecraft.gui.setScreen(tempCurrentScreen);
 		tempCurrentScreen = null;
-	}
-	
-	/**
-	 * This mixin allows AutoSprint to enable sprinting even when the player is
-	 * too hungry.
-	 */
-	@Inject(method = "isSprintingPossible(Z)Z",
-		at = @At("HEAD"),
-		cancellable = true)
-	private void onCanSprint(boolean allowTouchingWater,
-		CallbackInfoReturnable<Boolean> cir)
-	{
-		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintHungry())
-			cir.setReturnValue(true);
 	}
 	
 	/**
