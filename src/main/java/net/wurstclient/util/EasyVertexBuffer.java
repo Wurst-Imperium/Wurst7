@@ -50,16 +50,19 @@ public final class EasyVertexBuffer implements AutoCloseable
 	public static EasyVertexBuffer createAndUpload(PrimitiveTopology drawMode,
 		VertexFormat format, Consumer<VertexConsumer> callback)
 	{
-		BufferBuilder bufferBuilder =
-			new BufferBuilder(new ByteBufferBuilder(256), drawMode, format);
-		callback.accept(bufferBuilder);
-		
-		try(MeshData buffer = bufferBuilder.build())
+		try(ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(256))
 		{
-			if(buffer == null)
-				return new EasyVertexBuffer(drawMode);
+			BufferBuilder bufferBuilder =
+				new BufferBuilder(byteBufferBuilder, drawMode, format);
+			callback.accept(bufferBuilder);
 			
-			return new EasyVertexBuffer(buffer, drawMode);
+			try(MeshData buffer = bufferBuilder.build())
+			{
+				if(buffer == null)
+					return new EasyVertexBuffer(drawMode);
+				
+				return new EasyVertexBuffer(buffer, drawMode);
+			}
 		}
 	}
 	

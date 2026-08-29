@@ -302,7 +302,7 @@ public final class AltManagerScreen extends Screen
 		
 		for(String line : lines)
 		{
-			String[] data = line.split(":");
+			String[] data = line.split(":", 2);
 			
 			switch(data.length)
 			{
