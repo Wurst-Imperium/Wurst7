@@ -10,6 +10,7 @@ package net.wurstclient.mixin.xray.sodium;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Desc;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -40,10 +41,12 @@ public class DefaultFluidRendererMixin
 	 * <=0.8.6 installed.
 	 */
 	@Inject(
-		method = "isFullBlockFluidOccluded(Lnet/minecraft/class_1920;Lnet/minecraft/class_2338;Lnet/minecraft/class_2350;Lnet/minecraft/class_2680;Lnet/minecraft/class_3610;)Z",
+		target = @Desc(value = "isFullBlockFluidOccluded",
+			ret = boolean.class,
+			args = {BlockAndTintGetter.class, BlockPos.class, Direction.class,
+				BlockState.class, FluidState.class}),
 		at = @At("HEAD"),
 		cancellable = true,
-		remap = false,
 		require = 0)
 	private void onIsFullBlockFluidOccluded(BlockAndTintGetter world,
 		BlockPos pos, Direction dir, BlockState state, FluidState fluid,
@@ -63,10 +66,12 @@ public class DefaultFluidRendererMixin
 	 * Sodium <=0.8.6 installed.
 	 */
 	@Inject(
-		method = "isSideExposed(Lnet/minecraft/class_1920;IIILnet/minecraft/class_2350;F)Z",
+		target = @Desc(value = "isSideExposed",
+			ret = boolean.class,
+			args = {BlockAndTintGetter.class, int.class, int.class, int.class,
+				Direction.class, float.class}),
 		at = @At("HEAD"),
 		cancellable = true,
-		remap = false,
 		require = 0)
 	private void onIsSideExposed(BlockAndTintGetter world, int x, int y, int z,
 		Direction dir, float height, CallbackInfoReturnable<Boolean> cir)
@@ -93,10 +98,12 @@ public class DefaultFluidRendererMixin
 	 * fluid side faces when using X-Ray with Sodium >=0.8.7.
 	 */
 	@Inject(
-		method = "isFullBlockFluidSideVisible(Lnet/minecraft/class_1922;Lnet/minecraft/class_2338;Lnet/minecraft/class_2350;Lnet/minecraft/class_3610;)Z",
+		target = @Desc(value = "isFullBlockFluidSideVisible",
+			ret = boolean.class,
+			args = {BlockGetter.class, BlockPos.class, Direction.class,
+				FluidState.class}),
 		at = @At("HEAD"),
 		cancellable = true,
-		remap = false,
 		require = 0)
 	private void onIsFullBlockFluidSideVisible(BlockGetter world, BlockPos pos,
 		Direction dir, FluidState fluid, CallbackInfoReturnable<Boolean> cir)
@@ -127,10 +134,12 @@ public class DefaultFluidRendererMixin
 	 * annoying to work around so I left it as-is.
 	 */
 	@Inject(
-		method = "isFluidSideExposed(Lnet/minecraft/class_1920;Lnet/minecraft/class_2680;Lnet/minecraft/class_2338;Lnet/minecraft/class_2350;F)Z",
+		target = @Desc(value = "isFluidSideExposed",
+			ret = boolean.class,
+			args = {BlockAndTintGetter.class, BlockState.class, BlockPos.class,
+				Direction.class, float.class}),
 		at = @At("HEAD"),
 		cancellable = true,
-		remap = false,
 		require = 0)
 	private void onIsFluidSideExposed(BlockAndTintGetter world,
 		BlockState state, BlockPos neighborPos, Direction dir, float height,
@@ -157,10 +166,12 @@ public class DefaultFluidRendererMixin
 	 * Applies to Sodium >=0.8.7.
 	 */
 	@Inject(
-		method = "getUpFaceExposureByNeighbors(Lnet/minecraft/class_1920;Lnet/minecraft/class_2338;Lnet/minecraft/class_3610;)I",
+		target = @Desc(value = "getUpFaceExposureByNeighbors",
+			ret = int.class,
+			args = {BlockAndTintGetter.class, BlockPos.class,
+				FluidState.class}),
 		at = @At("HEAD"),
 		cancellable = true,
-		remap = false,
 		require = 0)
 	private void onGetUpFaceExposureByNeighbors(BlockAndTintGetter level,
 		BlockPos pos, FluidState fluidState,
