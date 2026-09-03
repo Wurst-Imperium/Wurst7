@@ -18,9 +18,9 @@ public final class FilterAllaysSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof Allay);
+		return e instanceof Allay;
 	}
 	
 	public static FilterAllaysSetting genericCombat(boolean checked)

@@ -23,13 +23,13 @@ public final class FilterHostileSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
 		// never filter out neutral mobs (including piglins)
 		if(e instanceof NeutralMob || e instanceof Piglin)
-			return true;
+			return false;
 		
-		return !(e instanceof Enemy);
+		return e instanceof Enemy;
 	}
 	
 	public static FilterHostileSetting genericCombat(boolean checked)

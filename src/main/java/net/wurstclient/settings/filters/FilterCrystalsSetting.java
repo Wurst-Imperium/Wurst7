@@ -18,9 +18,9 @@ public final class FilterCrystalsSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof EndCrystal);
+		return e instanceof EndCrystal;
 	}
 	
 	public static FilterCrystalsSetting genericCombat(boolean checked)

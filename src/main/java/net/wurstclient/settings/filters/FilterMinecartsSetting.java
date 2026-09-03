@@ -18,8 +18,8 @@ public final class FilterMinecartsSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof AbstractMinecart);
+		return e instanceof AbstractMinecart;
 	}
 }

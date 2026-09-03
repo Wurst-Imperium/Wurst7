@@ -26,29 +26,29 @@ public final class FilterPetsSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
 		if(e instanceof TamableAnimal tamable && tamable.isTame())
-			return false;
+			return true;
 		
 		if(e instanceof AbstractHorse horse && !(horse instanceof Camel)
 			&& horse.isTamed())
-			return false;
+			return true;
 		
 		if(e instanceof Mob mob && isPetIfSaddled(mob) && mob.isSaddled())
-			return false;
+			return true;
 		
 		if(e instanceof HappyGhast)
-			return false;
+			return true;
 		
 		if(e instanceof Ocelot ocelot && ocelot.isTrusting())
-			return false;
+			return true;
 		
 		if(e instanceof Fox fox
 			&& fox.getTrustedEntities().findAny().isPresent())
-			return false;
+			return true;
 		
-		return true;
+		return false;
 	}
 	
 	private boolean isPetIfSaddled(Mob e)

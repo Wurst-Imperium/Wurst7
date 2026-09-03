@@ -18,9 +18,9 @@ public final class FilterVillagersSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof AbstractVillager);
+		return e instanceof AbstractVillager;
 	}
 	
 	public static FilterVillagersSetting genericCombat(boolean checked)

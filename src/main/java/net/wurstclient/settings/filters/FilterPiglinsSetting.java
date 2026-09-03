@@ -28,15 +28,15 @@ public final class FilterPiglinsSetting extends AttackDetectingEntityFilter
 	}
 	
 	@Override
-	public boolean onTest(Entity e)
+	protected boolean onFiltersOut(Entity e)
 	{
-		return !(e instanceof Piglin);
+		return e instanceof Piglin;
 	}
 	
 	@Override
-	public boolean ifCalmTest(Entity e)
+	protected boolean ifCalmFiltersOut(Entity e)
 	{
-		return !(e instanceof Piglin pe) || pe.isAggressive();
+		return e instanceof Piglin pe && !pe.isAggressive();
 	}
 	
 	public static FilterPiglinsSetting genericCombat(Mode selected)

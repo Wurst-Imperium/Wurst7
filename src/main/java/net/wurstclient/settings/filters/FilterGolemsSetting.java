@@ -19,9 +19,9 @@ public final class FilterGolemsSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof AbstractGolem) || e instanceof Shulker;
+		return e instanceof AbstractGolem && !(e instanceof Shulker);
 	}
 	
 	public static FilterGolemsSetting genericCombat(boolean checked)

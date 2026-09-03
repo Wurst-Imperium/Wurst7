@@ -17,9 +17,9 @@ public final class FilterInvisibleSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !e.isInvisible();
+		return e.isInvisible();
 	}
 	
 	public static FilterInvisibleSetting genericCombat(boolean checked)

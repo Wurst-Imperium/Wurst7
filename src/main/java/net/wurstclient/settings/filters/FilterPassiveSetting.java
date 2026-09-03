@@ -27,18 +27,18 @@ public final class FilterPassiveSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
 		// never filter out hostile mobs (including hoglins)
 		if(e instanceof Enemy)
-			return true;
+			return false;
 		
 		// never filter out neutral mobs (including pufferfish)
 		if(e instanceof NeutralMob || e instanceof Pufferfish)
-			return true;
+			return false;
 		
-		return !(e instanceof Animal || e instanceof AmbientCreature
-			|| e instanceof WaterAnimal || e instanceof AgeableWaterCreature);
+		return e instanceof Animal || e instanceof AmbientCreature
+			|| e instanceof WaterAnimal || e instanceof AgeableWaterCreature;
 	}
 	
 	public static FilterPassiveSetting genericCombat(boolean checked)

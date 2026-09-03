@@ -22,9 +22,9 @@ public final class FilterSlimesSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof Slime) || e instanceof MagmaCube;
+		return e instanceof Slime && !(e instanceof MagmaCube);
 	}
 	
 	public static FilterSlimesSetting genericCombat(boolean checked)

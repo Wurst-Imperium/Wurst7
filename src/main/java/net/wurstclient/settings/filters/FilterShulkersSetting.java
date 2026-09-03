@@ -18,9 +18,9 @@ public final class FilterShulkersSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof Shulker);
+		return e instanceof Shulker;
 	}
 	
 	public static FilterShulkersSetting genericCombat(boolean checked)

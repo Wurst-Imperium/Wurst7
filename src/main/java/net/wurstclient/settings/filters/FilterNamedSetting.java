@@ -17,9 +17,9 @@ public final class FilterNamedSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !e.hasCustomName();
+		return e.hasCustomName();
 	}
 	
 	public static FilterNamedSetting genericCombat(boolean checked)

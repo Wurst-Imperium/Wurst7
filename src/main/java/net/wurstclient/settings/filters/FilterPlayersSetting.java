@@ -18,9 +18,9 @@ public final class FilterPlayersSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof Player);
+		return e instanceof Player;
 	}
 	
 	public static FilterPlayersSetting genericCombat(boolean checked)

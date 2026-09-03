@@ -7,6 +7,7 @@
  */
 package net.wurstclient.settings.filters;
 
+import net.minecraft.world.entity.Entity;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.filterlists.EntityFilterList.EntityFilter;
@@ -21,9 +22,9 @@ public abstract class EntityFilterCheckbox extends CheckboxSetting
 	}
 	
 	@Override
-	public final boolean isFilterEnabled()
+	public final boolean test(Entity e)
 	{
-		return isChecked();
+		return isChecked() && !filtersOut(e);
 	}
 	
 	@Override
@@ -31,4 +32,6 @@ public abstract class EntityFilterCheckbox extends CheckboxSetting
 	{
 		return this;
 	}
+	
+	protected abstract boolean filtersOut(Entity e);
 }

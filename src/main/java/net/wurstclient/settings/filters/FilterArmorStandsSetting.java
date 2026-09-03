@@ -18,9 +18,9 @@ public final class FilterArmorStandsSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof ArmorStand);
+		return e instanceof ArmorStand;
 	}
 	
 	public static FilterArmorStandsSetting genericCombat(boolean checked)

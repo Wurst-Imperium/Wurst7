@@ -23,21 +23,21 @@ public final class FilterBabiesSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
 		// never filter out hostile mobs (including hoglins)
 		if(e instanceof Enemy)
-			return true;
+			return false;
 		
 		// filter out passive entity babies
 		if(e instanceof AgeableMob pe && pe.isBaby())
-			return false;
+			return true;
 		
 		// filter out tadpoles
 		if(e instanceof Tadpole)
-			return false;
+			return true;
 		
-		return true;
+		return false;
 	}
 	
 	public static FilterBabiesSetting genericCombat(boolean checked)

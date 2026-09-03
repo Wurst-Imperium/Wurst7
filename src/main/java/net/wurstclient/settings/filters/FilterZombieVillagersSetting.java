@@ -18,9 +18,9 @@ public final class FilterZombieVillagersSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof ZombieVillager);
+		return e instanceof ZombieVillager;
 	}
 	
 	public static FilterZombieVillagersSetting genericCombat(boolean checked)

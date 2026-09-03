@@ -27,18 +27,17 @@ public final class FilterFlyingSetting extends SliderSetting
 	@Override
 	public boolean test(Entity e)
 	{
+		return getValue() > 0 && !filtersOut(e);
+	}
+	
+	private boolean filtersOut(Entity e)
+	{
 		if(!(e instanceof Player))
-			return true;
+			return false;
 		
 		AABB box = e.getBoundingBox();
 		box = box.minmax(box.move(0, -getValue(), 0));
-		return !WurstClient.MC.level.noCollision(box);
-	}
-	
-	@Override
-	public boolean isFilterEnabled()
-	{
-		return getValue() > 0;
+		return WurstClient.MC.level.noCollision(box);
 	}
 	
 	@Override

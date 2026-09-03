@@ -18,9 +18,9 @@ public final class FilterBatsSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof AmbientCreature);
+		return e instanceof AmbientCreature;
 	}
 	
 	public static FilterBatsSetting genericCombat(boolean checked)

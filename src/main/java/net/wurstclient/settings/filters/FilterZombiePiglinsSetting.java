@@ -25,15 +25,15 @@ public final class FilterZombiePiglinsSetting
 	}
 	
 	@Override
-	public boolean onTest(Entity e)
+	protected boolean onFiltersOut(Entity e)
 	{
-		return !(e instanceof ZombifiedPiglin);
+		return e instanceof ZombifiedPiglin;
 	}
 	
 	@Override
-	public boolean ifCalmTest(Entity e)
+	protected boolean ifCalmFiltersOut(Entity e)
 	{
-		return !(e instanceof ZombifiedPiglin zpe) || zpe.isAggressive();
+		return e instanceof ZombifiedPiglin zpe && !zpe.isAggressive();
 	}
 	
 	public static FilterZombiePiglinsSetting genericCombat(Mode selected)

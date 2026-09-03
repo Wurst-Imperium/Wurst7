@@ -40,12 +40,7 @@ public class EntityFilterList
 	public final <T extends Entity> Stream<T> applyTo(Stream<T> stream)
 	{
 		for(EntityFilter filter : entityFilters)
-		{
-			if(!filter.isFilterEnabled())
-				continue;
-			
 			stream = stream.filter(filter);
-		}
 		
 		return stream;
 	}
@@ -53,7 +48,7 @@ public class EntityFilterList
 	public final boolean testOne(Entity entity)
 	{
 		for(EntityFilter filter : entityFilters)
-			if(filter.isFilterEnabled() && !filter.test(entity))
+			if(!filter.test(entity))
 				return false;
 			
 		return true;
@@ -93,8 +88,6 @@ public class EntityFilterList
 	
 	public static interface EntityFilter extends Predicate<Entity>
 	{
-		public boolean isFilterEnabled();
-		
 		public Setting getSetting();
 	}
 }

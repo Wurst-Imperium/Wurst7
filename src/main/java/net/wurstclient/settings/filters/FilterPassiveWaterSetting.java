@@ -25,14 +25,14 @@ public final class FilterPassiveWaterSetting extends EntityFilterCheckbox
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
 		// never filter out pufferfish
 		if(e instanceof Pufferfish)
-			return true;
+			return false;
 		
-		return !(e instanceof WaterAnimal || e instanceof AgeableWaterCreature
-			|| e instanceof Axolotl);
+		return e instanceof WaterAnimal || e instanceof AgeableWaterCreature
+			|| e instanceof Axolotl;
 	}
 	
 	public static FilterPassiveWaterSetting genericCombat(boolean checked)

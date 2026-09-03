@@ -24,15 +24,15 @@ public final class FilterEndermenSetting extends AttackDetectingEntityFilter
 	}
 	
 	@Override
-	public boolean onTest(Entity e)
+	protected boolean onFiltersOut(Entity e)
 	{
-		return !(e instanceof EnderMan);
+		return e instanceof EnderMan;
 	}
 	
 	@Override
-	public boolean ifCalmTest(Entity e)
+	protected boolean ifCalmFiltersOut(Entity e)
 	{
-		return !(e instanceof EnderMan ee) || ee.isAggressive();
+		return e instanceof EnderMan ee && !ee.isAggressive();
 	}
 	
 	public static FilterEndermenSetting genericCombat(Mode selected)
