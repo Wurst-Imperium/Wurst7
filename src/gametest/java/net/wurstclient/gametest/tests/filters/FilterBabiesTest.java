@@ -33,94 +33,89 @@ public final class FilterBabiesTest extends EntityFilterTest
 		Supplier<EntityFilter> filter = () -> new FilterBabiesSetting("", true);
 		
 		// Filtered out
-		assertFilterResult("Baby Armadillo", filter,
-			() -> spawnBaby(EntityTypes.ARMADILLO), false);
-		assertFilterResult("Baby Axolotl", filter,
-			() -> spawnBaby(EntityTypes.AXOLOTL), false);
-		assertFilterResult("Baby Bee", filter, () -> spawnBaby(EntityTypes.BEE),
-			false);
-		assertFilterResult("Baby Camel", filter,
-			() -> spawnBaby(EntityTypes.CAMEL), false);
-		assertFilterResult("Kitten (Baby Cat)", filter,
-			() -> spawnBaby(EntityTypes.CAT), false);
-		assertFilterResult("Chick (Baby Chicken)", filter,
-			() -> spawnBaby(EntityTypes.CHICKEN), false);
-		assertFilterResult("Baby Cow", filter, () -> spawnBaby(EntityTypes.COW),
-			false);
-		assertFilterResult("Baby Dolphin", filter,
-			() -> spawnBaby(EntityTypes.DOLPHIN), false);
-		assertFilterResult("Baby Donkey", filter,
-			() -> spawnBaby(EntityTypes.DONKEY), false);
-		assertFilterResult("Baby Fox", filter, () -> spawnBaby(EntityTypes.FOX),
-			false);
-		assertFilterResult("Tadpole (Baby Frog)", filter,
-			() -> spawnEntity(EntityTypes.TADPOLE), false);
-		assertFilterResult("Ghastling (Baby Happy Ghast)", filter,
-			() -> spawnBaby(EntityTypes.HAPPY_GHAST), false);
-		assertFilterResult("Baby Glow Squid", filter,
-			() -> spawnBaby(EntityTypes.GLOW_SQUID), false);
-		assertFilterResult("Baby Goat", filter,
-			() -> spawnBaby(EntityTypes.GOAT), false);
-		assertFilterResult("Foal (Baby Horse)", filter,
-			() -> spawnBaby(EntityTypes.HORSE), false);
-		assertFilterResult("Baby Llama", filter,
-			() -> spawnBaby(EntityTypes.LLAMA), false);
-		assertFilterResult("Baby Mooshroom", filter,
-			() -> spawnBaby(EntityTypes.MOOSHROOM), false);
-		assertFilterResult("Baby Mule", filter,
-			() -> spawnBaby(EntityTypes.MULE), false);
-		assertFilterResult("Baby Nautilus", filter,
-			() -> spawnBaby(EntityTypes.NAUTILUS), false);
-		assertFilterResult("Baby Ocelot", filter,
-			() -> spawnBaby(EntityTypes.OCELOT), false);
-		assertFilterResult("Baby Panda", filter,
-			() -> spawnBaby(EntityTypes.PANDA), false);
-		assertFilterResult("Baby Pig", filter, () -> spawnBaby(EntityTypes.PIG),
-			false);
-		assertFilterResult("Baby Polar Bear", filter,
-			() -> spawnBaby(EntityTypes.POLAR_BEAR), false);
-		assertFilterResult("Baby Rabbit", filter,
-			() -> spawnBaby(EntityTypes.RABBIT), false);
-		assertFilterResult("Baby Sheep", filter,
-			() -> spawnBaby(EntityTypes.SHEEP), false);
-		assertFilterResult("Baby Skeleton Horse", filter,
-			() -> spawnBaby(EntityTypes.SKELETON_HORSE), false);
-		assertFilterResult("Snifflet (Baby Sniffer)", filter,
-			() -> spawnBaby(EntityTypes.SNIFFER), false);
-		assertFilterResult("Baby Squid", filter,
-			() -> spawnBaby(EntityTypes.SQUID), false);
-		assertFilterResult("Baby Strider", filter,
-			() -> spawnBaby(EntityTypes.STRIDER), false);
-		assertFilterResult("Baby Trader Llama", filter,
-			() -> spawnBaby(EntityTypes.TRADER_LLAMA), false);
-		assertFilterResult("Baby Turtle", filter,
-			() -> spawnBaby(EntityTypes.TURTLE), false);
-		assertFilterResult("Puppy (Baby Wolf)", filter,
-			() -> spawnBaby(EntityTypes.WOLF), false);
-		assertFilterResult("Baby Villager", filter,
-			() -> spawnBaby(EntityTypes.VILLAGER), false);
-		assertFilterResult("Baby Zombie Horse", filter,
-			() -> spawnBaby(EntityTypes.ZOMBIE_HORSE), false);
+		assertFilteredOut("Baby Armadillo", filter,
+			() -> spawnBaby(EntityTypes.ARMADILLO));
+		assertFilteredOut("Baby Axolotl", filter,
+			() -> spawnBaby(EntityTypes.AXOLOTL));
+		assertFilteredOut("Baby Bee", filter, () -> spawnBaby(EntityTypes.BEE));
+		assertFilteredOut("Baby Camel", filter,
+			() -> spawnBaby(EntityTypes.CAMEL));
+		assertFilteredOut("Kitten (Baby Cat)", filter,
+			() -> spawnBaby(EntityTypes.CAT));
+		assertFilteredOut("Chick (Baby Chicken)", filter,
+			() -> spawnBaby(EntityTypes.CHICKEN));
+		assertFilteredOut("Baby Cow", filter, () -> spawnBaby(EntityTypes.COW));
+		assertFilteredOut("Baby Dolphin", filter,
+			() -> spawnBaby(EntityTypes.DOLPHIN));
+		assertFilteredOut("Baby Donkey", filter,
+			() -> spawnBaby(EntityTypes.DONKEY));
+		assertFilteredOut("Baby Fox", filter, () -> spawnBaby(EntityTypes.FOX));
+		assertFilteredOut("Tadpole (Baby Frog)", filter,
+			() -> spawnEntity(EntityTypes.TADPOLE));
+		assertFilteredOut("Ghastling (Baby Happy Ghast)", filter,
+			() -> spawnBaby(EntityTypes.HAPPY_GHAST));
+		assertFilteredOut("Baby Glow Squid", filter,
+			() -> spawnBaby(EntityTypes.GLOW_SQUID));
+		assertFilteredOut("Baby Goat", filter,
+			() -> spawnBaby(EntityTypes.GOAT));
+		assertFilteredOut("Foal (Baby Horse)", filter,
+			() -> spawnBaby(EntityTypes.HORSE));
+		assertFilteredOut("Baby Llama", filter,
+			() -> spawnBaby(EntityTypes.LLAMA));
+		assertFilteredOut("Baby Mooshroom", filter,
+			() -> spawnBaby(EntityTypes.MOOSHROOM));
+		assertFilteredOut("Baby Mule", filter,
+			() -> spawnBaby(EntityTypes.MULE));
+		assertFilteredOut("Baby Nautilus", filter,
+			() -> spawnBaby(EntityTypes.NAUTILUS));
+		assertFilteredOut("Baby Ocelot", filter,
+			() -> spawnBaby(EntityTypes.OCELOT));
+		assertFilteredOut("Baby Panda", filter,
+			() -> spawnBaby(EntityTypes.PANDA));
+		assertFilteredOut("Baby Pig", filter, () -> spawnBaby(EntityTypes.PIG));
+		assertFilteredOut("Baby Polar Bear", filter,
+			() -> spawnBaby(EntityTypes.POLAR_BEAR));
+		assertFilteredOut("Baby Rabbit", filter,
+			() -> spawnBaby(EntityTypes.RABBIT));
+		assertFilteredOut("Baby Sheep", filter,
+			() -> spawnBaby(EntityTypes.SHEEP));
+		assertFilteredOut("Baby Skeleton Horse", filter,
+			() -> spawnBaby(EntityTypes.SKELETON_HORSE));
+		assertFilteredOut("Snifflet (Baby Sniffer)", filter,
+			() -> spawnBaby(EntityTypes.SNIFFER));
+		assertFilteredOut("Baby Squid", filter,
+			() -> spawnBaby(EntityTypes.SQUID));
+		assertFilteredOut("Baby Strider", filter,
+			() -> spawnBaby(EntityTypes.STRIDER));
+		assertFilteredOut("Baby Trader Llama", filter,
+			() -> spawnBaby(EntityTypes.TRADER_LLAMA));
+		assertFilteredOut("Baby Turtle", filter,
+			() -> spawnBaby(EntityTypes.TURTLE));
+		assertFilteredOut("Puppy (Baby Wolf)", filter,
+			() -> spawnBaby(EntityTypes.WOLF));
+		assertFilteredOut("Baby Villager", filter,
+			() -> spawnBaby(EntityTypes.VILLAGER));
+		assertFilteredOut("Baby Zombie Horse", filter,
+			() -> spawnBaby(EntityTypes.ZOMBIE_HORSE));
 		
 		// Allowed because hostile
-		assertFilterResult("Gurgle (Baby Drowned)", filter,
-			() -> spawnBaby(EntityTypes.DROWNED), true);
-		assertFilterResult("Baby Hoglin", filter,
-			() -> spawnBaby(EntityTypes.HOGLIN), true);
-		assertFilterResult("Baby Husk", filter,
-			() -> spawnBaby(EntityTypes.HUSK), true);
-		assertFilterResult("Baby Zoglin", filter,
-			() -> spawnBaby(EntityTypes.ZOGLIN), true);
-		assertFilterResult("Baby Zombie", filter,
-			() -> spawnBaby(EntityTypes.ZOMBIE), true);
-		assertFilterResult("Baby Zombie Villager", filter,
-			() -> spawnBaby(EntityTypes.ZOMBIE_VILLAGER), true);
+		assertAllowed("Gurgle (Baby Drowned)", filter,
+			() -> spawnBaby(EntityTypes.DROWNED));
+		assertAllowed("Baby Hoglin", filter,
+			() -> spawnBaby(EntityTypes.HOGLIN));
+		assertAllowed("Baby Husk", filter, () -> spawnBaby(EntityTypes.HUSK));
+		assertAllowed("Baby Zoglin", filter,
+			() -> spawnBaby(EntityTypes.ZOGLIN));
+		assertAllowed("Baby Zombie", filter,
+			() -> spawnBaby(EntityTypes.ZOMBIE));
+		assertAllowed("Baby Zombie Villager", filter,
+			() -> spawnBaby(EntityTypes.ZOMBIE_VILLAGER));
 		
 		// Allowed because neutral
-		assertFilterResult("Baby Piglin", filter,
-			() -> spawnBaby(EntityTypes.PIGLIN), true);
-		assertFilterResult("Baby Zombified Piglin", filter,
-			() -> spawnBaby(EntityTypes.ZOMBIFIED_PIGLIN), true);
+		assertAllowed("Baby Piglin", filter,
+			() -> spawnBaby(EntityTypes.PIGLIN));
+		assertAllowed("Baby Zombified Piglin", filter,
+			() -> spawnBaby(EntityTypes.ZOMBIFIED_PIGLIN));
 	}
 	
 	private <T extends Mob> T spawnBaby(EntityType<T> type)
