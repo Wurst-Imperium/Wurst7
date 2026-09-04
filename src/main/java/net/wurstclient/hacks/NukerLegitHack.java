@@ -187,7 +187,6 @@ public final class NukerLegitHack extends Hack
 		
 		if(im.continueDestroyBlock(pos, side))
 		{
-			MC.level.addBreakingBlockEffect(pos, side);
 			attackSwing.swing();
 			MC.options.keyAttack.setDown(true);
 		}

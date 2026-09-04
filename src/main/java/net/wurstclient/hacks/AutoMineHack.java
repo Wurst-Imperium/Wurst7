@@ -105,7 +105,6 @@ public final class AutoMineHack extends Hack
 		
 		if(im.continueDestroyBlock(pos, side))
 		{
-			MC.level.addBreakingBlockEffect(pos, side);
 			AttackSwing.CLIENT.swing();
 			MC.options.keyAttack.setDown(true);
 		}
