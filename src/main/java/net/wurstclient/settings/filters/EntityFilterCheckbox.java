@@ -24,7 +24,7 @@ public abstract class EntityFilterCheckbox extends CheckboxSetting
 	@Override
 	public final boolean test(Entity e)
 	{
-		return isChecked() && !filtersOut(e);
+		return !isChecked() || !filtersOut(e);
 	}
 	
 	@Override

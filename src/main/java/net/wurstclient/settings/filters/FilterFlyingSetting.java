@@ -27,7 +27,10 @@ public final class FilterFlyingSetting extends SliderSetting
 	@Override
 	public boolean test(Entity e)
 	{
-		return getValue() > 0 && !filtersOut(e);
+		if(getValue() > 0)
+			return !filtersOut(e);
+		
+		return true;
 	}
 	
 	private boolean filtersOut(Entity e)
