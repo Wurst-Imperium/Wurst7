@@ -24,7 +24,6 @@ public final class FilterBabiesSetting extends EntityFilterCheckbox
 		if(e instanceof Tadpole)
 			return true;
 		
-		// Age locking is player-imposed, unlike natural perma-babies.
 		return e instanceof AgeableMob mob && mob.isBaby()
 			&& (mob.canAgeUp() || mob.isAgeLocked());
 	}
