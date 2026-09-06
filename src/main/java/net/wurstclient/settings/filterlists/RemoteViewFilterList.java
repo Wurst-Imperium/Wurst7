@@ -46,7 +46,7 @@ public final class RemoteViewFilterList extends EntityFilterList
 			+ " mobs like fish, squid, dolphins and axolotls.", true));
 		
 		builder.add(new FilterBabiesSetting(
-			"Won't view baby pigs, baby villagers, etc.", true));
+			"description.wurst.setting.remoteview.filter_babies", true));
 		
 		builder.add(new FilterBatsSetting(
 			"description.wurst.setting.remoteview.filter_bats", true));

@@ -47,7 +47,7 @@ public final class FollowFilterList extends EntityFilterList
 			true));
 		
 		builder.add(new FilterBabiesSetting(
-			"Won't follow baby pigs, baby villagers, etc.", true));
+			"description.wurst.setting.follow.filter_babies", true));
 		
 		builder.add(new FilterBatsSetting(
 			"description.wurst.setting.follow.filter_bats", true));

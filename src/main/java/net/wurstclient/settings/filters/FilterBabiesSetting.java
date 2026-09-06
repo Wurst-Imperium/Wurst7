@@ -10,39 +10,28 @@ package net.wurstclient.settings.filters;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.frog.Tadpole;
-import net.minecraft.world.entity.monster.Enemy;
 
 public final class FilterBabiesSetting extends EntityFilterCheckbox
 {
-	private static final String EXCEPTIONS_TEXT = "\n\nThis filter does not"
-		+ " affect baby zombies and other hostile baby mobs.";
-	
 	public FilterBabiesSetting(String description, boolean checked)
 	{
-		super("Filter babies", description + EXCEPTIONS_TEXT, checked);
+		super("Filter babies", description, checked);
 	}
 	
 	@Override
 	protected boolean filtersOut(Entity e)
 	{
-		// never filter out hostile mobs (including hoglins)
-		if(e instanceof Enemy)
-			return false;
-		
-		// filter out passive entity babies
-		if(e instanceof AgeableMob pe && pe.isBaby())
-			return true;
-		
-		// filter out tadpoles
 		if(e instanceof Tadpole)
 			return true;
 		
-		return false;
+		// Age locking is player-imposed, unlike natural perma-babies.
+		return e instanceof AgeableMob mob && mob.isBaby()
+			&& (mob.canAgeUp() || mob.isAgeLocked());
 	}
 	
 	public static FilterBabiesSetting genericCombat(boolean checked)
 	{
 		return new FilterBabiesSetting(
-			"Won't attack baby pigs, baby villagers, etc.", checked);
+			"description.wurst.setting.generic.filter_babies_combat", checked);
 	}
 }

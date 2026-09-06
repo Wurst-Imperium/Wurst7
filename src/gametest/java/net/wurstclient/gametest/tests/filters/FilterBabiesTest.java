@@ -15,6 +15,8 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.frog.Tadpole;
 import net.wurstclient.gametest.tests.EntityFilterTest;
 import net.wurstclient.settings.filterlists.EntityFilterList.EntityFilter;
 import net.wurstclient.settings.filters.FilterBabiesSetting;
@@ -31,54 +33,54 @@ public final class FilterBabiesTest extends EntityFilterTest
 	protected void runImpl()
 	{
 		logger.info("Testing baby mob filter");
-		Supplier<EntityFilter> filter = () -> new FilterBabiesSetting("", true);
+		Supplier<EntityFilter> filter =
+			() -> FilterBabiesSetting.genericCombat(true);
 		
-		// Passive mobs (filter out if baby)
-		for(EntityType<? extends Mob> type : List.of(EntityTypes.ARMADILLO,
-			EntityTypes.AXOLOTL, EntityTypes.BEE, EntityTypes.CAMEL,
-			EntityTypes.CAT, EntityTypes.CHICKEN, EntityTypes.COW,
-			EntityTypes.DOLPHIN, EntityTypes.DONKEY, EntityTypes.FOX,
-			EntityTypes.HAPPY_GHAST, EntityTypes.GLOW_SQUID, EntityTypes.GOAT,
-			EntityTypes.HORSE, EntityTypes.LLAMA, EntityTypes.MOOSHROOM,
-			EntityTypes.MULE, EntityTypes.NAUTILUS, EntityTypes.OCELOT,
-			EntityTypes.PANDA, EntityTypes.PIG, EntityTypes.POLAR_BEAR,
-			EntityTypes.RABBIT, EntityTypes.SHEEP, EntityTypes.SKELETON_HORSE,
-			EntityTypes.SNIFFER, EntityTypes.SQUID, EntityTypes.STRIDER,
-			EntityTypes.TRADER_LLAMA, EntityTypes.TURTLE, EntityTypes.WOLF,
-			EntityTypes.VILLAGER, EntityTypes.ZOMBIE_HORSE))
-		{
-			assertFilteredOut(type.toShortString() + " (baby)", filter,
+		// Normal baby/adult baseline
+		assertFilteredOut("baby cow", filter, () -> spawnBaby(EntityTypes.COW));
+		assertAllowed("adult cow", filter, () -> spawnEntity(EntityTypes.COW));
+		
+		// Both are hostile, but only hoglins grow up
+		assertFilteredOut("baby hoglin", filter,
+			() -> spawnBaby(EntityTypes.HOGLIN));
+		assertAllowed("baby zoglin", filter,
+			() -> spawnBaby(EntityTypes.ZOGLIN));
+		
+		// Undead horses are AgeableMobs, but override canAgeUp() to false
+		assertFilteredOut("baby horse", filter,
+			() -> spawnBaby(EntityTypes.HORSE));
+		for(EntityType<? extends Mob> type : List.of(EntityTypes.SKELETON_HORSE,
+			EntityTypes.ZOMBIE_HORSE))
+			assertAllowed(type.toShortString() + " (baby)", filter,
 				() -> spawnBaby(type));
-			assertAllowed(type.toShortString() + " (adult)", filter,
-				() -> spawnEntity(type));
-		}
 		
-		// Special case: Tadpoles (baby frogs) are a separate entity type
-		assertFilteredOut(EntityTypes.TADPOLE.toShortString(), filter,
+		// Villagers grow up even though they cannot be age-locked
+		assertFilteredOut("baby villager", filter,
+			() -> spawnBaby(EntityTypes.VILLAGER));
+		
+		// Tadpoles grow into a separate entity type rather than an adult
+		// variant
+		assertFilteredOut("tadpole", filter,
 			() -> spawnEntity(EntityTypes.TADPOLE));
-		assertAllowed(EntityTypes.FROG.toShortString(), filter,
-			() -> spawnEntity(EntityTypes.FROG));
+		assertAllowed("frog", filter, () -> spawnEntity(EntityTypes.FROG));
 		
-		// Hostile mobs (always allow)
-		for(EntityType<? extends Mob> type : List.of(EntityTypes.DROWNED,
-			EntityTypes.HOGLIN, EntityTypes.HUSK, EntityTypes.ZOGLIN,
-			EntityTypes.ZOMBIE, EntityTypes.ZOMBIE_VILLAGER))
-		{
-			assertAllowed(type.toShortString() + " (baby)", filter,
-				() -> spawnBaby(type));
-			assertAllowed(type.toShortString() + " (adult)", filter,
-				() -> spawnEntity(type));
-		}
-		
-		// Neutral mobs (always allow)
+		// Natural perma-babies without the AgeableMob aging system
 		for(EntityType<? extends Mob> type : List.of(EntityTypes.PIGLIN,
-			EntityTypes.ZOMBIFIED_PIGLIN))
-		{
+			EntityTypes.ZOMBIE))
 			assertAllowed(type.toShortString() + " (baby)", filter,
 				() -> spawnBaby(type));
-			assertAllowed(type.toShortString() + " (adult)", filter,
-				() -> spawnEntity(type));
-		}
+		
+		// Golden dandelions stop aging but must not bypass the filter
+		assertFilteredOut("age-locked cow", filter, () -> {
+			Cow cow = spawnBaby(EntityTypes.COW);
+			cow.setAgeLocked(true);
+			return cow;
+		});
+		assertFilteredOut("age-locked tadpole", filter, () -> {
+			Tadpole tadpole = spawnEntity(EntityTypes.TADPOLE);
+			tadpole.setAgeLocked(true);
+			return tadpole;
+		});
 	}
 	
 	private <T extends Mob> T spawnBaby(EntityType<T> type)

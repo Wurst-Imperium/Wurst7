@@ -49,9 +49,8 @@ public final class FeedAuraHack extends Hack
 			+ "Anything that is further away than the specified value will not be fed.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final FilterBabiesSetting filterBabies =
-		new FilterBabiesSetting("Won't feed baby animals.\n"
-			+ "Saves food, but doesn't speed up baby growth.", true);
+	private final FilterBabiesSetting filterBabies = new FilterBabiesSetting(
+		"description.wurst.setting.feedaura.filter_babies", true);
 	
 	private final CheckboxSetting filterUntamed =
 		new CheckboxSetting("Filter untamed",
