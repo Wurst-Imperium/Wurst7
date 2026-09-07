@@ -12,14 +12,19 @@ import java.util.function.Supplier;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.minecraft.world.entity.Bucketable;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.animal.feline.Ocelot;
 import net.minecraft.world.entity.animal.fox.Fox;
+import net.minecraft.world.entity.animal.frog.Tadpole;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.monster.cubemob.SulfurCube;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.wurstclient.gametest.tests.EntityFilterTest;
@@ -38,12 +43,12 @@ public final class FilterPetsTest extends EntityFilterTest
 	protected void runImpl()
 	{
 		logger.info("Testing pet filter");
-		Supplier<EntityFilter> filter = () -> new FilterPetsSetting("", true);
+		Supplier<EntityFilter> filter =
+			() -> FilterPetsSetting.genericCombat(true);
 		
 		// Normal pets: filter out if tamed
-		for(EntityType<? extends TamableAnimal> type : List.of(EntityTypes.CAT,
-			EntityTypes.NAUTILUS, EntityTypes.PARROT, EntityTypes.WOLF,
-			EntityTypes.ZOMBIE_NAUTILUS))
+		for(EntityType<? extends TamableAnimal> type : List.of(EntityTypes.WOLF,
+			EntityTypes.NAUTILUS, EntityTypes.ZOMBIE_NAUTILUS))
 		{
 			assertFilteredOut(type.toShortString() + " (tamed)", filter,
 				() -> spawnTamedAnimal(type));
@@ -52,10 +57,8 @@ public final class FilterPetsTest extends EntityFilterTest
 		}
 		
 		// Normal horse-likes: filter out if tamed
-		for(EntityType<? extends AbstractHorse> type : List.of(
-			EntityTypes.DONKEY, EntityTypes.HORSE, EntityTypes.LLAMA,
-			EntityTypes.MULE, EntityTypes.TRADER_LLAMA,
-			EntityTypes.ZOMBIE_HORSE))
+		for(EntityType<? extends AbstractHorse> type : List
+			.of(EntityTypes.HORSE, EntityTypes.ZOMBIE_HORSE))
 		{
 			assertFilteredOut(type.toShortString() + " (tamed)", filter,
 				() -> spawnTamedEquine(type));
@@ -116,6 +119,54 @@ public final class FilterPetsTest extends EntityFilterTest
 			filter, () -> spawnTrustingFox());
 		assertAllowed(EntityTypes.FOX.toShortString() + " (wild)", filter,
 			() -> spawnEntity(EntityTypes.FOX));
+		
+		assertFilteredOut("player-built iron golem", filter, () -> {
+			IronGolem golem = spawnEntity(EntityTypes.IRON_GOLEM);
+			golem.setPlayerCreated(true);
+			return golem;
+		});
+		assertAllowed("natural iron golem", filter,
+			() -> spawnEntity(EntityTypes.IRON_GOLEM));
+		
+		// Golden dandelions turn otherwise-wild babies into pets
+		assertAllowed("growing baby cow", filter, () -> {
+			Cow cow = spawnEntity(EntityTypes.COW);
+			cow.setBaby(true);
+			return cow;
+		});
+		assertFilteredOut("age-locked cow", filter, () -> {
+			Cow cow = spawnEntity(EntityTypes.COW);
+			cow.setBaby(true);
+			cow.setAgeLocked(true);
+			return cow;
+		});
+		assertFilteredOut("age-locked tadpole", filter, () -> {
+			Tadpole tadpole = spawnEntity(EntityTypes.TADPOLE);
+			tadpole.setAgeLocked(true);
+			return tadpole;
+		});
+		assertAllowed("wild tadpole (always reports fromBucket)", filter,
+			() -> spawnEntity(EntityTypes.TADPOLE));
+		
+		// Each has a separate implementation of bucket history
+		for(EntityType<? extends Mob> type : List.of(EntityTypes.COD,
+			EntityTypes.AXOLOTL, EntityTypes.SULFUR_CUBE))
+		{
+			assertAllowed(type.toShortString() + " (wild)", filter,
+				() -> spawnEntity(type));
+			assertFilteredOut(type.toShortString() + " (bucket-released)",
+				filter, () -> {
+					Mob mob = spawnEntity(type);
+					((Bucketable)mob).setFromBucket(true);
+					return mob;
+				});
+		}
+		assertAllowed("filled bucket-released sulfur cube", filter, () -> {
+			SulfurCube cube = spawnEntity(EntityTypes.SULFUR_CUBE);
+			cube.setFromBucket(true);
+			cube.setItemSlot(EquipmentSlot.BODY, new ItemStack(Items.STONE));
+			return cube;
+		});
 		
 		// Clean up taming particles
 		context.waitTick();
