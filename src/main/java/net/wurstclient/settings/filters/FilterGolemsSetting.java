@@ -10,10 +10,11 @@ package net.wurstclient.settings.filters;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.golem.AbstractGolem;
 import net.minecraft.world.entity.monster.Shulker;
+import net.wurstclient.util.text.WText;
 
 public final class FilterGolemsSetting extends EntityFilterCheckbox
 {
-	public FilterGolemsSetting(String description, boolean checked)
+	public FilterGolemsSetting(WText description, boolean checked)
 	{
 		super("Filter golems", description, checked);
 	}
@@ -27,12 +28,16 @@ public final class FilterGolemsSetting extends EntityFilterCheckbox
 	public static FilterGolemsSetting genericCombat(boolean checked)
 	{
 		return new FilterGolemsSetting(
-			"description.wurst.setting.generic.filter_golems_combat", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_golems_combat"),
+			checked);
 	}
 	
 	public static FilterGolemsSetting genericVision(boolean checked)
 	{
 		return new FilterGolemsSetting(
-			"description.wurst.setting.generic.filter_golems_vision", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_golems_vision"),
+			checked);
 	}
 }

@@ -15,15 +15,13 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.fish.Pufferfish;
 import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.entity.monster.Enemy;
+import net.wurstclient.util.text.WText;
 
 public final class FilterPassiveSetting extends EntityFilterCheckbox
 {
-	private static final String EXCEPTIONS_TEXT = "\n\nThis filter does not"
-		+ " affect wolves, bees, polar bears, pufferfish, and villagers.";
-	
-	public FilterPassiveSetting(String description, boolean checked)
+	public FilterPassiveSetting(WText description, boolean checked)
 	{
-		super("Filter passive mobs", description + EXCEPTIONS_TEXT, checked);
+		super("Filter passive mobs", description, checked);
 	}
 	
 	@Override
@@ -43,15 +41,17 @@ public final class FilterPassiveSetting extends EntityFilterCheckbox
 	
 	public static FilterPassiveSetting genericCombat(boolean checked)
 	{
-		return new FilterPassiveSetting("Won't attack animals like pigs and"
-			+ " cows, ambient mobs like bats, and water mobs like fish, squid"
-			+ " and dolphins.", checked);
+		return new FilterPassiveSetting(
+			WText.translated(
+				"description.wurst.setting.generic.filter_passive_combat"),
+			checked);
 	}
 	
 	public static FilterPassiveSetting genericVision(boolean checked)
 	{
-		return new FilterPassiveSetting("Won't show animals like pigs and"
-			+ " cows, ambient mobs like bats, and water mobs like fish, squid"
-			+ " and dolphins.", checked);
+		return new FilterPassiveSetting(
+			WText.translated(
+				"description.wurst.setting.generic.filter_passive_vision"),
+			checked);
 	}
 }

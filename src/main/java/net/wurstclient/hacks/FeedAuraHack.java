@@ -49,19 +49,16 @@ public final class FeedAuraHack extends Hack
 			+ "Anything that is further away than the specified value will not be fed.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
-	private final FilterBabiesSetting filterBabies = new FilterBabiesSetting(
-		"description.wurst.setting.feedaura.filter_babies", true);
+	private final FilterBabiesSetting filterBabies =
+		new FilterBabiesSetting(this, true);
 	
 	private final CheckboxSetting filterUntamed =
 		new CheckboxSetting("Filter untamed",
-			"Won't feed tameable animals that haven't been tamed yet.", false);
+			"description.wurst.setting.feedaura.filter_untamed", false);
 	
-	private final CheckboxSetting filterHorses = new CheckboxSetting(
-		"Filter horse-like animals",
-		"Won't feed horses, llamas, donkeys, etc.\n"
-			+ "Recommended in Minecraft versions before 1.20.3 due to MC-233276,"
-			+ "which causes these animals to consume items indefinitely.",
-		false);
+	private final CheckboxSetting filterHorses =
+		new CheckboxSetting("Filter horse-like animals",
+			"description.wurst.setting.feedaura.filter_horses", false);
 	
 	private final Random random = new Random();
 	private LivingEntity target;

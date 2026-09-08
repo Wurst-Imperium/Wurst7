@@ -14,11 +14,12 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.filterlists.EntityFilterList.EntityFilter;
+import net.wurstclient.util.text.WText;
 
 public final class FilterFlyingSetting extends SliderSetting
 	implements EntityFilter
 {
-	public FilterFlyingSetting(String description, double value)
+	public FilterFlyingSetting(WText description, double value)
 	{
 		super("Filter flying", description, value, 0, 2, 0.05,
 			ValueDisplay.DECIMAL.withLabel(0, "off"));
@@ -52,6 +53,8 @@ public final class FilterFlyingSetting extends SliderSetting
 	public static FilterFlyingSetting genericCombat(double value)
 	{
 		return new FilterFlyingSetting(
-			"description.wurst.setting.generic.filter_flying_combat", value);
+			WText.translated(
+				"description.wurst.setting.generic.filter_flying_combat"),
+			value);
 	}
 }

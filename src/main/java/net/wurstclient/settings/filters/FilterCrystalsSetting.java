@@ -9,10 +9,11 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.wurstclient.util.text.WText;
 
 public final class FilterCrystalsSetting extends EntityFilterCheckbox
 {
-	public FilterCrystalsSetting(String description, boolean checked)
+	public FilterCrystalsSetting(WText description, boolean checked)
 	{
 		super("Filter end crystals", description, checked);
 	}
@@ -26,7 +27,8 @@ public final class FilterCrystalsSetting extends EntityFilterCheckbox
 	public static FilterCrystalsSetting genericCombat(boolean checked)
 	{
 		return new FilterCrystalsSetting(
-			"description.wurst.setting.generic.filter_crystals_combat",
+			WText.translated(
+				"description.wurst.setting.generic.filter_crystals_combat"),
 			checked);
 	}
 }

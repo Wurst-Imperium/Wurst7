@@ -9,10 +9,11 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
+import net.wurstclient.util.text.WText;
 
 public final class FilterShulkerBulletSetting extends EntityFilterCheckbox
 {
-	public FilterShulkerBulletSetting(String description, boolean checked)
+	public FilterShulkerBulletSetting(WText description, boolean checked)
 	{
 		super("Filter shulker bullets", description, checked);
 	}
@@ -25,8 +26,8 @@ public final class FilterShulkerBulletSetting extends EntityFilterCheckbox
 	
 	public static FilterShulkerBulletSetting genericCombat(boolean checked)
 	{
-		return new FilterShulkerBulletSetting(
-			"description.wurst.setting.generic.filter_shulker_bullets_combat",
+		return new FilterShulkerBulletSetting(WText.translated(
+			"description.wurst.setting.generic.filter_shulker_bullets_combat"),
 			checked);
 	}
 }

@@ -18,6 +18,7 @@ import net.minecraft.world.entity.Mob;
 import net.wurstclient.gametest.tests.EntityFilterTest;
 import net.wurstclient.settings.filterlists.EntityFilterList.EntityFilter;
 import net.wurstclient.settings.filters.FilterPassiveWaterSetting;
+import net.wurstclient.util.text.WText;
 
 public final class FilterPassiveWaterTest extends EntityFilterTest
 {
@@ -32,7 +33,7 @@ public final class FilterPassiveWaterTest extends EntityFilterTest
 	{
 		logger.info("Testing passive water mob filter");
 		Supplier<EntityFilter> filter =
-			() -> new FilterPassiveWaterSetting("", true);
+			() -> new FilterPassiveWaterSetting(WText.empty(), true);
 		
 		// Filtered out
 		for(EntityType<? extends Mob> type : List.of(EntityTypes.AXOLOTL,

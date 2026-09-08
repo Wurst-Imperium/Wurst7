@@ -10,12 +10,20 @@ package net.wurstclient.settings.filters;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.frog.Tadpole;
+import net.wurstclient.hack.Hack;
+import net.wurstclient.util.text.WText;
 
 public final class FilterBabiesSetting extends EntityFilterCheckbox
 {
-	public FilterBabiesSetting(String description, boolean checked)
+	public FilterBabiesSetting(WText description, boolean checked)
 	{
 		super("Filter babies", description, checked);
+	}
+	
+	public FilterBabiesSetting(Hack hack, boolean checked)
+	{
+		this(WText.translated("description.wurst.setting."
+			+ hack.getName().toLowerCase() + ".filter_babies"), checked);
 	}
 	
 	@Override
@@ -31,6 +39,8 @@ public final class FilterBabiesSetting extends EntityFilterCheckbox
 	public static FilterBabiesSetting genericCombat(boolean checked)
 	{
 		return new FilterBabiesSetting(
-			"description.wurst.setting.generic.filter_babies_combat", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_babies_combat"),
+			checked);
 	}
 }

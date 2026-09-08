@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.wurstclient.settings.filters.*;
+import net.wurstclient.util.text.WText;
 
 public final class AnchorAuraFilterList extends EntityFilterList
 {
@@ -22,78 +23,64 @@ public final class AnchorAuraFilterList extends EntityFilterList
 	public static AnchorAuraFilterList create()
 	{
 		ArrayList<EntityFilter> builder = new ArrayList<>();
-		String damageWarning =
-			"\n\nThey can still take damage if they get too close to a valid target or an existing anchor.";
 		
-		builder.add(new FilterPlayersSetting(
-			"Won't target other players when auto-placing anchors."
-				+ damageWarning,
-			false));
+		builder.add(
+			new FilterPlayersSetting(description("filter_players"), false));
 		
-		builder.add(new FilterHostileSetting("Won't target hostile mobs like"
-			+ " zombies and creepers when auto-placing anchors."
-			+ damageWarning, true));
+		builder
+			.add(new FilterHostileSetting(description("filter_hostile"), true));
 		
-		builder.add(new FilterNeutralSetting("Won't target neutral mobs like"
-			+ " endermen and wolves when auto-placing anchors." + damageWarning,
+		builder.add(new FilterNeutralSetting(description("filter_neutral"),
 			AttackDetectingEntityFilter.Mode.ON));
 		
-		builder.add(new FilterPassiveSetting("Won't target animals like pigs"
-			+ " and cows, ambient mobs like bats, and water mobs like fish,"
-			+ " squid and dolphins when auto-placing anchors." + damageWarning,
-			true));
+		builder
+			.add(new FilterPassiveSetting(description("filter_passive"), true));
 		
-		builder.add(new FilterPassiveWaterSetting("Won't target passive water"
-			+ " mobs like fish, squid, dolphins and axolotls when auto-placing"
-			+ " anchors." + damageWarning, true));
+		builder.add(new FilterPassiveWaterSetting(
+			description("filter_passive_water"), true));
 		
-		builder.add(new FilterBatsSetting("Won't target bats and any other"
-			+ " \"ambient\" mobs when auto-placing anchors." + damageWarning,
-			true));
+		builder.add(new FilterBatsSetting(description("filter_bats"), true));
 		
-		builder.add(new FilterSlimesSetting("Won't target slimes when"
-			+ " auto-placing anchors." + damageWarning, true));
+		builder
+			.add(new FilterSlimesSetting(description("filter_slimes"), true));
 		
-		builder.add(new FilterVillagersSetting("Won't target villagers and"
-			+ " wandering traders when auto-placing anchors." + damageWarning,
-			true));
+		builder.add(
+			new FilterVillagersSetting(description("filter_villagers"), true));
 		
-		builder.add(new FilterZombieVillagersSetting("Won't target zombified"
-			+ " villagers when auto-placing anchors." + damageWarning, true));
+		builder.add(new FilterZombieVillagersSetting(
+			description("filter_zombie_villagers"), true));
 		
-		builder.add(new FilterGolemsSetting("Won't target iron golems and snow"
-			+ " golems when auto-placing anchors." + damageWarning, true));
+		builder
+			.add(new FilterGolemsSetting(description("filter_golems"), true));
 		
-		builder.add(new FilterPiglinsSetting(
-			"Won't target piglins when auto-placing anchors.",
+		builder.add(new FilterPiglinsSetting(description("filter_piglins"),
 			AttackDetectingEntityFilter.Mode.ON));
 		
-		builder.add(new FilterZombiePiglinsSetting("Won't target"
-			+ " zombified piglins when auto-placing anchors." + damageWarning,
-			AttackDetectingEntityFilter.Mode.ON));
+		builder.add(
+			new FilterZombiePiglinsSetting(description("filter_zombie_piglins"),
+				AttackDetectingEntityFilter.Mode.ON));
 		
-		builder.add(new FilterShulkersSetting("Won't target shulkers when"
-			+ " auto-placing anchors." + damageWarning, true));
+		builder.add(
+			new FilterShulkersSetting(description("filter_shulkers"), true));
 		
-		builder.add(new FilterAllaysSetting(
-			"Won't target allays when auto-placing anchors." + damageWarning,
-			true));
+		builder
+			.add(new FilterAllaysSetting(description("filter_allays"), true));
 		
-		builder.add(new FilterInvisibleSetting(
-			"Won't target invisible entities when auto-placing anchors."
-				+ damageWarning,
-			false));
+		builder.add(
+			new FilterInvisibleSetting(description("filter_invisible"), false));
 		
-		builder.add(new FilterNamedSetting(
-			"Won't target name-tagged entities when auto-placing anchors."
-				+ damageWarning,
-			false));
+		builder.add(new FilterNamedSetting(description("filter_named"), false));
 		
 		builder.add(new FilterArmorStandsSetting(
-			"Won't target armor stands when auto-placing anchors."
-				+ damageWarning,
-			true));
+			description("filter_armor_stands"), true));
 		
 		return new AnchorAuraFilterList(builder);
+	}
+	
+	private static WText description(String key)
+	{
+		return WText.translated("description.wurst.setting.anchoraura." + key)
+			.append("\n\n").append(WText.translated(
+				"description.wurst.setting.anchoraura.filter_damage_warning"));
 	}
 }

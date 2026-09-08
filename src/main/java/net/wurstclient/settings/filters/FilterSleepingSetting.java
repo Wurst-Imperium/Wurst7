@@ -10,10 +10,11 @@ package net.wurstclient.settings.filters;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
+import net.wurstclient.util.text.WText;
 
 public final class FilterSleepingSetting extends EntityFilterCheckbox
 {
-	public FilterSleepingSetting(String description, boolean checked)
+	public FilterSleepingSetting(WText description, boolean checked)
 	{
 		super("Filter sleeping", description, checked);
 	}
@@ -30,14 +31,16 @@ public final class FilterSleepingSetting extends EntityFilterCheckbox
 	public static FilterSleepingSetting genericCombat(boolean checked)
 	{
 		return new FilterSleepingSetting(
-			"description.wurst.setting.generic.filter_sleeping_combat",
+			WText.translated(
+				"description.wurst.setting.generic.filter_sleeping_combat"),
 			checked);
 	}
 	
 	public static FilterSleepingSetting genericVision(boolean checked)
 	{
 		return new FilterSleepingSetting(
-			"description.wurst.setting.generic.filter_sleeping_vision",
+			WText.translated(
+				"description.wurst.setting.generic.filter_sleeping_vision"),
 			checked);
 	}
 }

@@ -25,10 +25,11 @@ import net.minecraft.world.entity.animal.happyghast.HappyGhast;
 import net.minecraft.world.entity.animal.pig.Pig;
 import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.monster.cubemob.SulfurCube;
+import net.wurstclient.util.text.WText;
 
 public final class FilterPetsSetting extends EntityFilterCheckbox
 {
-	public FilterPetsSetting(String description, boolean checked)
+	public FilterPetsSetting(WText description, boolean checked)
 	{
 		super("Filter pets", description, checked);
 	}
@@ -81,12 +82,16 @@ public final class FilterPetsSetting extends EntityFilterCheckbox
 	public static FilterPetsSetting genericCombat(boolean checked)
 	{
 		return new FilterPetsSetting(
-			"description.wurst.setting.generic.filter_pets_combat", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_pets_combat"),
+			checked);
 	}
 	
 	public static FilterPetsSetting genericVision(boolean checked)
 	{
 		return new FilterPetsSetting(
-			"description.wurst.setting.generic.filter_pets_vision", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_pets_vision"),
+			checked);
 	}
 }

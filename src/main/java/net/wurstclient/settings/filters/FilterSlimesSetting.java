@@ -10,15 +10,13 @@ package net.wurstclient.settings.filters;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.cubemob.MagmaCube;
 import net.minecraft.world.entity.monster.cubemob.Slime;
+import net.wurstclient.util.text.WText;
 
 public final class FilterSlimesSetting extends EntityFilterCheckbox
 {
-	private static final String EXCEPTIONS_TEXT =
-		"\n\nThis filter does not affect magma cubes.";
-	
-	public FilterSlimesSetting(String description, boolean checked)
+	public FilterSlimesSetting(WText description, boolean checked)
 	{
-		super("Filter slimes", description + EXCEPTIONS_TEXT, checked);
+		super("Filter slimes", description, checked);
 	}
 	
 	@Override
@@ -29,11 +27,17 @@ public final class FilterSlimesSetting extends EntityFilterCheckbox
 	
 	public static FilterSlimesSetting genericCombat(boolean checked)
 	{
-		return new FilterSlimesSetting("Won't attack slimes.", checked);
+		return new FilterSlimesSetting(
+			WText.translated(
+				"description.wurst.setting.generic.filter_slimes_combat"),
+			checked);
 	}
 	
 	public static FilterSlimesSetting genericVision(boolean checked)
 	{
-		return new FilterSlimesSetting("Won't show slimes.", checked);
+		return new FilterSlimesSetting(
+			WText.translated(
+				"description.wurst.setting.generic.filter_slimes_vision"),
+			checked);
 	}
 }

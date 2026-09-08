@@ -12,16 +12,17 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.animal.fish.Pufferfish;
 import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.wurstclient.util.text.WText;
 
 public final class FilterNeutralSetting extends AttackDetectingEntityFilter
 {
-	private FilterNeutralSetting(String description, Mode selected,
+	private FilterNeutralSetting(WText description, Mode selected,
 		boolean checked)
 	{
 		super("Filter neutral mobs", description, selected, checked);
 	}
 	
-	public FilterNeutralSetting(String description, Mode selected)
+	public FilterNeutralSetting(WText description, Mode selected)
 	{
 		this(description, selected, false);
 	}
@@ -50,18 +51,20 @@ public final class FilterNeutralSetting extends AttackDetectingEntityFilter
 	public static FilterNeutralSetting genericCombat(Mode selected)
 	{
 		return new FilterNeutralSetting(
-			"description.wurst.setting.generic.filter_neutral_combat",
+			WText.translated(
+				"description.wurst.setting.generic.filter_neutral_combat"),
 			selected);
 	}
 	
 	public static FilterNeutralSetting genericVision(Mode selected)
 	{
 		return new FilterNeutralSetting(
-			"description.wurst.setting.generic.filter_neutral_vision",
+			WText.translated(
+				"description.wurst.setting.generic.filter_neutral_vision"),
 			selected);
 	}
 	
-	public static FilterNeutralSetting onOffOnly(String description,
+	public static FilterNeutralSetting onOffOnly(WText description,
 		boolean onByDefault)
 	{
 		return new FilterNeutralSetting(description, null, onByDefault);

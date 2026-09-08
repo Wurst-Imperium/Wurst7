@@ -9,10 +9,11 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.zombie.ZombieVillager;
+import net.wurstclient.util.text.WText;
 
 public final class FilterZombieVillagersSetting extends EntityFilterCheckbox
 {
-	public FilterZombieVillagersSetting(String description, boolean checked)
+	public FilterZombieVillagersSetting(WText description, boolean checked)
 	{
 		super("Filter zombie villagers", description, checked);
 	}
@@ -25,15 +26,15 @@ public final class FilterZombieVillagersSetting extends EntityFilterCheckbox
 	
 	public static FilterZombieVillagersSetting genericCombat(boolean checked)
 	{
-		return new FilterZombieVillagersSetting(
-			"description.wurst.setting.generic.filter_zombie_villagers_combat",
+		return new FilterZombieVillagersSetting(WText.translated(
+			"description.wurst.setting.generic.filter_zombie_villagers_combat"),
 			checked);
 	}
 	
 	public static FilterZombieVillagersSetting genericVision(boolean checked)
 	{
-		return new FilterZombieVillagersSetting(
-			"description.wurst.setting.generic.filter_zombie_villagers_vision",
+		return new FilterZombieVillagersSetting(WText.translated(
+			"description.wurst.setting.generic.filter_zombie_villagers_vision"),
 			checked);
 	}
 }

@@ -12,16 +12,13 @@ import net.minecraft.world.entity.animal.AgeableWaterCreature;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.animal.fish.Pufferfish;
 import net.minecraft.world.entity.animal.fish.WaterAnimal;
+import net.wurstclient.util.text.WText;
 
 public final class FilterPassiveWaterSetting extends EntityFilterCheckbox
 {
-	private static final String EXCEPTIONS_TEXT =
-		"\n\nThis filter does not affect guardians, drowned, and pufferfish.";
-	
-	public FilterPassiveWaterSetting(String description, boolean checked)
+	public FilterPassiveWaterSetting(WText description, boolean checked)
 	{
-		super("Filter passive water mobs", description + EXCEPTIONS_TEXT,
-			checked);
+		super("Filter passive water mobs", description, checked);
 	}
 	
 	@Override
@@ -37,13 +34,15 @@ public final class FilterPassiveWaterSetting extends EntityFilterCheckbox
 	
 	public static FilterPassiveWaterSetting genericCombat(boolean checked)
 	{
-		return new FilterPassiveWaterSetting("Won't attack passive water mobs"
-			+ " like fish, squid, dolphins and axolotls.", checked);
+		return new FilterPassiveWaterSetting(WText.translated(
+			"description.wurst.setting.generic.filter_passive_water_combat"),
+			checked);
 	}
 	
 	public static FilterPassiveWaterSetting genericVision(boolean checked)
 	{
-		return new FilterPassiveWaterSetting("Won't show passive water mobs"
-			+ " like fish, squid, dolphins and axolotls.", checked);
+		return new FilterPassiveWaterSetting(WText.translated(
+			"description.wurst.setting.generic.filter_passive_water_vision"),
+			checked);
 	}
 }

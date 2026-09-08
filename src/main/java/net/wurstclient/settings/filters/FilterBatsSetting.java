@@ -9,10 +9,11 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ambient.AmbientCreature;
+import net.wurstclient.util.text.WText;
 
 public final class FilterBatsSetting extends EntityFilterCheckbox
 {
-	public FilterBatsSetting(String description, boolean checked)
+	public FilterBatsSetting(WText description, boolean checked)
 	{
 		super("Filter bats", description, checked);
 	}
@@ -26,12 +27,16 @@ public final class FilterBatsSetting extends EntityFilterCheckbox
 	public static FilterBatsSetting genericCombat(boolean checked)
 	{
 		return new FilterBatsSetting(
-			"description.wurst.setting.generic.filter_bats_combat", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_bats_combat"),
+			checked);
 	}
 	
 	public static FilterBatsSetting genericVision(boolean checked)
 	{
 		return new FilterBatsSetting(
-			"description.wurst.setting.generic.filter_bats_vision", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_bats_vision"),
+			checked);
 	}
 }

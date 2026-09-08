@@ -11,12 +11,12 @@ import net.minecraft.world.entity.Entity;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.Setting;
 import net.wurstclient.settings.filterlists.EntityFilterList.EntityFilter;
+import net.wurstclient.util.text.WText;
 
 public abstract class EntityFilterCheckbox extends CheckboxSetting
 	implements EntityFilter
 {
-	public EntityFilterCheckbox(String name, String description,
-		boolean checked)
+	public EntityFilterCheckbox(String name, WText description, boolean checked)
 	{
 		super(name, description, checked);
 	}

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.wurstclient.settings.filters.*;
+import net.wurstclient.util.text.WText;
 
 public final class RemoteViewFilterList extends EntityFilterList
 {
@@ -23,71 +24,71 @@ public final class RemoteViewFilterList extends EntityFilterList
 	{
 		ArrayList<EntityFilter> builder = new ArrayList<>();
 		
-		builder.add(new FilterPlayersSetting(
-			"description.wurst.setting.remoteview.filter_players", false));
+		builder.add(
+			new FilterPlayersSetting(description("filter_players"), false));
 		
-		builder.add(new FilterSleepingSetting(
-			"description.wurst.setting.remoteview.filter_sleeping", false));
+		builder.add(
+			new FilterSleepingSetting(description("filter_sleeping"), false));
 		
-		builder.add(new FilterFlyingSetting(
-			"description.wurst.setting.remoteview.filter_flying", 0));
-		
-		builder.add(new FilterHostileSetting(
-			"Won't view hostile mobs like zombies and creepers.", true));
-		
-		builder.add(FilterNeutralSetting.onOffOnly(
-			"description.wurst.setting.remoteview.filter_neutral", true));
-		
-		builder.add(new FilterPassiveSetting("Won't view animals like pigs and"
-			+ " cows, ambient mobs like bats, and water mobs like fish, squid"
-			+ " and dolphins.", true));
-		
-		builder.add(new FilterPassiveWaterSetting("Won't view passive water"
-			+ " mobs like fish, squid, dolphins and axolotls.", true));
-		
-		builder.add(new FilterBabiesSetting(
-			"description.wurst.setting.remoteview.filter_babies", true));
-		
-		builder.add(new FilterBatsSetting(
-			"description.wurst.setting.remoteview.filter_bats", true));
-		
-		builder.add(new FilterSlimesSetting("Won't view slimes.", true));
-		
-		builder.add(new FilterPetsSetting(
-			"description.wurst.setting.remoteview.filter_pets", true));
-		
-		builder.add(new FilterVillagersSetting(
-			"description.wurst.setting.remoteview.filter_villagers", true));
-		
-		builder.add(new FilterZombieVillagersSetting(
-			"description.wurst.setting.remoteview.filter_zombie_villagers",
-			true));
-		
-		builder.add(new FilterGolemsSetting(
-			"description.wurst.setting.remoteview.filter_golems", true));
+		builder.add(new FilterFlyingSetting(description("filter_flying"), 0));
 		
 		builder
-			.add(FilterPiglinsSetting.onOffOnly("Won't view piglins.", true));
+			.add(new FilterHostileSetting(description("filter_hostile"), true));
 		
-		builder.add(FilterZombiePiglinsSetting.onOffOnly(
-			"description.wurst.setting.remoteview.filter_zombie_piglins",
-			true));
+		builder.add(FilterNeutralSetting
+			.onOffOnly(description("filter_neutral"), true));
 		
-		builder.add(FilterEndermenSetting.onOffOnly(
-			"description.wurst.setting.remoteview.filter_endermen", true));
+		builder
+			.add(new FilterPassiveSetting(description("filter_passive"), true));
 		
-		builder.add(new FilterShulkersSetting(
-			"description.wurst.setting.remoteview.filter_shulkers", true));
+		builder.add(new FilterPassiveWaterSetting(
+			description("filter_passive_water"), true));
 		
-		builder.add(new FilterAllaysSetting(
-			"description.wurst.setting.remoteview.filter_allays", true));
+		builder
+			.add(new FilterBabiesSetting(description("filter_babies"), true));
 		
-		builder.add(new FilterInvisibleSetting(
-			"description.wurst.setting.remoteview.filter_invisible", false));
+		builder.add(new FilterBatsSetting(description("filter_bats"), true));
+		
+		builder
+			.add(new FilterSlimesSetting(description("filter_slimes"), true));
+		
+		builder.add(new FilterPetsSetting(description("filter_pets"), true));
+		
+		builder.add(
+			new FilterVillagersSetting(description("filter_villagers"), true));
+		
+		builder.add(new FilterZombieVillagersSetting(
+			description("filter_zombie_villagers"), true));
+		
+		builder
+			.add(new FilterGolemsSetting(description("filter_golems"), true));
+		
+		builder.add(FilterPiglinsSetting
+			.onOffOnly(description("filter_piglins"), true));
+		
+		builder.add(FilterZombiePiglinsSetting
+			.onOffOnly(description("filter_zombie_piglins"), true));
+		
+		builder.add(FilterEndermenSetting
+			.onOffOnly(description("filter_endermen"), true));
+		
+		builder.add(
+			new FilterShulkersSetting(description("filter_shulkers"), true));
+		
+		builder
+			.add(new FilterAllaysSetting(description("filter_allays"), true));
+		
+		builder.add(
+			new FilterInvisibleSetting(description("filter_invisible"), false));
 		
 		builder.add(new FilterArmorStandsSetting(
-			"description.wurst.setting.remoteview.filter_armor_stands", true));
+			description("filter_armor_stands"), true));
 		
 		return new RemoteViewFilterList(builder);
+	}
+	
+	private static WText description(String key)
+	{
+		return WText.translated("description.wurst.setting.remoteview." + key);
 	}
 }

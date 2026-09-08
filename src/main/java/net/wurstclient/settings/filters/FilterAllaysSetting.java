@@ -9,10 +9,11 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.allay.Allay;
+import net.wurstclient.util.text.WText;
 
 public final class FilterAllaysSetting extends EntityFilterCheckbox
 {
-	public FilterAllaysSetting(String description, boolean checked)
+	public FilterAllaysSetting(WText description, boolean checked)
 	{
 		super("Filter allays", description, checked);
 	}
@@ -26,12 +27,16 @@ public final class FilterAllaysSetting extends EntityFilterCheckbox
 	public static FilterAllaysSetting genericCombat(boolean checked)
 	{
 		return new FilterAllaysSetting(
-			"description.wurst.setting.generic.filter_allays_combat", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_allays_combat"),
+			checked);
 	}
 	
 	public static FilterAllaysSetting genericVision(boolean checked)
 	{
 		return new FilterAllaysSetting(
-			"description.wurst.setting.generic.filter_allays_vision", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_allays_vision"),
+			checked);
 	}
 }

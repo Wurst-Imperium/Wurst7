@@ -9,17 +9,18 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
+import net.wurstclient.util.text.WText;
 
 public final class FilterZombiePiglinsSetting
 	extends AttackDetectingEntityFilter
 {
-	private FilterZombiePiglinsSetting(String description, Mode selected,
+	private FilterZombiePiglinsSetting(WText description, Mode selected,
 		boolean checked)
 	{
 		super("Filter zombie piglins", description, selected, checked);
 	}
 	
-	public FilterZombiePiglinsSetting(String description, Mode selected)
+	public FilterZombiePiglinsSetting(WText description, Mode selected)
 	{
 		this(description, selected, false);
 	}
@@ -38,19 +39,19 @@ public final class FilterZombiePiglinsSetting
 	
 	public static FilterZombiePiglinsSetting genericCombat(Mode selected)
 	{
-		return new FilterZombiePiglinsSetting(
-			"description.wurst.setting.generic.filter_zombie_piglins_combat",
+		return new FilterZombiePiglinsSetting(WText.translated(
+			"description.wurst.setting.generic.filter_zombie_piglins_combat"),
 			selected);
 	}
 	
 	public static FilterZombiePiglinsSetting genericVision(Mode selected)
 	{
-		return new FilterZombiePiglinsSetting(
-			"description.wurst.setting.generic.filter_zombie_piglins_vision",
+		return new FilterZombiePiglinsSetting(WText.translated(
+			"description.wurst.setting.generic.filter_zombie_piglins_vision"),
 			selected);
 	}
 	
-	public static FilterZombiePiglinsSetting onOffOnly(String description,
+	public static FilterZombiePiglinsSetting onOffOnly(WText description,
 		boolean onByDefault)
 	{
 		return new FilterZombiePiglinsSetting(description, null, onByDefault);

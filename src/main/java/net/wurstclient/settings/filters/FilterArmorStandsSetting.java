@@ -9,10 +9,11 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.wurstclient.util.text.WText;
 
 public final class FilterArmorStandsSetting extends EntityFilterCheckbox
 {
-	public FilterArmorStandsSetting(String description, boolean checked)
+	public FilterArmorStandsSetting(WText description, boolean checked)
 	{
 		super("Filter armor stands", description, checked);
 	}
@@ -26,14 +27,16 @@ public final class FilterArmorStandsSetting extends EntityFilterCheckbox
 	public static FilterArmorStandsSetting genericCombat(boolean checked)
 	{
 		return new FilterArmorStandsSetting(
-			"description.wurst.setting.generic.filter_armor_stands_combat",
+			WText.translated(
+				"description.wurst.setting.generic.filter_armor_stands_combat"),
 			checked);
 	}
 	
 	public static FilterArmorStandsSetting genericVision(boolean checked)
 	{
 		return new FilterArmorStandsSetting(
-			"description.wurst.setting.generic.filter_armor_stands_vision",
+			WText.translated(
+				"description.wurst.setting.generic.filter_armor_stands_vision"),
 			checked);
 	}
 }
