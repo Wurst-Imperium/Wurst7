@@ -8,13 +8,8 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.ambient.AmbientCreature;
-import net.minecraft.world.entity.animal.AgeableWaterCreature;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.fish.Pufferfish;
-import net.minecraft.world.entity.animal.fish.WaterAnimal;
-import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.Mob;
+import net.wurstclient.util.MobDisposition;
 import net.wurstclient.util.text.WText;
 
 public final class FilterPassiveSetting extends EntityFilterCheckbox
@@ -27,16 +22,8 @@ public final class FilterPassiveSetting extends EntityFilterCheckbox
 	@Override
 	protected boolean filtersOut(Entity e)
 	{
-		// never filter out hostile mobs (including hoglins)
-		if(e instanceof Enemy)
-			return false;
-		
-		// never filter out neutral mobs (including pufferfish)
-		if(e instanceof NeutralMob || e instanceof Pufferfish)
-			return false;
-		
-		return e instanceof Animal || e instanceof AmbientCreature
-			|| e instanceof WaterAnimal || e instanceof AgeableWaterCreature;
+		return e instanceof Mob mob
+			&& MobDisposition.of(mob) == MobDisposition.PASSIVE;
 	}
 	
 	public static FilterPassiveSetting genericCombat(boolean checked)

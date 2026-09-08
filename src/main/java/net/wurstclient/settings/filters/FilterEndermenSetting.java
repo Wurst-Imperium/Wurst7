@@ -33,7 +33,7 @@ public final class FilterEndermenSetting extends AttackDetectingEntityFilter
 	@Override
 	protected boolean ifCalmFiltersOut(Entity e)
 	{
-		return e instanceof EnderMan ee && !ee.isAggressive();
+		return e instanceof EnderMan ee && !ee.isCreepy();
 	}
 	
 	public static FilterEndermenSetting genericCombat(Mode selected)

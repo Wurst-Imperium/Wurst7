@@ -38,6 +38,9 @@ accessible	field	net/minecraft/client/gui/screens/achievement/StatsScreen	isLoad
 accessible	field	net/minecraft/world/entity/Entity	stuckSpeedMultiplier	Lnet/minecraft/world/phys/Vec3;
 accessible	field	net/minecraft/world/entity/LivingEntity	equipment	Lnet/minecraft/world/entity/EntityEquipment;
 accessible	field	net/minecraft/world/entity/LivingEntity	jumping	Z
+accessible	field	net/minecraft/world/entity/Mob	DATA_MOB_FLAGS_ID	Lnet/minecraft/network/syncher/EntityDataAccessor;
+accessible	field	net/minecraft/world/entity/animal/goat/Goat	isLoweringHead	Z
+accessible	field	net/minecraft/world/entity/monster/zombie/ZombifiedPiglin	SPEED_MODIFIER_ATTACKING_ID	Lnet/minecraft/resources/Identifier;
 accessible	field	net/minecraft/client/renderer/ItemInHandRenderer	mainHandHeight	F
 accessible	field	net/minecraft/client/renderer/ItemInHandRenderer	oMainHandHeight	F
 accessible	field	net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket	sectionPos	Lnet/minecraft/core/SectionPos;

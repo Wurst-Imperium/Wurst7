@@ -8,9 +8,8 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.minecraft.world.entity.Mob;
+import net.wurstclient.util.MobDisposition;
 import net.wurstclient.util.text.WText;
 
 public final class FilterHostileSetting extends EntityFilterCheckbox
@@ -23,11 +22,8 @@ public final class FilterHostileSetting extends EntityFilterCheckbox
 	@Override
 	protected boolean filtersOut(Entity e)
 	{
-		// never filter out neutral mobs (including piglins)
-		if(e instanceof NeutralMob || e instanceof Piglin)
-			return false;
-		
-		return e instanceof Enemy;
+		return e instanceof Mob mob
+			&& MobDisposition.of(mob) == MobDisposition.HOSTILE;
 	}
 	
 	public static FilterHostileSetting genericCombat(boolean checked)
