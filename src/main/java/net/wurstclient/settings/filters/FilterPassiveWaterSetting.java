@@ -8,10 +8,12 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.animal.AgeableWaterCreature;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
+import net.minecraft.world.entity.animal.dolphin.Dolphin;
+import net.minecraft.world.entity.animal.fish.AbstractFish;
 import net.minecraft.world.entity.animal.fish.Pufferfish;
-import net.minecraft.world.entity.animal.fish.WaterAnimal;
+import net.minecraft.world.entity.animal.squid.Squid;
+import net.minecraft.world.entity.animal.turtle.Turtle;
 import net.wurstclient.util.text.WText;
 
 public final class FilterPassiveWaterSetting extends EntityFilterCheckbox
@@ -28,8 +30,9 @@ public final class FilterPassiveWaterSetting extends EntityFilterCheckbox
 		if(e instanceof Pufferfish)
 			return false;
 		
-		return e instanceof WaterAnimal || e instanceof AgeableWaterCreature
-			|| e instanceof Axolotl;
+		return e instanceof AbstractFish || e instanceof Squid
+			|| e instanceof Dolphin || e instanceof Axolotl
+			|| e instanceof Turtle;
 	}
 	
 	public static FilterPassiveWaterSetting genericCombat(boolean checked)

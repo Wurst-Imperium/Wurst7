@@ -39,27 +39,23 @@ public final class FilterPassiveWaterTest extends EntityFilterTest
 		for(EntityType<? extends Mob> type : List.of(EntityTypes.AXOLOTL,
 			EntityTypes.COD, EntityTypes.DOLPHIN, EntityTypes.GLOW_SQUID,
 			EntityTypes.SALMON, EntityTypes.SQUID, EntityTypes.TADPOLE,
-			EntityTypes.TROPICAL_FISH))
+			EntityTypes.TROPICAL_FISH, EntityTypes.TURTLE))
 			assertFilteredOut(type.toShortString(), filter,
 				() -> spawnEntity(type));
 		
 		// Allowed because hostile
 		for(EntityType<? extends Mob> type : List.of(EntityTypes.DROWNED,
-			EntityTypes.ELDER_GUARDIAN, EntityTypes.GUARDIAN,
-			EntityTypes.PUFFERFISH))
+			EntityTypes.ELDER_GUARDIAN, EntityTypes.GUARDIAN))
 			assertAllowed(type.toShortString() + " (hostile mob)", filter,
 				() -> spawnEntity(type));
 		
 		// Allowed because neutral
 		for(EntityType<? extends Mob> type : List.of(EntityTypes.NAUTILUS,
-			EntityTypes.ZOMBIE_NAUTILUS))
+			EntityTypes.PUFFERFISH, EntityTypes.ZOMBIE_NAUTILUS))
 			assertAllowed(type.toShortString() + " (neutral mob)", filter,
 				() -> spawnEntity(type));
 		
-		// Allowed because land-based
-		for(EntityType<? extends Mob> type : List.of(EntityTypes.SILVERFISH,
-			EntityTypes.TURTLE))
-			assertAllowed(type.toShortString() + " (land-based mob)", filter,
-				() -> spawnEntity(type));
+		// Tadpoles count as aquatic, adult frogs don't.
+		assertAllowed("frog", filter, () -> spawnEntity(EntityTypes.FROG));
 	}
 }
