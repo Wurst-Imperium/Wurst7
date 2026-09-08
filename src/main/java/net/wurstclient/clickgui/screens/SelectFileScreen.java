@@ -7,6 +7,7 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import com.mojang.blaze3d.Blaze3D;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import java.nio.file.Path;
@@ -25,7 +26,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.WurstColors;
 
@@ -70,7 +70,7 @@ public final class SelectFileScreen extends Screen
 	
 	private void openFolder()
 	{
-		Util.getPlatform().openFile(setting.getFolder().toFile());
+		Blaze3D.openPath(setting.getFolder());
 	}
 	
 	private void openPrevScreen()

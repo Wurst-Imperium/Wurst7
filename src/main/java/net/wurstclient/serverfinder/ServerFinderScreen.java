@@ -7,9 +7,11 @@
  */
 package net.wurstclient.serverfinder;
 
+import com.mojang.blaze3d.Blaze3D;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
@@ -26,7 +28,6 @@ import net.minecraft.client.multiplayer.ServerData.Type;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Util;
 import net.wurstclient.util.MathUtils;
 
 public class ServerFinderScreen extends Screen
@@ -58,8 +59,8 @@ public class ServerFinderScreen extends Screen
 		
 		addRenderableWidget(Button
 			.builder(Component.literal("Tutorial"),
-				b -> Util.getPlatform().openUri(
-					"https://www.wurstclient.net/serverfinder-tutorial/"))
+				b -> Blaze3D.openUri(URI.create(
+					"https://www.wurstclient.net/serverfinder-tutorial/")))
 			.bounds(width / 2 - 100, height / 4 + 120 + 12, 200, 20).build());
 		
 		addRenderableWidget(Button

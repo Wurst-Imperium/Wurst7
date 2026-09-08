@@ -7,6 +7,7 @@
  */
 package net.wurstclient.options;
 
+import com.mojang.blaze3d.Blaze3D;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import java.io.IOException;
@@ -25,7 +26,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.WurstColors;
 import net.wurstclient.util.json.JsonException;
@@ -72,8 +72,8 @@ public final class KeybindProfilesScreen extends Screen
 	
 	private void openFolder()
 	{
-		Util.getPlatform().openFile(
-			WurstClient.INSTANCE.getKeybinds().getProfilesFolder().toFile());
+		Blaze3D
+			.openPath(WurstClient.INSTANCE.getKeybinds().getProfilesFolder());
 	}
 	
 	private void newProfile(String name)

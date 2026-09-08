@@ -7,9 +7,12 @@
  */
 package net.wurstclient.options;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+
+import com.mojang.blaze3d.Blaze3D;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.Font;
@@ -21,8 +24,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Util;
-import net.minecraft.util.Util.OS;
 import net.wurstclient.WurstClient;
 import net.wurstclient.analytics.PlausibleAnalytics;
 import net.wurstclient.commands.FriendsCmd;
@@ -118,20 +119,21 @@ public class WurstOptionsScreen extends Screen
 	
 	private void addLinkButtons()
 	{
-		OS os = Util.getPlatform();
-		
 		new WurstOptionsButton(54, 24, () -> "Official Website",
-			"§n§lWurstClient.net",
-			b -> os.openUri("https://www.wurstclient.net/options-website/"));
+			"§n§lWurstClient.net", b -> Blaze3D.openUri(
+				URI.create("https://www.wurstclient.net/options-website/")));
 		
 		new WurstOptionsButton(54, 48, () -> "Wurst Wiki", "§n§lWurst.Wiki",
-			b -> os.openUri("https://www.wurstclient.net/options-wiki/"));
+			b -> Blaze3D.openUri(
+				URI.create("https://www.wurstclient.net/options-wiki/")));
 		
 		new WurstOptionsButton(54, 72, () -> "WurstForum", "§n§lWurstForum.net",
-			b -> os.openUri("https://www.wurstclient.net/options-forum/"));
+			b -> Blaze3D.openUri(
+				URI.create("https://www.wurstclient.net/options-forum/")));
 		
 		new WurstOptionsButton(54, 96, () -> "Twitter", "@Wurst_Imperium",
-			b -> os.openUri("https://www.wurstclient.net/options-twitter/"));
+			b -> Blaze3D.openUri(
+				URI.create("https://www.wurstclient.net/options-twitter/")));
 		
 		new WurstOptionsButton(54, 120, () -> "Donate",
 			"§n§lWurstClient.net/donate\n"
@@ -139,7 +141,8 @@ public class WurstOptionsScreen extends Screen
 				+ " to use for everyone.\n\n"
 				+ "Every bit helps and is much appreciated! You can also get a"
 				+ " few cool perks in return.",
-			b -> os.openUri("https://www.wurstclient.net/options-donate/"));
+			b -> Blaze3D.openUri(
+				URI.create("https://www.wurstclient.net/options-donate/")));
 	}
 	
 	@Override
