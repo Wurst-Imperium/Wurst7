@@ -7,22 +7,22 @@
  */
 package net.wurstclient.settings.filters;
 
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.player.Player;
 import net.wurstclient.util.text.WText;
 
 public final class FilterSleepingSetting extends EntityFilterCheckbox
 {
 	public FilterSleepingSetting(WText description, boolean checked)
 	{
-		super("Filter sleeping", description, checked);
+		super("Filter sleeping players", description, checked);
 	}
 	
 	@Override
 	protected boolean filtersOut(Entity e)
 	{
-		if(!(e instanceof Player pe))
+		if(!(e instanceof Avatar pe))
 			return false;
 		
 		return pe.isSleeping() || pe.getPose() == Pose.SLEEPING;

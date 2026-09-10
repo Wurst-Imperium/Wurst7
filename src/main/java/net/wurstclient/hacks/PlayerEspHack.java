@@ -13,9 +13,8 @@ import java.util.stream.Stream;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
@@ -50,7 +49,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		new EntityFilterList(FilterSleepingSetting.genericVision(false),
 			new FilterInvisibleSetting(this, false));
 	
-	private final ArrayList<Player> players = new ArrayList<>();
+	private final ArrayList<Avatar> players = new ArrayList<>();
 	
 	public PlayerEspHack()
 	{
@@ -82,8 +81,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	{
 		players.clear();
 		
-		Stream<AbstractClientPlayer> stream = MC.level.players()
-			.parallelStream().filter(AbstractClientPlayer::isAlive)
+		Stream<Avatar> stream = EntityUtils.getAliveEntities(Avatar.class)
 			.filter(EntityUtils.IS_NOT_SELF)
 			.filter(e -> Math.abs(e.getY() - MC.player.getY()) <= 1e6);
 		
@@ -108,7 +106,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			double extraSize = boxSize.getExtraSize() / 2;
 			
 			ArrayList<ColoredBox> boxes = new ArrayList<>(players.size());
-			for(Player e : players)
+			for(Avatar e : players)
 			{
 				AABB box = EntityUtils.getLerpedBox(e, partialTicks)
 					.move(0, extraSize, 0).inflate(extraSize);
@@ -121,7 +119,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		if(style.hasLines())
 		{
 			ArrayList<ColoredPoint> ends = new ArrayList<>(players.size());
-			for(Player e : players)
+			for(Avatar e : players)
 			{
 				Vec3 point =
 					EntityUtils.getLerpedBox(e, partialTicks).getCenter();
@@ -132,7 +130,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private int getColor(Player e)
+	private int getColor(Avatar e)
 	{
 		if(WURST.getFriends().contains(e.getName().getString()))
 			return 0x800000FF;

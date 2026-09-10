@@ -14,8 +14,8 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
@@ -101,7 +101,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		
 		Stream<LivingEntity> stream =
 			EntityUtils.getAliveEntities(LivingEntity.class)
-				.filter(e -> !(e instanceof Player));
+				.filter(e -> !(e instanceof Avatar));
 		
 		stream = entityFilters.applyTo(stream);
 		

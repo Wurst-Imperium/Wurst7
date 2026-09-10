@@ -7,8 +7,8 @@
  */
 package net.wurstclient.settings.filters;
 
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.Setting;
@@ -21,7 +21,7 @@ public final class FilterFlyingSetting extends SliderSetting
 {
 	public FilterFlyingSetting(WText description, double value)
 	{
-		super("Filter flying", description, value, 0, 2, 0.05,
+		super("Filter flying players", description, value, 0, 2, 0.05,
 			ValueDisplay.DECIMAL.withLabel(0, "off"));
 	}
 	
@@ -36,7 +36,7 @@ public final class FilterFlyingSetting extends SliderSetting
 	
 	private boolean filtersOut(Entity e)
 	{
-		if(!(e instanceof Player))
+		if(!(e instanceof Avatar))
 			return false;
 		
 		AABB box = e.getBoundingBox();
