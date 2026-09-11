@@ -31,4 +31,12 @@ public final class FilterInteractionsSetting extends EntityFilterCheckbox
 				"description.wurst.setting.generic.filter_interactions_combat"),
 			checked);
 	}
+	
+	public static FilterInteractionsSetting genericVision(boolean checked)
+	{
+		return new FilterInteractionsSetting(
+			WText.translated(
+				"description.wurst.setting.generic.filter_interactions_vision"),
+			checked);
+	}
 }

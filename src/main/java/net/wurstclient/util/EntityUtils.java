@@ -56,8 +56,9 @@ public enum EntityUtils
 	
 	public static Stream<Entity> getFollowableEntities()
 	{
-		return getAliveEntities().filter(IS_NOT_SELF).filter(
-			e -> e instanceof LivingEntity || e instanceof AbstractMinecart);
+		return getAliveEntities().filter(IS_NOT_SELF)
+			.filter(e -> e instanceof LivingEntity
+				|| e instanceof AbstractMinecart || e instanceof Interaction);
 	}
 	
 	public static final Predicate<Entity> IS_NOT_SELF =

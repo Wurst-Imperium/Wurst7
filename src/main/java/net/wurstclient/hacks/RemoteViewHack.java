@@ -11,6 +11,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -38,7 +40,7 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 	private final EntityFilterList entityFilters =
 		RemoteViewFilterList.create();
 	
-	private LivingEntity entity;
+	private Entity entity;
 	
 	public RemoteViewHack()
 	{
@@ -55,9 +57,10 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 		// Find entity if not already set
 		if(entity == null)
 		{
-			Stream<LivingEntity> stream =
-				EntityUtils.getAliveEntities(LivingEntity.class)
-					.filter(EntityUtils.IS_NOT_SELF);
+			Stream<Entity> stream = EntityUtils.getAliveEntities()
+				.filter(
+					e -> e instanceof LivingEntity || e instanceof Interaction)
+				.filter(EntityUtils.IS_NOT_SELF);
 			
 			stream = entityFilters.applyTo(stream);
 			
@@ -110,13 +113,12 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		List<LivingEntity> matches =
-			EntityUtils.getAliveEntities(LivingEntity.class)
-				.filter(EntityUtils.IS_NOT_SELF)
-				.filter(e -> name.equalsIgnoreCase(e.getName().getString()))
-				.sorted(
-					Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
-				.toList();
+		List<Entity> matches = EntityUtils.getAliveEntities()
+			.filter(e -> e instanceof LivingEntity || e instanceof Interaction)
+			.filter(EntityUtils.IS_NOT_SELF)
+			.filter(e -> name.equalsIgnoreCase(e.getName().getString()))
+			.sorted(Comparator.comparingDouble(EntityUtils::distanceToHitboxSq))
+			.toList();
 		
 		if(matches.isEmpty())
 		{
@@ -124,7 +126,7 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 			return;
 		}
 		
-		LivingEntity newEntity =
+		Entity newEntity =
 			matches.get((matches.indexOf(entity) + 1) % matches.size());
 		
 		if(isEnabled())

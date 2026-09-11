@@ -87,6 +87,9 @@ public final class FollowFilterList extends EntityFilterList
 		builder.add(
 			new FilterMinecartsSetting(description("filter_minecarts"), true));
 		
+		builder.add(new FilterInteractionsSetting(
+			description("filter_interactions"), true));
+		
 		return new FollowFilterList(builder);
 	}
 	

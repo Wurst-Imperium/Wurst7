@@ -15,6 +15,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -65,9 +67,10 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			FilterAllaysSetting.genericVision(false),
 			FilterInvisibleSetting.genericVision(false),
 			FilterNamedSetting.genericVision(false),
-			FilterArmorStandsSetting.genericVision(true));
+			FilterArmorStandsSetting.genericVision(true),
+			FilterInteractionsSetting.genericVision(false));
 	
-	private final ArrayList<LivingEntity> mobs = new ArrayList<>();
+	private final ArrayList<Entity> mobs = new ArrayList<>();
 	
 	public MobEspHack()
 	{
@@ -99,9 +102,9 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	{
 		mobs.clear();
 		
-		Stream<LivingEntity> stream =
-			EntityUtils.getAliveEntities(LivingEntity.class)
-				.filter(e -> !(e instanceof Avatar));
+		Stream<Entity> stream = EntityUtils.getAliveEntities()
+			.filter(e -> e instanceof LivingEntity || e instanceof Interaction)
+			.filter(e -> !(e instanceof Avatar));
 		
 		stream = entityFilters.applyTo(stream);
 		
@@ -124,7 +127,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			double extraSize = boxSize.getExtraSize() / 2;
 			
 			ArrayList<ColoredBox> boxes = new ArrayList<>(mobs.size());
-			for(LivingEntity e : mobs)
+			for(Entity e : mobs)
 			{
 				AABB box = EntityUtils.getLerpedBox(e, partialTicks)
 					.move(0, extraSize, 0).inflate(extraSize);
@@ -137,7 +140,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		if(style.hasLines())
 		{
 			ArrayList<ColoredPoint> ends = new ArrayList<>(mobs.size());
-			for(LivingEntity e : mobs)
+			for(Entity e : mobs)
 			{
 				Vec3 point =
 					EntityUtils.getLerpedBox(e, partialTicks).getCenter();
@@ -148,7 +151,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		}
 	}
 	
-	private int getColor(LivingEntity e)
+	private int getColor(Entity e)
 	{
 		float f = MC.player.distanceTo(e) / 20F;
 		float r = Mth.clamp(2 - f, 0, 1);

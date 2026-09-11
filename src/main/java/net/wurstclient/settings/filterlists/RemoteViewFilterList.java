@@ -84,6 +84,9 @@ public final class RemoteViewFilterList extends EntityFilterList
 		builder.add(new FilterArmorStandsSetting(
 			description("filter_armor_stands"), true));
 		
+		builder.add(new FilterInteractionsSetting(
+			description("filter_interactions"), true));
+		
 		return new RemoteViewFilterList(builder);
 	}
 	
