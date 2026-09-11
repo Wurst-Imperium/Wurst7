@@ -236,7 +236,7 @@
   "description.wurst.hack.potionsaver": "当你站着不动时冻结所有的药水效果时间。",
   "description.wurst.hack.prophuntesp": "在躲猫猫小游戏中知道哪些是人扮的方块。\n用于 Mineplex 服务器的 Prophunt（躲猫猫），其他服务器未必奏效。",
   "description.wurst.hack.protect": "使用 AI 模式保护最近的实体，并保护它免受其他实体的伤害。\n使用指令 .protect 来保护指定的实体，而不是最近的一个。",
-  "description.wurst.hack.radar": "生成一个雷达 UI 并显示附近的实体。\n§c红色§r - 玩家/玩家模型\n§6橘色§r - 怪物\n§a绿色§r - 动物\n§7灰色§r - 其他",
+  "description.wurst.hack.radar": "生成一个雷达 UI 并显示附近的实体。\n§9蓝色§r - 好友\n§c红色§r - 玩家/玩家模型\n§6橘色§r - 敌对生物\n§e黄色§r - 中立生物\n§a绿色§r - 被动生物\n§7灰色§r - 其他/交互实体",
   "description.wurst.hack.rainbowui": "§c让§a每§9一§c样§a都§9充§c满§a五§9彩§c斑§a斓§9的§c样§a子§9，§c包§a括§9你§c当§a前§9所§c在 §aU§9I",
   "description.wurst.hack.reach": "允许你碰到更远的距离。",
   "description.wurst.hack.remoteview": "允许你以另一个视角观看世界。\n使用 .rv 指令来指定一个特定的实体。",

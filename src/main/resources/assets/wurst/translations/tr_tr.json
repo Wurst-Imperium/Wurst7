@@ -192,7 +192,7 @@
   "description.wurst.hack.potionsaver": "Hareketsiz dururken tüm iksir efektlerini dondurur.",
   "description.wurst.hack.prophuntesp": "Prophunt'ta sahte blokları görmenizi sağlar.\nMineplex Prophunt için yapılmıştır. Diğer sunucularda çalışmayabilir.",
   "description.wurst.hack.protect": "En yakındaki varlığı takip eden ve onu diğer varlıklardan koruyan bir bot.\nBelirli bir varlığı korumak için .protect kullanın.",
-  "description.wurst.hack.radar": "Yakındaki varlıkların konumunu gösterir.\n§ckırmızı§r - oyuncular/mankenler\n§6turuncu§r - canavarlar\n§ayeşil§r - hayvanlar\n§7gri§r - diğerleri",
+  "description.wurst.hack.radar": "Yakındaki varlıkların konumunu gösterir.\n§9mavi§r - arkadaşlar\n§ckırmızı§r - oyuncular/mankenler\n§6turuncu§r - düşman moblar\n§esarı§r - nötr moblar\n§ayeşil§r - pasif moblar\n§7gri§r - diğerleri/etkileşim varlıkları",
   "description.wurst.hack.rainbowui": "§cH§ae§9r§cş§ae§cy§ai §9r§ce§an§9k§cl§ai §cy§aa§9p§ca§ar.",
   "description.wurst.hack.reach": "Daha uzağa ulaşmanıza izin verir.",
   "description.wurst.hack.remoteview": "Başka birisi gibi dünyayı görmenizi sağlar.\nBelirli bir hedefe yönlendirmek için .rv komutunu kullanın.",

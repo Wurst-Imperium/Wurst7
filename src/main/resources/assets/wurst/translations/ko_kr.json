@@ -106,7 +106,7 @@
   "description.wurst.hack.potionsaver": "정지 상태에서는 모든 물약 효과를 유지합니다.",
   "description.wurst.hack.prophuntesp": "블럭 숨바꼭질에서 가짜 블록을 볼 수 있게 해줍니다.\nMineplex서버의 블럭 숨바꼭질을 위해 제작되었으며, 다른 서버에서 작동하지 않을 수 있습니다.",
   "description.wurst.hack.protect": "가장 가까운 개체를 따라가고 다른 개체로부터 보호하는 봇입니다.\n가장 가까운 개체 대신 특정 개체를 보호하려면 .protect 명령을 사용하세요.",
-  "description.wurst.hack.radar": "주변 개체의 위치를 보여줍니다.\n§c빨강색§r - 플레이어/마네킹\n§6주황색§r - 몬스터\n§a초록색§r - 동물\n§7회색§r - 기타",
+  "description.wurst.hack.radar": "주변 개체의 위치를 보여줍니다.\n§9파란색§r - 친구\n§c빨강색§r - 플레이어/마네킹\n§6주황색§r - 적대적 몹\n§e노란색§r - 중립적 몹\n§a초록색§r - 비공격적 몹\n§7회색§r - 기타/상호작용 개체",
   "description.wurst.hack.remoteview": "특정 플레이어의 시야를 공유합니다.\n.rv 명령을 사용하여 특정 개체를 대상으로 설정할 수 있습니다.",
   "description.wurst.hack.safewalk": "블럭끝에서 떨어지지 않게 해줍니다.",
   "description.wurst.hack.scaffoldwalk": "자동으로 발 아래에 블록을 배치합니다.",

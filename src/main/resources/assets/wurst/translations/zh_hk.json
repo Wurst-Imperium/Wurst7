@@ -121,7 +121,7 @@
   "description.wurst.hack.potionsaver": "當你企住唔郁時凍結所有嘅葯水效果時間。",
   "description.wurst.hack.prophuntesp": "喺捉依因小游戲中知道邊啲係人扮嘅方塊。\n用於 Mineplex 伺服器嘅 Prophunt（捉依因），其他伺服器未必湊效。",
   "description.wurst.hack.protect": "使用 AI 模式保護最近嘅實體，並保護佢免受其他實體嘅傷害。\n使用指令 .protect 嚟保護指定嘅實體，而唔係最近嘅一個。",
-  "description.wurst.hack.radar": "生成一個雷達 UI 並顯示附近嘅實體。\n§c紅色§r - 玩家/玩家模型\n§6橙色§r - 怪物\n§a綠色§r - 動物\n§7灰色§r - 其他",
+  "description.wurst.hack.radar": "生成一個雷達 UI 並顯示附近嘅實體。\n§9藍色§r - 好友\n§c紅色§r - 玩家/玩家模型\n§6橙色§r - 敵對生物\n§e黃色§r - 中立生物\n§a綠色§r - 被動生物\n§7灰色§r - 其他/互動實體",
   "description.wurst.hack.rainbowui": "§c讓§a每§9一§c樣§a嘢§9充§c滿§a五§9彩§c斑§a斕§9嘅§c樣§a子§9，\n§c包§a括§9你§c當§a前§9嘅 §cU§aI§9。",
   "description.wurst.hack.reach": "允許你掂到更遠嘅距離。",
   "description.wurst.hack.remoteview": "允許你以另一個視角睇世界。\n使用 .rv 指令嚟指定一個特殊嘅實體。",

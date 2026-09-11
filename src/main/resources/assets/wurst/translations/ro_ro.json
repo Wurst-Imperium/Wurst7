@@ -124,7 +124,7 @@
   "description.wurst.hack.potionsaver": "Ingheata efectele potiunilor in timp ce stai pe loc.",
   "description.wurst.hack.prophuntesp": "Iti permite sa vezi jucatorii ascunsi in prophunt.\nFacut pentru Mineplex Prophunt. Posibil sa nu functioneze pe alte servere.",
   "description.wurst.hack.protect": "Un bot care urmareste cea mai apropiata entitate si o protejeaza de alte entitati.\nFoloseste .protect pentru a te referi la o entitate anume si nu cea mai apropiata.",
-  "description.wurst.hack.radar": "Arata locatia entitatilor din apropiere.\n§crosu§r - jucatori/manechine\n§6portocaliu§r - monstrii\n§averde§r - animale\n§7gri§r - altele",
+  "description.wurst.hack.radar": "Arata locatia entitatilor din apropiere.\n§9albastru§r - prieteni\n§crosu§r - jucatori/manechine\n§6portocaliu§r - mobi ostili\n§egalben§r - mobi neutri\n§averde§r - mobi pasivi\n§7gri§r - altele/entități de interacțiune",
   "description.wurst.hack.rainbowui": "§cF§aa§9c§ce §at§9o§ct§au§9l §cc§ao§9l§co§ar§9a§ct§a.",
   "description.wurst.hack.reach": "Iti permite sa ajungi mai departe.",
   "description.wurst.hack.remoteview": "Iti permite sa vezi lumea drept alta persoana.\nFoloseste comanda .rv pentru a te referi la o entitate anume.",

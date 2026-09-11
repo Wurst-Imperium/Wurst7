@@ -152,7 +152,7 @@
   "description.wurst.hack.potionsaver": "静止中にすべてのポーションの効果を停止させる。",
   "description.wurst.hack.prophuntesp": "Prophuntで偽物のブロックを見破ることができる。\nMineplexサーバーのミニゲーム「Prophunt」用。他サーバーでは動作しない可能性あり。",
   "description.wurst.hack.protect": "自動で最も近いエンティティを追跡し護衛する。\n.protect で護衛するエンティティを指定可能。",
-  "description.wurst.hack.radar": "近くのエンティティの居場所を表示する。\n§c赤色§r - プレイヤー/マネキン\n§6オレンジ色§r - モンスター\n§a緑色§r - 動物\n§7灰色§r - その他",
+  "description.wurst.hack.radar": "近くのエンティティの居場所を表示する。\n§9青色§r - フレンド\n§c赤色§r - プレイヤー/マネキン\n§6オレンジ色§r - 敵対モブ\n§e黄色§r - 中立モブ\n§a緑色§r - 友好モブ\n§7灰色§r - その他/操作記録エンティティ",
   "description.wurst.hack.rainbowui": "§cす§aべ§9て§cを§aカ§9ラ§cフ§aル§9に§cす§aる§9。",
   "description.wurst.hack.reach": "より遠くに手が届くようになる。",
   "description.wurst.hack.remoteview": "他人の視点でワールドを見ることができるようになる。\n.rv で特定のエンティティを対象として指定可能。",

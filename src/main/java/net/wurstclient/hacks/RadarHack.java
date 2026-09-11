@@ -43,6 +43,8 @@ public final class RadarHack extends Hack implements UpdateListener
 		new EntityFilterList(FilterPlayersSetting.genericVision(false),
 			FilterSleepingSetting.genericVision(false),
 			FilterHostileSetting.genericVision(false),
+			FilterNeutralSetting
+				.genericVision(AttackDetectingEntityFilter.Mode.OFF),
 			FilterPassiveSetting.genericVision(false),
 			FilterPassiveWaterSetting.genericVision(false),
 			FilterBatsSetting.genericVision(true),

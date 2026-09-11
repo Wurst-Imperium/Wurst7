@@ -125,7 +125,7 @@
   "description.wurst.hack.potionsaver": "Gèle tous les effets de potion pendant que vous êtes immobile.",
   "description.wurst.hack.prophuntesp": "Permet de voir les faux blocs dans le Prophunt.\nConçu pour le Prohunt de Mineplex. Peut ne pas fonctionner sur d'autres serveurs.",
   "description.wurst.hack.protect": "Un bot qui suit l'entité la plus proche et la protège des autres entités.\nUtilisez .protect pour protéger une entité spécifique au lieu de la plus proche.",
-  "description.wurst.hack.radar": "Affiche l'emplacement des entités à proximité.\n§crouge§r - joueurs/mannequins\n§6orange§r - monstres\n§avert§r - animaux\n§7gris§r - autres",
+  "description.wurst.hack.radar": "Affiche l'emplacement des entités à proximité.\n§9bleu§r - amis\n§crouge§r - joueurs/mannequins\n§6orange§r - créatures hostiles\n§ejaune§r - créatures neutres\n§avert§r - créatures passives\n§7gris§r - autres/entités d'interaction",
   "description.wurst.hack.rainbowui": "§cR§ae§9n§cd §at§9o§cu§at §9c§co§al§9o§cr§aé.",
   "description.wurst.hack.reach": "Permet d'atteindre plus loin.",
   "description.wurst.hack.remoteview": "Permet de voir le monde comme quelqu'un d'autre.\nUtilisez la commande .rv pour qu'il cible une entité spécifique.",

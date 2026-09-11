@@ -128,7 +128,7 @@
   "description.wurst.hack.potionsaver": "Pozastaví všecny efekty lektvarů, dokud stojíte na místě.",
   "description.wurst.hack.prophuntesp": "Umožňuje vidět falešné bloky v Prophuntu.\nVyrobeno pro Mineplexí Prophunt. Může však fungovat i na jiných serverech.",
   "description.wurst.hack.protect": "Bot, který sleduje nejbližší entitu a chrání ji před ostatními entitami.\nPoužijte .protect k ochraně konkrétní entity místo té nejbližší.",
-  "description.wurst.hack.radar": "Zobrazí polohu blízkých entit.\n§cčerveně§r - hráči/figuríny\n§6oranžově§r - monstra\n§azeleně§r - zvířata\n§7šedě§r - ostatní",
+  "description.wurst.hack.radar": "Zobrazí polohu blízkých entit.\n§9modře§r - přátelé\n§cčerveně§r - hráči/figuríny\n§6oranžově§r - nepřátelští mobové\n§ežlutě§r - neutrální mobové\n§azeleně§r - pasivní mobové\n§7šedě§r - ostatní/snímače interakcí",
   "description.wurst.hack.rainbowui": "§cD§aě§9l§cá §av§9š§ce§ac§9h§cn§ao §9k§cr§aá§9s§cn§aě §9b§ca§ar§9e§cv§an§9é§c.",
   "description.wurst.hack.reach": "Umožňuje dosáhnout dále.",
   "description.wurst.hack.remoteview": "Umožňuje vidět svět pohledem někoho jiného.\nPoužijte příkaz .rv k použití na konkrétní entitu.",

@@ -283,7 +283,7 @@
   "description.wurst.hack.potionsaver": "Freezes all potion effects while you are standing still.",
   "description.wurst.hack.prophuntesp": "Allows you to see fake blocks in Prophunt.\nMade for Mineplex Prophunt. Might not work on other servers.",
   "description.wurst.hack.protect": "A bot that follows the closest entity and protects it from other entities.\nUse .protect to protect a specific entity instead of the closest one.",
-  "description.wurst.hack.radar": "Shows the location of nearby entities.\n§cred§r - players/mannequins\n§6orange§r - monsters\n§agreen§r - animals\n§7gray§r - others",
+  "description.wurst.hack.radar": "Shows the location of nearby entities.\n§9blue§r - friends\n§cred§r - players/mannequins\n§6orange§r - hostile mobs\n§eyellow§r - neutral mobs\n§agreen§r - passive mobs\n§7gray§r - others/interaction entities",
   "description.wurst.hack.rainbowui": "§cM§aa§9k§ce§as §9e§cv§ae§9r§cy§at§9h§ci§an§9g §cc§ao§9l§co§ar§9f§cu§al§9.",
   "description.wurst.hack.reach": "Allows you to reach further.",
   "description.wurst.hack.remoteview": "Allows you to see the world as someone else.\nUse the .rv command to make it target a specific entity.",
