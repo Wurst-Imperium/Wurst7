@@ -363,6 +363,7 @@
   "description.wurst.setting.generic.filter_golems_vision": "Won't show iron, snow or copper golems.\n\nThis filter does not affect shulkers.",
   "description.wurst.setting.generic.filter_hostile_combat": "Won't attack hostile mobs, including spiders, wardens, creakings, giants, and killer bunnies.\n\nThis filter does not affect endermen, non-brute piglins, zombified piglins, or tiny green slimes.",
   "description.wurst.setting.generic.filter_hostile_vision": "Won't show hostile mobs, including spiders, wardens, creakings, giants, and killer bunnies.\n\nThis filter does not affect endermen, non-brute piglins, zombified piglins, or tiny green slimes.",
+  "description.wurst.setting.generic.filter_interactions_combat": "Won't attack interaction entities, which are invisible hitboxes that some servers use to create custom mobs or buttons.",
   "description.wurst.setting.generic.filter_invisible_combat": "Won't attack invisible entities.",
   "description.wurst.setting.generic.filter_invisible_vision": "Won't show invisible entities.",
   "description.wurst.setting.generic.filter_named_combat": "Won't attack name-tagged entities.",

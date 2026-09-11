@@ -70,7 +70,7 @@ public final class TriggerBotHack extends Hack
 		false);
 	
 	private final EntityFilterList entityFilters =
-		EntityFilterList.genericCombat();
+		EntityFilterList.genericMeleeCombat();
 	
 	private boolean simulatingMouseClick;
 	
@@ -171,7 +171,7 @@ public final class TriggerBotHack extends Hack
 	
 	private boolean isCorrectEntity(Entity entity)
 	{
-		if(!EntityUtils.IS_ATTACKABLE.test(entity))
+		if(!EntityUtils.IS_ATTACKABLE_MELEE.test(entity))
 			return false;
 		
 		if(EntityUtils.distanceToHitboxSq(entity) > range.getValueSq())

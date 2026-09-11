@@ -49,7 +49,7 @@ public final class ClickAuraHack extends Hack
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 	
 	private final EntityFilterList entityFilters =
-		EntityFilterList.genericCombat();
+		EntityFilterList.genericMeleeCombat();
 	
 	public ClickAuraHack()
 	{
@@ -113,7 +113,7 @@ public final class ClickAuraHack extends Hack
 	{
 		// set entity
 		LocalPlayer player = MC.player;
-		Stream<Entity> stream = EntityUtils.getAttackableEntities();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		
 		double rangeSq = Math.pow(range.getValue(), 2);
 		stream =

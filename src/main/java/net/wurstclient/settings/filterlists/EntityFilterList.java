@@ -54,7 +54,40 @@ public class EntityFilterList
 		return true;
 	}
 	
-	public static EntityFilterList genericCombat()
+	public static EntityFilterList genericMeleeCombat()
+	{
+		return new EntityFilterList(FilterPlayersSetting.genericCombat(false),
+			FilterSleepingSetting.genericCombat(false),
+			FilterFlyingSetting.genericCombat(0),
+			FilterHostileSetting.genericCombat(false),
+			FilterNeutralSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterPassiveSetting.genericCombat(false),
+			FilterPassiveWaterSetting.genericCombat(false),
+			FilterBabiesSetting.genericCombat(false),
+			FilterBatsSetting.genericCombat(false),
+			FilterSlimesSetting.genericCombat(false),
+			FilterPetsSetting.genericCombat(false),
+			FilterVillagersSetting.genericCombat(false),
+			FilterZombieVillagersSetting.genericCombat(false),
+			FilterGolemsSetting.genericCombat(false),
+			FilterPiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterZombiePiglinsSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterEndermenSetting
+				.genericCombat(AttackDetectingEntityFilter.Mode.OFF),
+			FilterShulkersSetting.genericCombat(false),
+			FilterAllaysSetting.genericCombat(false),
+			FilterInvisibleSetting.genericCombat(false),
+			FilterNamedSetting.genericCombat(false),
+			FilterShulkerBulletSetting.genericCombat(false),
+			FilterArmorStandsSetting.genericCombat(false),
+			FilterCrystalsSetting.genericCombat(false),
+			FilterInteractionsSetting.genericCombat(true));
+	}
+	
+	public static EntityFilterList genericRangedCombat()
 	{
 		return new EntityFilterList(FilterPlayersSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),

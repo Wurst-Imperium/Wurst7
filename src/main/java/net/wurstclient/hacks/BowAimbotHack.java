@@ -57,7 +57,7 @@ public final class BowAimbotHack extends Hack
 		0.2, 0, 2, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private final EntityFilterList entityFilters =
-		EntityFilterList.genericCombat();
+		EntityFilterList.genericRangedCombat();
 	
 	private final ColorSetting color = new ColorSetting("ESP color",
 		"Color of the box that BowAimbot draws around the target.", Color.RED);
@@ -177,7 +177,7 @@ public final class BowAimbotHack extends Hack
 	
 	private Entity filterEntities(Stream<Entity> s)
 	{
-		Stream<Entity> stream = s.filter(EntityUtils.IS_ATTACKABLE);
+		Stream<Entity> stream = s.filter(EntityUtils.IS_ATTACKABLE_RANGED);
 		stream = entityFilters.applyTo(stream);
 		
 		return stream.min(priority.getSelected().comparator).orElse(null);
