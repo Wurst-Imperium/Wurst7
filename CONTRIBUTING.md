@@ -33,7 +33,7 @@ Happy maintainers ensure happy users, happy users ensure happy sponsors. In that
 
 - **Follow the code style:** Run `./gradlew spotlessApply` or Eclipse settings from the [codestyle folder](codestyle). For anything that this doesn't cover, please try to match the existing style as closely as possible.
 
-- **Run tests:** `./gradlew check runClientGameTest runClientGameTestWithMods` must pass. Consider adding a gametest for your change. It's not easy, but it helps a lot.
+- **Run tests:** `./gradlew check runClientGameTest runClientGameTestWithMods` must pass.
 
 - **Sign the CLA:** <https://cla-assistant.io/Wurst-Imperium/Wurst7>. See below for why.
 
