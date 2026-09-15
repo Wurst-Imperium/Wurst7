@@ -12,11 +12,13 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.phys.AABB;
@@ -81,6 +83,8 @@ public enum EntityUtils
 	public static final Predicate<Entity> IS_ATTACKABLE_MELEE =
 		e -> e != null && e.isAlive()
 			&& (e instanceof LivingEntity || e instanceof EndCrystal
+				|| (e instanceof Projectile
+					&& e.is(EntityTypeTags.REDIRECTABLE_PROJECTILE))
 				|| e instanceof ShulkerBullet || e instanceof Interaction)
 			&& IS_NOT_SELF.test(e) && !WURST.getFriends().isFriend(e);
 	

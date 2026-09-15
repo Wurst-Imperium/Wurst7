@@ -265,7 +265,7 @@
   "description.wurst.setting.generic.filter_pets_vision": "Evcil hayvanları göstermez.\n\nEvcilleştirilmiş/güvenen moblar, yaşı kilitlenmiş yavrular, eyerli domuzlar / develer / lavgezerler, oyuncuların yaptığı golemler, mutlu ghastlar, huzurverenler ve kovadan bırakılan mobların çoğu dahildir.\n\nBu filtre doğal olarak oluşan demir golemleri veya içinde blok bulunan sülfür küplerini etkilemez.",
   "description.wurst.setting.generic.filter_players_combat": "Mankenler dahil diğer oyunculara saldırmaz.",
   "description.wurst.setting.generic.filter_players_vision": "Mankenler dahil diğer oyuncuları göstermez.",
-  "description.wurst.setting.generic.filter_shulker_bullets_combat": "Shulker mermilerine saldırmaz.",
+  "description.wurst.setting.generic.filter_projectiles_combat": "Shulker mermileri, ghast ateş topları ve rüzgâr topları dahil olmak üzere fırlatılan nesnelere saldırmaz.",
   "description.wurst.setting.generic.filter_shulkers_combat": "Shulker'lara saldırmaz.",
   "description.wurst.setting.generic.filter_shulkers_vision": "Shulker'ları göstermez.",
   "description.wurst.setting.generic.filter_sleeping_combat": "Mankenler dahil uyuyan oyunculara saldırmaz.\n\nMineplex gibi sunucuların yerde uyuyan oyuncular koyarak onları ceset gibi göstermesine karşı kullanışlıdır.",

@@ -383,7 +383,7 @@
   "description.wurst.setting.generic.filter_piglins_vision": "§lOn§r: Won't show piglins.\n\n§lIf calm§r: Only shows piglins if it detects they have become aggressive (toward any target, not just you).\n\n§lOff§r: This filter does nothing.\n\nThis filter does not affect piglin brutes or zombified piglins.",
   "description.wurst.setting.generic.filter_players_combat": "Won't attack other players, including mannequins.",
   "description.wurst.setting.generic.filter_players_vision": "Won't show other players, including mannequins.",
-  "description.wurst.setting.generic.filter_shulker_bullets_combat": "Won't attack shulker bullets.",
+  "description.wurst.setting.generic.filter_projectiles_combat": "Won't attack projectiles, including shulker bullets, ghast fireballs, and wind charges.",
   "description.wurst.setting.generic.filter_shulkers_combat": "Won't attack shulkers.",
   "description.wurst.setting.generic.filter_shulkers_vision": "Won't show shulkers.",
   "description.wurst.setting.generic.filter_sleeping_combat": "Won't attack sleeping players, including mannequins.\n\nUseful for servers like Mineplex that place sleeping players on the ground to make them look like corpses.",

@@ -78,7 +78,7 @@ public final class ProtectHack extends Hack
 			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(false),
 			FilterNamedSetting.genericCombat(false),
-			FilterShulkerBulletSetting.genericCombat(false),
+			FilterProjectilesSetting.genericCombat(false),
 			FilterArmorStandsSetting.genericCombat(false),
 			FilterCrystalsSetting.genericCombat(true),
 			FilterInteractionsSetting.genericCombat(true));

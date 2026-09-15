@@ -221,7 +221,7 @@
   "description.wurst.setting.generic.filter_pets_vision": "ペットを表示しない。\n\n飼いならされた/信頼しているモブ、成長がロックされた子供、サドル付きのブタ / ラクダ / ストライダー、プレイヤーが作ったゴーレム、ハッピーガスト、アレイ、バケツから放されたほとんどのモブを含む。\n\n自然にスポーンしたアイアンゴーレムや、内部にブロックのあるサルファーキューブには影響しない。",
   "description.wurst.setting.generic.filter_players_combat": "他のプレイヤー（マネキンを含む）を攻撃しない",
   "description.wurst.setting.generic.filter_players_vision": "他のプレイヤー（マネキンを含む）を表示しない。",
-  "description.wurst.setting.generic.filter_shulker_bullets_combat": "シュルカーの弾を攻撃しない。",
+  "description.wurst.setting.generic.filter_projectiles_combat": "シュルカーの弾、ガストの火の玉、ウィンドチャージなどの飛び道具を攻撃しない。",
   "description.wurst.setting.generic.filter_shulkers_combat": "シュルカーを攻撃しない。",
   "description.wurst.setting.generic.filter_shulkers_vision": "シュルカーを表示しない。",
   "description.wurst.setting.generic.filter_sleeping_combat": "寝ているプレイヤー（マネキンを含む）を攻撃しない。\n\n眠っているプレイヤーを地面に置いて死体のように見せる Mineplex などのサーバーで役立ちます。",

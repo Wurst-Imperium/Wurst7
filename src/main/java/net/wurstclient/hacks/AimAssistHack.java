@@ -83,7 +83,7 @@ public final class AimAssistHack extends Hack
 			FilterShulkersSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
-			FilterShulkerBulletSetting.genericCombat(false),
+			FilterProjectilesSetting.genericCombat(false),
 			FilterArmorStandsSetting.genericCombat(true),
 			FilterCrystalsSetting.genericCombat(true),
 			FilterInteractionsSetting.genericCombat(true));

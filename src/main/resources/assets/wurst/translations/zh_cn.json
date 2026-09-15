@@ -316,7 +316,7 @@
   "description.wurst.setting.generic.filter_pets_vision": "不会显示宠物，包括已驯服/信任的生物、锁定年龄的幼年生物、装有鞍的猪/骆驼/炽足兽、玩家建造的傀儡、快乐恶魂、悦灵，以及大多数从桶中放出的生物。\n\n此过滤器不影响自然生成的铁傀儡或体内有方块的硫方怪。",
   "description.wurst.setting.generic.filter_players_combat": "不会攻击其他玩家，包括玩家模型。",
   "description.wurst.setting.generic.filter_players_vision": "不会显示其他玩家，包括玩家模型。",
-  "description.wurst.setting.generic.filter_shulker_bullets_combat": "不会攻击潜影贝导弹。",
+  "description.wurst.setting.generic.filter_projectiles_combat": "不会攻击弹射物，包括潜影弹、恶魂火球和风弹。",
   "description.wurst.setting.generic.filter_shulkers_combat": "不会攻击潜影贝。",
   "description.wurst.setting.generic.filter_shulkers_vision": "不会显示潜影贝。",
   "description.wurst.setting.generic.filter_sleeping_combat": "不会攻击正在睡觉的玩家，包括玩家模型。\n\n对于像 Mineplex 这样将睡觉的玩家放在地上使其看起来像尸体的服务器很有用。",

@@ -316,7 +316,7 @@
   "description.wurst.setting.generic.filter_pets_vision": "Nie będzie pokazywać zwierzaków, w tym oswojonych/ufających mobów, małych mobów z zablokowanym wzrostem, osiodłanych świń / wielbłądów / magmołazów, golemów zbudowanych przez graczy, wesołych ghastów, otuszków i większości mobów wypuszczonych z wiadra.\n\nTen filtr nie wpływa na naturalnie powstałe żelazne golemy ani na kostki siarki z blokiem w środku.",
   "description.wurst.setting.generic.filter_players_combat": "Nie będzie atakować innych graczy, w tym manekinów.",
   "description.wurst.setting.generic.filter_players_vision": "Nie będzie pokazywać innych graczy, w tym manekinów.",
-  "description.wurst.setting.generic.filter_shulker_bullets_combat": "Nie będzie atakować pocisków shulkerów.",
+  "description.wurst.setting.generic.filter_projectiles_combat": "Nie będzie atakować pocisków, w tym pocisków shulkerów, kul ognia ghastów i wietrznych kul.",
   "description.wurst.setting.generic.filter_shulkers_combat": "Nie będzie atakować shulkerów.",
   "description.wurst.setting.generic.filter_shulkers_vision": "Nie będzie pokazywać shulkerów.",
   "description.wurst.setting.generic.filter_sleeping_combat": "Nie będzie atakować śpiących graczy, w tym manekinów.\n\nPrzydatne dla serwerów takich jak Mineplex, które umieszczają śpiących graczy na ziemi, aby wyglądali jak trupy.",

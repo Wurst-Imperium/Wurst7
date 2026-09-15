@@ -316,7 +316,7 @@
   "description.wurst.setting.generic.filter_pets_vision": "Не отображать питомцев, включая прирученных/доверяющих мобов, детёнышей с остановленным ростом, осёдланных свиней / верблюдов / лавомерок, построенных игроками големов, счастливых гастов, тихонь и большинство мобов, выпущенных из ведра.\n\nЭтот фильтр не влияет на естественно появившихся железных големов и серных кубов с блоком внутри.",
   "description.wurst.setting.generic.filter_players_combat": "Не атаковать других игроков, включая манекены.",
   "description.wurst.setting.generic.filter_players_vision": "Не отображать других игроков, включая манекены.",
-  "description.wurst.setting.generic.filter_shulker_bullets_combat": "Не атаковать снаряды шалкера.",
+  "description.wurst.setting.generic.filter_projectiles_combat": "Не атаковать снаряды, включая снаряды шалкеров, файерболы гастов и заряды ветра.",
   "description.wurst.setting.generic.filter_shulkers_combat": "Не атаковать шалкеров.",
   "description.wurst.setting.generic.filter_shulkers_vision": "Не отображать шалкеров.",
   "description.wurst.setting.generic.filter_sleeping_combat": "Не атаковать спящих игроков, включая манекены.\n\nПолезно для серверов типа Mineplex, где «трупы» игроков реализованы через спящих NPC.",
