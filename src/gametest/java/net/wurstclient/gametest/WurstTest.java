@@ -145,6 +145,7 @@ public class WurstTest implements FabricClientGameTest
 		
 		// Test Wurst commands
 		new CopyItemCmdTest(context, spContext).run();
+		new DamageCmdTest(context, spContext).run();
 		new GiveCmdTest(context, spContext).run();
 		new ModifyCmdTest(context, spContext).run();
 		
