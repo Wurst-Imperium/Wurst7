@@ -62,7 +62,7 @@ public final class FightBotHack extends Hack
 		new PauseAttackOnContainersSetting(true);
 	
 	private final EntityFilterList entityFilters =
-		EntityFilterList.genericCombat();
+		EntityFilterList.genericMeleeCombat();
 	
 	private EntityPathFinder pathFinder;
 	private PathProcessor processor;
@@ -127,7 +127,7 @@ public final class FightBotHack extends Hack
 			return;
 		
 		// set entity
-		Stream<Entity> stream = EntityUtils.getAttackableEntities();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		stream = entityFilters.applyTo(stream);
 		
 		Entity entity = stream

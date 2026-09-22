@@ -36,7 +36,7 @@ public class ClientLevelMixin
 		method = "getMarkerParticleTarget()Lnet/minecraft/world/level/block/Block;",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onGetBlockParticle(CallbackInfoReturnable<Block> cir)
+	private void onGetMarkerParticleTarget(CallbackInfoReturnable<Block> cir)
 	{
 		if(!WurstClient.INSTANCE.getHax().barrierEspHack.isEnabled())
 			return;

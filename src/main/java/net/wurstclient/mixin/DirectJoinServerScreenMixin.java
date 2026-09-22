@@ -34,7 +34,7 @@ public class DirectJoinServerScreenMixin extends Screen
 	}
 	
 	@Inject(method = "onSelect()V", at = @At("TAIL"))
-	private void onSaveAndClose(CallbackInfo ci)
+	private void onOnSelect(CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(serverData);
 	}

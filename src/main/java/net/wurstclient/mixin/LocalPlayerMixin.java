@@ -106,7 +106,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/player/LocalPlayer;isSlowDueToUsingItem()Z",
 			ordinal = 0))
-	private boolean wrapTickMovementItemUse(LocalPlayer instance,
+	private boolean wrapAiStepItemUse(LocalPlayer instance,
 		Operation<Boolean> original)
 	{
 		if(WurstClient.INSTANCE.getHax().noSlowdownHack.isEnabled())
@@ -149,13 +149,13 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	}
 	
 	@Inject(method = "sendPosition()V", at = @At("HEAD"))
-	private void onSendMovementPacketsHEAD(CallbackInfo ci)
+	private void onSendPositionHEAD(CallbackInfo ci)
 	{
 		EventManager.fire(PreMotionEvent.INSTANCE);
 	}
 	
 	@Inject(method = "sendPosition()V", at = @At("TAIL"))
-	private void onSendMovementPacketsTAIL(CallbackInfo ci)
+	private void onSendPositionTAIL(CallbackInfo ci)
 	{
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
@@ -179,13 +179,14 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	
 	/**
 	 * When PortalGUI is enabled, this mixin temporarily sets the current screen
-	 * to null to prevent the updateNausea() method from closing it.
+	 * to null to prevent handlePortalTransitionEffect() from closing it.
 	 */
 	@Inject(method = "handlePortalTransitionEffect(Z)V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/gui/Gui;screen()Lnet/minecraft/client/gui/screens/Screen;",
 			ordinal = 0))
-	private void beforeTickNausea(boolean fromPortalEffect, CallbackInfo ci)
+	private void beforeHandlePortalTransitionEffect(boolean fromPortalEffect,
+		CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
 			return;
@@ -195,15 +196,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	}
 	
 	/**
-	 * This mixin restores the current screen as soon as the updateNausea()
-	 * method is done looking at it.
+	 * This mixin restores the current screen as soon as
+	 * handlePortalTransitionEffect() is done looking at it.
 	 */
 	@Inject(method = "handlePortalTransitionEffect(Z)V",
 		at = @At(value = "FIELD",
 			target = "Lnet/minecraft/client/player/LocalPlayer;portalEffectIntensity:F",
 			opcode = Opcodes.GETFIELD,
 			ordinal = 1))
-	private void afterTickNausea(boolean fromPortalEffect, CallbackInfo ci)
+	private void afterHandlePortalTransitionEffect(boolean fromPortalEffect,
+		CallbackInfo ci)
 	{
 		if(tempCurrentScreen == null)
 			return;

@@ -8,29 +8,34 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
+import net.wurstclient.util.text.WText;
 
 public final class FilterNamedSetting extends EntityFilterCheckbox
 {
-	public FilterNamedSetting(String description, boolean checked)
+	public FilterNamedSetting(WText description, boolean checked)
 	{
 		super("Filter named", description, checked);
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !e.hasCustomName();
+		return e.hasCustomName();
 	}
 	
 	public static FilterNamedSetting genericCombat(boolean checked)
 	{
 		return new FilterNamedSetting(
-			"description.wurst.setting.generic.filter_named_combat", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_named_combat"),
+			checked);
 	}
 	
 	public static FilterNamedSetting genericVision(boolean checked)
 	{
 		return new FilterNamedSetting(
-			"description.wurst.setting.generic.filter_named_vision", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_named_vision"),
+			checked);
 	}
 }

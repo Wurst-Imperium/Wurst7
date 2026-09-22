@@ -7,6 +7,8 @@ accessible	method	net/minecraft/client/Minecraft	startUseItem	()V
 accessible	method	net/minecraft/client/MouseHandler	onButton	(JLnet/minecraft/client/input/MouseButtonInfo;I)V
 accessible	method	net/minecraft/client/renderer/rendertype/RenderType	create	(Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;
 accessible	method	net/minecraft/core/component/DataComponentMap$Builder	setUnchecked	(Lnet/minecraft/core/component/DataComponentType;Ljava/lang/Object;)V
+accessible	method	net/minecraft/world/entity/AgeableMob	setAgeLocked	(Z)V
+accessible	method	net/minecraft/world/entity/animal/frog/Tadpole	setAgeLocked	(Z)V
 accessible	method	net/minecraft/world/entity/animal/feline/Ocelot	isTrusting	()Z
 accessible	method	net/minecraft/world/entity/animal/feline/Ocelot	setTrusting	(Z)V
 accessible	method	net/minecraft/world/entity/animal/fox/Fox	addTrustedEntity	(Lnet/minecraft/world/entity/LivingEntity;)V
@@ -38,4 +40,7 @@ accessible	field	net/minecraft/client/gui/screens/achievement/StatsScreen	isLoad
 accessible	field	net/minecraft/world/entity/Entity	stuckSpeedMultiplier	Lnet/minecraft/world/phys/Vec3;
 accessible	field	net/minecraft/world/entity/LivingEntity	equipment	Lnet/minecraft/world/entity/EntityEquipment;
 accessible	field	net/minecraft/world/entity/LivingEntity	jumping	Z
+accessible	field	net/minecraft/world/entity/Mob	DATA_MOB_FLAGS_ID	Lnet/minecraft/network/syncher/EntityDataAccessor;
+accessible	field	net/minecraft/world/entity/animal/goat/Goat	isLoweringHead	Z
+accessible	field	net/minecraft/world/entity/monster/zombie/ZombifiedPiglin	SPEED_MODIFIER_ATTACKING_ID	Lnet/minecraft/resources/Identifier;
 accessible	field	net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket	sectionPos	Lnet/minecraft/core/SectionPos;

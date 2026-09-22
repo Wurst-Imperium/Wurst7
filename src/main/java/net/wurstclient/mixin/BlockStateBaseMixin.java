@@ -43,7 +43,7 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 		method = "isCollisionShapeFullBlock(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Z",
 		at = @At("TAIL"),
 		cancellable = true)
-	private void onIsFullCube(BlockGetter world, BlockPos pos,
+	private void onIsCollisionShapeFullBlock(BlockGetter world, BlockPos pos,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		IsNormalCubeEvent event = new IsNormalCubeEvent();
@@ -56,7 +56,7 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 		method = "getShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onGetOutlineShape(BlockGetter view, BlockPos pos,
+	private void onGetShape(BlockGetter view, BlockPos pos,
 		CollisionContext context, CallbackInfoReturnable<VoxelShape> cir)
 	{
 		if(context == CollisionContext.empty())

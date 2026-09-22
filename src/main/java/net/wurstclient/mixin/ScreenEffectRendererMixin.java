@@ -37,7 +37,7 @@ public class ScreenEffectRendererMixin
 		method = "submitWater(Lnet/minecraft/client/renderer/state/level/PlayerRenderState$WaterOverlay;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private static void onRenderUnderwaterOverlay(
+	private static void onSubmitWater(
 		PlayerRenderState.WaterOverlay waterOverlay, PoseStack matrices,
 		SubmitNodeCollector submitNodeCollector, CallbackInfo ci)
 	{

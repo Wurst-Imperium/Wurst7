@@ -28,7 +28,7 @@ public abstract class FirstPersonHandsAndItemsRendererMixin
 		method = "submitHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/PlayerRenderState;Lnet/minecraft/client/renderer/state/level/FirstPersonHandsAndItemsRenderState;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onRenderHandsWithItems(float tickProgress, PoseStack matrices,
+	private void onSubmitHandsWithItems(float tickProgress, PoseStack matrices,
 		SubmitNodeCollector entityRenderCommandQueue, PlayerRenderState player,
 		FirstPersonHandsAndItemsRenderState handsAndItems, CallbackInfo ci)
 	{

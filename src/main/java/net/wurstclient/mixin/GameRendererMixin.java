@@ -48,7 +48,7 @@ public abstract class GameRendererMixin implements AutoCloseable
 	
 	@WrapOperation(method = "renderLevel()V",
 		at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"))
-	private float onCalculateSpinningEffectIntensity(float portalIntensity,
+	private float onRenderLevelNauseaMax(float portalIntensity,
 		float nauseaIntensity, Operation<Float> original)
 	{
 		if(!WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled())
@@ -61,8 +61,8 @@ public abstract class GameRendererMixin implements AutoCloseable
 		method = "nightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
 		at = @At("HEAD"),
 		cancellable = true)
-	private static void onGetNightVisionStrength(LivingEntity entity,
-		float tickDelta, CallbackInfoReturnable<Float> cir)
+	private static void onNightVisionScale(LivingEntity entity, float tickDelta,
+		CallbackInfoReturnable<Float> cir)
 	{
 		FullbrightHack fullbright =
 			WurstClient.INSTANCE.getHax().fullbrightHack;
@@ -78,8 +78,8 @@ public abstract class GameRendererMixin implements AutoCloseable
 		method = "bobHurt(Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onTiltViewWhenHurt(CameraRenderState cameraState,
-		PoseStack matrices, CallbackInfo ci)
+	private void onBobHurt(CameraRenderState cameraState, PoseStack matrices,
+		CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
 			ci.cancel();

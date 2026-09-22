@@ -43,7 +43,7 @@ public abstract class ClientPacketListenerMixin
 	@Inject(
 		method = "handleLogin(Lnet/minecraft/network/protocol/game/ClientboundLoginPacket;)V",
 		at = @At("TAIL"))
-	public void onOnGameJoin(ClientboundLoginPacket packet, CallbackInfo ci)
+	public void onHandleLogin(ClientboundLoginPacket packet, CallbackInfo ci)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
 		if(!wurst.isEnabled())
@@ -73,8 +73,8 @@ public abstract class ClientPacketListenerMixin
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/multiplayer/ClientChunkCache;replaceWithPacketData(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)Lnet/minecraft/world/level/chunk/LevelChunk;",
 			shift = At.Shift.AFTER))
-	private void onLoadChunk(ClientboundLevelChunkWithLightPacket packet,
-		CallbackInfo ci)
+	private void onHandleLevelChunkWithLight(
+		ClientboundLevelChunkWithLightPacket packet, CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getHax().newChunksHack.afterLoadChunk(packet.x(),
 			packet.z());
@@ -83,7 +83,7 @@ public abstract class ClientPacketListenerMixin
 	@Inject(
 		method = "handleBlockUpdate(Lnet/minecraft/network/protocol/game/ClientboundBlockUpdatePacket;)V",
 		at = @At("TAIL"))
-	private void onOnBlockUpdate(ClientboundBlockUpdatePacket packet,
+	private void onHandleBlockUpdate(ClientboundBlockUpdatePacket packet,
 		CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getHax().newChunksHack
@@ -93,7 +93,7 @@ public abstract class ClientPacketListenerMixin
 	@Inject(
 		method = "handleChunkBlocksUpdate(Lnet/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket;)V",
 		at = @At("TAIL"))
-	private void onOnChunkDeltaUpdate(
+	private void onHandleChunkBlocksUpdate(
 		ClientboundSectionBlocksUpdatePacket packet, CallbackInfo ci)
 	{
 		packet.runUpdates(

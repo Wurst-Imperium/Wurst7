@@ -20,6 +20,6 @@ public final class PortalGuiHack extends Hack
 		setCategory(Category.OTHER);
 	}
 	
-	// See LocalPlayerMixin.beforeTickNausea() and
-	// LocalPlayerMixin.afterTickNausea()
+	// See LocalPlayerMixin.beforeHandlePortalTransitionEffect() and
+	// LocalPlayerMixin.afterHandlePortalTransitionEffect()
 }

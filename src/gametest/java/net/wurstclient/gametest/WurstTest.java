@@ -34,8 +34,10 @@ import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.wurstclient.gametest.tests.*;
 import net.wurstclient.gametest.tests.filters.FilterBabiesTest;
+import net.wurstclient.gametest.tests.filters.FilterCalmTest;
 import net.wurstclient.gametest.tests.filters.FilterPassiveWaterTest;
 import net.wurstclient.gametest.tests.filters.FilterPetsTest;
+import net.wurstclient.gametest.tests.filters.MobDispositionTest;
 
 public class WurstTest implements FabricClientGameTest
 {
@@ -125,6 +127,8 @@ public class WurstTest implements FabricClientGameTest
 		new FilterBabiesTest(context, spContext).run();
 		new FilterPassiveWaterTest(context, spContext).run();
 		new FilterPetsTest(context, spContext).run();
+		new MobDispositionTest(context, spContext).run();
+		new FilterCalmTest(context, spContext).run();
 		
 		// TODO: Open ClickGUI and Navigator
 		
@@ -143,6 +147,7 @@ public class WurstTest implements FabricClientGameTest
 		
 		// Test Wurst commands
 		new CopyItemCmdTest(context, spContext).run();
+		new DamageCmdTest(context, spContext).run();
 		new GiveCmdTest(context, spContext).run();
 		new ModifyCmdTest(context, spContext).run();
 		

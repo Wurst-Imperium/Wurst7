@@ -83,9 +83,10 @@ public final class AimAssistHack extends Hack
 			FilterShulkersSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
-			FilterShulkerBulletSetting.genericCombat(false),
+			FilterProjectilesSetting.genericCombat(false),
 			FilterArmorStandsSetting.genericCombat(true),
-			FilterCrystalsSetting.genericCombat(true));
+			FilterCrystalsSetting.genericCombat(true),
+			FilterInteractionsSetting.genericCombat(true));
 	
 	private Entity target;
 	private float nextYaw;
@@ -170,7 +171,7 @@ public final class AimAssistHack extends Hack
 	
 	private void chooseTarget()
 	{
-		Stream<Entity> stream = EntityUtils.getAttackableEntities();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		
 		double rangeSq = range.getValueSq();
 		stream =

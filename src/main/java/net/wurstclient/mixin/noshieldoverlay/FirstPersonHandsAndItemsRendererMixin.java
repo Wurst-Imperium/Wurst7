@@ -35,7 +35,7 @@ public abstract class FirstPersonHandsAndItemsRendererMixin
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/world/item/ItemStack;getUseAnimation()Lnet/minecraft/world/item/ItemUseAnimation;",
 			shift = At.Shift.AFTER))
-	private void onRenderArmWithItemBlocking(PlayerRenderState player,
+	private void onSubmitArmWithItemBlocking(PlayerRenderState player,
 		FirstPersonHandsAndItemsRenderState handsAndItems, float tickProgress,
 		float pitch, InteractionHand hand, float swingProgress, ItemStack item,
 		float equipProgress, PoseStack matrices,
@@ -59,7 +59,7 @@ public abstract class FirstPersonHandsAndItemsRendererMixin
 		method = "submitArmWithItem(Lnet/minecraft/client/renderer/state/level/PlayerRenderState;Lnet/minecraft/client/renderer/state/level/FirstPersonHandsAndItemsRenderState;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V",
 		at = @At(value = "FIELD",
 			target = "Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;currentSwing:Lnet/minecraft/world/entity/LivingEntity$SwingDescription;"))
-	private void onRenderArmWithItemNotBlocking(PlayerRenderState player,
+	private void onSubmitArmWithItemNotBlocking(PlayerRenderState player,
 		FirstPersonHandsAndItemsRenderState handsAndItems, float tickProgress,
 		float pitch, InteractionHand hand, float swingProgress, ItemStack item,
 		float equipProgress, PoseStack matrices,

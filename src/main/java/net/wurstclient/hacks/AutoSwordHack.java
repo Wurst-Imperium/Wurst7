@@ -81,7 +81,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			Entity entity = ((EntityHitResult)MC.hitResult).getEntity();
 			
 			if(entity instanceof LivingEntity
-				&& EntityUtils.IS_ATTACKABLE.test(entity))
+				&& EntityUtils.IS_ATTACKABLE_MELEE.test(entity))
 				setSlot(entity);
 		}
 		
