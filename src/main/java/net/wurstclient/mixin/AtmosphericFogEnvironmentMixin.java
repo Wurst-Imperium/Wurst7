@@ -27,9 +27,8 @@ public class AtmosphericFogEnvironmentMixin
 	 * NoFog is enabled.
 	 */
 	@Inject(method = "setupFog", at = @At("TAIL"), cancellable = true)
-	private void onApplyStartEndModifier(FogData data, Camera camera,
-		ClientLevel world, float viewDistance, DeltaTracker tickCounter,
-		CallbackInfo ci)
+	private void onSetupFog(FogData data, Camera camera, ClientLevel world,
+		float viewDistance, DeltaTracker tickCounter, CallbackInfo ci)
 	{
 		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
 			return;

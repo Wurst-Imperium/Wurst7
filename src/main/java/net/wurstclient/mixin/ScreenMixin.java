@@ -26,7 +26,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler
 		method = "extractTransparentBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	public void onRenderInGameBackground(GuiGraphicsExtractor context,
+	public void onExtractTransparentBackground(GuiGraphicsExtractor context,
 		CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noBackgroundHack

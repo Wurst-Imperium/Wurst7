@@ -27,7 +27,7 @@ public class LivingEntityMixin
 	@Inject(method = "getEffectBlendFactor(Lnet/minecraft/core/Holder;F)F",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onGetEffectFadeFactor(Holder<MobEffect> registryEntry,
+	private void onGetEffectBlendFactor(Holder<MobEffect> registryEntry,
 		float delta, CallbackInfoReturnable<Float> cir)
 	{
 		if(registryEntry != MobEffects.DARKNESS)

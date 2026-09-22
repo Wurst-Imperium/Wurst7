@@ -53,7 +53,7 @@ public abstract class EntityMixin
 	@Inject(method = "push(Lnet/minecraft/world/entity/Entity;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onPushAwayFrom(Entity entity, CallbackInfo ci)
+	private void onPush(Entity entity, CallbackInfo ci)
 	{
 		VelocityFromEntityCollisionEvent event =
 			new VelocityFromEntityCollisionEvent((Entity)(Object)this);

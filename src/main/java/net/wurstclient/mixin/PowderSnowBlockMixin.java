@@ -30,7 +30,7 @@ public abstract class PowderSnowBlockMixin extends Block implements BucketPickup
 		method = "canEntityWalkOnPowderSnow(Lnet/minecraft/world/entity/Entity;)Z",
 		at = @At("HEAD"),
 		cancellable = true)
-	private static void onCanWalkOnPowderSnow(Entity entity,
+	private static void onCanEntityWalkOnPowderSnow(Entity entity,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		if(!WurstClient.INSTANCE.getHax().snowShoeHack.isEnabled())

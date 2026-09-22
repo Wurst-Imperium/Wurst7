@@ -20,8 +20,7 @@ import net.wurstclient.WurstClient;
 public abstract class LevelMixin implements LevelAccessor, AutoCloseable
 {
 	@Inject(method = "getRainLevel(F)F", at = @At("HEAD"), cancellable = true)
-	private void onGetRainGradient(float delta,
-		CallbackInfoReturnable<Float> cir)
+	private void onGetRainLevel(float delta, CallbackInfoReturnable<Float> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().noWeatherHack.isRainDisabled())
 			cir.setReturnValue(0F);
