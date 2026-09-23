@@ -19,8 +19,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.minecraft.client.User;
+import net.minecraft.client.resources.server.DownloadQueue;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.server.packs.DownloadQueue;
 import net.wurstclient.WurstClient;
 
 @Mixin(DownloadQueue.class)

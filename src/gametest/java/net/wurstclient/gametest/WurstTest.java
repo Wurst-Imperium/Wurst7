@@ -56,6 +56,9 @@ public class WurstTest implements FabricClientGameTest
 		LOGGER.info("Reached title screen");
 		AltManagerTest.testAltManagerButton(context);
 		
+		ModListPrivacyTest modListPrivacyTest = new ModListPrivacyTest();
+		modListPrivacyTest.start();
+		
 		LOGGER.info("Creating test world");
 		TestWorldBuilder worldBuilder = context.worldBuilder();
 		worldBuilder.adjustSettings(creator -> {
@@ -73,6 +76,7 @@ public class WurstTest implements FabricClientGameTest
 			LOGGER.info("Exiting test world");
 		}
 		
+		modListPrivacyTest.finish();
 		LOGGER.info("Test complete");
 	}
 	
