@@ -29,7 +29,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.InputFaker;
@@ -39,6 +38,7 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.AirStrafingSpeedListener.AirStrafingSpeedEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
+import net.wurstclient.events.MobEffectListener.MobEffectEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
@@ -286,33 +286,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	@Override
 	public boolean hasEffect(Holder<MobEffect> effect)
 	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		
-		if(effect == MobEffects.NIGHT_VISION
-			&& hax.fullbrightHack.isNightVisionActive())
-			return true;
-		
-		if(effect == MobEffects.LEVITATION && hax.noLevitationHack.isEnabled())
-			return false;
-		
-		if(effect == MobEffects.BLINDNESS && hax.antiBlindHack.isEnabled())
-			return false;
-		
-		if(effect == MobEffects.DARKNESS && hax.antiBlindHack.isEnabled())
-			return false;
-		
-		return super.hasEffect(effect);
+		return getEffect(effect) != null;
 	}
 	
 	@Override
 	public MobEffectInstance getEffect(Holder<MobEffect> effect)
 	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		
-		if(effect == MobEffects.LEVITATION && hax.noLevitationHack.isEnabled())
-			return null;
-		
-		return super.getEffect(effect);
+		MobEffectEvent event =
+			new MobEffectEvent(effect, super.getEffect(effect));
+		EventManager.fire(event);
+		return event.getInstance();
 	}
 	
 	@Override

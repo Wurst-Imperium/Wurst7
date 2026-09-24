@@ -23,7 +23,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
-import net.wurstclient.hacks.FullbrightHack;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin implements AutoCloseable
@@ -66,11 +65,11 @@ public abstract class GameRendererMixin implements AutoCloseable
 	private static void onNightVisionScale(LivingEntity entity, float tickDelta,
 		CallbackInfoReturnable<Float> cir)
 	{
-		FullbrightHack fullbright =
-			WurstClient.INSTANCE.getHax().fullbrightHack;
+		float nightVisionStrength = WurstClient.INSTANCE.getHax().fullbrightHack
+			.getNightVisionStrength();
 		
-		if(fullbright.isNightVisionActive())
-			cir.setReturnValue(fullbright.getNightVisionStrength());
+		if(nightVisionStrength > 0)
+			cir.setReturnValue(nightVisionStrength);
 	}
 	
 	/**

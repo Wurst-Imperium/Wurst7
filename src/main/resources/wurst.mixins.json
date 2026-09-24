@@ -43,7 +43,6 @@
     "LanguageManagerMixin",
     "LevelMixin",
     "LevelRendererMixin",
-    "LivingEntityMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",
     "MobEffectInstanceMixin",

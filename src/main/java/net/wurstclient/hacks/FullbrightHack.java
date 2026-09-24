@@ -9,8 +9,11 @@ package net.wurstclient.hacks;
 
 import net.minecraft.client.OptionInstance;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.MobEffectListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.fullbright.BadOptimizationsLightmapHook;
@@ -23,7 +26,8 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 @SearchTags({"Fullbrightness", "full brightness", "Fulbrightness",
 	"ful brightness", "NightVision", "night vision", "FullLightness",
 	"FulLightness", "full lightness", "FullGamma", "full gamma"})
-public final class FullbrightHack extends Hack implements UpdateListener
+public final class FullbrightHack extends Hack
+	implements UpdateListener, MobEffectListener
 {
 	private final EnumSetting<Method> method = new EnumSetting<>("Method",
 		"\u00a7lGamma\u00a7r works by setting your brightness slider beyond 100%. Incompatible with shader packs.\n\n"
@@ -38,6 +42,10 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		"Fullbright will set your brightness slider back to this value when you turn it off.",
 		0.5, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
+	private final MobEffectInstance nightVisionInstance =
+		new MobEffectInstance(MobEffects.NIGHT_VISION,
+			MobEffectInstance.INFINITE_DURATION, 0, false, false);
+	
 	private boolean wasGammaChanged;
 	private float nightVisionStrength;
 	
@@ -51,6 +59,7 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		
 		checkGammaOnStartup();
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(MobEffectListener.class, this);
 	}
 	
 	private void checkGammaOnStartup()
@@ -170,9 +179,12 @@ public final class FullbrightHack extends Hack implements UpdateListener
 			BadOptimizationsLightmapHook.markForUpdate();
 	}
 	
-	public boolean isNightVisionActive()
+	@Override
+	public void onMobEffect(MobEffectEvent event)
 	{
-		return nightVisionStrength > 0;
+		if(event.getEffect() == MobEffects.NIGHT_VISION
+			&& nightVisionStrength > 0)
+			event.setInstance(nightVisionInstance);
 	}
 	
 	public float getNightVisionStrength()
@@ -213,6 +225,5 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		}
 	}
 	
-	// See LocalPlayerMixin.hasEffect() and
-	// GameRendererMixin.onNightVisionScale()
+	// See GameRendererMixin.onNightVisionScale()
 }
