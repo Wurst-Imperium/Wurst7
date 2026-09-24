@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -29,9 +30,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.InputFaker;
 import net.wurstclient.InputFaker.TempRealInput;
@@ -344,20 +343,17 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	}
 	
 	/**
-	 * This is the part that makes Liquids work.
+	 * Makes Liquids work. Must take priority over Freecam's raycast wrapper.
 	 */
-	@WrapOperation(
+	@ModifyArg(
 		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;",
-			ordinal = 0))
-	private static HitResult liquidsRaycast(Entity instance, double maxDistance,
-		float tickDelta, boolean includeFluids, Operation<HitResult> original)
+			ordinal = 0),
+		index = 2)
+	private static boolean modifyIncludeFluidsForLiquids(boolean includeFluids)
 	{
-		if(!WurstClient.INSTANCE.getHax().liquidsHack.isEnabled())
-			return original.call(instance, maxDistance, tickDelta,
-				includeFluids);
-		
-		return original.call(instance, maxDistance, tickDelta, true);
+		return includeFluids
+			|| WurstClient.INSTANCE.getHax().liquidsHack.isEnabled();
 	}
 }
