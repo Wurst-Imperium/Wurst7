@@ -28,7 +28,7 @@ public abstract class DeltaTrackerTimerMixin
 			target = "Lnet/minecraft/client/DeltaTracker$Timer;lastMs:J",
 			opcode = Opcodes.PUTFIELD,
 			ordinal = 0))
-	public void onBeginRenderTick(long timeMillis,
+	public void onAdvanceGameTime(long timeMillis,
 		CallbackInfoReturnable<Integer> cir)
 	{
 		deltaTicks *= WurstClient.INSTANCE.getHax().timerHack.getTimerSpeed();

@@ -45,7 +45,7 @@ public abstract class ModelBlockRendererMixin implements ItemLike
 		method = "shouldRenderFace(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;ZLnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos;)Z",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/world/level/block/Block;shouldRenderFace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z"))
-	private static boolean onRenderSmoothOrFlat(BlockState state,
+	private static boolean onShouldRenderFace(BlockState state,
 		BlockState otherState, Direction side, Operation<Boolean> original,
 		BlockAndTintGetter world, BlockState stateButFromTheOtherMethod,
 		boolean cull, Direction sideButFromTheOtherMethod, BlockPos neighborPos)

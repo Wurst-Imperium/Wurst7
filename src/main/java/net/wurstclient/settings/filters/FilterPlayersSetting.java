@@ -7,31 +7,36 @@
  */
 package net.wurstclient.settings.filters;
 
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+import net.wurstclient.util.text.WText;
 
 public final class FilterPlayersSetting extends EntityFilterCheckbox
 {
-	public FilterPlayersSetting(String description, boolean checked)
+	public FilterPlayersSetting(WText description, boolean checked)
 	{
 		super("Filter players", description, checked);
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof Player);
+		return e instanceof Avatar;
 	}
 	
 	public static FilterPlayersSetting genericCombat(boolean checked)
 	{
 		return new FilterPlayersSetting(
-			"description.wurst.setting.generic.filter_players_combat", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_players_combat"),
+			checked);
 	}
 	
 	public static FilterPlayersSetting genericVision(boolean checked)
 	{
 		return new FilterPlayersSetting(
-			"description.wurst.setting.generic.filter_players_vision", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_players_vision"),
+			checked);
 	}
 }

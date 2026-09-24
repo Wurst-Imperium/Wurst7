@@ -88,7 +88,7 @@ public final class KillauraHack extends Hack
 			false);
 	
 	private final EntityFilterList entityFilters =
-		EntityFilterList.genericCombat();
+		EntityFilterList.genericMeleeCombat();
 	
 	private Entity target;
 	private Entity renderTarget;
@@ -152,7 +152,7 @@ public final class KillauraHack extends Hack
 		if(pauseOnContainers.shouldPause())
 			return;
 		
-		Stream<Entity> stream = EntityUtils.getAttackableEntities();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		double rangeSq = range.getValueSq();
 		stream =
 			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);

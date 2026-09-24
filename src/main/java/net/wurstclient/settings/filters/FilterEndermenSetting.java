@@ -9,47 +9,50 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.EnderMan;
+import net.wurstclient.util.text.WText;
 
 public final class FilterEndermenSetting extends AttackDetectingEntityFilter
 {
-	private FilterEndermenSetting(String description, Mode selected,
+	private FilterEndermenSetting(WText description, Mode selected,
 		boolean checked)
 	{
 		super("Filter endermen", description, selected, checked);
 	}
 	
-	public FilterEndermenSetting(String description, Mode selected)
+	public FilterEndermenSetting(WText description, Mode selected)
 	{
 		this(description, selected, false);
 	}
 	
 	@Override
-	public boolean onTest(Entity e)
+	protected boolean onFiltersOut(Entity e)
 	{
-		return !(e instanceof EnderMan);
+		return e instanceof EnderMan;
 	}
 	
 	@Override
-	public boolean ifCalmTest(Entity e)
+	protected boolean ifCalmFiltersOut(Entity e)
 	{
-		return !(e instanceof EnderMan ee) || ee.isAggressive();
+		return e instanceof EnderMan ee && !ee.isCreepy();
 	}
 	
 	public static FilterEndermenSetting genericCombat(Mode selected)
 	{
 		return new FilterEndermenSetting(
-			"description.wurst.setting.generic.filter_endermen_combat",
+			WText.translated(
+				"description.wurst.setting.generic.filter_endermen_combat"),
 			selected);
 	}
 	
 	public static FilterEndermenSetting genericVision(Mode selected)
 	{
 		return new FilterEndermenSetting(
-			"description.wurst.setting.generic.filter_endermen_vision",
+			WText.translated(
+				"description.wurst.setting.generic.filter_endermen_vision"),
 			selected);
 	}
 	
-	public static FilterEndermenSetting onOffOnly(String description,
+	public static FilterEndermenSetting onOffOnly(WText description,
 		boolean onByDefault)
 	{
 		return new FilterEndermenSetting(description, null, onByDefault);

@@ -28,7 +28,7 @@ public abstract class WorldEnvironmentAttributeAccessMixin
 		"getValue(Lnet/minecraft/world/attribute/EnvironmentAttribute;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/attribute/SpatialAttributeInterpolator;)Ljava/lang/Object;"},
 		at = @At("RETURN"),
 		require = 2)
-	public Object onGetAttributeValue(Object original,
+	public Object onGetDimensionValueOrGetValue(Object original,
 		EnvironmentAttribute<?> attribute)
 	{
 		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;

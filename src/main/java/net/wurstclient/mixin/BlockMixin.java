@@ -21,7 +21,7 @@ import net.wurstclient.hack.HackList;
 public abstract class BlockMixin implements ItemLike
 {
 	@Inject(method = "getSpeedFactor()F", at = @At("HEAD"), cancellable = true)
-	private void onGetVelocityMultiplier(CallbackInfoReturnable<Float> cir)
+	private void onGetSpeedFactor(CallbackInfoReturnable<Float> cir)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax == null || !hax.noSlowdownHack.isEnabled())

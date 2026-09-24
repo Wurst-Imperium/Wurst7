@@ -36,7 +36,19 @@ public abstract class EntityFilterTest extends SingleplayerTest
 		});
 	}
 	
-	protected final void assertFilterResult(String description,
+	protected final void assertFilteredOut(String description,
+		Supplier<EntityFilter> filterSupplier, Supplier<Entity> spawner)
+	{
+		assertFilterResult(description, filterSupplier, spawner, false);
+	}
+	
+	protected final void assertAllowed(String description,
+		Supplier<EntityFilter> filterSupplier, Supplier<Entity> spawner)
+	{
+		assertFilterResult(description, filterSupplier, spawner, true);
+	}
+	
+	private void assertFilterResult(String description,
 		Supplier<EntityFilter> filterSupplier, Supplier<Entity> spawner,
 		boolean expectedResult)
 	{

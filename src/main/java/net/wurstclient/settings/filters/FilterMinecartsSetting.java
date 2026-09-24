@@ -9,17 +9,18 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.wurstclient.util.text.WText;
 
 public final class FilterMinecartsSetting extends EntityFilterCheckbox
 {
-	public FilterMinecartsSetting(String description, boolean checked)
+	public FilterMinecartsSetting(WText description, boolean checked)
 	{
 		super("Filter minecarts", description, checked);
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof AbstractMinecart);
+		return e instanceof AbstractMinecart;
 	}
 }

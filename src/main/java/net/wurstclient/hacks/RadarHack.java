@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -42,11 +43,14 @@ public final class RadarHack extends Hack implements UpdateListener
 		new EntityFilterList(FilterPlayersSetting.genericVision(false),
 			FilterSleepingSetting.genericVision(false),
 			FilterHostileSetting.genericVision(false),
+			FilterNeutralSetting
+				.genericVision(AttackDetectingEntityFilter.Mode.OFF),
 			FilterPassiveSetting.genericVision(false),
 			FilterPassiveWaterSetting.genericVision(false),
 			FilterBatsSetting.genericVision(true),
 			FilterSlimesSetting.genericVision(false),
-			FilterInvisibleSetting.genericVision(false));
+			FilterInvisibleSetting.genericVision(false),
+			FilterInteractionsSetting.genericVision(false));
 	
 	public RadarHack()
 	{
@@ -81,9 +85,9 @@ public final class RadarHack extends Hack implements UpdateListener
 	public void onUpdate()
 	{
 		entities.clear();
-		Stream<LivingEntity> stream =
-			EntityUtils.getAliveEntities(LivingEntity.class)
-				.filter(EntityUtils.IS_NOT_SELF);
+		Stream<Entity> stream = EntityUtils.getAliveEntities()
+			.filter(e -> e instanceof LivingEntity || e instanceof Interaction)
+			.filter(EntityUtils.IS_NOT_SELF);
 		
 		stream = entityFilters.applyTo(stream);
 		

@@ -24,7 +24,8 @@ public abstract class LanguageManagerMixin
 	@Inject(
 		method = "onResourceManagerReload(Lnet/minecraft/server/packs/resources/ResourceManager;)V",
 		at = @At("HEAD"))
-	private void onReload(ResourceManager manager, CallbackInfo ci)
+	private void onOnResourceManagerReload(ResourceManager manager,
+		CallbackInfo ci)
 	{
 		// Using a mixin for this because WurstClient.initialize() runs too
 		// early to call ResourceManager.registerReloader()
