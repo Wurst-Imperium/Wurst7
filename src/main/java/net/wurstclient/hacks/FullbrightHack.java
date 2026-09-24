@@ -73,6 +73,21 @@ public final class FullbrightHack extends Hack implements UpdateListener
 		});
 	}
 	
+	public void turnOffInstantly()
+	{
+		setEnabled(false);
+		
+		if(wasGammaChanged)
+		{
+			ISimpleOption.get(MC.options.gamma())
+				.forceSetValue(defaultGamma.getValue());
+			wasGammaChanged = false;
+		}
+		
+		nightVisionStrength = 0;
+		BadOptimizationsLightmapHook.markForUpdate();
+	}
+	
 	@Override
 	public void onUpdate()
 	{
