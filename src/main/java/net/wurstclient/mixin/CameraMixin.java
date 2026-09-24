@@ -75,24 +75,6 @@ public abstract class CameraMixin
 	}
 	
 	/**
-	 * Prevents blindness and darkness effects from changing the sky when
-	 * AntiBlind is enabled.
-	 *
-	 * <p>
-	 * In 26.1-snapshot-7, those effects don't appear to visibly change the sky
-	 * even without this mixin. Might be a bug in that snapshot.
-	 */
-	@Inject(
-		method = "extractRenderState(Lnet/minecraft/client/renderer/state/level/CameraRenderState;F)V",
-		at = @At("RETURN"))
-	private void onExtractRenderState(CameraRenderState cameraState,
-		float partialTicks, CallbackInfo ci)
-	{
-		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
-			cameraState.entityRenderState.doesMobEffectBlockSky = false;
-	}
-	
-	/**
 	 * Makes the zoom work.
 	 */
 	@ModifyReturnValue(method = "calculateFov(F)F", at = @At("RETURN"))
