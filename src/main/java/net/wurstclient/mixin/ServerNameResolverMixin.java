@@ -43,7 +43,7 @@ public class ServerNameResolverMixin
 		method = "resolveAddress(Lnet/minecraft/client/multiplayer/resolver/ServerAddress;)Ljava/util/Optional;",
 		at = @At("HEAD"),
 		cancellable = true)
-	public void resolve(ServerAddress address,
+	public void onResolveAddress(ServerAddress address,
 		CallbackInfoReturnable<Optional<ResolvedServerAddress>> cir)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())

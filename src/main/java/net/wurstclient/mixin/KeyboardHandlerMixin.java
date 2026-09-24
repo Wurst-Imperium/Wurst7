@@ -22,7 +22,7 @@ public class KeyboardHandlerMixin
 {
 	@Inject(method = "keyPress(JILnet/minecraft/client/input/KeyEvent;)V",
 		at = @At("HEAD"))
-	private void onOnKey(long windowHandle, int action, KeyEvent arg,
+	private void onKeyPress(long windowHandle, int action, KeyEvent arg,
 		CallbackInfo ci)
 	{
 		EventManager.fire(new KeyPressEvent(arg.key(), arg.scancode(), action,

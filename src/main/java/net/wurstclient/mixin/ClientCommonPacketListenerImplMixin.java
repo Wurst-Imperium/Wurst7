@@ -27,7 +27,7 @@ public abstract class ClientCommonPacketListenerImplMixin
 	@WrapOperation(method = "send(Lnet/minecraft/network/protocol/Packet;)V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V"))
-	private void wrapSendPacket(Connection connection, Packet<?> packet,
+	private void wrapSend(Connection connection, Packet<?> packet,
 		Operation<Void> original)
 	{
 		PacketOutputEvent event = new PacketOutputEvent(packet);

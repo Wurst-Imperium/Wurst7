@@ -7,37 +7,40 @@
  */
 package net.wurstclient.settings.filters;
 
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.player.Player;
+import net.wurstclient.util.text.WText;
 
 public final class FilterSleepingSetting extends EntityFilterCheckbox
 {
-	public FilterSleepingSetting(String description, boolean checked)
+	public FilterSleepingSetting(WText description, boolean checked)
 	{
-		super("Filter sleeping", description, checked);
+		super("Filter sleeping players", description, checked);
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		if(!(e instanceof Player pe))
-			return true;
+		if(!(e instanceof Avatar pe))
+			return false;
 		
-		return !pe.isSleeping() && pe.getPose() != Pose.SLEEPING;
+		return pe.isSleeping() || pe.getPose() == Pose.SLEEPING;
 	}
 	
 	public static FilterSleepingSetting genericCombat(boolean checked)
 	{
 		return new FilterSleepingSetting(
-			"description.wurst.setting.generic.filter_sleeping_combat",
+			WText.translated(
+				"description.wurst.setting.generic.filter_sleeping_combat"),
 			checked);
 	}
 	
 	public static FilterSleepingSetting genericVision(boolean checked)
 	{
 		return new FilterSleepingSetting(
-			"description.wurst.setting.generic.filter_sleeping_vision",
+			WText.translated(
+				"description.wurst.setting.generic.filter_sleeping_vision"),
 			checked);
 	}
 }

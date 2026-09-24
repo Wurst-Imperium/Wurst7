@@ -28,7 +28,7 @@ public abstract class LocalPlayerMixin
 	@WrapOperation(method = "shouldStopRunSprinting()Z",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/player/ClientInput;hasForwardImpulse()Z"))
-	private boolean wrapHasForwardMovement(ClientInput input,
+	private boolean wrapHasForwardImpulse(ClientInput input,
 		Operation<Boolean> original)
 	{
 		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldOmniSprint())
@@ -44,7 +44,7 @@ public abstract class LocalPlayerMixin
 	@Inject(method = "isSprintingPossible(Z)Z",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onCanSprint(boolean allowTouchingWater,
+	private void onIsSprintingPossible(boolean allowTouchingWater,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		if(WurstClient.INSTANCE.getHax().autoSprintHack.shouldSprintHungry())

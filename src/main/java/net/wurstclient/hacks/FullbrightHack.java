@@ -199,5 +199,5 @@ public final class FullbrightHack extends Hack implements UpdateListener
 	}
 	
 	// See LocalPlayerMixin.hasEffect() and
-	// GameRendererMixin.onGetNightVisionStrength()
+	// GameRendererMixin.onGetNightVisionScale()
 }

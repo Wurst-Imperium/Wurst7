@@ -20,5 +20,5 @@ public final class NoVignetteHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See GuiMixin.onRenderVignetteOverlay()
+	// See GuiMixin.onExtractVignette()
 }

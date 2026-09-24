@@ -33,7 +33,7 @@ public abstract class CommandSuggestionsMixin
 	private CompletableFuture<Suggestions> pendingSuggestions;
 	
 	@Inject(method = "updateCommandInfo()V", at = @At("TAIL"))
-	private void onRefresh(CallbackInfo ci)
+	private void onUpdateCommandInfo(CallbackInfo ci)
 	{
 		AutoCompleteHack autoComplete =
 			WurstClient.INSTANCE.getHax().autoCompleteHack;

@@ -22,7 +22,7 @@ public abstract class MobEffectInstanceMixin
 	@Inject(method = "tickDownDuration()V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onUpdateDuration(CallbackInfo ci)
+	private void onTickDownDuration(CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().potionSaverHack.isFrozen())
 			ci.cancel();
