@@ -7,10 +7,14 @@
  */
 package net.wurstclient.mixin;
 
+import java.util.Optional;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
@@ -26,6 +30,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.ChatUtils;
 
@@ -66,6 +71,17 @@ public abstract class ClientPacketListenerMixin
 		SystemToast systemToast = new SystemToast(
 			SystemToast.SystemToastId.UNSECURE_SERVER_WARNING, title, message);
 		minecraft.gui.toastManager().addToast(systemToast);
+	}
+	
+	@ModifyExpressionValue(
+		method = "handleExplosion(Lnet/minecraft/network/protocol/game/ClientboundExplodePacket;)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/network/protocol/game/ClientboundExplodePacket;playerKnockback()Ljava/util/Optional;"))
+	private Optional<Vec3> onHandleExplosionPlayerKnockback(
+		Optional<Vec3> original)
+	{
+		return original.map(
+			WurstClient.INSTANCE.getHax().antiKnockbackHack::modifyKnockback);
 	}
 	
 	@Inject(
