@@ -240,7 +240,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	}
 	
 	@Override
-	public boolean isTouchingWaterBypass()
+	public boolean isInWaterBypass()
 	{
 		return super.isInWater();
 	}

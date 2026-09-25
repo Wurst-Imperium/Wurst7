@@ -59,7 +59,7 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 		if(!MC.player.onGround())
 			return;
 		
-		if(!IMC.getPlayer().isTouchingWaterBypass())
+		if(!IMC.getPlayer().isInWaterBypass())
 			return;
 		
 		MC.player.jumpFromGround();
