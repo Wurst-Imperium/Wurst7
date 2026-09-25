@@ -24,15 +24,14 @@ import net.minecraft.world.level.entity.EntityAccess;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VelocityFromEntityCollisionListener.VelocityFromEntityCollisionEvent;
-import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin
 	implements Nameable, EntityAccess, CommandSource
 {
 	/**
-	 * This mixin makes the VelocityFromFluidEvent work, which is used by
-	 * AntiWaterPush.
+	 * Prevents fluid currents from pushing the local player while AntiWaterPush
+	 * is enabled.
 	 */
 	@WrapOperation(method = "updateFluidInteraction()Z",
 		at = @At(value = "INVOKE",
@@ -41,10 +40,8 @@ public abstract class EntityMixin
 	private boolean wrapUpdateFluidInteractionIsPushedByFluid(Entity instance,
 		Operation<Boolean> original)
 	{
-		VelocityFromFluidEvent event = new VelocityFromFluidEvent(instance);
-		EventManager.fire(event);
-		
-		if(event.isCancelled())
+		if(instance == WurstClient.MC.player
+			&& WurstClient.INSTANCE.getHax().antiWaterPushHack.isEnabled())
 			return false;
 		
 		return original.call(instance);

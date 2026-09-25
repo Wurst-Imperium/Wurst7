@@ -11,13 +11,12 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.IsPlayerInWaterListener;
 import net.wurstclient.events.UpdateListener;
-import net.wurstclient.events.VelocityFromFluidListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"anti water push", "NoWaterPush", "no water push"})
-public final class AntiWaterPushHack extends Hack implements UpdateListener,
-	VelocityFromFluidListener, IsPlayerInWaterListener
+public final class AntiWaterPushHack extends Hack
+	implements UpdateListener, IsPlayerInWaterListener
 {
 	private final CheckboxSetting preventSlowdown = new CheckboxSetting(
 		"Prevent slowdown", "Allows you to walk underwater at full speed.\n"
@@ -35,7 +34,6 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(VelocityFromFluidListener.class, this);
 		EVENTS.add(IsPlayerInWaterListener.class, this);
 	}
 	
@@ -43,7 +41,6 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(VelocityFromFluidListener.class, this);
 		EVENTS.remove(IsPlayerInWaterListener.class, this);
 	}
 	
@@ -66,13 +63,6 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onVelocityFromFluid(VelocityFromFluidEvent event)
-	{
-		if(event.getEntity() == MC.player)
-			event.cancel();
-	}
-	
-	@Override
 	public void onIsPlayerInWater(IsPlayerInWaterEvent event)
 	{
 		if(preventSlowdown.isChecked())
@@ -83,4 +73,6 @@ public final class AntiWaterPushHack extends Hack implements UpdateListener,
 	{
 		return preventSlowdown.isChecked();
 	}
+	
+	// See EntityMixin.wrapUpdateFluidInteractionIsPushedByFluid()
 }
