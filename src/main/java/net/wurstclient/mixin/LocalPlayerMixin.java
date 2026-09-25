@@ -35,7 +35,7 @@ import net.wurstclient.InputFaker;
 import net.wurstclient.InputFaker.TempRealInput;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.AirStrafingSpeedListener.AirStrafingSpeedEvent;
+import net.wurstclient.events.FlyingSpeedListener.FlyingSpeedEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.MobEffectListener.MobEffectEvent;
@@ -213,15 +213,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		tempCurrentScreen = null;
 	}
 	
-	/**
-	 * Getter method for what used to be airStrafingSpeed.
-	 * Overridden to allow for the speed to be modified by hacks.
-	 */
 	@Override
 	protected float getFlyingSpeed()
 	{
-		AirStrafingSpeedEvent event =
-			new AirStrafingSpeedEvent(super.getFlyingSpeed());
+		FlyingSpeedEvent event = new FlyingSpeedEvent(super.getFlyingSpeed());
 		EventManager.fire(event);
 		return event.getSpeed();
 	}

@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
-import net.wurstclient.events.AirStrafingSpeedListener;
+import net.wurstclient.events.FlyingSpeedListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
@@ -25,7 +25,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 
 public final class GlideHack extends Hack
-	implements UpdateListener, AirStrafingSpeedListener
+	implements UpdateListener, FlyingSpeedListener
 {
 	private final SliderSetting fallSpeed = new SliderSetting("Fall speed",
 		0.125, 0.005, 0.25, 0.005, ValueDisplay.DECIMAL);
@@ -68,14 +68,14 @@ public final class GlideHack extends Hack
 	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(AirStrafingSpeedListener.class, this);
+		EVENTS.add(FlyingSpeedListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(AirStrafingSpeedListener.class, this);
+		EVENTS.remove(FlyingSpeedListener.class, this);
 	}
 	
 	@Override
@@ -114,7 +114,7 @@ public final class GlideHack extends Hack
 	}
 	
 	@Override
-	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
+	public void onGetFlyingSpeed(FlyingSpeedEvent event)
 	{
 		event.setSpeed(event.getDefaultSpeed() * moveSpeed.getValueF());
 	}
