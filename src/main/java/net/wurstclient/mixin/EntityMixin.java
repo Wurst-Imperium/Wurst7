@@ -22,8 +22,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.VelocityFromEntityCollisionListener.VelocityFromEntityCollisionEvent;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin
@@ -47,16 +45,17 @@ public abstract class EntityMixin
 		return original.call(instance);
 	}
 	
+	/**
+	 * Prevents entity collisions from pushing the local player while
+	 * AntiEntityPush is enabled.
+	 */
 	@Inject(method = "push(Lnet/minecraft/world/entity/Entity;)V",
 		at = @At("HEAD"),
 		cancellable = true)
 	private void onPush(Entity entity, CallbackInfo ci)
 	{
-		VelocityFromEntityCollisionEvent event =
-			new VelocityFromEntityCollisionEvent((Entity)(Object)this);
-		EventManager.fire(event);
-		
-		if(event.isCancelled())
+		if((Object)this == WurstClient.MC.player
+			&& WurstClient.INSTANCE.getHax().antiEntityPushHack.isEnabled())
 			ci.cancel();
 	}
 	
