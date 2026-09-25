@@ -37,7 +37,6 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.FlyingSpeedListener.FlyingSpeedEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
-import net.wurstclient.events.KnockbackListener.KnockbackEvent;
 import net.wurstclient.events.MobEffectListener.MobEffectEvent;
 import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
@@ -224,9 +223,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	@Override
 	public void lerpMotion(Vec3 vec)
 	{
-		KnockbackEvent event = new KnockbackEvent(vec.x, vec.y, vec.z);
-		EventManager.fire(event);
-		super.lerpMotion(new Vec3(event.getX(), event.getY(), event.getZ()));
+		super.lerpMotion(WurstClient.INSTANCE.getHax().antiKnockbackHack
+			.modifyKnockback(vec));
 	}
 	
 	@Override
