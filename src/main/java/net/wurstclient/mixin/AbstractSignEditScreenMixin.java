@@ -32,7 +32,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(method = "init()V", at = @At("HEAD"))
+	@Inject(method = "init()V", at = @At("TAIL"))
 	private void onInit(CallbackInfo ci)
 	{
 		AutoSignHack autoSignHack = WurstClient.INSTANCE.getHax().autoSignHack;
