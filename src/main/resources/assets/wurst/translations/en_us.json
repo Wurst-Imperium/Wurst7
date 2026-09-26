@@ -41,6 +41,7 @@
   "description.wurst.setting.antiafk.show_wait_time": "Displays the remaining wait time in the HackList.",
   "description.wurst.hack.antiblind": "Prevents blindness and darkness effects.\nIncompatible with OptiFine.",
   "description.wurst.hack.anticactus": "Protects you from cactus damage.",
+  "description.wurst.setting.anticactus.prevent_cactus-top_damage": "Sends extra movement packets to protect you when standing on top of a cactus. Works on vanilla and Paper servers. Does not work against Grim, NoCheat+, or Vulcan.\n\n§c§lWARNING:§r You can still take some damage during lag spikes.",
   "description.wurst.hack.antientitypush": "Prevents you from getting pushed by players and mobs.",
   "description.wurst.hack.antihunger": "Slows down your hunger when you are walking.\n\n§c§lWARNING:§r There have been reports of this hack causing you to take extra fall damage under specific, unknown conditions.",
   "description.wurst.hack.antiknockback": "Prevents you from taking knockback from players and mobs.",
