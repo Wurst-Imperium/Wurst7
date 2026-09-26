@@ -9,6 +9,7 @@ package net.wurstclient.other_features;
 
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
+import net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.ConnectionPacketOutputListener;
@@ -27,7 +28,9 @@ public final class VanillaSpoofOtf extends OtherFeature
 	public VanillaSpoofOtf()
 	{
 		super("VanillaSpoof",
-			"Bypasses anti-Fabric plugins by pretending to be a vanilla client.");
+			"Bypasses anti-Fabric plugins by pretending to be a vanilla client."
+				+ "\n\nEnable before connecting. Reconnect after changing this setting."
+				+ "\n\nNot compatible with servers that require mods, for obvious reasons.");
 		addSetting(spoof);
 		
 		EVENTS.add(ConnectionPacketOutputListener.class, this);
@@ -39,24 +42,20 @@ public final class VanillaSpoofOtf extends OtherFeature
 		if(!spoof.isChecked())
 			return;
 		
-		if(!(event
-			.getPacket() instanceof ServerboundCustomPayloadPacket packet))
-			return;
-		
-		// change client brand "fabric" back to "vanilla"
-		if(packet.payload() instanceof BrandPayload)
-			event.setPacket(new ServerboundCustomPayloadPacket(
-				new BrandPayload("vanilla")));
+		if(event.getPacket() instanceof ServerboundCustomPayloadPacket packet)
+		{
+			if(packet.payload() instanceof BrandPayload)
+				event.setPacket(new ServerboundCustomPayloadPacket(
+					new BrandPayload("vanilla")));
+			else
+				// Block mod payloads, including minecraft:register
+				event.cancel();
 			
-		// cancel Fabric's "c:version", "c:register" and
-		// "fabric:custom_ingredient_sync" packets
-		// TODO: Something else is needed to prevent the connection from
-		// hanging when these packets are cancelled.
-		
-		// Identifier channel = packet.payload().getId().id();
-		// if(channel.getNamespace().equals("fabric")
-		// || channel.getNamespace().equals("c"))
-		// event.cancel();
+		}else if(event
+			.getPacket() instanceof ServerboundCustomQueryAnswerPacket packet)
+			// Vanilla replies to login queries with the same ID and no payload
+			event.setPacket(new ServerboundCustomQueryAnswerPacket(
+				packet.transactionId(), null));
 	}
 	
 	@Override
