@@ -317,7 +317,7 @@
   "description.wurst.hack.search": "Helps you to find specific blocks by highlighting them in rainbow color.",
   "description.wurst.hack.skinderp": "Randomly toggles parts of your skin.",
   "description.wurst.hack.sneak": "Makes you sneak automatically.",
-  "description.wurst.hack.snowshoe": "Allows you to walk on powder snow.",
+  "description.wurst.hack.snowshoe": "Allows you to walk on powder snow without freezing.\nDoes not prevent freezing when submerged.",
   "description.wurst.hack.speedhack": "Allows you to run ~2.5x faster than you would by sprinting and jumping.\n\n§6§lWARNING:§r Patched in NoCheat+ version 3.13.2. Will only bypass older versions of NoCheat+.\nType §l/ncp version§r to check a server's NoCheat+ version.",
   "description.wurst.hack.speednuker": "Faster version of Nuker that cannot bypass NoCheat+.",
   "description.wurst.hack.spider": "Allows you to climb up walls like a spider.",
