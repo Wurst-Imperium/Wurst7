@@ -3,5 +3,5 @@
 *.java text eol=crlf whitespace=-blank-at-eol
 *.json text eol=crlf
 *.mcmeta text eol=crlf
-*.bat text eol=crlf
+*.bat text=auto eol=crlf
 *.cmd text eol=crlf
