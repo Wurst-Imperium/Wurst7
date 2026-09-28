@@ -5,9 +5,10 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.autorespawn;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,8 +18,6 @@ import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.DeathListener.DeathEvent;
 import net.wurstclient.hacks.AutoRespawnHack;
 
 @Mixin(DeathScreen.class)
@@ -32,7 +31,8 @@ public abstract class DeathScreenMixin extends Screen
 	@Inject(method = "tick()V", at = @At("TAIL"))
 	private void onTick(CallbackInfo ci)
 	{
-		EventManager.fire(DeathEvent.INSTANCE);
+		if(WurstClient.INSTANCE.getHax().autoRespawnHack.isEnabled())
+			respawn();
 	}
 	
 	@Inject(method = "init()V", at = @At("TAIL"))
@@ -50,7 +50,14 @@ public abstract class DeathScreenMixin extends Screen
 		addRenderableWidget(
 			Button.builder(Component.literal("AutoRespawn: OFF"), b -> {
 				autoRespawn.setEnabled(true);
-				autoRespawn.onDeath();
+				respawn();
 			}).bounds(backButtonX, backButtonY + 48, 200, 20).build());
+	}
+	
+	@Unique
+	private void respawn()
+	{
+		minecraft.player.respawn();
+		minecraft.gui.setScreen(null);
 	}
 }

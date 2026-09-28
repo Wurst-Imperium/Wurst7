@@ -126,7 +126,6 @@
   "description.wurst.hack.parkour": "Při dosažení hrany bloku skáčete automaticky.\nUžitečné pro parkoury a skoko-běhách.",
   "description.wurst.hack.playeresp": "Zvýrazní okolní hráče, včetně figurín.\nESP boxy přátel se zobrazí modře.",
   "description.wurst.hack.portalgui": "Umožňuje otevření inventářů v portálech.",
-  "description.wurst.hack.potionsaver": "Pozastaví všecny efekty lektvarů, dokud stojíte na místě.",
   "description.wurst.hack.prophuntesp": "Umožňuje vidět falešné bloky v Prophuntu.\nVyrobeno pro Mineplexí Prophunt. Může však fungovat i na jiných serverech.",
   "description.wurst.hack.protect": "Bot, který sleduje nejbližší entitu a chrání ji před ostatními entitami.\nPoužijte .protect k ochraně konkrétní entity místo té nejbližší.",
   "description.wurst.hack.radar": "Zobrazí polohu blízkých entit.\n§9modře§r - přátelé\n§cčerveně§r - hráči/figuríny\n§6oranžově§r - nepřátelští mobové\n§ežlutě§r - neutrální mobové\n§azeleně§r - pasivní mobové\n§7šedě§r - ostatní/snímače interakcí",

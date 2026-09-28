@@ -119,7 +119,6 @@
   "description.wurst.hack.parkour": "當到方塊邊緣你會自動跳起身。\n適用於跑酷或跳同跑。",
   "description.wurst.hack.playeresp": "高亮透視附近嘅玩家，包括玩家模型。\n如果係你嘅好友話會顯示藍色框框。",
   "description.wurst.hack.portalgui": "允許你喺傳送門內打開 GUI。",
-  "description.wurst.hack.potionsaver": "當你企住唔郁時凍結所有嘅葯水效果時間。",
   "description.wurst.hack.prophuntesp": "喺捉依因小游戲中知道邊啲係人扮嘅方塊。\n用於 Mineplex 伺服器嘅 Prophunt（捉依因），其他伺服器未必湊效。",
   "description.wurst.hack.protect": "使用 AI 模式保護最近嘅實體，並保護佢免受其他實體嘅傷害。\n使用指令 .protect 嚟保護指定嘅實體，而唔係最近嘅一個。",
   "description.wurst.hack.radar": "生成一個雷達 UI 並顯示附近嘅實體。\n§9藍色§r - 好友\n§c紅色§r - 玩家/玩家模型\n§6橙色§r - 敵對生物\n§e黃色§r - 中立生物\n§a綠色§r - 被動生物\n§7灰色§r - 其他/互動實體",

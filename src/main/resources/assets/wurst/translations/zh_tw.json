@@ -126,7 +126,6 @@
   "description.wurst.hack.parkour": "你會自動跳躍起來，當到方塊的邊緣。\n適用於跑酷或跳和跑。",
   "description.wurst.hack.playeresp": "高亮透視附近的玩家，包括玩家模型。\n如果是你的好友的話會顯示藍色框框。",
   "description.wurst.hack.portalgui": "允許你在傳送門內打開GUI。",
-  "description.wurst.hack.potionsaver": "當你站著不動時凍結所有的藥水效果時間。",
   "description.wurst.hack.prophuntesp": "在躲猫猫小遊戲中知道哪些是人扮的方塊。\n用於Mineplex服務器的Prophunt（躲猫猫），其他服務器未必凑效。",
   "description.wurst.hack.protect": "使用AI模式保護最近的實體，並保護它免受其他實體的傷害。\n使用指令.protect來保護指定的實體，而不是最近的一個。",
   "description.wurst.hack.radar": "生成一個雷達UI並顯示附近的實體。\n§9藍色§r - 好友\n§c紅色§r - 玩家/玩家模型\n§6橘色§r - 敵對生物\n§e黃色§r - 中立生物\n§a綠色§r - 被動生物\n§7灰色§r - 其他/互動實體",

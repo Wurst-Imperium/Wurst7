@@ -10,7 +10,7 @@ package net.wurstclient.hacks;
 import net.minecraft.client.player.LocalPlayer;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.AirStrafingSpeedListener;
+import net.wurstclient.events.FlyingSpeedListener;
 import net.wurstclient.events.IsNormalCubeListener;
 import net.wurstclient.events.PlayerMoveListener;
 import net.wurstclient.events.VisGraphListener;
@@ -20,7 +20,7 @@ import net.wurstclient.hack.Hack;
 @SearchTags({"no clip"})
 public final class NoClipHack extends Hack
 	implements UpdateListener, PlayerMoveListener, IsNormalCubeListener,
-	VisGraphListener, AirStrafingSpeedListener
+	VisGraphListener, FlyingSpeedListener
 {
 	public NoClipHack()
 	{
@@ -35,7 +35,7 @@ public final class NoClipHack extends Hack
 		EVENTS.add(PlayerMoveListener.class, this);
 		EVENTS.add(IsNormalCubeListener.class, this);
 		EVENTS.add(VisGraphListener.class, this);
-		EVENTS.add(AirStrafingSpeedListener.class, this);
+		EVENTS.add(FlyingSpeedListener.class, this);
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public final class NoClipHack extends Hack
 		EVENTS.remove(PlayerMoveListener.class, this);
 		EVENTS.remove(IsNormalCubeListener.class, this);
 		EVENTS.remove(VisGraphListener.class, this);
-		EVENTS.remove(AirStrafingSpeedListener.class, this);
+		EVENTS.remove(FlyingSpeedListener.class, this);
 		
 		MC.player.noPhysics = false;
 	}
@@ -70,7 +70,7 @@ public final class NoClipHack extends Hack
 	}
 	
 	@Override
-	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
+	public void onGetFlyingSpeed(FlyingSpeedEvent event)
 	{
 		event.setSpeed(0.2F);
 	}
