@@ -233,7 +233,6 @@
   "description.wurst.hack.playeresp": "Podświetla pobliskich graczy, w tym manekiny.\nRamki ESP znajomych będą wyświetlane na niebiesko.",
   "description.wurst.hack.portalesp": "Podświetla pobliskie portale.",
   "description.wurst.hack.portalgui": "Umożliwia otwieranie GUI w portalach.",
-  "description.wurst.hack.potionsaver": "Wstrzymuje wszystkie efekty mikstur, gdy stoisz w miejscu.",
   "description.wurst.hack.prophuntesp": "Pozwala zobaczyć fałszywe bloki w Prophuncie.\nStworzony dla Prophunta Mineplexa. Może nie działać na innych serwerach.",
   "description.wurst.hack.protect": "Bot, który podąża za najbliższym bytem i chroni go przed innymi bytami.\nUżyj .protect, aby chronić określony byt zamiast najbliższego.",
   "description.wurst.hack.radar": "Pokazuje lokalizację pobliskich bytów.\n§9niebieski§r - znajomi\n§cczerwony§r - gracze/manekiny\n§6pomarańczowy§r - wrogie moby\n§eżółty§r - neutralne moby\n§azielony§r - pasywne moby\n§7szary§r - inne/byty interakcji",

@@ -100,6 +100,4 @@ public final class AutoStealHack extends Hack
 	{
 		return buttons.isChecked();
 	}
-	
-	// See ContainerScreenMixin and ShulkerBoxScreenMixin
 }

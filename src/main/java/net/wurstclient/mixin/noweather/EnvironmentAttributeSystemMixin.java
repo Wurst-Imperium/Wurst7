@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.noweather;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +20,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.NoWeatherHack;
 
 @Mixin(EnvironmentAttributeSystem.class)
-public abstract class WorldEnvironmentAttributeAccessMixin
+public abstract class EnvironmentAttributeSystemMixin
 	implements EnvironmentAttributeReader
 {
 	@ModifyReturnValue(method = {

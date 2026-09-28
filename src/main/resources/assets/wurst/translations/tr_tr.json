@@ -189,7 +189,6 @@
   "description.wurst.hack.playeresp": "Mankenler dahil yakındaki oyuncuları vurgular.\nArkadaşların ESP kutuları mavi görünür.",
   "description.wurst.hack.portalesp": "Yakındaki portalları vurgular.",
   "description.wurst.hack.portalgui": "Portallarda GUI'leri açmanızı sağlar.",
-  "description.wurst.hack.potionsaver": "Hareketsiz dururken tüm iksir efektlerini dondurur.",
   "description.wurst.hack.prophuntesp": "Prophunt'ta sahte blokları görmenizi sağlar.\nMineplex Prophunt için yapılmıştır. Diğer sunucularda çalışmayabilir.",
   "description.wurst.hack.protect": "En yakındaki varlığı takip eden ve onu diğer varlıklardan koruyan bir bot.\nBelirli bir varlığı korumak için .protect kullanın.",
   "description.wurst.hack.radar": "Yakındaki varlıkların konumunu gösterir.\n§9mavi§r - arkadaşlar\n§ckırmızı§r - oyuncular/mankenler\n§6turuncu§r - düşman moblar\n§esarı§r - nötr moblar\n§ayeşil§r - pasif moblar\n§7gri§r - diğerleri/etkileşim varlıkları",
