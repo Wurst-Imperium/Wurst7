@@ -10,8 +10,6 @@ plugins {
 	id "net.wimods.github-compile-summary" version "0.1.1"
 }
 
-def ENV = System.getenv()
-
 version = project.mod_version
 group = project.maven_group
 
@@ -240,27 +238,35 @@ def getChangelog(String platform, String from) {
 import org.kohsuke.github.GHReleaseBuilder
 import org.kohsuke.github.GitHub
 
-task github(dependsOn: build) {
+tasks.register("github") {
+	dependsOn tasks.named("build")
+
+	def githubToken = providers.environmentVariable("GITHUB_TOKEN")
+	def repoId = project.mcx_repo_id
+	def ghVersion = getGhVersion()
+	def changelogImage = getChangelogImage("github.com/${repoId}/releases/tag/${ghVersion}")
+	def jarFile = tasks.named("jar", Jar).flatMap { it.archiveFile }
+	def sourcesJarFile = tasks.named("sourcesJar", Jar).flatMap { it.archiveFile }
+	inputs.files(jarFile, sourcesJarFile)
+
 	onlyIf {
-		ENV.GITHUB_TOKEN
+		!githubToken.getOrElse("").isEmpty()
 	}
 	
 	doLast {
-		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repoId = project.mcx_repo_id
+		def github = GitHub.connectUsingOAuth(githubToken.get())
 		def repository = github.getRepository(repoId)
-		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
-			releaseBuilder.body(getChangelogImage("github.com/${repoId}/releases/tag/${ghVersion}"))
+			releaseBuilder.body(changelogImage)
 			releaseBuilder.prerelease(ghVersion.contains("pre"))
 			ghRelease = releaseBuilder.create()
 		}
 		
-		ghRelease.uploadAsset(jar.archiveFile.get().getAsFile(), "application/java-archive")
-		ghRelease.uploadAsset(sourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
+		ghRelease.uploadAsset(jarFile.get().asFile, "application/java-archive")
+		ghRelease.uploadAsset(sourcesJarFile.get().asFile, "application/java-archive")
 	}
 }
 
@@ -268,18 +274,21 @@ import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHMilestoneState
 import java.time.Instant
 
-task closeMilestone {
+tasks.register("closeMilestone") {
+	def githubToken = providers.environmentVariable("GITHUB_TOKEN")
+	def repoId = project.gh_repo_id
+	def ghVersion = getGhVersion()
+	def changelog = getChangelog("GitHub", "github.com/${repoId}/milestone/${ghVersion}")
+
 	onlyIf {
-		ENV.GITHUB_TOKEN
+		!githubToken.getOrElse("").isEmpty()
 	}
 	
 	doLast {
-		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repoId = project.gh_repo_id
+		def github = GitHub.connectUsingOAuth(githubToken.get())
 		def repository = github.getRepository(repoId)
-		def ghVersion = getGhVersion()
 		
-		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
+		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState
 		def milestone = repository.listMilestones(GHIssueState.ALL).find { it.title == ghVersion }
 		if (milestone == null) {
 			milestone = repository.createMilestone(ghVersion, "")
@@ -287,7 +296,7 @@ task closeMilestone {
 		
 		if (milestone.getState() != GHMilestoneState.CLOSED) {
 			milestone.setDueOn(Date.from(Instant.now()))
-			milestone.setDescription(getChangelog("GitHub", "github.com/${repoId}/milestone/${ghVersion}"))
+			milestone.setDescription(changelog)
 			milestone.close()
 		}
 	}
