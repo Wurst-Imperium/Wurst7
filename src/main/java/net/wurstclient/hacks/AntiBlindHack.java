@@ -7,15 +7,17 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.world.effect.MobEffects;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.MobEffectListener;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"AntiBlindness", "NoBlindness", "anti blindness", "no blindness",
 	"AntiDarkness", "NoDarkness", "anti darkness", "no darkness",
 	"AntiWardenEffect", "anti warden effect", "NoWardenEffect",
 	"no warden effect"})
-public final class AntiBlindHack extends Hack
+public final class AntiBlindHack extends Hack implements MobEffectListener
 {
 	public AntiBlindHack()
 	{
@@ -23,7 +25,23 @@ public final class AntiBlindHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See CameraMixin.onExtractRenderState(),
-	// LivingEntityMixin.onGetEffectBlendFactor(),
-	// LocalPlayerMixin.hasEffect()
+	@Override
+	protected void onEnable()
+	{
+		EVENTS.add(MobEffectListener.class, this);
+	}
+	
+	@Override
+	protected void onDisable()
+	{
+		EVENTS.remove(MobEffectListener.class, this);
+	}
+	
+	@Override
+	public void onMobEffect(MobEffectEvent event)
+	{
+		if(event.getEffect() == MobEffects.BLINDNESS
+			|| event.getEffect() == MobEffects.DARKNESS)
+			event.setInstance(null);
+	}
 }

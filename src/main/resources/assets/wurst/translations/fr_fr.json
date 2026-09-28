@@ -122,7 +122,6 @@
   "description.wurst.hack.parkour": "Vous fait sauter automatiquement lorsque vous atteignez le bord d'un bloc.\nUtile pour les parcours.",
   "description.wurst.hack.playeresp": "Met en évidence les joueurs à proximité, y compris les mannequins.\nLes boîtes ESP des amis apparaîtront en bleu.",
   "description.wurst.hack.portalgui": "Vous permet d'ouvrir les GUI dans des portails.",
-  "description.wurst.hack.potionsaver": "Gèle tous les effets de potion pendant que vous êtes immobile.",
   "description.wurst.hack.prophuntesp": "Permet de voir les faux blocs dans le Prophunt.\nConçu pour le Prohunt de Mineplex. Peut ne pas fonctionner sur d'autres serveurs.",
   "description.wurst.hack.protect": "Un bot qui suit l'entité la plus proche et la protège des autres entités.\nUtilisez .protect pour protéger une entité spécifique au lieu de la plus proche.",
   "description.wurst.hack.radar": "Affiche l'emplacement des entités à proximité.\n§9bleu§r - amis\n§crouge§r - joueurs/mannequins\n§6orange§r - créatures hostiles\n§ejaune§r - créatures neutres\n§avert§r - créatures passives\n§7gris§r - autres/entités d'interaction",

@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.anticactus;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CactusBlock;
@@ -20,8 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.CactusCollisionShapeListener.CactusCollisionShapeEvent;
+import net.wurstclient.hack.HackList;
 
 @Mixin(CactusBlock.class)
 public abstract class CactusBlockMixin extends Block
@@ -35,15 +35,15 @@ public abstract class CactusBlockMixin extends Block
 		method = "getCollisionShape(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onGetCollisionShape(BlockState state, BlockGetter world,
+	private void onGetCollisionShape(BlockState state, BlockGetter level,
 		BlockPos pos, CollisionContext context,
 		CallbackInfoReturnable<VoxelShape> cir)
 	{
-		CactusCollisionShapeEvent event = new CactusCollisionShapeEvent();
-		EventManager.fire(event);
+		if(level instanceof ServerLevel)
+			return;
 		
-		VoxelShape collisionShape = event.getCollisionShape();
-		if(collisionShape != null)
-			cir.setReturnValue(collisionShape);
+		HackList hax = WurstClient.INSTANCE.getHax();
+		if(hax != null && hax.antiCactusHack.isEnabled())
+			cir.setReturnValue(hax.antiCactusHack.getCollisionShape());
 	}
 }

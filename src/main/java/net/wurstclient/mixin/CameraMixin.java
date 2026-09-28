@@ -11,13 +11,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.level.material.FogType;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.CameraDistanceHack;
@@ -54,24 +52,6 @@ public abstract class CameraMixin
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
 			cir.setReturnValue(FogType.NONE);
-	}
-	
-	/**
-	 * Prevents blindness and darkness effects from changing the sky when
-	 * AntiBlind is enabled.
-	 *
-	 * <p>
-	 * In 26.1-snapshot-7, those effects don't appear to visibly change the sky
-	 * even without this mixin. Might be a bug in that snapshot.
-	 */
-	@Inject(
-		method = "extractRenderState(Lnet/minecraft/client/renderer/state/level/CameraRenderState;F)V",
-		at = @At("RETURN"))
-	private void onExtractRenderState(CameraRenderState cameraState,
-		float partialTicks, CallbackInfo ci)
-	{
-		if(WurstClient.INSTANCE.getHax().antiBlindHack.isEnabled())
-			cameraState.entityRenderState.doesMobEffectBlockSky = false;
 	}
 	
 	/**
