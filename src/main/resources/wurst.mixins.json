@@ -60,6 +60,7 @@
     "nametags.MobRendererMixin",
     "nametags.SubmitNodeCollectionMixin",
     "nobackground.ScreenMixin",
+    "noclip.LocalPlayerMixin",
     "nofog.AtmosphericFogEnvironmentMixin",
     "nofog.FogRendererMixin",
     "noshieldoverlay.ItemInHandRendererMixin",

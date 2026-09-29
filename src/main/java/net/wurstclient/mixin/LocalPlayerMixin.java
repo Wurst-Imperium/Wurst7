@@ -36,7 +36,6 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.FlyingSpeedListener.FlyingSpeedEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.MobEffectListener.MobEffectEvent;
-import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
@@ -105,14 +104,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	private void onSendPositionTAIL(CallbackInfo ci)
 	{
 		EventManager.fire(PostMotionEvent.INSTANCE);
-	}
-	
-	@Inject(
-		method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
-		at = @At("HEAD"))
-	private void onMove(MoverType type, Vec3 offset, CallbackInfo ci)
-	{
-		EventManager.fire(PlayerMoveEvent.INSTANCE);
 	}
 	
 	@Inject(method = "isAutoJumpEnabled()Z",

@@ -8,20 +8,30 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.FlyingSpeedListener;
-import net.wurstclient.events.IsNormalCubeListener;
-import net.wurstclient.events.PlayerMoveListener;
-import net.wurstclient.events.VisGraphListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.mixinterface.IKeyMapping;
 
 @SearchTags({"no clip"})
-public final class NoClipHack extends Hack
-	implements UpdateListener, PlayerMoveListener, IsNormalCubeListener,
-	VisGraphListener, FlyingSpeedListener
+public final class NoClipHack extends Hack implements UpdateListener
 {
+	private Vec3 direction = Vec3.ZERO;
+	private int preJumpTicks;
+	private int postJumpTicks;
+	private boolean needsButtonRelease;
+	
 	public NoClipHack()
 	{
 		super("NoClip");
@@ -32,64 +42,111 @@ public final class NoClipHack extends Hack
 	protected void onEnable()
 	{
 		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(PlayerMoveListener.class, this);
-		EVENTS.add(IsNormalCubeListener.class, this);
-		EVENTS.add(VisGraphListener.class, this);
-		EVENTS.add(FlyingSpeedListener.class, this);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(PlayerMoveListener.class, this);
-		EVENTS.remove(IsNormalCubeListener.class, this);
-		EVENTS.remove(VisGraphListener.class, this);
-		EVENTS.remove(FlyingSpeedListener.class, this);
-		
-		MC.player.noPhysics = false;
+		direction = Vec3.ZERO;
+		preJumpTicks = 0;
+		postJumpTicks = 0;
+		needsButtonRelease = false;
 	}
 	
 	@Override
 	public void onUpdate()
 	{
+		double forward = (MC.options.keyUp.isDown() ? 1 : 0)
+			- (MC.options.keyDown.isDown() ? 1 : 0);
+		double left = (MC.options.keyLeft.isDown() ? 1 : 0)
+			- (MC.options.keyRight.isDown() ? 1 : 0);
+		double up = (MC.options.keyJump.isDown() ? 1 : 0)
+			- (IKeyMapping.get(MC.options.keyShift).isActuallyDown() ? 1 : 0);
+		
+		direction = new Vec3(left, up, forward).normalize()
+			.yRot(-MC.player.getYRot() * Mth.DEG_TO_RAD);
+		if(direction.lengthSqr() == 0)
+			needsButtonRelease = false;
+	}
+	
+	public boolean shouldSendPosition()
+	{
+		if(!isEnabled())
+			return true;
+		
+		if(postJumpTicks > 0)
+		{
+			postJumpTicks--;
+			return false;
+		}
+		
 		LocalPlayer player = MC.player;
+		if(!player.isAlive() || player.isPassenger() || player.isSpectator()
+			|| MC.gui.screen() != null
+			|| WURST.getHax().freecamHack.isMovingCamera()
+			|| MC.level.noBlockCollision(player,
+				player.getBoundingBox().deflate(1e-5))
+			|| needsButtonRelease || direction.lengthSqr() == 0)
+		{
+			preJumpTicks = 0;
+			return true;
+		}
 		
-		player.noPhysics = true;
-		player.fallDistance = 0;
-		player.setOnGround(false);
+		if(preJumpTicks++ <= 2)
+			return false;
+		preJumpTicks = 0;
 		
-		player.getAbilities().flying = false;
-		player.setDeltaMovement(0, 0, 0);
+		needsButtonRelease = true;
+		boolean canUseElytra =
+			!player.isFallFlying() && !player.isInWater()
+				&& !player.getAbilities().flying
+				&& !player.hasEffect(MobEffects.LEVITATION)
+				&& LivingEntity.canGlideUsing(
+					player.getItemBySlot(EquipmentSlot.CHEST),
+					EquipmentSlot.CHEST);
+		double maxDistance = canUseElytra ? 38 : 22;
 		
-		float speed = 0.2F;
-		if(MC.options.keyJump.isDown())
-			player.push(0, speed, 0);
-		if(MC.options.keyShift.isDown())
-			player.push(0, -speed, 0);
+		Vec3 destination = findDestination(direction, maxDistance);
+		if(destination == null)
+			return true;
+		
+		Connection connection = player.connection.getConnection();
+		for(int i = 0; i < 4; i++)
+			connection.send(
+				new ServerboundMovePlayerPacket.StatusOnly(false, false), null,
+				false);
+		
+		if(canUseElytra)
+			connection.send(
+				new ServerboundPlayerCommandPacket(player,
+					ServerboundPlayerCommandPacket.Action.START_FALL_FLYING),
+				null, false);
+			
+		// Vanilla sends the final packet, flushes the batch and
+		// remembers the position
+		player.setPos(destination);
+		postJumpTicks = 2;
+		return true;
 	}
 	
-	@Override
-	public void onGetFlyingSpeed(FlyingSpeedEvent event)
+	private Vec3 findDestination(Vec3 direction, double maxDistance)
 	{
-		event.setSpeed(0.2F);
-	}
-	
-	@Override
-	public void onPlayerMove()
-	{
-		MC.player.noPhysics = true;
-	}
-	
-	@Override
-	public void onIsNormalCube(IsNormalCubeEvent event)
-	{
-		event.cancel();
-	}
-	
-	@Override
-	public void onVisGraph(VisGraphEvent event)
-	{
-		event.cancel();
+		LocalPlayer player = MC.player;
+		for(double distance = 0.25; distance <= maxDistance; distance += 0.25)
+		{
+			Vec3 offset = direction.scale(distance);
+			AABB box = player.getBoundingBox().move(offset);
+			
+			if(!MC.level.getWorldBorder().isWithinBounds(box)
+				|| !BlockPos.betweenClosedStream(box.deflate(1e-7))
+					.allMatch(MC.level::isLoaded))
+				return null;
+			
+			if(MC.level.noCollision(player, box))
+				return player.position().add(offset);
+		}
+		
+		return null;
 	}
 }
