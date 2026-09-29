@@ -4,7 +4,7 @@
   },
   "passes": [
     {
-      "vertex_shader": "minecraft:core/screenquad",
+      "vertex_shader": "minecraft:core/screentriangle",
       "fragment_shader": "wurst:post/lsd",
       "inputs": [
         {
@@ -35,7 +35,7 @@
       }
     },
     {
-      "vertex_shader": "minecraft:core/screenquad",
+      "vertex_shader": "minecraft:core/screentriangle",
       "fragment_shader": "minecraft:post/blit",
       "inputs": [
         {

@@ -66,6 +66,7 @@
     "freecam.LocalPlayerMixin",
     "healthtags.EntityRendererMixin",
     "nametags.EntityRendererMixin",
+    "nametags.InventoryScreenMixin",
     "nametags.LivingEntityRendererMixin",
     "nametags.MobRendererMixin",
     "nametags.SubmitNodeCollectionMixin",

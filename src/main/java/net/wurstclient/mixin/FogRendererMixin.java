@@ -34,14 +34,15 @@ public class FogRendererMixin
 	 * it.
 	 */
 	@Inject(
-		method = "setupFog(Lnet/minecraft/client/Camera;ILnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;)Lnet/minecraft/client/renderer/fog/FogData;",
+		method = "setupFog(Lnet/minecraft/client/Camera;ILnet/minecraft/client/DeltaTracker;FLnet/minecraft/client/multiplayer/ClientLevel;Z)Lnet/minecraft/client/renderer/fog/FogData;",
 		at = @At(value = "FIELD",
 			target = "Lnet/minecraft/client/renderer/fog/FogData;renderDistanceEnd:F",
 			opcode = Opcodes.PUTFIELD,
 			shift = At.Shift.AFTER))
 	private void modifyFogData(Camera camera, int renderDistanceInChunks,
 		DeltaTracker deltaTracker, float darkenWorldAmount, ClientLevel level,
-		CallbackInfoReturnable<FogData> cir, @Local FogData fog)
+		boolean shouldCreateBossFog, CallbackInfoReturnable<FogData> cir,
+		@Local FogData fog)
 	{
 		if(!WurstClient.INSTANCE.getHax().noFogHack.isEnabled())
 			return;

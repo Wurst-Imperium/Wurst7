@@ -49,8 +49,7 @@ public abstract class CameraMixin
 			cir.setReturnValue(desiredCameraDistance);
 	}
 	
-	@Inject(
-		method = "getFluidInCamera()Lnet/minecraft/world/level/material/FogType;",
+	@Inject(method = "getFogType()Lnet/minecraft/world/level/material/FogType;",
 		at = @At("HEAD"),
 		cancellable = true)
 	private void onGetSubmersionType(CallbackInfoReturnable<FogType> cir)

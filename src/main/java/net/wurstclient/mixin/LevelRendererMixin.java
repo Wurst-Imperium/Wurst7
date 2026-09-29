@@ -7,7 +7,6 @@
  */
 package net.wurstclient.mixin;
 
-import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,12 +32,11 @@ public class LevelRendererMixin
 	private LevelRenderState levelRenderState;
 	
 	@Inject(
-		method = "render(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;Lorg/joml/Vector4f;ZZ)V",
+		method = "render(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;Z)V",
 		at = @At("RETURN"))
 	private void onRender(GraphicsResourceAllocator allocator,
 		boolean renderBlockOutline, CameraRenderState cameraState,
-		GpuBufferSlice gpuBufferSlice, Vector4f vector4f,
-		boolean shouldRenderSky, boolean consistentDepthRequired,
+		GpuBufferSlice gpuBufferSlice, boolean consistentDepthRequired,
 		CallbackInfo ci)
 	{
 		PoseStack matrixStack = new PoseStack();

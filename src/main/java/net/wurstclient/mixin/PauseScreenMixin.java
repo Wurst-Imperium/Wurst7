@@ -102,7 +102,7 @@ public abstract class PauseScreenMixin extends Screen
 				|| button.getBottom() < y || button.getY() > y + height)
 				continue;
 			
-			if(!button.visible)
+			if(!button.isVisible())
 				continue;
 			
 			buttonsInTheWay.add(button);
@@ -131,7 +131,7 @@ public abstract class PauseScreenMixin extends Screen
 		@Local LinearLayout iconButtonRow)
 	{
 		if(WurstClient.INSTANCE.getOtfs().wurstOptionsOtf.isVisibleInGameMenu())
-			iconButtonRow.visitWidgets(button -> button.visible = false);
+			iconButtonRow.visitWidgets(button -> button.setVisible(false));
 	}
 	
 	@Inject(
