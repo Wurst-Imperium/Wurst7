@@ -138,12 +138,14 @@ public final class NoClipHack extends Hack implements UpdateListener
 			Vec3 offset = direction.scale(distance);
 			AABB box = player.getBoundingBox().move(offset);
 			
-			if(!MC.level.getWorldBorder().isWithinBounds(box)
-				|| !BlockPos.betweenClosedStream(box.deflate(1e-7))
-					.allMatch(MC.level::isLoaded))
+			if(!BlockPos.betweenClosedStream(box.deflate(1e-7))
+				.allMatch(MC.level::isLoaded))
 				return null;
-			
-			if(MC.level.noCollision(player, box))
+				
+			// noEntityCollision() only rejects entities with solid collision,
+			// like boats. Normal entity collisions are allowed.
+			if(MC.level.noBlockCollision(player, box)
+				&& MC.level.noEntityCollision(player, box))
 				return player.position().add(offset);
 		}
 		
