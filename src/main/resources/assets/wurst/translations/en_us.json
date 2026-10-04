@@ -254,6 +254,7 @@
   "description.wurst.hack.newchunks": "Highlights newly generated chunks around you.",
   "description.wurst.hack.nobackground": "Removes the dark background behind inventories.",
   "description.wurst.hack.noclip": "Allows you to teleport through up to 21 blocks (or 37 with elytra equipped).\n\nYou must be at least partially inside a block to start, e.g. by dropping sand on yourself or walking into a door while it's moving. You won't be pushed out of the block while NoClip is enabled.\n\nThen just use the movement keys (including jump/sneak) to choose a direction and you'll appear on the other side. Nothing will happen if there are too many blocks to get through.\n\n§c§lWARNING:§r Teleporting down can cause a lot of fall damage, even with NoFall!",
+  "description.wurst.setting.noclip.show_passable_blocks": "Outlines blocks you can teleport through near the crosshair.\n§agreen§r = passable without elytra\n§bcyan§r = passable only with elytra",
   "description.wurst.hack.nocomcrash": "Lags and crashes servers using the Nocom exploit.\nDoes not work on Paper servers. Tested working on Vanilla, Spigot, and Fabric. Can be disabled by some AntiCheats.",
   "description.wurst.hack.nofall": "Protects you from fall damage.",
   "description.wurst.setting.nofall.allow_elytra": "Also tries to prevent fall damage while you are flying with an elytra.\n\n§c§lWARNING:§r This can sometimes cause you to stop flying unexpectedly.",
