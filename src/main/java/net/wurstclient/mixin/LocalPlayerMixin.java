@@ -152,6 +152,26 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		tempCurrentScreen = null;
 	}
 	
+	/**
+	 * Prevents flying up with Flight activating elytra.
+	 */
+	@Override
+	public boolean canGlide()
+	{
+		return !WurstClient.INSTANCE.getHax().flightHack.isEnabled()
+			&& super.canGlide();
+	}
+	
+	/**
+	 * Prevents Flight getting horizontally stuck if elytra is already active.
+	 */
+	@Override
+	public boolean isFallFlying()
+	{
+		return !WurstClient.INSTANCE.getHax().flightHack.isEnabled()
+			&& super.isFallFlying();
+	}
+	
 	@Override
 	protected float getFlyingSpeed()
 	{
