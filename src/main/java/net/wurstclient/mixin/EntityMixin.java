@@ -23,17 +23,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.VelocityFromEntityCollisionListener.VelocityFromEntityCollisionEvent;
-import net.wurstclient.events.VelocityFromFluidListener.VelocityFromFluidEvent;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin
 	implements Nameable, EntityAccess, CommandSource
 {
 	/**
-	 * This mixin makes the VelocityFromFluidEvent work, which is used by
-	 * AntiWaterPush. It's set to require 0 because it doesn't work in Forge,
+	 * Prevents fluid currents from pushing the local player while AntiWaterPush
+	 * is enabled. It's set to require 0 because it doesn't work in Forge,
 	 * when using Sinytra Connector.
 	 */
 	@WrapWithCondition(
@@ -45,21 +42,21 @@ public abstract class EntityMixin
 		require = 0)
 	private boolean shouldSetVelocity(Entity instance, Vec3 velocity)
 	{
-		VelocityFromFluidEvent event = new VelocityFromFluidEvent(instance);
-		EventManager.fire(event);
-		return !event.isCancelled();
+		return instance != WurstClient.MC.player
+			|| !WurstClient.INSTANCE.getHax().antiWaterPushHack.isEnabled();
 	}
 	
+	/**
+	 * Prevents entity collisions from pushing the local player while
+	 * AntiEntityPush is enabled.
+	 */
 	@Inject(method = "push(Lnet/minecraft/world/entity/Entity;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onPushAwayFrom(Entity entity, CallbackInfo ci)
+	private void onPush(Entity entity, CallbackInfo ci)
 	{
-		VelocityFromEntityCollisionEvent event =
-			new VelocityFromEntityCollisionEvent((Entity)(Object)this);
-		EventManager.fire(event);
-		
-		if(event.isCancelled())
+		if((Object)this == WurstClient.MC.player
+			&& WurstClient.INSTANCE.getHax().antiEntityPushHack.isEnabled())
 			ci.cancel();
 	}
 	

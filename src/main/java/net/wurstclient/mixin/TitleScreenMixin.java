@@ -39,7 +39,7 @@ public abstract class TitleScreenMixin extends Screen
 	 * run in demo mode, as the Realms button doesn't exist there.
 	 */
 	@Inject(method = "createNormalMenuOptions(II)I", at = @At("RETURN"))
-	private void onAddNormalWidgets(int y, int spacingY,
+	private void onCreateNormalMenuOptions(int y, int spacingY,
 		CallbackInfoReturnable<Integer> cir)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
@@ -87,7 +87,7 @@ public abstract class TitleScreenMixin extends Screen
 		method = "getMultiplayerDisabledReason()Lnet/minecraft/network/chat/Component;",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onGetMultiplayerDisabledText(
+	private void onGetMultiplayerDisabledReason(
 		CallbackInfoReturnable<Component> cir)
 	{
 		cir.setReturnValue(null);

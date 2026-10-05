@@ -37,9 +37,8 @@ public class ScreenEffectRendererMixin
 		method = "renderWater(Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private static void onRenderUnderwaterOverlay(Minecraft client,
-		PoseStack matrices, MultiBufferSource vertexConsumerProvider,
-		CallbackInfo ci)
+	private static void onRenderWater(Minecraft client, PoseStack matrices,
+		MultiBufferSource vertexConsumerProvider, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())
 			ci.cancel();

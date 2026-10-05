@@ -81,14 +81,14 @@ public class JoinMultiplayerScreenMixin extends Screen
 	}
 	
 	@Inject(method = "repositionElements()V", at = @At("TAIL"))
-	private void onRefreshWidgetPositions(CallbackInfo ci)
+	private void onRepositionElements(CallbackInfo ci)
 	{
 		updateLastServerButton();
 	}
 	
 	@Inject(method = "join(Lnet/minecraft/client/multiplayer/ServerData;)V",
 		at = @At("HEAD"))
-	private void onConnect(ServerData entry, CallbackInfo ci)
+	private void onJoin(ServerData entry, CallbackInfo ci)
 	{
 		LastServerRememberer.setLastServer(entry);
 		updateLastServerButton();

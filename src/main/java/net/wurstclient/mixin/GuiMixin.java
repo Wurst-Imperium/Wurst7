@@ -25,13 +25,13 @@ import net.wurstclient.hack.HackList;
 @Mixin(Gui.class)
 public class GuiMixin
 {
-	// runs after extractScoreboardSidebar()
+	// runs after renderScoreboardSidebar()
 	// and before tabList.setVisible()
 	@Inject(
 		method = "renderTabList(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V",
 		at = @At("HEAD"))
-	private void onRenderPlayerList(GuiGraphics context,
-		DeltaTracker tickCounter, CallbackInfo ci)
+	private void onRenderTabList(GuiGraphics context, DeltaTracker tickCounter,
+		CallbackInfo ci)
 	{
 		if(WurstClient.MC.debugEntries.isOverlayVisible())
 			return;
@@ -44,7 +44,7 @@ public class GuiMixin
 		method = "renderTextureOverlay(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/resources/Identifier;F)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onRenderOverlay(GuiGraphics context, Identifier texture,
+	private void onRenderTextureOverlay(GuiGraphics context, Identifier texture,
 		float opacity, CallbackInfo ci)
 	{
 		if(texture == null)
@@ -63,7 +63,7 @@ public class GuiMixin
 	}
 	
 	@Inject(method = "renderVignette", at = @At("HEAD"), cancellable = true)
-	private void onRenderVignetteOverlay(GuiGraphics context, Entity entity,
+	private void onRenderVignette(GuiGraphics context, Entity entity,
 		CallbackInfo ci)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
