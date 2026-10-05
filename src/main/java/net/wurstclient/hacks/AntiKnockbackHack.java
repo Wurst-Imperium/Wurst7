@@ -7,16 +7,16 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.KnockbackListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"anti knockback", "AntiVelocity", "anti velocity", "NoKnockback",
 	"no knockback", "AntiKB", "anti kb"})
-public final class AntiKnockbackHack extends Hack implements KnockbackListener
+public final class AntiKnockbackHack extends Hack
 {
 	private final SliderSetting hStrength =
 		new SliderSetting("Horizontal Strength",
@@ -40,26 +40,15 @@ public final class AntiKnockbackHack extends Hack implements KnockbackListener
 		addSetting(vStrength);
 	}
 	
-	@Override
-	protected void onEnable()
+	public Vec3 modifyKnockback(Vec3 original)
 	{
-		EVENTS.add(KnockbackListener.class, this);
-	}
-	
-	@Override
-	protected void onDisable()
-	{
-		EVENTS.remove(KnockbackListener.class, this);
-	}
-	
-	@Override
-	public void onKnockback(KnockbackEvent event)
-	{
+		if(!isEnabled())
+			return original;
+		
 		double verticalMultiplier = 1 - vStrength.getValue();
 		double horizontalMultiplier = 1 - hStrength.getValue();
 		
-		event.setX(event.getDefaultX() * horizontalMultiplier);
-		event.setY(event.getDefaultY() * verticalMultiplier);
-		event.setZ(event.getDefaultZ() * horizontalMultiplier);
+		return original.multiply(horizontalMultiplier, verticalMultiplier,
+			horizontalMultiplier);
 	}
 }

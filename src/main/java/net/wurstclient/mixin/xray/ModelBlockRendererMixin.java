@@ -44,9 +44,9 @@ public abstract class ModelBlockRendererMixin implements ItemLike
 		method = "shouldRenderFace(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos;)Z",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/world/level/block/Block;shouldRenderFace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z"))
-	private boolean onRenderSmoothOrFlat(BlockState state,
-		BlockState otherState, Direction side, Operation<Boolean> original,
-		BlockAndTintGetter world, BlockState stateButFromTheOtherMethod,
+	private boolean onShouldRenderFace(BlockState state, BlockState otherState,
+		Direction side, Operation<Boolean> original, BlockAndTintGetter world,
+		BlockState stateButFromTheOtherMethod,
 		Direction sideButFromTheOtherMethod, BlockPos neighborPos)
 	{
 		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;

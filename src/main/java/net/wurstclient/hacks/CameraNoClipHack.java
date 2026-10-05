@@ -20,5 +20,5 @@ public final class CameraNoClipHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See CameraMixin.onClipToSpace()
+	// See CameraMixin.onGetMaxZoom()
 }

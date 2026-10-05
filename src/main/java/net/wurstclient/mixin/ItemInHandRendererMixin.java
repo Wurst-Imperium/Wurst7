@@ -27,7 +27,7 @@ public abstract class ItemInHandRendererMixin
 		method = "submitHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/player/LocalPlayer;I)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onRenderHandsWithItems(float tickProgress, PoseStack matrices,
+	private void onSubmitHandsWithItems(float tickProgress, PoseStack matrices,
 		SubmitNodeCollector entityRenderCommandQueue, LocalPlayer player,
 		int light, CallbackInfo ci)
 	{
