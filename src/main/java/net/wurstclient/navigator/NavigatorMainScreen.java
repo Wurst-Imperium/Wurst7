@@ -7,10 +7,10 @@
  */
 package net.wurstclient.navigator;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.awt.Rectangle;
 import java.util.ArrayList;
-
-import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -77,30 +77,30 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		int keyCode = context.key();
 		boolean hasShiftDown = context.hasShiftDown();
 		
-		if(keyCode == GLFW.GLFW_KEY_ENTER)
+		if(keyCode == InputConstants.KEY_RETURN)
 			leftClick(selectedFeature);
 		
-		if(keyCode == GLFW.GLFW_KEY_SPACE)
+		if(keyCode == InputConstants.KEY_SPACE)
 			expand(selectedFeature);
 		
-		if(keyCode == GLFW.GLFW_KEY_RIGHT
-			|| keyCode == GLFW.GLFW_KEY_TAB && !hasShiftDown)
+		if(keyCode == InputConstants.KEY_RIGHT
+			|| keyCode == InputConstants.KEY_TAB && !hasShiftDown)
 		{
 			if(selectedFeature + 1 < navigatorDisplayList.size())
 				selectedFeature++;
 			
-		}else if(keyCode == GLFW.GLFW_KEY_LEFT
-			|| keyCode == GLFW.GLFW_KEY_TAB && hasShiftDown)
+		}else if(keyCode == InputConstants.KEY_LEFT
+			|| keyCode == InputConstants.KEY_TAB && hasShiftDown)
 		{
 			if(selectedFeature - 1 > -1)
 				selectedFeature--;
 			
-		}else if(keyCode == GLFW.GLFW_KEY_DOWN)
+		}else if(keyCode == InputConstants.KEY_DOWN)
 		{
 			if(selectedFeature + 3 < navigatorDisplayList.size())
 				selectedFeature += 3;
 			
-		}else if(keyCode == GLFW.GLFW_KEY_UP)
+		}else if(keyCode == InputConstants.KEY_UP)
 			if(selectedFeature - 3 > -1)
 				selectedFeature -= 3;
 	}
@@ -115,7 +115,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			return;
 		
 		// back button
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(button == InputConstants.MOUSE_BUTTON_4)
 		{
 			WurstClient.MC.gui.setScreen((Screen)null);
 			return;
@@ -125,16 +125,16 @@ public final class NavigatorMainScreen extends NavigatorScreen
 			return;
 		
 		// arrow click, shift click, wheel click
-		if(button == GLFW.GLFW_MOUSE_BUTTON_LEFT
+		if(button == InputConstants.MOUSE_BUTTON_LEFT
 			&& (hasShiftDown || hoveringArrow)
-			|| button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE)
+			|| button == InputConstants.MOUSE_BUTTON_MIDDLE)
 		{
 			expand(hoveredFeature);
 			return;
 		}
 		
 		// left click
-		if(button == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+		if(button == InputConstants.MOUSE_BUTTON_LEFT)
 			leftClick(hoveredFeature);
 	}
 	

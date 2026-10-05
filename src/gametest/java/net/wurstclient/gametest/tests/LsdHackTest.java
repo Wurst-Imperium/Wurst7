@@ -41,8 +41,8 @@ public final class LsdHackTest extends SingleplayerTest
 		
 		runWurstCommand("t LSD on");
 		waitFor(
-			mc -> LsdHack.LSD_POST_EFFECT
-				.equals(mc.gameRenderer.currentPostEffect()),
+			mc -> mc.player.getActivePostEffects()
+				.contains(LsdHack.LSD_POST_EFFECT),
 			"LSD post-effect did not activate.");
 		
 		// At this phase, the wool should look green.
@@ -52,7 +52,9 @@ public final class LsdHackTest extends SingleplayerTest
 		
 		// Clean up
 		runWurstCommand("t LSD off");
-		waitFor(mc -> mc.gameRenderer.currentPostEffect() == null,
+		waitFor(
+			mc -> !mc.player.getActivePostEffects()
+				.contains(LsdHack.LSD_POST_EFFECT),
 			"LSD post-effect did not deactivate.");
 		setBlocksAndWait(blocks -> blocks.fill(-12, -60, 10, 12, -48, 10,
 			Blocks.SMOOTH_STONE));

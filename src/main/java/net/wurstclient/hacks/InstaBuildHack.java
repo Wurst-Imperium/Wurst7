@@ -28,7 +28,6 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.AutoBuildTemplate;
 import net.wurstclient.util.BlockPlacer;
 import net.wurstclient.util.BlockPlacer.BlockPlacingParams;
@@ -184,8 +183,7 @@ public final class InstaBuildHack extends Hack
 				&& !MC.player.getMainHandItem().is(item))
 				giveOrSelectItem(item);
 			
-			InteractionSimulator.rightClickBlock(params.toHitResult(),
-				SwingHand.OFF);
+			InteractionSimulator.rightClickBlock(params.toHitResult());
 		}
 		
 		inventory.setSelectedSlot(oldSlot);

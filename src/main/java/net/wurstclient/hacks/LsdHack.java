@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.List;
+
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.wurstclient.Category;
@@ -30,22 +32,21 @@ public final class LsdHack extends Hack
 	{
 		WURST.getHax().remoteViewHack.setEnabled(false);
 		
-		if(!(MC.getCameraEntity() instanceof Player))
+		if(!(MC.getCameraEntity() instanceof Player) || MC.player == null)
 		{
 			setEnabled(false);
 			return;
 		}
 		
-		if(MC.gameRenderer.currentPostEffect() != null)
-			MC.gameRenderer.clearPostEffect();
-		
-		MC.gameRenderer.setPostEffect(LSD_POST_EFFECT);
+		List<Identifier> activePostEffects = MC.player.getActivePostEffects();
+		if(!activePostEffects.contains(LSD_POST_EFFECT))
+			activePostEffects.add(LSD_POST_EFFECT);
 	}
 	
 	@Override
 	protected void onDisable()
 	{
-		if(MC.gameRenderer.currentPostEffect() != null)
-			MC.gameRenderer.clearPostEffect();
+		if(MC.player != null)
+			MC.player.getActivePostEffects().remove(LSD_POST_EFFECT);
 	}
 }

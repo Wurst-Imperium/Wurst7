@@ -9,7 +9,6 @@ package net.wurstclient.hacks;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.EntityHitResult;
 import net.wurstclient.Category;
@@ -19,11 +18,11 @@ import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.mixinterface.IKeyMapping;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
 
@@ -47,8 +46,8 @@ public final class TriggerBotHack extends Hack
 			100, 0, 1000, 50, ValueDisplay.INTEGER.withPrefix("\u00b1")
 				.withSuffix("ms").withLabel(0, "off"));
 	
-	private final SwingHandSetting swingHand =
-		new SwingHandSetting(this, SwingHand.CLIENT);
+	private final AttackSwingSetting attackSwing =
+		new AttackSwingSetting(this, AttackSwing.CLIENT);
 	
 	private final CheckboxSetting attackWhileBlocking =
 		new CheckboxSetting("Attack while blocking",
@@ -65,7 +64,7 @@ public final class TriggerBotHack extends Hack
 			+ " attacking manually.\n\n"
 			+ "\u00a7c\u00a7lWARNING:\u00a7r Simulating mouse clicks can lead"
 			+ " to unexpected behavior, like in-game menus clicking themselves."
-			+ " Also, the \"Swing hand\" and \"Attack while blocking\" settings"
+			+ " Also, the \"Attack swing\" and \"Attack while blocking\" settings"
 			+ " will not work while this option is enabled.",
 		false);
 	
@@ -82,7 +81,7 @@ public final class TriggerBotHack extends Hack
 		addSetting(range);
 		addSetting(speed);
 		addSetting(speedRandMS);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 		addSetting(attackWhileBlocking);
 		addSetting(simulateMouseClick);
 		
@@ -163,7 +162,7 @@ public final class TriggerBotHack extends Hack
 		}else
 		{
 			MC.gameMode.attack(player, target);
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			attackSwing.swing();
 		}
 		
 		speed.resetTimer(speedRandMS.getValue());

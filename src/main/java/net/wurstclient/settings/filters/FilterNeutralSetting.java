@@ -16,7 +16,7 @@ import net.minecraft.world.entity.animal.goat.Goat;
 import net.minecraft.world.entity.animal.nautilus.AbstractNautilus;
 import net.minecraft.world.entity.animal.panda.Panda;
 import net.minecraft.world.entity.animal.wolf.Wolf;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
 import net.wurstclient.util.MobDisposition;
 import net.wurstclient.util.text.WText;
@@ -54,7 +54,7 @@ public final class FilterNeutralSetting extends AttackDetectingEntityFilter
 		if(mob instanceof Bee bee)
 			return !bee.isAngry() && !bee.isAggressive();
 		
-		if(mob instanceof EnderMan enderman)
+		if(mob instanceof Enderman enderman)
 			return !enderman.isCreepy();
 		
 		if(mob instanceof Pufferfish pufferfish)

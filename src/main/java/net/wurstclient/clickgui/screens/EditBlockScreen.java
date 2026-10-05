@@ -7,8 +7,9 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -82,11 +83,11 @@ public final class EditBlockScreen extends Screen
 	{
 		switch(context.key())
 		{
-			case GLFW.GLFW_KEY_ENTER:
+			case InputConstants.KEY_RETURN:
 			done();
 			break;
 			
-			case GLFW.GLFW_KEY_ESCAPE:
+			case InputConstants.KEY_ESCAPE:
 			minecraft.gui.setScreen(prevScreen);
 			break;
 		}

@@ -8,7 +8,7 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.wurstclient.util.text.WText;
 
 public final class FilterEndermenSetting extends AttackDetectingEntityFilter
@@ -27,13 +27,13 @@ public final class FilterEndermenSetting extends AttackDetectingEntityFilter
 	@Override
 	protected boolean onFiltersOut(Entity e)
 	{
-		return e instanceof EnderMan;
+		return e instanceof Enderman;
 	}
 	
 	@Override
 	protected boolean ifCalmFiltersOut(Entity e)
 	{
-		return e instanceof EnderMan ee && !ee.isCreepy();
+		return e instanceof Enderman ee && !ee.isCreepy();
 	}
 	
 	public static FilterEndermenSetting genericCombat(Mode selected)

@@ -8,7 +8,6 @@
 package net.wurstclient;
 
 import net.minecraft.client.renderer.rendertype.LayeringTransform;
-import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
@@ -22,7 +21,6 @@ public enum WurstRenderLayers
 	public static final RenderType LINES = RenderType.create("wurst:lines",
 		RenderSetup.builder(WurstShaderPipelines.DEPTH_TEST_LINES)
 			.setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-			.setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
 			.createRenderSetup());
 	
 	/**
@@ -33,7 +31,6 @@ public enum WurstRenderLayers
 		RenderType.create("wurst:esp_lines",
 			RenderSetup.builder(WurstShaderPipelines.ESP_LINES)
 				.setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-				.setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
 				.createRenderSetup());
 	
 	/**

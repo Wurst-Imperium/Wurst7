@@ -20,6 +20,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.TextFieldSetting;
 import net.wurstclient.util.MathUtils;
+import net.wurstclient.util.SdlUtils;
 
 @SearchTags({"telescope", "optifine"})
 @DontBlock
@@ -130,8 +131,13 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		if(MC.gui.screen() != null && !zoomInScreens.isChecked())
 			return false;
 		
-		return InputConstants.isKeyDown(MC.getWindow(),
-			InputConstants.getKey(keybind.getValue()).getValue());
+		InputConstants.Key key = InputConstants.getKey(keybind.getValue());
+		int code = key.getValue();
+		
+		if(key.getType() == InputConstants.Type.MOUSE)
+			return SdlUtils.isMouseButtonPressed(code);
+		
+		return InputConstants.isKeyDown(code);
 	}
 	
 	private boolean isValidKeybind(String keybind)

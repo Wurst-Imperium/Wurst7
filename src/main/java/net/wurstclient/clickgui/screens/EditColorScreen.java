@@ -7,14 +7,14 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
-
-import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -240,11 +240,11 @@ public final class EditColorScreen extends Screen
 	{
 		switch(context.key())
 		{
-			case GLFW.GLFW_KEY_ENTER:
+			case InputConstants.KEY_RETURN:
 			done();
 			break;
 			
-			case GLFW.GLFW_KEY_ESCAPE:
+			case InputConstants.KEY_ESCAPE:
 			minecraft.gui.setScreen(prevScreen);
 			break;
 		}

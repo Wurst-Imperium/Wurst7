@@ -1,18 +1,18 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <minecraft:globals.glsl>
+#include <minecraft:globals.glsl>
 
 uniform sampler2D DiffuseSampler;
 
-in vec2 texCoord;
-in vec2 oneTexel;
+layout(location = 0) in vec2 texCoord;
 
 layout(std140) uniform LSDConfig {
     vec2 Frequency;
     vec2 WobbleAmount;
 };
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 vec3 hue(float h)
 {

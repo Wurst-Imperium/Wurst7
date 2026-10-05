@@ -7,8 +7,6 @@
  */
 package net.wurstclient.keybinds;
 
-import org.lwjgl.glfw.GLFW;
-
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.gui.screens.Screen;
@@ -40,7 +38,7 @@ public final class KeybindProcessor
 	@Override
 	public void onKeyPress(KeyPressEvent event)
 	{
-		if(event.getAction() != GLFW.GLFW_PRESS)
+		if(event.getAction() != InputConstants.PRESS)
 			return;
 		
 		if(!isKeybindProcessingAllowed())
@@ -58,7 +56,7 @@ public final class KeybindProcessor
 	@Override
 	public void onMouseButtonPress(MouseButtonPressEvent event)
 	{
-		if(event.getAction() != GLFW.GLFW_PRESS)
+		if(event.getAction() != InputConstants.PRESS)
 			return;
 		
 		if(!isKeybindProcessingAllowed())
@@ -75,8 +73,7 @@ public final class KeybindProcessor
 	
 	private boolean isKeybindProcessingAllowed()
 	{
-		if(InputConstants.isKeyDown(WurstClient.MC.getWindow(),
-			GLFW.GLFW_KEY_F3))
+		if(InputConstants.isKeyDown(InputConstants.KEY_F3))
 			return false;
 		
 		Screen screen = WurstClient.MC.gui.screen();

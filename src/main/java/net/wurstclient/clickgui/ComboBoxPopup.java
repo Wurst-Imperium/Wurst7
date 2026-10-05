@@ -7,7 +7,7 @@
  */
 package net.wurstclient.clickgui;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -40,7 +40,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	@Override
 	public void handleMouseClick(int mouseX, int mouseY, int mouseButton)
 	{
-		if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+		if(mouseButton != InputConstants.MOUSE_BUTTON_LEFT)
 			return;
 		
 		int yi1 = getY() - 11;

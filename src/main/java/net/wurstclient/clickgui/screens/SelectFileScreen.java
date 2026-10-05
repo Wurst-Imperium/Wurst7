@@ -7,12 +7,13 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import com.mojang.blaze3d.Blaze3D;
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -25,7 +26,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Util;
 import net.wurstclient.settings.FileSetting;
 import net.wurstclient.util.WurstColors;
 
@@ -70,7 +70,7 @@ public final class SelectFileScreen extends Screen
 	
 	private void openFolder()
 	{
-		Util.getPlatform().openFile(setting.getFolder().toFile());
+		Blaze3D.openPath(setting.getFolder());
 	}
 	
 	private void openPrevScreen()
@@ -114,9 +114,9 @@ public final class SelectFileScreen extends Screen
 	@Override
 	public boolean keyPressed(KeyEvent context)
 	{
-		if(context.key() == GLFW.GLFW_KEY_ENTER)
+		if(context.key() == InputConstants.KEY_RETURN)
 			done();
-		else if(context.key() == GLFW.GLFW_KEY_ESCAPE)
+		else if(context.key() == InputConstants.KEY_ESCAPE)
 			openPrevScreen();
 		
 		return super.keyPressed(context);

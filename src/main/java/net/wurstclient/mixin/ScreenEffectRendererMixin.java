@@ -16,9 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.state.level.PlayerRenderState;
 import net.wurstclient.WurstClient;
 
 @Mixin(ScreenEffectRenderer.class)
@@ -34,10 +34,11 @@ public class ScreenEffectRendererMixin
 	}
 	
 	@Inject(
-		method = "submitWater(Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;)V",
+		method = "submitWater(Lnet/minecraft/client/renderer/state/level/PlayerRenderState$WaterOverlay;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private static void onSubmitWater(Minecraft client, PoseStack matrices,
+	private static void onSubmitWater(
+		PlayerRenderState.WaterOverlay waterOverlay, PoseStack matrices,
 		SubmitNodeCollector submitNodeCollector, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noOverlayHack.isEnabled())

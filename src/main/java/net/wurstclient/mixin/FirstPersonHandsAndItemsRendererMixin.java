@@ -14,22 +14,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.FirstPersonHandsAndItemsRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.state.level.FirstPersonHandsAndItemsRenderState;
+import net.minecraft.client.renderer.state.level.PlayerRenderState;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hack.HackList;
 
-@Mixin(ItemInHandRenderer.class)
-public abstract class ItemInHandRendererMixin
+@Mixin(FirstPersonHandsAndItemsRenderer.class)
+public abstract class FirstPersonHandsAndItemsRendererMixin
 {
 	@Inject(
-		method = "submitHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/player/LocalPlayer;I)V",
+		method = "submitHandsWithItems(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/PlayerRenderState;Lnet/minecraft/client/renderer/state/level/FirstPersonHandsAndItemsRenderState;)V",
 		at = @At("HEAD"),
 		cancellable = true)
 	private void onSubmitHandsWithItems(float tickProgress, PoseStack matrices,
-		SubmitNodeCollector entityRenderCommandQueue, LocalPlayer player,
-		int light, CallbackInfo ci)
+		SubmitNodeCollector entityRenderCommandQueue, PlayerRenderState player,
+		FirstPersonHandsAndItemsRenderState handsAndItems, CallbackInfo ci)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax.freecamHack.shouldHideHand()

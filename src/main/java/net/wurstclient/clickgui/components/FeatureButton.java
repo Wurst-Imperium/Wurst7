@@ -7,6 +7,8 @@
  */
 package net.wurstclient.clickgui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.util.Objects;
 
 import net.minecraft.client.gui.Font;
@@ -44,7 +46,7 @@ public final class FeatureButton extends Component
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
 		MouseButtonEvent context)
 	{
-		if(mouseButton != 0)
+		if(mouseButton != InputConstants.MOUSE_BUTTON_LEFT)
 			return;
 		
 		if(hasSettings && (mouseX > getX() + getWidth() - 12

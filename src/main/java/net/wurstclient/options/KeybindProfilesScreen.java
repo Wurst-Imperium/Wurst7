@@ -7,13 +7,14 @@
  */
 package net.wurstclient.options;
 
+import com.mojang.blaze3d.Blaze3D;
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -25,7 +26,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.WurstColors;
 import net.wurstclient.util.json.JsonException;
@@ -72,8 +72,8 @@ public final class KeybindProfilesScreen extends Screen
 	
 	private void openFolder()
 	{
-		Util.getPlatform().openFile(
-			WurstClient.INSTANCE.getKeybinds().getProfilesFolder().toFile());
+		Blaze3D
+			.openPath(WurstClient.INSTANCE.getKeybinds().getProfilesFolder());
 	}
 	
 	private void newProfile(String name)
@@ -116,9 +116,9 @@ public final class KeybindProfilesScreen extends Screen
 	@Override
 	public boolean keyPressed(KeyEvent context)
 	{
-		if(context.key() == GLFW.GLFW_KEY_ENTER)
+		if(context.key() == InputConstants.KEY_RETURN)
 			loadSelected();
-		else if(context.key() == GLFW.GLFW_KEY_ESCAPE)
+		else if(context.key() == InputConstants.KEY_ESCAPE)
 			minecraft.gui.setScreen(prevScreen);
 		
 		return super.keyPressed(context);

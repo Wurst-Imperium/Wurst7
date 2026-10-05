@@ -7,11 +7,11 @@
  */
 package net.wurstclient.hacks.templatetool.states;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-
-import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -137,11 +137,11 @@ public final class ChooseNameState extends TemplateToolState
 		{
 			switch(context.key())
 			{
-				case GLFW.GLFW_KEY_ESCAPE:
+				case InputConstants.KEY_ESCAPE:
 				cancelButton.onPress(context);
 				break;
 				
-				case GLFW.GLFW_KEY_ENTER:
+				case InputConstants.KEY_RETURN:
 				doneButton.onPress(context);
 				break;
 			}

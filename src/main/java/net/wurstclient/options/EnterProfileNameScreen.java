@@ -7,9 +7,9 @@
  */
 package net.wurstclient.options;
 
-import java.util.function.Consumer;
+import com.mojang.blaze3d.platform.InputConstants;
 
-import org.lwjgl.glfw.GLFW;
+import java.util.function.Consumer;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -72,11 +72,11 @@ public final class EnterProfileNameScreen extends Screen
 	{
 		switch(context.key())
 		{
-			case GLFW.GLFW_KEY_ENTER:
+			case InputConstants.KEY_RETURN:
 			done();
 			break;
 			
-			case GLFW.GLFW_KEY_ESCAPE:
+			case InputConstants.KEY_ESCAPE:
 			minecraft.gui.setScreen(prevScreen);
 			break;
 		}

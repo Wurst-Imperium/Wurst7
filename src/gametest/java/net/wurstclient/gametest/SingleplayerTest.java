@@ -11,8 +11,9 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
+
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -20,6 +21,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.FirstPersonHandsAndItems;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.wurstclient.gametest.BlockTestHelper.BlockBatch;
@@ -114,10 +116,10 @@ public abstract class SingleplayerTest
 	protected final void waitForHandSwing()
 	{
 		context.waitFor(mc -> {
-			var renderer =
-				mc.getEntityRenderDispatcher().getItemInHandRenderer();
-			return !mc.player.swinging && renderer.mainHandHeight == 1
-				&& renderer.oMainHandHeight == 1;
+			FirstPersonHandsAndItems handsAndItems =
+				mc.player.firstPersonHandsAndItems();
+			return !mc.player.isSwinging() && handsAndItems.mainHandHeight == 1
+				&& handsAndItems.oMainHandHeight == 1;
 		}, 20);
 	}
 	
@@ -128,9 +130,9 @@ public abstract class SingleplayerTest
 	
 	protected final void clearInventory()
 	{
-		input.pressKey(GLFW.GLFW_KEY_T);
+		input.pressKey(InputConstants.KEY_T);
 		input.typeChars("/clear");
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
+		input.pressKey(InputConstants.KEY_RETURN);
 		context.waitTicks(2);
 	}
 	

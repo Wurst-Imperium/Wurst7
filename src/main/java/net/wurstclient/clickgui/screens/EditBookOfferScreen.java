@@ -7,8 +7,9 @@
  */
 package net.wurstclient.clickgui.screens;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -229,7 +230,7 @@ public final class EditBookOfferScreen extends Screen
 		levelField.mouseClicked(context, doubleClick);
 		priceField.mouseClicked(context, doubleClick);
 		
-		if(context.button() == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(context.button() == InputConstants.MOUSE_BUTTON_4)
 			cancelButton.onPress(context);
 		
 		return childClicked;
@@ -240,12 +241,12 @@ public final class EditBookOfferScreen extends Screen
 	{
 		switch(context.key())
 		{
-			case GLFW.GLFW_KEY_ENTER:
+			case InputConstants.KEY_RETURN:
 			if(saveButton.active)
 				saveButton.onPress(context);
 			break;
 			
-			case GLFW.GLFW_KEY_ESCAPE:
+			case InputConstants.KEY_ESCAPE:
 			cancelButton.onPress(context);
 			break;
 			

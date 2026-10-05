@@ -18,7 +18,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -30,11 +29,11 @@ import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.nukers.NukerMultiIdListSetting;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockBreakingCache;
@@ -58,8 +57,8 @@ public final class VeinMinerHack extends Hack
 	private final NukerMultiIdListSetting multiIdList =
 		new NukerMultiIdListSetting("The types of blocks to mine as veins.");
 	
-	private final SwingHandSetting swingHand = new SwingHandSetting(
-		SwingHandSetting.genericMiningDescription(this), SwingHand.SERVER);
+	private final AttackSwingSetting attackSwing = new AttackSwingSetting(
+		AttackSwingSetting.genericMiningDescription(this), AttackSwing.SERVER);
 	
 	private final BlockBreakingCache cache = new BlockBreakingCache();
 	private final OverlayRenderer overlay = new OverlayRenderer();
@@ -82,7 +81,7 @@ public final class VeinMinerHack extends Hack
 		addSetting(range);
 		addSetting(flat);
 		addSetting(multiIdList);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 		addSetting(maxVeinSize);
 		addSetting(checkLOS);
 	}
@@ -159,7 +158,7 @@ public final class VeinMinerHack extends Hack
 			
 			currentBlock = blocks.get(0);
 			BlockBreaker.breakBlocksWithPacketSpam(blocks);
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			attackSwing.swing();
 			return;
 		}
 		
@@ -192,7 +191,7 @@ public final class VeinMinerHack extends Hack
 		if(!MC.gameMode.continueDestroyBlock(params.pos(), params.side()))
 			return false;
 		
-		swingHand.swing(InteractionHand.MAIN_HAND);
+		attackSwing.swing();
 		return true;
 	}
 	

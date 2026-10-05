@@ -19,6 +19,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -27,13 +28,15 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.FaceTargetSetting;
 import net.wurstclient.settings.FaceTargetSetting.FaceTarget;
+import net.wurstclient.settings.InteractSwingSetting;
+import net.wurstclient.settings.InteractSwingSetting.InteractSwing;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.TakeItemsFromSetting;
 import net.wurstclient.settings.TakeItemsFromSetting.TakeItemsFrom;
 import net.wurstclient.settings.filterlists.CrystalAuraFilterList;
@@ -65,8 +68,11 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	private final FaceTargetSetting faceTarget =
 		FaceTargetSetting.withPacketSpam(this, FaceTarget.OFF);
 	
-	private final SwingHandSetting swingHand =
-		new SwingHandSetting(this, SwingHand.CLIENT);
+	private final AttackSwingSetting attackSwing =
+		new AttackSwingSetting(this, AttackSwing.CLIENT);
+	
+	private final InteractSwingSetting interactSwing =
+		new InteractSwingSetting(this, InteractSwing.CLIENT);
 	
 	private final TakeItemsFromSetting takeItemsFrom =
 		TakeItemsFromSetting.withoutHands(this, TakeItemsFrom.INVENTORY);
@@ -83,7 +89,8 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 		addSetting(autoPlace);
 		addSetting(checkLOS);
 		addSetting(faceTarget);
-		addSetting(swingHand);
+		addSetting(attackSwing);
+		addSetting(interactSwing);
 		addSetting(takeItemsFrom);
 		
 		entityFilters.forEach(this::addSetting);
@@ -138,7 +145,6 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 	{
 		ArrayList<BlockPos> newCrystals = new ArrayList<>();
 		
-		boolean shouldSwing = false;
 		for(Entity target : targets)
 		{
 			ArrayList<BlockPos> freeBlocks = getFreeBlocksNear(target);
@@ -146,16 +152,12 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			for(BlockPos pos : freeBlocks)
 				if(placeCrystal(pos))
 				{
-					shouldSwing = true;
 					newCrystals.add(pos);
 					
 					// TODO optional speed limit(?)
 					break;
 				}
 		}
-		
-		if(shouldSwing)
-			swingHand.swing(InteractionHand.MAIN_HAND);
 		
 		return newCrystals;
 	}
@@ -169,7 +171,7 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 		}
 		
 		if(!crystals.isEmpty())
-			swingHand.swing(InteractionHand.MAIN_HAND);
+			attackSwing.swing();
 	}
 	
 	private boolean placeCrystal(BlockPos pos)
@@ -210,8 +212,11 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			faceTarget.face(hitVec);
 			
 			// place block
+			SwingAnimation swingAnimation =
+				MC.player.getMainHandItem().getInteractAnimation();
 			IMC.getInteractionManager().rightClickBlock(neighbor,
 				side.getOpposite(), hitVec);
+			interactSwing.swing(InteractionHand.MAIN_HAND, swingAnimation);
 			
 			return true;
 		}

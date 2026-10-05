@@ -87,12 +87,13 @@ public final class OcclusionCullingTest extends SingleplayerTest
 			// This is based on the simplified render loop in
 			// ClientGameTestContextImpl.doTakeScreenshot().
 			// Just calling extract() alone can leave the game in a bad state.
+			mc.gameRenderer.update(DeltaTracker.ONE);
 			mc.gameRenderer.extract(DeltaTracker.ONE, true);
 			boolean actual = mc.gameRenderer
 				.gameRenderState().levelRenderState.blockEntityRenderStates
 					.stream()
 					.anyMatch(state -> chestPos.equals(state.blockPos));
-			mc.gameRenderer.render(DeltaTracker.ONE, true);
+			mc.gameRenderer.render();
 			RenderSystem.getDevice().createCommandEncoder().submit();
 			return actual == expected;
 		}, 20, errorMsg);

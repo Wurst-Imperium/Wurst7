@@ -7,7 +7,7 @@
  */
 package net.wurstclient.gametest.tests;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -33,7 +33,7 @@ public final class AutoSprintHackTest extends SingleplayerTest
 		runWurstCommand("t AutoSprint on");
 		runWurstCommand("setcheckbox AutoSprint omnidirectional_sprint on");
 		Vec3 start = context.computeOnClient(mc -> mc.player.position());
-		input.holdKeyFor(GLFW.GLFW_KEY_A, 10);
+		input.holdKeyFor(InputConstants.KEY_A, 10);
 		double distance = context.computeOnClient(
 			mc -> mc.player.position().subtract(start).horizontalDistance());
 		context.runOnClient(mc -> {

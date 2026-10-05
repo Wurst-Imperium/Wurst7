@@ -11,18 +11,17 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RotationUtils;
@@ -39,8 +38,8 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
 	
-	private final SwingHandSetting swingHand = new SwingHandSetting(
-		SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
+	private final AttackSwingSetting attackSwing = new AttackSwingSetting(
+		AttackSwingSetting.genericCombatDescription(this), AttackSwing.CLIENT);
 	
 	private final PauseAttackOnContainersSetting pauseOnContainers =
 		new PauseAttackOnContainersSetting(false);
@@ -56,7 +55,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		addSetting(range);
 		addSetting(speed);
 		addSetting(fov);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 		addSetting(pauseOnContainers);
 		
 		entityFilters.forEach(this::addSetting);
@@ -125,7 +124,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			MC.gameMode.attack(MC.player, entity);
 		}
 		
-		swingHand.swing(InteractionHand.MAIN_HAND);
+		attackSwing.swing();
 		speed.resetTimer();
 	}
 }

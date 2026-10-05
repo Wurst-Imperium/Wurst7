@@ -11,8 +11,7 @@ import static net.wurstclient.gametest.WurstClientTestHelper.*;
 
 import java.nio.file.Path;
 
-import org.lwjgl.glfw.GLFW;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -37,7 +36,7 @@ public final class AntiWobbleHackTest extends SingleplayerTest
 		logger.info("Testing AntiWobble hack");
 		
 		// Hide the hand, hack list and overlays
-		input.pressKey(GLFW.GLFW_KEY_F1);
+		input.pressKey(InputConstants.KEY_F1);
 		Path reference = context.takeScreenshot("antiwobble_reference");
 		
 		for(String effect : new String[]{"nausea", "portal"})
@@ -79,7 +78,7 @@ public final class AntiWobbleHackTest extends SingleplayerTest
 		}
 		
 		runWurstCommand("t AntiWobble off");
-		input.pressKey(GLFW.GLFW_KEY_F1);
+		input.pressKey(InputConstants.KEY_F1);
 	}
 	
 	private boolean imagesMatch(Path referencePath, Path screenshotPath)

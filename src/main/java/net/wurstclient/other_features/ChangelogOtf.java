@@ -7,7 +7,10 @@
  */
 package net.wurstclient.other_features;
 
-import net.minecraft.util.Util;
+import java.net.URI;
+
+import com.mojang.blaze3d.Blaze3D;
+
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
@@ -35,6 +38,6 @@ public final class ChangelogOtf extends OtherFeature
 	{
 		String link = new Version(WurstClient.VERSION).getChangelogLink()
 			+ "?utm_source=Wurst+Client&utm_medium=ChangelogOtf&utm_content=View+Changelog";
-		Util.getPlatform().openUri(link);
+		Blaze3D.openUri(URI.create(link));
 	}
 }

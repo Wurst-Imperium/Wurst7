@@ -7,7 +7,7 @@
  */
 package net.wurstclient.clickgui.components;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -35,7 +35,7 @@ public abstract class AbstractListEditButton extends Component
 	public void handleMouseClick(double mouseX, double mouseY, int mouseButton,
 		MouseButtonEvent context)
 	{
-		if(mouseButton != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+		if(mouseButton != InputConstants.MOUSE_BUTTON_LEFT)
 			return;
 		
 		if(mouseX < getX() + getWidth() - buttonWidth - 4)

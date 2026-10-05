@@ -20,7 +20,7 @@ public class PathPos extends BlockPos
 	
 	public PathPos(BlockPos pos, boolean jumping)
 	{
-		super(pos);
+		super(pos.getX(), pos.getY(), pos.getZ());
 		this.jumping = jumping;
 	}
 	

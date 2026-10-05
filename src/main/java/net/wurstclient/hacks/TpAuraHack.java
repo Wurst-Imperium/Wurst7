@@ -13,7 +13,6 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.Category;
@@ -21,12 +20,12 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
+import net.wurstclient.settings.AttackSwingSetting;
+import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
-import net.wurstclient.settings.SwingHandSetting;
-import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RotationUtils;
@@ -49,8 +48,8 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
 		Priority.values(), Priority.ANGLE);
 	
-	private final SwingHandSetting swingHand = new SwingHandSetting(
-		SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
+	private final AttackSwingSetting attackSwing = new AttackSwingSetting(
+		AttackSwingSetting.genericCombatDescription(this), AttackSwing.CLIENT);
 	
 	private final PauseAttackOnContainersSetting pauseOnContainers =
 		new PauseAttackOnContainersSetting(true);
@@ -66,7 +65,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		addSetting(range);
 		addSetting(speed);
 		addSetting(priority);
-		addSetting(swingHand);
+		addSetting(attackSwing);
 		addSetting(pauseOnContainers);
 		
 		entityFilters.forEach(this::addSetting);
@@ -136,7 +135,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 			.sendPlayerLookPacket();
 		
 		MC.gameMode.attack(player, entity);
-		swingHand.swing(InteractionHand.MAIN_HAND);
+		attackSwing.swing();
 		speed.resetTimer();
 	}
 	

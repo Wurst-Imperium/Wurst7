@@ -23,7 +23,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.XRayHack;
 
 /**
- * Last updated for Fabric Renderer Indigo 9.0.0 (Minecraft 26.2).
+ * Last updated for Fabric Renderer Indigo 9.1.7 (Minecraft 26.3-snapshot-5).
  */
 @Pseudo
 @Mixin(

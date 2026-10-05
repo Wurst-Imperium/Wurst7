@@ -7,7 +7,7 @@
  */
 package net.wurstclient.mixin;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeyboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -21,6 +21,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IKeyMapping;
+import net.wurstclient.util.SdlUtils;
 
 @Mixin(KeyMapping.class)
 public abstract class KeyMappingMixin implements IKeyMapping
@@ -33,13 +34,12 @@ public abstract class KeyMappingMixin implements IKeyMapping
 	@Deprecated // use IKeyMapping.isActuallyDown() instead
 	public boolean wurst_isActuallyDown()
 	{
-		Window window = WurstClient.MC.getWindow();
 		int code = key.getValue();
 		
 		if(key.getType() == InputConstants.Type.MOUSE)
-			return GLFW.glfwGetMouseButton(window.handle(), code) == 1;
+			return SdlUtils.isMouseButtonPressed(code);
 		
-		return InputConstants.isKeyDown(window, code);
+		return InputConstants.isKeyDown(code);
 	}
 	
 	@Override
@@ -61,14 +61,10 @@ public abstract class KeyMappingMixin implements IKeyMapping
 		
 		switch(key.getType())
 		{
-			case KEYSYM:
+			case KEYBOARD:
 			mc.keyboardHandler.keyPress(window.handle(), action,
-				new KeyEvent(key.getValue(), 0, 0));
-			break;
-			
-			case SCANCODE:
-			mc.keyboardHandler.keyPress(window.handle(), action,
-				new KeyEvent(GLFW.GLFW_KEY_UNKNOWN, key.getValue(), 0));
+				new KeyEvent(key.getValue(), SDLKeyboard.SDL_GetKeyFromScancode(
+					key.getValue(), (short)0, false), 0));
 			break;
 			
 			case MOUSE:

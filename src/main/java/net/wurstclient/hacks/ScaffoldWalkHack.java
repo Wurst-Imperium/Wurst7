@@ -23,6 +23,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.InteractSwingSetting.InteractSwing;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RotationUtils;
 
@@ -156,7 +157,7 @@ public final class ScaffoldWalkHack extends Hack implements UpdateListener
 			RotationUtils.getNeededRotations(hitVec).sendPlayerLookPacket();
 			IMC.getInteractionManager().rightClickBlock(neighbor, side2,
 				hitVec);
-			MC.player.swing(InteractionHand.MAIN_HAND);
+			InteractSwing.CLIENT.swing(InteractionHand.MAIN_HAND);
 			MC.rightClickDelay = 4;
 			
 			return true;

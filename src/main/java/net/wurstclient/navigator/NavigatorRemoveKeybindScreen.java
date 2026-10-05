@@ -7,12 +7,12 @@
  */
 package net.wurstclient.navigator;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.Font;
@@ -94,8 +94,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	@Override
 	protected void onKeyPress(KeyEvent context)
 	{
-		if(context.key() == GLFW.GLFW_KEY_ESCAPE
-			|| context.key() == GLFW.GLFW_KEY_BACKSPACE)
+		if(context.key() == InputConstants.KEY_ESCAPE
+			|| context.key() == InputConstants.KEY_BACKSPACE)
 			minecraft.gui.setScreen(parent);
 	}
 	
@@ -105,7 +105,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int button = context.button();
 		
 		// back button
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if(button == InputConstants.MOUSE_BUTTON_4)
 		{
 			WurstClient.MC.gui.setScreen(parent);
 			return;
