@@ -10,12 +10,11 @@ package net.wurstclient.hacks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
-import net.wurstclient.events.DeathListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"auto respawn", "AutoRevive", "auto revive"})
-public final class AutoRespawnHack extends Hack implements DeathListener
+public final class AutoRespawnHack extends Hack
 {
 	private final CheckboxSetting button =
 		new CheckboxSetting("Death screen button", "Shows a button on the death"
@@ -26,25 +25,6 @@ public final class AutoRespawnHack extends Hack implements DeathListener
 		super("AutoRespawn");
 		setCategory(Category.COMBAT);
 		addSetting(button);
-	}
-	
-	@Override
-	protected void onEnable()
-	{
-		EVENTS.add(DeathListener.class, this);
-	}
-	
-	@Override
-	protected void onDisable()
-	{
-		EVENTS.remove(DeathListener.class, this);
-	}
-	
-	@Override
-	public void onDeath()
-	{
-		MC.player.respawn();
-		MC.gui.setScreen(null);
 	}
 	
 	public boolean shouldShowButton()

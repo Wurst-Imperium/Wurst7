@@ -50,7 +50,7 @@ public abstract class MultiPlayerGameModeMixin implements IMultiPlayerGameMode
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/player/LocalPlayer;getId()I",
 			ordinal = 0))
-	private void onPlayerDamageBlock(BlockPos pos, Direction direction,
+	private void onContinueDestroyBlock(BlockPos pos, Direction direction,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		EventManager.fire(new BlockBreakingProgressEvent(pos, direction));
@@ -59,7 +59,7 @@ public abstract class MultiPlayerGameModeMixin implements IMultiPlayerGameMode
 	@Inject(
 		method = "releaseUsingItem(Lnet/minecraft/world/entity/player/Player;)V",
 		at = @At("HEAD"))
-	private void onStopUsingItem(Player player, CallbackInfo ci)
+	private void onReleaseUsingItem(Player player, CallbackInfo ci)
 	{
 		EventManager.fire(StopUsingItemEvent.INSTANCE);
 	}
@@ -67,7 +67,7 @@ public abstract class MultiPlayerGameModeMixin implements IMultiPlayerGameMode
 	@Inject(
 		method = "attack(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;)V",
 		at = @At("HEAD"))
-	private void onAttackEntity(Player player, Entity target, CallbackInfo ci)
+	private void onAttack(Player player, Entity target, CallbackInfo ci)
 	{
 		if(player != minecraft.player)
 			return;

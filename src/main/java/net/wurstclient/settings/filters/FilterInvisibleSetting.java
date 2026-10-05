@@ -8,31 +8,41 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
+import net.wurstclient.hack.Hack;
+import net.wurstclient.util.text.WText;
 
 public final class FilterInvisibleSetting extends EntityFilterCheckbox
 {
-	public FilterInvisibleSetting(String description, boolean checked)
+	public FilterInvisibleSetting(WText description, boolean checked)
 	{
 		super("Filter invisible", description, checked);
 	}
 	
-	@Override
-	public boolean test(Entity e)
+	public FilterInvisibleSetting(Hack hack, boolean checked)
 	{
-		return !e.isInvisible();
+		this(WText.translated("description.wurst.setting."
+			+ hack.getName().toLowerCase() + ".filter_invisible"), checked);
+	}
+	
+	@Override
+	protected boolean filtersOut(Entity e)
+	{
+		return e.isInvisible();
 	}
 	
 	public static FilterInvisibleSetting genericCombat(boolean checked)
 	{
 		return new FilterInvisibleSetting(
-			"description.wurst.setting.generic.filter_invisible_combat",
+			WText.translated(
+				"description.wurst.setting.generic.filter_invisible_combat"),
 			checked);
 	}
 	
 	public static FilterInvisibleSetting genericVision(boolean checked)
 	{
 		return new FilterInvisibleSetting(
-			"description.wurst.setting.generic.filter_invisible_vision",
+			WText.translated(
+				"description.wurst.setting.generic.filter_invisible_vision"),
 			checked);
 	}
 }

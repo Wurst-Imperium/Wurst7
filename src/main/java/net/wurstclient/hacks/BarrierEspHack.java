@@ -19,6 +19,4 @@ public class BarrierEspHack extends Hack
 		super("BarrierESP");
 		setCategory(Category.RENDER);
 	}
-	
-	// See ClientLevelMixin
 }
