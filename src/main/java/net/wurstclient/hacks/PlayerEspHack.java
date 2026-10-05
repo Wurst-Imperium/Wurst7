@@ -27,6 +27,7 @@ import net.wurstclient.settings.EspBoxSizeSetting;
 import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.settings.EspStyleSetting.EspStyle;
 import net.wurstclient.settings.filterlists.EntityFilterList;
+import net.wurstclient.settings.filters.FilterCreativeSetting;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.settings.filters.FilterSleepingSetting;
 import net.wurstclient.util.EntityUtils;
@@ -46,7 +47,8 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
 	
 	private final EntityFilterList entityFilters =
-		new EntityFilterList(FilterSleepingSetting.genericVision(false),
+		new EntityFilterList(FilterCreativeSetting.genericVision(false),
+			FilterSleepingSetting.genericVision(false),
 			new FilterInvisibleSetting(this, false));
 	
 	private final ArrayList<Avatar> players = new ArrayList<>();
