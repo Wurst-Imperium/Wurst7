@@ -28,6 +28,9 @@ public final class FollowFilterList extends EntityFilterList
 			new FilterPlayersSetting(description("filter_players"), false));
 		
 		builder.add(
+			new FilterCreativeSetting(description("filter_creative"), false));
+		
+		builder.add(
 			new FilterSleepingSetting(description("filter_sleeping"), false));
 		
 		builder.add(new FilterFlyingSetting(description("filter_flying"), 0));

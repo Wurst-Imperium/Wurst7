@@ -25,8 +25,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.wurstclient.WurstClient;
-import net.wurstclient.event.EventManager;
-import net.wurstclient.events.IsNormalCubeListener.IsNormalCubeEvent;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.hacks.HandNoClipHack;
 
@@ -37,19 +35,6 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 		Property<?>[] properties, Comparable<?>[] values)
 	{
 		super(owner, properties, values);
-	}
-	
-	@Inject(
-		method = "isCollisionShapeFullBlock(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Z",
-		at = @At("TAIL"),
-		cancellable = true)
-	private void onIsCollisionShapeFullBlock(BlockGetter world, BlockPos pos,
-		CallbackInfoReturnable<Boolean> cir)
-	{
-		IsNormalCubeEvent event = new IsNormalCubeEvent();
-		EventManager.fire(event);
-		
-		cir.setReturnValue(cir.getReturnValue() && !event.isCancelled());
 	}
 	
 	@Inject(

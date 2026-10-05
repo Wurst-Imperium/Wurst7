@@ -27,6 +27,9 @@ public final class AnchorAuraFilterList extends EntityFilterList
 		builder.add(
 			new FilterPlayersSetting(description("filter_players"), false));
 		
+		builder.add(
+			new FilterCreativeSetting(description("filter_creative"), true));
+		
 		builder
 			.add(new FilterHostileSetting(description("filter_hostile"), true));
 		
