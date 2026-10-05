@@ -34,7 +34,7 @@ public abstract class CreativeModeInventoryScreenMixin
 		method = "hasPermissions(Lnet/minecraft/world/entity/player/Player;)Z",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onShouldShowOperatorTab(Player player,
+	private void onHasPermissions(Player player,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		if(WurstClient.INSTANCE.isEnabled())

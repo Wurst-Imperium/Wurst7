@@ -86,6 +86,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	// same filters as in Killaura, but with stricter defaults
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
+			FilterCreativeSetting.genericCombat(true),
 			FilterSleepingSetting.genericCombat(true),
 			FilterFlyingSetting.genericCombat(0.5),
 			FilterHostileSetting.genericCombat(false),
@@ -110,9 +111,10 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(true),
 			FilterNamedSetting.genericCombat(false),
-			FilterShulkerBulletSetting.genericCombat(false),
+			FilterProjectilesSetting.genericCombat(false),
 			FilterArmorStandsSetting.genericCombat(false),
-			FilterCrystalsSetting.genericCombat(false));
+			FilterCrystalsSetting.genericCombat(false),
+			FilterInteractionsSetting.genericCombat(true));
 	
 	private Entity target;
 	private float nextYaw;
@@ -175,7 +177,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		if(MC.gui.screen() instanceof AbstractContainerScreen)
 			return;
 		
-		Stream<Entity> stream = EntityUtils.getAttackableEntities();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		double rangeSq = range.getValueSq();
 		stream =
 			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);

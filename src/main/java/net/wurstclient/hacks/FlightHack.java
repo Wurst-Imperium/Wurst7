@@ -12,7 +12,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.AirStrafingSpeedListener;
+import net.wurstclient.events.FlyingSpeedListener;
 import net.wurstclient.events.IsPlayerInWaterListener;
 import net.wurstclient.events.MouseScrollListener;
 import net.wurstclient.events.UpdateListener;
@@ -24,7 +24,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @SearchTags({"FlyHack", "fly hack", "flying"})
 public final class FlightHack extends Hack implements UpdateListener,
-	IsPlayerInWaterListener, AirStrafingSpeedListener, MouseScrollListener
+	IsPlayerInWaterListener, FlyingSpeedListener, MouseScrollListener
 {
 	private final SliderSetting horizontalSpeed = new SliderSetting(
 		"Horizontal speed", "description.wurst.setting.flight.horizontal_speed",
@@ -97,7 +97,7 @@ public final class FlightHack extends Hack implements UpdateListener,
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(IsPlayerInWaterListener.class, this);
-		EVENTS.add(AirStrafingSpeedListener.class, this);
+		EVENTS.add(FlyingSpeedListener.class, this);
 		EVENTS.add(MouseScrollListener.class, this);
 	}
 	
@@ -106,7 +106,7 @@ public final class FlightHack extends Hack implements UpdateListener,
 	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(IsPlayerInWaterListener.class, this);
-		EVENTS.remove(AirStrafingSpeedListener.class, this);
+		EVENTS.remove(FlyingSpeedListener.class, this);
 		EVENTS.remove(MouseScrollListener.class, this);
 	}
 	
@@ -136,7 +136,7 @@ public final class FlightHack extends Hack implements UpdateListener,
 	}
 	
 	@Override
-	public void onGetAirStrafingSpeed(AirStrafingSpeedEvent event)
+	public void onGetFlyingSpeed(FlyingSpeedEvent event)
 	{
 		if(WURST.getHax().freecamHack.isMovingCamera())
 			return;
