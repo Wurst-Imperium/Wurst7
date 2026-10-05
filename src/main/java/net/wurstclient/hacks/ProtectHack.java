@@ -53,6 +53,7 @@ public final class ProtectHack extends Hack
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
+			FilterCreativeSetting.genericCombat(false),
 			FilterSleepingSetting.genericCombat(false),
 			FilterFlyingSetting.genericCombat(0),
 			FilterHostileSetting.genericCombat(false),
@@ -77,9 +78,10 @@ public final class ProtectHack extends Hack
 			FilterAllaysSetting.genericCombat(false),
 			FilterInvisibleSetting.genericCombat(false),
 			FilterNamedSetting.genericCombat(false),
-			FilterShulkerBulletSetting.genericCombat(false),
+			FilterProjectilesSetting.genericCombat(false),
 			FilterArmorStandsSetting.genericCombat(false),
-			FilterCrystalsSetting.genericCombat(true));
+			FilterCrystalsSetting.genericCombat(true),
+			FilterInteractionsSetting.genericCombat(true));
 	
 	private EntityPathFinder pathFinder;
 	private PathProcessor processor;
@@ -190,7 +192,7 @@ public final class ProtectHack extends Hack
 		}
 		
 		// set enemy
-		Stream<Entity> stream = EntityUtils.getAttackableEntities()
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
 			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= 36)
 			.filter(e -> e != friend);
 		

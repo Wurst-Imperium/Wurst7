@@ -45,7 +45,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		new PauseAttackOnContainersSetting(false);
 	
 	private final EntityFilterList entityFilters =
-		EntityFilterList.genericCombat();
+		EntityFilterList.genericMeleeCombat();
 	
 	public MultiAuraHack()
 	{
@@ -96,7 +96,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// get entities
-		Stream<Entity> stream = EntityUtils.getAttackableEntities();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		double rangeSq = Math.pow(range.getValue(), 2);
 		stream =
 			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);

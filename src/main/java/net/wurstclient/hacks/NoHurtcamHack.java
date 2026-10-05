@@ -20,5 +20,5 @@ public final class NoHurtcamHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See GameRendererMixin.onTiltViewWhenHurt()
+	// See GameRendererMixin.onBobHurt()
 }

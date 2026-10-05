@@ -9,31 +9,34 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
+import net.wurstclient.util.text.WText;
 
 public final class FilterVillagersSetting extends EntityFilterCheckbox
 {
-	public FilterVillagersSetting(String description, boolean checked)
+	public FilterVillagersSetting(WText description, boolean checked)
 	{
 		super("Filter villagers", description, checked);
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof AbstractVillager);
+		return e instanceof AbstractVillager;
 	}
 	
 	public static FilterVillagersSetting genericCombat(boolean checked)
 	{
 		return new FilterVillagersSetting(
-			"description.wurst.setting.generic.filter_villagers_combat",
+			WText.translated(
+				"description.wurst.setting.generic.filter_villagers_combat"),
 			checked);
 	}
 	
 	public static FilterVillagersSetting genericVision(boolean checked)
 	{
 		return new FilterVillagersSetting(
-			"description.wurst.setting.generic.filter_villagers_vision",
+			WText.translated(
+				"description.wurst.setting.generic.filter_villagers_vision"),
 			checked);
 	}
 }

@@ -21,6 +21,6 @@ public final class NoOverlayHack extends Hack
 		setCategory(Category.RENDER);
 	}
 	
-	// See CameraMixin.onGetSubmersionType(), GuiMixin.onRenderOverlay(),
-	// ScreenEffectRendererMixin.onRenderUnderwaterOverlay()
+	// See CameraMixin.onGetFogType(), HudMixin.onExtractTextureOverlay(),
+	// ScreenEffectRendererMixin.onSubmitWater()
 }

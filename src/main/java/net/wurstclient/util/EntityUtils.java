@@ -12,10 +12,13 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.phys.AABB;
@@ -55,32 +58,39 @@ public enum EntityUtils
 	
 	public static Stream<Entity> getFollowableEntities()
 	{
-		return getAliveEntities().filter(IS_NOT_SELF).filter(
-			e -> e instanceof LivingEntity || e instanceof AbstractMinecart);
+		return getAliveEntities().filter(IS_NOT_SELF)
+			.filter(e -> e instanceof LivingEntity
+				|| e instanceof AbstractMinecart || e instanceof Interaction);
 	}
 	
 	public static final Predicate<Entity> IS_NOT_SELF =
 		e -> e != null && e != MC.player && !(e instanceof FakePlayerEntity);
 	
-	public static Stream<Entity> getAttackableEntities()
+	public static Stream<Entity> getMeleeAttackableEntities()
 	{
-		return getEntities().filter(IS_ATTACKABLE);
+		return getEntities().filter(IS_ATTACKABLE_MELEE);
 	}
 	
 	/**
-	 * Same as {@link #getAttackableEntities()} but excludes end crystals and
-	 * projectiles.
+	 * Same as {@link #getMeleeAttackableEntities()} but excludes end crystals,
+	 * projectiles and interaction entities.
 	 */
 	public static Stream<LivingEntity> getExplosionWorthyAttackableEntities()
 	{
-		return getEntities(LivingEntity.class).filter(IS_ATTACKABLE);
+		return getEntities(LivingEntity.class).filter(IS_ATTACKABLE_RANGED);
 	}
 	
-	public static final Predicate<Entity> IS_ATTACKABLE =
+	public static final Predicate<Entity> IS_ATTACKABLE_MELEE =
 		e -> e != null && e.isAlive()
 			&& (e instanceof LivingEntity || e instanceof EndCrystal
-				|| e instanceof ShulkerBullet)
+				|| (e instanceof Projectile
+					&& e.is(EntityTypeTags.REDIRECTABLE_PROJECTILE))
+				|| e instanceof ShulkerBullet || e instanceof Interaction)
 			&& IS_NOT_SELF.test(e) && !WURST.getFriends().isFriend(e);
+	
+	// Interaction entities cannot be hit by projectiles.
+	public static final Predicate<Entity> IS_ATTACKABLE_RANGED =
+		IS_ATTACKABLE_MELEE.and(e -> !(e instanceof Interaction));
 	
 	/**
 	 * Interpolates (or "lerps") between the entity's position in the previous

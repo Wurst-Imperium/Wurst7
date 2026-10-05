@@ -45,6 +45,6 @@ public final class NoTelemetryOtf extends OtherFeature
 	}
 	
 	// See ClientTelemetryManagerMixin,
-	// MinecraftMixin.onIsTelemetryEnabledByApi(), and
-	// MinecraftMixin.onIsOptionalTelemetryEnabledByApi()
+	// MinecraftMixin.onAllowsTelemetry(), and
+	// MinecraftMixin.onExtraTelemetryAvailable()
 }

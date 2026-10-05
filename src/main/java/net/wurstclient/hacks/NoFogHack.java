@@ -19,6 +19,4 @@ public final class NoFogHack extends Hack
 		super("NoFog");
 		setCategory(Category.RENDER);
 	}
-	
-	// See FogRendererMixin and AtmosphericFogEnvironmentMixin
 }
