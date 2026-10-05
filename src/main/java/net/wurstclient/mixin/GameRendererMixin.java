@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -23,7 +24,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
-import net.wurstclient.hacks.FullbrightHack;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin implements AutoCloseable
@@ -46,31 +46,33 @@ public abstract class GameRendererMixin implements AutoCloseable
 			original.call(instance, cameraState, matrices);
 	}
 	
-	@WrapOperation(method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/util/Mth;lerp(FFF)F",
-			ordinal = 0))
-	private float onRenderWorldNauseaLerp(float delta, float start, float end,
-		Operation<Float> original)
+	/**
+	 * Disables nausea and portal wobble when using AntiWobble,
+	 * without the green tint that the vanilla setting creates.
+	 */
+	@ModifyExpressionValue(
+		method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/renderer/state/OptionsRenderState;screenEffectScale:F"),
+		require = 1)
+	private float onRenderLevelScreenEffectScale(float original)
 	{
-		if(!WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled())
-			return original.call(delta, start, end);
-		
-		return 0;
+		return WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled() ? 0
+			: original;
 	}
 	
 	@Inject(
 		method = "getNightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
 		at = @At("HEAD"),
 		cancellable = true)
-	private static void onGetNightVisionStrength(LivingEntity entity,
+	private static void onGetNightVisionScale(LivingEntity entity,
 		float tickDelta, CallbackInfoReturnable<Float> cir)
 	{
-		FullbrightHack fullbright =
-			WurstClient.INSTANCE.getHax().fullbrightHack;
+		float nightVisionStrength = WurstClient.INSTANCE.getHax().fullbrightHack
+			.getNightVisionStrength();
 		
-		if(fullbright.isNightVisionActive())
-			cir.setReturnValue(fullbright.getNightVisionStrength());
+		if(nightVisionStrength > 0)
+			cir.setReturnValue(nightVisionStrength);
 	}
 	
 	/**
@@ -80,8 +82,8 @@ public abstract class GameRendererMixin implements AutoCloseable
 		method = "bobHurt(Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onTiltViewWhenHurt(CameraRenderState cameraState,
-		PoseStack matrices, CallbackInfo ci)
+	private void onBobHurt(CameraRenderState cameraState, PoseStack matrices,
+		CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
 			ci.cancel();

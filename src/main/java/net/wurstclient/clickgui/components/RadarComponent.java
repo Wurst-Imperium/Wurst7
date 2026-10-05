@@ -12,19 +12,16 @@ import org.joml.Matrix3x2fStack;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.ambient.AmbientCreature;
-import net.minecraft.world.entity.animal.AgeableWaterCreature;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.fish.WaterAnimal;
-import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
 import net.wurstclient.clickgui.Component;
 import net.wurstclient.hacks.RadarHack;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.MobDisposition;
 import net.wurstclient.util.RenderUtils;
 
 public final class RadarComponent extends Component
@@ -108,13 +105,15 @@ public final class RadarComponent extends Component
 	{
 		if(WURST.getFriends().isFriend(e))
 			return 0xFF0000FF;
-		if(e instanceof Player)
+		if(e instanceof Avatar)
 			return 0xFFFF0000;
-		if(e instanceof Enemy)
-			return 0xFFFF8000;
-		if(e instanceof Animal || e instanceof AmbientCreature
-			|| e instanceof WaterAnimal || e instanceof AgeableWaterCreature)
-			return 0xFF00FF00;
+		if(e instanceof Mob mob)
+			return switch(MobDisposition.of(mob))
+			{
+				case HOSTILE -> 0xFFFF8000;
+				case NEUTRAL -> 0xFFFFFF00;
+				case PASSIVE -> 0xFF00FF00;
+			};
 		return 0xFF808080;
 	}
 	

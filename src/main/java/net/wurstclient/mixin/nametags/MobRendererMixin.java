@@ -29,7 +29,7 @@ public abstract class MobRendererMixin
 			opcode = Opcodes.GETFIELD,
 			ordinal = 0),
 		cancellable = true)
-	private void onHasLabel(CallbackInfoReturnable<Boolean> cir)
+	private void onShouldShowName(CallbackInfoReturnable<Boolean> cir)
 	{
 		// skip the mobEntity == dispatcher.targetedEntity check and return true
 		if(WurstClient.INSTANCE.getHax().nameTagsHack.shouldForceMobNametags())

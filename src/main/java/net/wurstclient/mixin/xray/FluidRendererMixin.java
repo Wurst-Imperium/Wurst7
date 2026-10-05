@@ -39,7 +39,7 @@ public class FluidRendererMixin
 		method = "tesselate(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/renderer/block/FluidRenderer$Output;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/material/FluidState;)V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/renderer/block/FluidRenderer;isFaceOccludedByNeighbor(Lnet/minecraft/core/Direction;FLnet/minecraft/world/level/block/state/BlockState;)Z"))
-	private boolean modifyShouldSkipRendering(Direction side, float height,
+	private boolean modifyIsFaceOccludedByNeighbor(Direction side, float height,
 		BlockState neighborState, Operation<Boolean> original,
 		BlockAndTintGetter world, BlockPos pos, FluidRenderer.Output output,
 		BlockState blockState, FluidState fluidState)

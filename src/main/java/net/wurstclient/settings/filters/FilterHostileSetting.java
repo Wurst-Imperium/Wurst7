@@ -8,39 +8,37 @@
 package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.minecraft.world.entity.Mob;
+import net.wurstclient.util.MobDisposition;
+import net.wurstclient.util.text.WText;
 
 public final class FilterHostileSetting extends EntityFilterCheckbox
 {
-	private static final String EXCEPTIONS_TEXT = "\n\nThis filter does not"
-		+ " affect endermen, non-brute piglins, and zombified piglins.";
-	
-	public FilterHostileSetting(String description, boolean checked)
+	public FilterHostileSetting(WText description, boolean checked)
 	{
-		super("Filter hostile mobs", description + EXCEPTIONS_TEXT, checked);
+		super("Filter hostile mobs", description, checked);
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		// never filter out neutral mobs (including piglins)
-		if(e instanceof NeutralMob || e instanceof Piglin)
-			return true;
-		
-		return !(e instanceof Enemy);
+		return e instanceof Mob mob
+			&& MobDisposition.of(mob) == MobDisposition.HOSTILE;
 	}
 	
 	public static FilterHostileSetting genericCombat(boolean checked)
 	{
 		return new FilterHostileSetting(
-			"Won't attack hostile mobs like zombies and creepers.", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_hostile_combat"),
+			checked);
 	}
 	
 	public static FilterHostileSetting genericVision(boolean checked)
 	{
 		return new FilterHostileSetting(
-			"Won't show hostile mobs like zombies and creepers.", checked);
+			WText.translated(
+				"description.wurst.setting.generic.filter_hostile_vision"),
+			checked);
 	}
 }

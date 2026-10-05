@@ -56,7 +56,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		new PauseAttackOnContainersSetting(true);
 	
 	private final EntityFilterList entityFilters =
-		EntityFilterList.genericCombat();
+		EntityFilterList.genericMeleeCombat();
 	
 	public TpAuraHack()
 	{
@@ -109,7 +109,7 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		LocalPlayer player = MC.player;
 		
 		// set entity
-		Stream<Entity> stream = EntityUtils.getAttackableEntities();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		double rangeSq = Math.pow(range.getValue(), 2);
 		stream =
 			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);
