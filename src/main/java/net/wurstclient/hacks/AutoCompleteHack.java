@@ -157,6 +157,4 @@ public final class AutoCompleteHack extends Hack
 		this.suggestionsUpdater = suggestionsUpdater;
 		lastRefreshTime = System.currentTimeMillis();
 	}
-	
-	// See CommandSuggestionsMixin
 }

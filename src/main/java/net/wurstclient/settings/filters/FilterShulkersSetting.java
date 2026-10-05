@@ -9,31 +9,34 @@ package net.wurstclient.settings.filters;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Shulker;
+import net.wurstclient.util.text.WText;
 
 public final class FilterShulkersSetting extends EntityFilterCheckbox
 {
-	public FilterShulkersSetting(String description, boolean checked)
+	public FilterShulkersSetting(WText description, boolean checked)
 	{
 		super("Filter shulkers", description, checked);
 	}
 	
 	@Override
-	public boolean test(Entity e)
+	protected boolean filtersOut(Entity e)
 	{
-		return !(e instanceof Shulker);
+		return e instanceof Shulker;
 	}
 	
 	public static FilterShulkersSetting genericCombat(boolean checked)
 	{
 		return new FilterShulkersSetting(
-			"description.wurst.setting.generic.filter_shulkers_combat",
+			WText.translated(
+				"description.wurst.setting.generic.filter_shulkers_combat"),
 			checked);
 	}
 	
 	public static FilterShulkersSetting genericVision(boolean checked)
 	{
 		return new FilterShulkersSetting(
-			"description.wurst.setting.generic.filter_shulkers_vision",
+			WText.translated(
+				"description.wurst.setting.generic.filter_shulkers_vision"),
 			checked);
 	}
 }

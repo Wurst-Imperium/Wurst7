@@ -30,8 +30,8 @@ public class BlockEntityRenderDispatcherMixin
 		method = "submit(Lnet/minecraft/client/renderer/blockentity/state/BlockEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private <S extends BlockEntityRenderState> void onRenderRenderState(
-		S renderState, PoseStack matrices, SubmitNodeCollector queue,
+	private <S extends BlockEntityRenderState> void onSubmit(S renderState,
+		PoseStack matrices, SubmitNodeCollector queue,
 		CameraRenderState cameraRenderState, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().xRayHack

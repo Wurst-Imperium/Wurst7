@@ -7,12 +7,14 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.world.effect.MobEffects;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.events.MobEffectListener;
 import net.wurstclient.hack.Hack;
 
 @SearchTags({"no levitation", "levitation", "levitate"})
-public final class NoLevitationHack extends Hack
+public final class NoLevitationHack extends Hack implements MobEffectListener
 {
 	public NoLevitationHack()
 	{
@@ -20,6 +22,22 @@ public final class NoLevitationHack extends Hack
 		setCategory(Category.MOVEMENT);
 	}
 	
-	// See LocalPlayerMixin.hasEffect() and
-	// LocalPlayerMixin.getEffect()
+	@Override
+	protected void onEnable()
+	{
+		EVENTS.add(MobEffectListener.class, this);
+	}
+	
+	@Override
+	protected void onDisable()
+	{
+		EVENTS.remove(MobEffectListener.class, this);
+	}
+	
+	@Override
+	public void onMobEffect(MobEffectEvent event)
+	{
+		if(event.getEffect() == MobEffects.LEVITATION)
+			event.setInstance(null);
+	}
 }
