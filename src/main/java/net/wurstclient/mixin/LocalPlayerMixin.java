@@ -36,7 +36,6 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.FlyingSpeedListener.FlyingSpeedEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.MobEffectListener.MobEffectEvent;
-import net.wurstclient.events.PlayerMoveListener.PlayerMoveEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
@@ -107,14 +106,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
-	@Inject(
-		method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
-		at = @At("HEAD"))
-	private void onMove(MoverType type, Vec3 offset, CallbackInfo ci)
-	{
-		EventManager.fire(PlayerMoveEvent.INSTANCE);
-	}
-	
 	@Inject(method = "isAutoJumpEnabled()Z",
 		at = @At("HEAD"),
 		cancellable = true)
@@ -160,6 +151,26 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		
 		minecraft.screen = tempCurrentScreen;
 		tempCurrentScreen = null;
+	}
+	
+	/**
+	 * Prevents flying up with Flight activating elytra.
+	 */
+	@Override
+	public boolean canGlide()
+	{
+		return !WurstClient.INSTANCE.getHax().flightHack.isEnabled()
+			&& super.canGlide();
+	}
+	
+	/**
+	 * Prevents Flight getting horizontally stuck if elytra is already active.
+	 */
+	@Override
+	public boolean isFallFlying()
+	{
+		return !WurstClient.INSTANCE.getHax().flightHack.isEnabled()
+			&& super.isFallFlying();
 	}
 	
 	@Override

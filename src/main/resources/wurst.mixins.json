@@ -61,6 +61,7 @@
     "nametags.MobRendererMixin",
     "nametags.StorageMixin",
     "nobackground.ScreenMixin",
+    "noclip.LocalPlayerMixin",
     "nofog.AtmosphericFogEnvironmentMixin",
     "nofog.FogRendererMixin",
     "noshieldoverlay.ItemInHandRendererMixin",
