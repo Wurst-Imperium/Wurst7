@@ -52,7 +52,7 @@ import net.minecraft.util.StringUtil;
 import net.minecraft.util.Util;
 import net.wurstclient.WurstClient;
 import net.wurstclient.altmanager.*;
-import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.mixinterface.IMinecraft;
 import net.wurstclient.util.MultiProcessingUtils;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
@@ -179,8 +179,7 @@ public final class AltManagerScreen extends Screen
 		editButton.active = altSelected;
 		deleteButton.active = altSelected;
 		
-		logoutButton.active =
-			((IMinecraftClient)minecraft).getWurstSession() != null;
+		logoutButton.active = ((IMinecraft)minecraft).getWurstUser() != null;
 	}
 	
 	@Override
@@ -225,7 +224,7 @@ public final class AltManagerScreen extends Screen
 	
 	private void pressLogout()
 	{
-		((IMinecraftClient)minecraft).setWurstSession(null);
+		((IMinecraft)minecraft).setWurstUser(null);
 		updateAltButtons();
 	}
 	

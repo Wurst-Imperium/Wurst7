@@ -183,7 +183,7 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 		// return;
 		
 		// place block
-		IMC.getInteractionManager().rightClickBlock(pos.relative(side),
+		IMC.getGameMode().rightClickBlock(pos.relative(side),
 			side.getOpposite(), hitVec);
 		
 		// reset timer

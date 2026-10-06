@@ -200,7 +200,7 @@ public final class AutoEatHack extends Hack implements UpdateListener
 		
 		// eat food
 		MC.options.keyUse.setDown(true);
-		IMC.getInteractionManager().rightClickItem();
+		IMC.getGameMode().rightClickItem();
 	}
 	
 	private int findBestFoodSlot(int maxPoints)

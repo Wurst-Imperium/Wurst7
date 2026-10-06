@@ -214,8 +214,8 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			// place block
 			SwingAnimation swingAnimation =
 				MC.player.getMainHandItem().getInteractAnimation();
-			IMC.getInteractionManager().rightClickBlock(neighbor,
-				side.getOpposite(), hitVec);
+			IMC.getGameMode().rightClickBlock(neighbor, side.getOpposite(),
+				hitVec);
 			interactSwing.swing(InteractionHand.MAIN_HAND, swingAnimation);
 			
 			return true;

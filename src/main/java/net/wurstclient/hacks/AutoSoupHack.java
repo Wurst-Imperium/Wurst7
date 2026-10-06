@@ -77,13 +77,12 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 				&& emptyBowlStack.getItem() != Items.BOWL;
 			
 			// place bowl in empty bowl slot
-			IMC.getInteractionManager().windowClick_PICKUP(i < 9 ? 36 + i : i);
-			IMC.getInteractionManager().windowClick_PICKUP(9);
+			IMC.getGameMode().windowClick_PICKUP(i < 9 ? 36 + i : i);
+			IMC.getGameMode().windowClick_PICKUP(9);
 			
 			// place non-bowl item from empty bowl slot in current slot
 			if(swap)
-				IMC.getInteractionManager()
-					.windowClick_PICKUP(i < 9 ? 36 + i : i);
+				IMC.getGameMode().windowClick_PICKUP(i < 9 ? 36 + i : i);
 		}
 		
 		// search soup in hotbar
@@ -108,7 +107,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 			
 			// eat soup
 			MC.options.keyUse.setDown(true);
-			IMC.getInteractionManager().rightClickItem();
+			IMC.getGameMode().rightClickItem();
 			
 			return;
 		}
@@ -120,7 +119,7 @@ public final class AutoSoupHack extends Hack implements UpdateListener
 		
 		// move soup in inventory to hotbar
 		if(soupInInventory != -1)
-			IMC.getInteractionManager().windowClick_QUICK_MOVE(soupInInventory);
+			IMC.getGameMode().windowClick_QUICK_MOVE(soupInInventory);
 	}
 	
 	private int findSoup(int startSlot, int endSlot)

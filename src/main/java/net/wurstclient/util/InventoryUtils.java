@@ -17,14 +17,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.wurstclient.WurstClient;
 import net.wurstclient.mixinterface.IMultiPlayerGameMode;
-import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.mixinterface.IMinecraft;
 
 public enum InventoryUtils
 {
 	;
 	
 	private static final Minecraft MC = WurstClient.MC;
-	private static final IMinecraftClient IMC = WurstClient.IMC;
+	private static final IMinecraft IMC = WurstClient.IMC;
 	
 	public static int indexOf(Item item)
 	{
@@ -207,7 +207,7 @@ public enum InventoryUtils
 	public static boolean selectItem(int slot)
 	{
 		Inventory inventory = MC.player.getInventory();
-		IMultiPlayerGameMode im = IMC.getInteractionManager();
+		IMultiPlayerGameMode gm = IMC.getGameMode();
 		
 		// if the slot is negative, abort and return false
 		if(slot < 0)
@@ -219,10 +219,10 @@ public enum InventoryUtils
 		// if there is an empty slot in the hotbar, shift-click the item there
 		// it will be selected in the next tick
 		else if(inventory.getFreeSlot() > -1 && inventory.getFreeSlot() < 9)
-			im.windowClick_QUICK_MOVE(toNetworkSlot(slot));
+			gm.windowClick_QUICK_MOVE(toNetworkSlot(slot));
 		// otherwise, swap with the currently selected item
 		else
-			im.windowClick_SWAP(toNetworkSlot(slot),
+			gm.windowClick_SWAP(toNetworkSlot(slot),
 				inventory.getSelectedSlot());
 		
 		return true;

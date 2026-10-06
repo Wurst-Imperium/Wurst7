@@ -102,10 +102,10 @@ public enum MicrosoftLoginManager
 	{
 		MinecraftProfile mcProfile = getAccount(email, password);
 		
-		User session = new User(mcProfile.getName(), mcProfile.getUUID(),
+		User user = new User(mcProfile.getName(), mcProfile.getUUID(),
 			mcProfile.getAccessToken(), Optional.empty(), Optional.empty());
 		
-		WurstClient.IMC.setWurstSession(session);
+		WurstClient.IMC.setWurstUser(user);
 	}
 	
 	private static MinecraftProfile getAccount(String email, String password)

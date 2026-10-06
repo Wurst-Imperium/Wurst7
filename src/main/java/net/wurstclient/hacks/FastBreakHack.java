@@ -110,7 +110,7 @@ public final class FastBreakHack extends Hack
 		
 		Action action = ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK;
 		Direction direction = event.getDirection();
-		IMC.getInteractionManager().sendPlayerActionC2SPacket(action, blockPos,
+		IMC.getGameMode().sendPlayerActionC2SPacket(action, blockPos,
 			direction);
 	}
 }
