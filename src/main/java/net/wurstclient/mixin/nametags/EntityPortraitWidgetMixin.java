@@ -12,24 +12,24 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.social.EntityPortraitWidget;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.wurstclient.WurstClient;
 
-@Mixin(InventoryScreen.class)
-public abstract class InventoryScreenMixin
+@Mixin(EntityPortraitWidget.class)
+public abstract class EntityPortraitWidgetMixin
 {
 	/**
-	 * Keeps forced player names out of inventory previews without affecting
+	 * Keeps forced player names out of entity portraits without affecting
 	 * nametags in the world.
 	 */
 	@ModifyReturnValue(
-		method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;",
+		method = "extractRenderState(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;",
 		at = @At("RETURN"))
-	private static EntityRenderState hidePlayerNameInInventory(
-		EntityRenderState state, LivingEntity entity)
+	private static EntityRenderState hidePlayerNameInPortrait(
+		EntityRenderState state, Entity entity)
 	{
 		if(entity instanceof Player
 			&& WurstClient.INSTANCE.getHax().nameTagsHack

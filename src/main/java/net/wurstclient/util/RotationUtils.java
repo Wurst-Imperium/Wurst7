@@ -156,7 +156,7 @@ public enum RotationUtils
 		float intendedWrapped = Mth.wrapDegrees(intended);
 		
 		float change = Mth.wrapDegrees(intendedWrapped - currentWrapped);
-		change = Mth.clamp(change, -maxChange, maxChange);
+		change = Math.clamp(change, -maxChange, maxChange);
 		
 		return current + change;
 	}

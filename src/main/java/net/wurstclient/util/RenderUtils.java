@@ -107,10 +107,10 @@ public enum RenderUtils
 	
 	public static int toIntColor(float[] rgb, float opacity)
 	{
-		return (int)(Mth.clamp(opacity, 0, 1) * 255) << 24
-			| (int)(Mth.clamp(rgb[0], 0, 1) * 255) << 16
-			| (int)(Mth.clamp(rgb[1], 0, 1) * 255) << 8
-			| (int)(Mth.clamp(rgb[2], 0, 1) * 255);
+		return (int)(Math.clamp(opacity, 0, 1) * 255) << 24
+			| (int)(Math.clamp(rgb[0], 0, 1) * 255) << 16
+			| (int)(Math.clamp(rgb[1], 0, 1) * 255) << 8
+			| (int)(Math.clamp(rgb[2], 0, 1) * 255);
 	}
 	
 	public static void drawLine(PoseStack matrices, Vec3 start, Vec3 end,

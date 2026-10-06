@@ -29,7 +29,6 @@ import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Mth;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
@@ -335,9 +334,9 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		int windowY1 = bgy1 + scroll + windowComponentY;
 		int windowY2 = windowY1 + window.getInnerHeight();
 		
-		context.fill(bgx1, bgy1, bgx2, Mth.clamp(windowY1, bgy1, bgy3),
+		context.fill(bgx1, bgy1, bgx2, Math.clamp(windowY1, bgy1, bgy3),
 			getBackgroundColor());
-		context.fill(bgx1, Mth.clamp(windowY2, bgy1, bgy3), bgx2, bgy2,
+		context.fill(bgx1, Math.clamp(windowY2, bgy1, bgy3), bgx2, bgy2,
 			getBackgroundColor());
 		RenderUtils.drawBoxShadow2D(context, bgx1, bgy1, bgx2, bgy2);
 		

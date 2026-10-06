@@ -25,7 +25,6 @@ accessible	field	net/minecraft/client/gui/screens/TitleScreen	fading	Z
 accessible	field	net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen	selectedTab	Lnet/minecraft/world/item/CreativeModeTab;
 accessible	field	net/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen	serverSelectionList	Lnet/minecraft/client/gui/screens/multiplayer/ServerSelectionList;
 accessible	field	net/minecraft/client/gui/screens/options/controls/KeyBindsList$KeyEntry	name	Lnet/minecraft/network/chat/Component;
-accessible	field	net/minecraft/client/gui/components/CycleButton	name	Lnet/minecraft/network/chat/Component;
 accessible	field	net/minecraft/client/multiplayer/ClientPacketListener	signedMessageEncoder	Lnet/minecraft/network/chat/SignedMessageChain$Encoder;
 accessible	field	net/minecraft/client/multiplayer/ClientPacketListener	chatSession	Lnet/minecraft/network/chat/LocalChatSession;
 accessible	field	net/minecraft/client/player/FirstPersonHandsAndItems	mainHandHeight	F

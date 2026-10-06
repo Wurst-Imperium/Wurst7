@@ -9,7 +9,6 @@ package net.wurstclient.util;
 
 import java.awt.Color;
 
-import net.minecraft.util.Mth;
 import net.wurstclient.util.json.JsonException;
 
 public enum ColorUtils
@@ -38,7 +37,7 @@ public enum ColorUtils
 			{
 				String channelString = s.substring(i * 2 + 1, i * 2 + 3);
 				int channel = Integer.parseUnsignedInt(channelString, 16);
-				rgb[i] = Mth.clamp(channel, 0, 255);
+				rgb[i] = Math.clamp(channel, 0, 255);
 			}
 			
 		}catch(NumberFormatException e)
@@ -72,7 +71,7 @@ public enum ColorUtils
 			for(int i = 0; i < rgb.length; i++)
 			{
 				int channel = Integer.parseInt(rgbStrings[i]);
-				rgb[i] = Mth.clamp(channel, 0, 255);
+				rgb[i] = Math.clamp(channel, 0, 255);
 			}
 			
 		}catch(NumberFormatException e)

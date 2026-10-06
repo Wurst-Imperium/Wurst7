@@ -182,8 +182,8 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		
 		Item item = stack.getItem();
 		return item instanceof ProjectileWeaponItem
-			|| item instanceof SnowballItem || item instanceof EggItem
-			|| item instanceof EnderpearlItem
+			|| item instanceof SnowballItem || item instanceof IceBallItem
+			|| item instanceof EggItem || item instanceof EnderpearlItem
 			|| item instanceof ThrowablePotionItem
 			|| item instanceof FishingRodItem || item instanceof TridentItem;
 	}
