@@ -806,7 +806,7 @@ public final class TunnellerHack extends Hack
 			return;
 		
 		// place block
-		IMC.getInteractionManager().rightClickBlock(pos.relative(side),
+		IMC.getGameMode().rightClickBlock(pos.relative(side),
 			side.getOpposite(), hitVec);
 		
 		// reset timer

@@ -126,6 +126,6 @@ public final class CreativeFlightHack extends Hack implements UpdateListener
 		KeyMapping[] keys = {MC.options.keyJump, MC.options.keyShift};
 		
 		for(KeyMapping key : keys)
-			IKeyMapping.get(key).resetPressedState();
+			IKeyMapping.get(key).resetDownState();
 	}
 }

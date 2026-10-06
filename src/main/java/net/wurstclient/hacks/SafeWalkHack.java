@@ -83,7 +83,7 @@ public final class SafeWalkHack extends Hack
 		if(sneaking)
 			sneakKey.setDown(true);
 		else
-			sneakKey.resetPressedState();
+			sneakKey.resetDownState();
 		
 		this.sneaking = sneaking;
 	}

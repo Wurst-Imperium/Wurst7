@@ -14,12 +14,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.wurstclient.WurstClient;
-import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.mixinterface.IMinecraft;
 
 public final class OverlayRenderer
 {
 	protected static final Minecraft MC = WurstClient.MC;
-	protected static final IMinecraftClient IMC = WurstClient.IMC;
+	protected static final IMinecraft IMC = WurstClient.IMC;
 	
 	private float progress;
 	private float prevProgress;
