@@ -54,6 +54,7 @@
     "freecam.LocalPlayerMixin",
     "freecam.MouseHandlerMixin",
     "healthtags.EntityRendererMixin",
+    "jesus.BlockStateBaseMixin",
     "nameprotect.StringDecomposerMixin",
     "nametags.EntityRendererMixin",
     "nametags.LivingEntityRendererMixin",

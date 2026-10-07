@@ -8,7 +8,6 @@
 package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -20,7 +19,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateHolder;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -57,25 +55,4 @@ public abstract class BlockStateBaseMixin extends StateHolder<Block, BlockState>
 		
 		cir.setReturnValue(Shapes.empty());
 	}
-	
-	@Inject(
-		method = "getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;",
-		at = @At("HEAD"),
-		cancellable = true)
-	private void onGetCollisionShape(BlockGetter world, BlockPos pos,
-		CollisionContext context, CallbackInfoReturnable<VoxelShape> cir)
-	{
-		if(getFluidState().isEmpty())
-			return;
-		
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.jesusHack.shouldBeSolid())
-			return;
-		
-		cir.setReturnValue(Shapes.block());
-		cir.cancel();
-	}
-	
-	@Shadow
-	public abstract FluidState getFluidState();
 }
