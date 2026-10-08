@@ -7,10 +7,7 @@
  */
 package net.wurstclient.mixin;
 
-import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -19,8 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.authlib.GameProfile;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -46,12 +41,6 @@ import net.wurstclient.mixinterface.ILocalPlayer;
 public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	implements ILocalPlayer
 {
-	@Shadow
-	@Final
-	protected Minecraft minecraft;
-	
-	private Screen tempCurrentScreen;
-	
 	private LocalPlayerMixin(WurstClient wurst, ClientLevel world,
 		GameProfile profile)
 	{
@@ -113,43 +102,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	{
 		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
 			cir.setReturnValue(false);
-	}
-	
-	/**
-	 * When PortalGUI is enabled, this mixin temporarily sets the current screen
-	 * to null to prevent handlePortalTransitionEffect() from closing it.
-	 */
-	@Inject(method = "handlePortalTransitionEffect(Z)V",
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/Gui;screen()Lnet/minecraft/client/gui/screens/Screen;",
-			ordinal = 0))
-	private void beforeHandlePortalTransitionEffect(boolean fromPortalEffect,
-		CallbackInfo ci)
-	{
-		if(!WurstClient.INSTANCE.getHax().portalGuiHack.isEnabled())
-			return;
-		
-		tempCurrentScreen = minecraft.gui.screen();
-		minecraft.gui.setScreen(null);
-	}
-	
-	/**
-	 * This mixin restores the current screen as soon as
-	 * handlePortalTransitionEffect() is done looking at it.
-	 */
-	@Inject(method = "handlePortalTransitionEffect(Z)V",
-		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/player/LocalPlayer;portalEffectIntensity:F",
-			opcode = Opcodes.GETFIELD,
-			ordinal = 1))
-	private void afterHandlePortalTransitionEffect(boolean fromPortalEffect,
-		CallbackInfo ci)
-	{
-		if(tempCurrentScreen == null)
-			return;
-		
-		minecraft.gui.setScreen(tempCurrentScreen);
-		tempCurrentScreen = null;
 	}
 	
 	/**
