@@ -70,6 +70,7 @@
     "noweather.ClientClockInstanceMixin",
     "noweather.EnvironmentAttributeSystemMixin",
     "noweather.LevelMixin",
+    "portalgui.LocalPlayerMixin",
     "remoteview.LevelExtractorMixin",
     "remoteview.LocalPlayerMixin",
     "snowshoe.PowderSnowBlockMixin",
