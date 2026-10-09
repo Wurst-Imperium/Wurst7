@@ -12,17 +12,24 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.entity.Entity;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hack.HackList;
 
-@Mixin(Block.class)
-public abstract class BlockMixin implements ItemLike
+@Mixin(Entity.class)
+public abstract class EntityMixin
 {
-	@Inject(method = "getSpeedFactor()F", at = @At("HEAD"), cancellable = true)
-	private void onGetSpeedFactor(CallbackInfoReturnable<Float> cir)
+	/**
+	 * Removes block slowdown for the local player while NoSlowdown is enabled.
+	 */
+	@Inject(method = "getBlockSpeedFactor()F",
+		at = @At("RETURN"),
+		cancellable = true)
+	private void onGetBlockSpeedFactor(CallbackInfoReturnable<Float> cir)
 	{
+		if((Object)this != WurstClient.MC.player)
+			return;
+		
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax == null || !hax.noSlowdownHack.isEnabled())
 			return;
