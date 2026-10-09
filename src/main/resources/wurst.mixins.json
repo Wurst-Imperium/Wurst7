@@ -1,7 +1,6 @@
 {
   "required": true,
   "package": "net.wurstclient.mixin",
-  "plugin": "net.wurstclient.WurstMixinPlugin",
   "compatibilityLevel": "JAVA_25",
   "mixinextras": {
     "minVersion": "0.5.0"
