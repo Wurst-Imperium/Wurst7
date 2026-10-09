@@ -8,7 +8,6 @@
   },
   "mixins": [],
   "client": [
-    "BlockStateBaseMixin",
     "CameraMixin",
     "ChatComponentMixin",
     "ChatScreenMixin",
@@ -53,6 +52,7 @@
     "freecam.CameraMixin",
     "freecam.LocalPlayerMixin",
     "freecam.MouseHandlerMixin",
+    "handnoclip.BlockStateBaseMixin",
     "healthtags.EntityRendererMixin",
     "jesus.BlockStateBaseMixin",
     "nameprotect.StringDecomposerMixin",

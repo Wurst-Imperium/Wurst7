@@ -44,6 +44,4 @@ public final class HandNoClipHack extends Hack
 	{
 		return blocks.contains(BlockUtils.getName(pos));
 	}
-	
-	// See BlockStateBaseMixin.onGetShape()
 }
