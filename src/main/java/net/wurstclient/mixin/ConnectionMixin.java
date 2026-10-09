@@ -88,10 +88,8 @@ public abstract class ConnectionMixin
 			ci.cancel();
 	}
 	
-	// These mixins target the second "send" method. The one with two arguments.
-	
 	@ModifyVariable(
-		method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;)V",
+		method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;Z)V",
 		at = @At("HEAD"))
 	public Packet<?> modifyPacket(Packet<?> packet)
 	{
@@ -103,11 +101,12 @@ public abstract class ConnectionMixin
 	}
 	
 	@Inject(
-		method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;)V",
+		method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;Z)V",
 		at = @At("HEAD"),
 		cancellable = true)
 	private void onSend(Packet<?> packet,
-		@Nullable ChannelFutureListener callback, CallbackInfo ci)
+		@Nullable ChannelFutureListener callback, boolean flush,
+		CallbackInfo ci)
 	{
 		ConnectionPacketOutputEvent event = getEvent(packet);
 		if(event == null)
