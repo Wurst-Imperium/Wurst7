@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.attribute.EnvironmentAttribute;
 import net.minecraft.world.attribute.EnvironmentAttributeReader;
 import net.minecraft.world.attribute.EnvironmentAttributeSystem;
@@ -31,6 +32,10 @@ public abstract class EnvironmentAttributeSystemMixin
 	public Object onGetDimensionValueOrGetValue(Object original,
 		EnvironmentAttribute<?> attribute)
 	{
+		ClientLevel level = WurstClient.MC.level;
+		if(level == null || (Object)this != level.environmentAttributes())
+			return original;
+		
 		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
 		
 		if(attribute == EnvironmentAttributes.MOON_PHASE
