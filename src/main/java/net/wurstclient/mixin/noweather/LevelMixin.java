@@ -22,6 +22,9 @@ public abstract class LevelMixin implements LevelAccessor, AutoCloseable
 	@Inject(method = "getRainLevel(F)F", at = @At("HEAD"), cancellable = true)
 	private void onGetRainLevel(float delta, CallbackInfoReturnable<Float> cir)
 	{
+		if(!isClientSide())
+			return;
+		
 		if(WurstClient.INSTANCE.getHax().noWeatherHack.isRainDisabled())
 			cir.setReturnValue(0F);
 	}
