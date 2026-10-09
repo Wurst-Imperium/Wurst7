@@ -65,7 +65,7 @@
     "nofog.AtmosphericFogEnvironmentMixin",
     "nofog.FogRendererMixin",
     "noshieldoverlay.FirstPersonHandsAndItemsRendererMixin",
-    "noslowdown.BlockMixin",
+    "noslowdown.EntityMixin",
     "noslowdown.LocalPlayerMixin",
     "noweather.ClientClockInstanceMixin",
     "noweather.EnvironmentAttributeSystemMixin",
