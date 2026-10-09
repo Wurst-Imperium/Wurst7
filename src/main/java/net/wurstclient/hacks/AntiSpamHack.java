@@ -12,7 +12,6 @@ import java.util.List;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ComponentRenderUtils;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.wurstclient.Category;
@@ -135,18 +134,7 @@ public final class AntiSpamHack extends Hack implements ChatInputListener
 		}
 		
 		if(spamCounter > 1)
-		{
-			// Someone, somewhere, is creating a MutableText object with an
-			// immutable List<Text> siblings parameter, which causes the game to
-			// crash when calling append(). So we always have to create a new
-			// MutableText object to avoid that.
-			MutableComponent oldText = (MutableComponent)event.getComponent();
-			MutableComponent newText =
-				MutableComponent.create(oldText.getContents());
-			newText.setStyle(oldText.getStyle());
-			oldText.getSiblings().forEach(newText::append);
-			
-			event.setComponent(newText.append(" [x" + spamCounter + "]"));
-		}
+			event.setComponent(
+				event.getComponent().copy().append(" [x" + spamCounter + "]"));
 	}
 }
