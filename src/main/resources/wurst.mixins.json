@@ -48,6 +48,8 @@
     "autosteal.ContainerScreenMixin",
     "autosteal.ShulkerBoxScreenMixin",
     "barrieresp.ClientLevelMixin",
+    "cameradistance.CameraMixin",
+    "cameranoclip.CameraMixin",
     "freecam.CameraMixin",
     "freecam.LocalPlayerMixin",
     "freecam.MouseHandlerMixin",
