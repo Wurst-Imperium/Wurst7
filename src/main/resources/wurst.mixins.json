@@ -33,7 +33,6 @@
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
     "OptionInstanceMixin",
-    "PackSelectionScreenMixin",
     "PauseScreenMixin",
     "ScreenEffectRendererMixin",
     "ServerNameResolverMixin",
