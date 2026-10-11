@@ -50,15 +50,8 @@ public class HudMixin
 		if(texture == null)
 			return;
 		
-		String path = texture.getPath();
-		HackList hax = WurstClient.INSTANCE.getHax();
-		
-		if("textures/misc/pumpkinblur.png".equals(path)
-			&& hax.noPumpkinHack.isEnabled())
-			ci.cancel();
-		
-		if("textures/misc/powder_snow_outline.png".equals(path)
-			&& hax.noOverlayHack.isEnabled())
+		if("textures/misc/pumpkinblur.png".equals(texture.getPath())
+			&& WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
 			ci.cancel();
 	}
 	
