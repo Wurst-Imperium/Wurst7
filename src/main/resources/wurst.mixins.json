@@ -38,6 +38,8 @@
     "StatsScreenMixin",
     "TitleScreenMixin",
     "anticactus.CactusBlockMixin",
+    "antiknockback.ClientPacketListenerMixin",
+    "antiknockback.LocalPlayerMixin",
     "autocomplete.CommandSuggestionsMixin",
     "autorespawn.DeathScreenMixin",
     "autosign.AbstractSignEditScreenMixin",
