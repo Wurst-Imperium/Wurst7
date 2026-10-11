@@ -52,6 +52,7 @@
     "freecam.MouseHandlerMixin",
     "handnoclip.BlockStateBaseMixin",
     "healthtags.EntityRendererMixin",
+    "infinichat.ChatScreenMixin",
     "jesus.BlockStateBaseMixin",
     "nameprotect.StringDecomposerMixin",
     "nametags.EntityRendererMixin",

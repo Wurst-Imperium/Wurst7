@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -24,19 +23,9 @@ import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 @Mixin(ChatScreen.class)
 public abstract class ChatScreenMixin extends Screen
 {
-	@Shadow
-	protected EditBox input;
-	
 	private ChatScreenMixin(WurstClient wurst, Component title)
 	{
 		super(title);
-	}
-	
-	@Inject(method = "init()V", at = @At("TAIL"))
-	protected void onInit(CallbackInfo ci)
-	{
-		if(WurstClient.INSTANCE.getHax().infiniChatHack.isEnabled())
-			input.setMaxLength(Integer.MAX_VALUE);
 	}
 	
 	@Inject(method = "handleChatInput(Ljava/lang/String;Z)V",
