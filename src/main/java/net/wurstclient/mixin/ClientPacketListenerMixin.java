@@ -22,10 +22,7 @@ import net.minecraft.network.TickablePacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
-import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
 import net.wurstclient.WurstClient;
 import net.wurstclient.util.ChatUtils;
 
@@ -66,38 +63,5 @@ public abstract class ClientPacketListenerMixin
 		SystemToast systemToast = new SystemToast(
 			SystemToast.SystemToastId.UNSECURE_SERVER_WARNING, title, message);
 		minecraft.gui.toastManager().addToast(systemToast);
-	}
-	
-	@Inject(
-		method = "handleLevelChunkWithLight(Lnet/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket;)V",
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/multiplayer/ClientChunkCache;replaceWithPacketData(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)Lnet/minecraft/world/level/chunk/LevelChunk;",
-			shift = At.Shift.AFTER))
-	private void onHandleLevelChunkWithLight(
-		ClientboundLevelChunkWithLightPacket packet, CallbackInfo ci)
-	{
-		WurstClient.INSTANCE.getHax().newChunksHack.afterLoadChunk(packet.x(),
-			packet.z());
-	}
-	
-	@Inject(
-		method = "handleBlockUpdate(Lnet/minecraft/network/protocol/game/ClientboundBlockUpdatePacket;)V",
-		at = @At("TAIL"))
-	private void onHandleBlockUpdate(ClientboundBlockUpdatePacket packet,
-		CallbackInfo ci)
-	{
-		WurstClient.INSTANCE.getHax().newChunksHack
-			.afterUpdateBlock(packet.getPos());
-	}
-	
-	@Inject(
-		method = "handleChunkBlocksUpdate(Lnet/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket;)V",
-		at = @At("TAIL"))
-	private void onHandleChunkBlocksUpdate(
-		ClientboundSectionBlocksUpdatePacket packet, CallbackInfo ci)
-	{
-		packet.runUpdates(
-			(pos, state) -> WurstClient.INSTANCE.getHax().newChunksHack
-				.afterUpdateBlock(pos));
 	}
 }
