@@ -31,6 +31,4 @@ public final class NoFireOverlayHack extends Hack
 	{
 		return isEnabled() ? offset.getValueF() : 0;
 	}
-	
-	// See ScreenEffectRendererMixin.getFireOffset()
 }

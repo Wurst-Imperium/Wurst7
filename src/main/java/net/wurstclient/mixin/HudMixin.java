@@ -15,18 +15,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Hud;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.Entity;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
-import net.wurstclient.hack.HackList;
 
 @Mixin(Hud.class)
 public class HudMixin
 {
-	// runs after extractScoreboardSidebar()
-	// and before tabList.setVisible()
+	/**
+	 * Fires GUIRenderEvent after the scoreboard and before the tab list is
+	 * rendered.
+	 */
 	@Inject(
 		method = "extractTabList(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V",
 		at = @At("HEAD"))
@@ -38,31 +37,5 @@ public class HudMixin
 		
 		float tickDelta = tickCounter.getGameTimeDeltaPartialTick(true);
 		EventManager.fire(new GUIRenderEvent(context, tickDelta));
-	}
-	
-	@Inject(
-		method = "extractTextureOverlay(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/resources/Identifier;F)V",
-		at = @At("HEAD"),
-		cancellable = true)
-	private void onExtractTextureOverlay(GuiGraphicsExtractor context,
-		Identifier texture, float opacity, CallbackInfo ci)
-	{
-		if(texture == null)
-			return;
-		
-		if("textures/misc/pumpkinblur.png".equals(texture.getPath())
-			&& WurstClient.INSTANCE.getHax().noPumpkinHack.isEnabled())
-			ci.cancel();
-	}
-	
-	@Inject(method = "extractVignette", at = @At("HEAD"), cancellable = true)
-	private void onExtractVignette(GuiGraphicsExtractor context, Entity entity,
-		CallbackInfo ci)
-	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.noVignetteHack.isEnabled())
-			return;
-		
-		ci.cancel();
 	}
 }
