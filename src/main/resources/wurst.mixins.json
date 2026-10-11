@@ -23,7 +23,6 @@
     "HudMixin",
     "FirstPersonHandsAndItemsRendererMixin",
     "JoinMultiplayerScreenMixin",
-    "KeyBindsListMixin",
     "KeyMappingMixin",
     "KeyboardHandlerMixin",
     "LanguageManagerMixin",
@@ -88,7 +87,10 @@
     "xray.indigo.AltModelBlockRendererImplMixin",
     "xray.sodium.AbstractBlockRenderContextMixin",
     "xray.sodium.BlockRendererMixin",
-    "xray.sodium.DefaultFluidRendererMixin"
+    "xray.sodium.DefaultFluidRendererMixin",
+    "zoom.CameraMixin",
+    "zoom.KeyBindsListMixin",
+    "zoom.MouseHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

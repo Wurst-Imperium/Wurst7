@@ -12,12 +12,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.VisGraphListener.VisGraphEvent;
 
@@ -40,24 +37,4 @@ public abstract class CameraMixin
 			cameraState.smartCull = false;
 	}
 	
-	/**
-	 * Makes the zoom work.
-	 */
-	@ModifyReturnValue(method = "calculateFov(F)F", at = @At("RETURN"))
-	private float onCalculateFov(float original)
-	{
-		return WurstClient.INSTANCE.getOtfs().zoomOtf
-			.changeFovBasedOnZoom(original);
-	}
-	
-	/**
-	 * Moves the hand in first person mode out of the way as you zoom in
-	 * further.
-	 */
-	@ModifyReturnValue(method = "calculateHudFov(F)F", at = @At("RETURN"))
-	private float onCalculateHudFov(float original)
-	{
-		return WurstClient.INSTANCE.getOtfs().zoomOtf
-			.changeFovBasedOnZoom(original);
-	}
 }
