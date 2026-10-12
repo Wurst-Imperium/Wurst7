@@ -190,22 +190,6 @@ public abstract class MinecraftMixin
 		cir.setReturnValue(wurstProfileKeys);
 	}
 	
-	@Inject(method = "allowsTelemetry()Z", at = @At("HEAD"), cancellable = true)
-	private void onAllowsTelemetry(CallbackInfoReturnable<Boolean> cir)
-	{
-		cir.setReturnValue(
-			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
-	}
-	
-	@Inject(method = "extraTelemetryAvailable()Z",
-		at = @At("HEAD"),
-		cancellable = true)
-	private void onExtraTelemetryAvailable(CallbackInfoReturnable<Boolean> cir)
-	{
-		cir.setReturnValue(
-			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
-	}
-	
 	@Override
 	public ILocalPlayer getPlayer()
 	{
