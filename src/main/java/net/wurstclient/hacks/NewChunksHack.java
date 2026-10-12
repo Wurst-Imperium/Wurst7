@@ -173,12 +173,11 @@ public final class NewChunksHack extends Hack
 		}
 	}
 	
-	public void afterLoadChunk(int x, int z)
+	public void afterLoadChunk(LevelChunk chunk)
 	{
 		if(!isEnabled())
 			return;
 		
-		LevelChunk chunk = MC.level.getChunk(x, z);
 		new Thread(() -> checkLoadedChunk(chunk), "NewChunks " + chunk.getPos())
 			.start();
 	}

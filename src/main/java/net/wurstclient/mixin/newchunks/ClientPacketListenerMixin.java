@@ -12,25 +12,27 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.wurstclient.WurstClient;
 
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPacketListenerMixin
 {
-	@Inject(
+	@ModifyExpressionValue(
 		method = "handleLevelChunkWithLight(Lnet/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket;)V",
 		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/multiplayer/ClientChunkCache;replaceWithPacketData(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)Lnet/minecraft/world/level/chunk/LevelChunk;",
-			shift = At.Shift.AFTER))
-	private void onHandleLevelChunkWithLight(
-		ClientboundLevelChunkWithLightPacket packet, CallbackInfo ci)
+			target = "Lnet/minecraft/client/multiplayer/ClientChunkCache;replaceWithPacketData(IILnet/minecraft/network/protocol/game/ClientboundLevelChunkPacketData;)Lnet/minecraft/world/level/chunk/LevelChunk;"))
+	private LevelChunk onHandleLevelChunkWithLight(LevelChunk chunk)
 	{
-		WurstClient.INSTANCE.getHax().newChunksHack.afterLoadChunk(packet.x(),
-			packet.z());
+		if(chunk != null)
+			WurstClient.INSTANCE.getHax().newChunksHack.afterLoadChunk(chunk);
+		
+		return chunk;
 	}
 	
 	@Inject(
