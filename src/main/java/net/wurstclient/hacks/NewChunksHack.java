@@ -238,7 +238,7 @@ public final class NewChunksHack extends Hack
 			return;
 		
 		newChunks.add(chunkPos);
-		newChunkReasons.add(pos);
+		newChunkReasons.add(pos.immutable());
 		if(logChunks.isChecked())
 			System.out.println("new chunk at " + chunkPos);
 	}
