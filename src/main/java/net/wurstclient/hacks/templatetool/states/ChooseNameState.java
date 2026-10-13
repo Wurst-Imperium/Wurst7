@@ -78,10 +78,8 @@ public final class ChooseNameState extends TemplateToolState
 				Component.empty());
 			nameField.setBordered(false);
 			nameField.setMaxLength(32);
-			nameField.setFocused(true);
 			nameField.setTextColor(CommonColors.WHITE);
 			addWidget(nameField);
-			setFocused(nameField);
 			
 			includeTypesBox =
 				Checkbox.builder(Component.literal("Include block types"), tr)
@@ -96,6 +94,12 @@ public final class ChooseNameState extends TemplateToolState
 				Button.builder(Component.literal("Cancel"), b -> cancel())
 					.bounds(middleX - 50, middleY + 80, 100, 15).build();
 			addRenderableWidget(cancelButton);
+		}
+		
+		@Override
+		protected void setInitialFocus()
+		{
+			setInitialFocus(nameField);
 		}
 		
 		private void done()
