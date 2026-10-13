@@ -60,9 +60,8 @@ public class DefaultFluidRendererMixin
 		BlockPos nPos = pos.offset(dir.getUnitVec3i());
 		BlockState neighborState = world.getBlockState(nPos);
 		
-		cir.setReturnValue(
-			!neighborState.getFluidState().getType().isSame(fluid.getType())
-				&& shouldDrawSide);
+		cir.setReturnValue(!neighborState.getFluidState().is(fluid.getType())
+			&& shouldDrawSide);
 	}
 	
 	/**
@@ -92,8 +91,9 @@ public class DefaultFluidRendererMixin
 			return;
 		
 		BlockState neighborState = world.getBlockState(neighborPos);
-		cir.setReturnValue(!neighborState.getFluidState().getType()
-			.isSame(state.getFluidState().getType()) && shouldDrawSide);
+		cir.setReturnValue(
+			!neighborState.getFluidState().is(state.getFluidState().getType())
+				&& shouldDrawSide);
 	}
 	
 	/**

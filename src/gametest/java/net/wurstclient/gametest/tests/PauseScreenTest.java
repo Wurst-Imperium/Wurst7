@@ -63,10 +63,10 @@ public final class PauseScreenTest extends SingleplayerTest
 		logger.info("Opening game menu without Wurst Options");
 		input.pressKey(InputConstants.KEY_ESCAPE);
 		assertScreenshotEquals("game_menu_alt",
-			"https://i.imgur.com/QFfGwj1.png");
+			"https://i.imgur.com/g7RRSkR.png");
 		
 		logger.info("Opening statistics screen with Wurst Options");
-		for(int i = 0; i < 3; i++)
+		for(int i = 0; i < 2; i++)
 			input.pressKey(InputConstants.KEY_TAB);
 		input.pressKey(InputConstants.KEY_RETURN);
 		context.waitFor(mc -> mc.gui.screen() instanceof StatsScreen statsScreen
