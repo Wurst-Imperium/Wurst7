@@ -19,6 +19,4 @@ public final class NoSlowdownHack extends Hack
 		super("NoSlowdown");
 		setCategory(Category.MOVEMENT);
 	}
-	
-	// See LocalPlayerMixin
 }

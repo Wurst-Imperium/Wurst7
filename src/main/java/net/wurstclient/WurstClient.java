@@ -35,12 +35,11 @@ import net.wurstclient.hack.HackList;
 import net.wurstclient.hud.IngameHUD;
 import net.wurstclient.keybinds.KeybindList;
 import net.wurstclient.keybinds.KeybindProcessor;
-import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.mixinterface.IMinecraft;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.SettingsFile;
-import net.wurstclient.update.ProblematicResourcePackDetector;
 import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
 
@@ -49,9 +48,9 @@ public enum WurstClient
 	INSTANCE;
 	
 	public static Minecraft MC;
-	public static IMinecraftClient IMC;
+	public static IMinecraft IMC;
 	
-	public static final String VERSION = "7.56";
+	public static final String VERSION = "7.56.1";
 	public static final String MC_VERSION = "26.2";
 	
 	private PlausibleAnalytics plausible;
@@ -74,7 +73,6 @@ public enum WurstClient
 	private boolean enabled = true;
 	private static boolean guiInitialized;
 	private WurstUpdater updater;
-	private ProblematicResourcePackDetector problematicPackDetector;
 	private Path wurstFolder;
 	
 	public void initialize()
@@ -82,7 +80,7 @@ public enum WurstClient
 		System.out.println("Starting Wurst Client...");
 		
 		MC = Minecraft.getInstance();
-		IMC = (IMinecraftClient)MC;
+		IMC = (IMinecraft)MC;
 		wurstFolder = createWurstFolder();
 		
 		Path analyticsFile = wurstFolder.resolve("analytics.json");
@@ -136,9 +134,6 @@ public enum WurstClient
 		
 		updater = new WurstUpdater();
 		eventManager.add(UpdateListener.class, updater);
-		
-		problematicPackDetector = new ProblematicResourcePackDetector();
-		problematicPackDetector.start();
 		
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
 		Path encFolder = Encryption.chooseEncryptionFolder();
@@ -305,11 +300,6 @@ public enum WurstClient
 	public WurstUpdater getUpdater()
 	{
 		return updater;
-	}
-	
-	public ProblematicResourcePackDetector getProblematicPackDetector()
-	{
-		return problematicPackDetector;
 	}
 	
 	public Path getWurstFolder()

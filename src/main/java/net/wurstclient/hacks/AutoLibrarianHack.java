@@ -332,7 +332,7 @@ public final class AutoLibrarianHack extends Hack
 		BlockPlacingParams params = BlockPlacer.getBlockPlacingParams(jobSite);
 		if(params == null)
 		{
-			sneakKey.resetPressedState();
+			sneakKey.resetDownState();
 			return;
 		}
 		
@@ -349,7 +349,7 @@ public final class AutoLibrarianHack extends Hack
 			swingHand.swing(hand);
 		
 		// reset sneak
-		sneakKey.resetPressedState();
+		sneakKey.resetDownState();
 	}
 	
 	private void openTradeScreen()

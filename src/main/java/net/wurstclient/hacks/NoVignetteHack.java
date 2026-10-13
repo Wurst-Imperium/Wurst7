@@ -19,6 +19,4 @@ public final class NoVignetteHack extends Hack
 		super("NoVignette");
 		setCategory(Category.RENDER);
 	}
-	
-	// See HudMixin.onExtractVignette()
 }

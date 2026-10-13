@@ -17,7 +17,7 @@ import net.wurstclient.events.MobEffectListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hacks.fullbright.BadOptimizationsLightmapHook;
-import net.wurstclient.mixinterface.ISimpleOption;
+import net.wurstclient.mixinterface.IOptionInstance;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -88,8 +88,8 @@ public final class FullbrightHack extends Hack
 		
 		if(wasGammaChanged)
 		{
-			ISimpleOption.get(MC.options.gamma())
-				.forceSetValue(defaultGamma.getValue());
+			IOptionInstance.get(MC.options.gamma())
+				.forceSet(defaultGamma.getValue());
 			wasGammaChanged = false;
 		}
 		
@@ -121,38 +121,38 @@ public final class FullbrightHack extends Hack
 		wasGammaChanged = true;
 		
 		OptionInstance<Double> gammaOption = MC.options.gamma();
-		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
+		IOptionInstance<Double> gammaOption2 = IOptionInstance.get(gammaOption);
 		double oldGammaValue = gammaOption.get();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
 		{
-			gammaOption2.forceSetValue(target);
+			gammaOption2.forceSet(target);
 			return;
 		}
 		
 		if(oldGammaValue < target)
-			gammaOption2.forceSetValue(oldGammaValue + 0.5);
+			gammaOption2.forceSet(oldGammaValue + 0.5);
 		else
-			gammaOption2.forceSetValue(oldGammaValue - 0.5);
+			gammaOption2.forceSet(oldGammaValue - 0.5);
 	}
 	
 	private void resetGamma(double target)
 	{
 		OptionInstance<Double> gammaOption = MC.options.gamma();
-		ISimpleOption<Double> gammaOption2 = ISimpleOption.get(gammaOption);
+		IOptionInstance<Double> gammaOption2 = IOptionInstance.get(gammaOption);
 		double oldGammaValue = gammaOption.get();
 		
 		if(!fade.isChecked() || Math.abs(oldGammaValue - target) <= 0.5)
 		{
-			gammaOption2.forceSetValue(target);
+			gammaOption2.forceSet(target);
 			wasGammaChanged = false;
 			return;
 		}
 		
 		if(oldGammaValue < target)
-			gammaOption2.forceSetValue(oldGammaValue + 0.5);
+			gammaOption2.forceSet(oldGammaValue + 0.5);
 		else
-			gammaOption2.forceSetValue(oldGammaValue - 0.5);
+			gammaOption2.forceSet(oldGammaValue - 0.5);
 	}
 	
 	private void updateNightVision()

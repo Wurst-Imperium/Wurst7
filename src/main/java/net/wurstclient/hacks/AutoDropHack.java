@@ -84,7 +84,7 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			if(!items.getItemNames().contains(itemName))
 				continue;
 			
-			IMC.getInteractionManager().windowClick_THROW(slot);
+			IMC.getGameMode().windowClick_THROW(slot);
 		}
 	}
 }

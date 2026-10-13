@@ -97,7 +97,7 @@ public final class NukerLegitHack extends Hack
 		EVENTS.remove(RenderListener.class, this);
 		
 		// resets
-		IKeyMapping.get(MC.options.keyAttack).resetPressedState();
+		IKeyMapping.get(MC.options.keyAttack).resetDownState();
 		MC.gameMode.stopDestroyBlock();
 		overlay.resetProgress();
 		currentBlock = null;
@@ -147,7 +147,7 @@ public final class NukerLegitHack extends Hack
 		// reset if no block was found
 		if(currentBlock == null)
 		{
-			IKeyMapping.get(MC.options.keyAttack).resetPressedState();
+			IKeyMapping.get(MC.options.keyAttack).resetDownState();
 			overlay.resetProgress();
 		}
 		

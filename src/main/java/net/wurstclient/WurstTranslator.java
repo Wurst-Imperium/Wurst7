@@ -219,7 +219,7 @@ public class WurstTranslator implements ResourceManagerReloadListener
 	 * Ensures that the given resource is from Wurst's built-in resource pack,
 	 * or at least from another client-side mod pretending to be Wurst, as it
 	 * should be impossible for server-provided resource packs to obtain a
-	 * KnownPack of <code>fabric:wurst</code>.
+	 * KnownPack of <code>vanilla:wurst</code>.
 	 *
 	 * <p>
 	 * ASSUME THEY CAN BYPASS THIS. CATCH EXCEPTIONS ANYWAY.
@@ -230,11 +230,8 @@ public class WurstTranslator implements ResourceManagerReloadListener
 			.flatMap(Resource::knownPackInfo).orElse(null);
 		if(knownPack == null)
 			return false;
-			
-		// Note: Namespace can be "fabric" or "vanilla" depending on
-		// Fabric API version (changed in 0.139.3+1.21.11).
-		return ("fabric".equals(knownPack.namespace())
-			|| "vanilla".equals(knownPack.namespace()))
+		
+		return "vanilla".equals(knownPack.namespace())
 			&& "wurst".equals(knownPack.id());
 	}
 }

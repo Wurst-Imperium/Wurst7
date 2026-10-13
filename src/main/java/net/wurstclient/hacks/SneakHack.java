@@ -63,7 +63,7 @@ public final class SneakHack extends Hack
 		switch(mode.getSelected())
 		{
 			case LEGIT:
-			IKeyMapping.get(MC.options.keyShift).resetPressedState();
+			IKeyMapping.get(MC.options.keyShift).resetDownState();
 			break;
 			
 			case PACKET:
@@ -81,13 +81,13 @@ public final class SneakHack extends Hack
 		{
 			case LEGIT:
 			if(offWhileFlying.isChecked() && isFlying())
-				sneakKey.resetPressedState();
+				sneakKey.resetDownState();
 			else
 				sneakKey.setDown(true);
 			break;
 			
 			case PACKET:
-			sneakKey.resetPressedState();
+			sneakKey.resetDownState();
 			// sendSneakPacket(Mode.PRESS_SHIFT_KEY);
 			// sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
 			break;

@@ -133,8 +133,8 @@ public final class FishingSpotManager
 		IKeyMapping jumpKey = IKeyMapping.get(MC.options.keyJump);
 		
 		PositionAndRotation nextPosRot = nextSpot.input();
-		forwardKey.resetPressedState();
-		jumpKey.resetPressedState();
+		forwardKey.resetDownState();
+		jumpKey.resetDownState();
 		
 		// match position
 		Vec3 nextPos = nextPosRot.pos();
