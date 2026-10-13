@@ -32,8 +32,8 @@ public abstract class AbstractSignEditScreenMixin extends Screen
 		super(title);
 	}
 	
-	@Inject(method = "init()V", at = @At("TAIL"))
-	private void onInit(CallbackInfo ci)
+	@Inject(method = "setInitialFocus()V", at = @At("TAIL"))
+	private void onSetInitialFocus(CallbackInfo ci)
 	{
 		AutoSignHack autoSignHack = WurstClient.INSTANCE.getHax().autoSignHack;
 		
