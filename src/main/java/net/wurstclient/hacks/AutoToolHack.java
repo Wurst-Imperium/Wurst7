@@ -31,7 +31,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.events.BlockBreakingProgressListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -224,7 +224,7 @@ public final class AutoToolHack extends Hack
 	{
 		Inventory inv = MC.player.getInventory();
 		int selectedSlot = inv.getSelectedSlot();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		IMultiPlayerGameMode gm = IMC.getGameMode();
 		
 		// If there's an empty slot in the main inventory,
 		// shift-click the damaged item out of the hotbar
@@ -232,7 +232,7 @@ public final class AutoToolHack extends Hack
 			.filter(i -> !inv.getItem(i).isEmpty()).findFirst();
 		if(emptySlot.isPresent())
 		{
-			im.windowClick_QUICK_MOVE(
+			gm.windowClick_QUICK_MOVE(
 				InventoryUtils.toNetworkSlot(selectedSlot));
 			return;
 		}
@@ -242,7 +242,7 @@ public final class AutoToolHack extends Hack
 			.filter(i -> !isDamageable(inv.getItem(i))).findFirst();
 		if(nonDamageableSlot.isPresent())
 		{
-			im.windowClick_SWAP(nonDamageableSlot.getAsInt(), selectedSlot);
+			gm.windowClick_SWAP(nonDamageableSlot.getAsInt(), selectedSlot);
 			return;
 		}
 		
@@ -251,13 +251,13 @@ public final class AutoToolHack extends Hack
 			.filter(i -> !isTooDamaged(inv.getItem(i), repairMode)).findFirst();
 		if(notTooDamagedSlot.isPresent())
 		{
-			im.windowClick_SWAP(notTooDamagedSlot.getAsInt(), selectedSlot);
+			gm.windowClick_SWAP(notTooDamagedSlot.getAsInt(), selectedSlot);
 			return;
 		}
 		
 		// Failing all of the above (whole inventory full of damaged tools),
 		// just swap with the top-left slot
-		im.windowClick_SWAP(0, selectedSlot);
+		gm.windowClick_SWAP(0, selectedSlot);
 	}
 	
 	private boolean isWrongTool(ItemStack heldItem, BlockState state)

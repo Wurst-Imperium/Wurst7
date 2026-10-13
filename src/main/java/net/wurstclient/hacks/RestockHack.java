@@ -21,7 +21,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -86,7 +86,7 @@ public final class RestockHack extends Hack implements UpdateListener
 			return;
 		
 		Inventory inv = MC.player.getInventory();
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
+		IMultiPlayerGameMode gm = IMC.getGameMode();
 		
 		int hotbarSlot = restockSlot.getValueI();
 		if(hotbarSlot == -1)
@@ -110,10 +110,10 @@ public final class RestockHack extends Hack implements UpdateListener
 			{
 				int pickupIndex = InventoryUtils.toNetworkSlot(itemIndex);
 				
-				im.windowClick_PICKUP(pickupIndex);
-				im.windowClick_PICKUP(InventoryUtils.toNetworkSlot(hotbarSlot));
+				gm.windowClick_PICKUP(pickupIndex);
+				gm.windowClick_PICKUP(InventoryUtils.toNetworkSlot(hotbarSlot));
 				if(!MC.player.inventoryMenu.getCarried().isEmpty())
-					im.windowClick_PICKUP(pickupIndex);
+					gm.windowClick_PICKUP(pickupIndex);
 				
 				if(hotbarStack.getCount() >= hotbarStack.getMaxStackSize())
 					break;
@@ -136,7 +136,7 @@ public final class RestockHack extends Hack implements UpdateListener
 				ItemStack stack = inv.getItem(i);
 				if(stack.isEmpty() || !stack.isDamageableItem())
 				{
-					IMC.getInteractionManager().windowClick_SWAP(i,
+					IMC.getGameMode().windowClick_SWAP(i,
 						InventoryUtils.toNetworkSlot(hotbarSlot));
 					break;
 				}

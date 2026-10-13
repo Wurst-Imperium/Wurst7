@@ -22,11 +22,11 @@ public interface IKeyMapping
 	
 	/**
 	 * Resets the pressed state to whether or not the user is actually pressing
-	 * this key on their keyboard.
+	 * this key on their keyboard or mouse.
 	 */
-	public default void resetPressedState()
+	public default void resetDownState()
 	{
-		wurst_resetPressedState();
+		wurst_resetDownState();
 	}
 	
 	/**
@@ -50,8 +50,7 @@ public interface IKeyMapping
 	}
 	
 	/**
-	 * Returns the given KeyMapping object as an IKeyMapping, allowing you to
-	 * access the resetPressedState() method.
+	 * Returns the given KeyMapping object as an IKeyMapping.
 	 */
 	public static IKeyMapping get(KeyMapping kb)
 	{
@@ -65,10 +64,10 @@ public interface IKeyMapping
 	public boolean wurst_isActuallyDown();
 	
 	/**
-	 * @deprecated Use {@link #resetPressedState()} instead.
+	 * @deprecated Use {@link #resetDownState()} instead.
 	 */
 	@Deprecated
-	public void wurst_resetPressedState();
+	public void wurst_resetDownState();
 	
 	/**
 	 * @deprecated Use {@link #simulatePress()} instead.

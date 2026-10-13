@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -41,14 +40,6 @@ public abstract class GameRendererMixin implements AutoCloseable
 		
 		if(!event.isCancelled())
 			original.call(instance, matrices, tickDelta);
-	}
-	
-	@ModifyReturnValue(method = "getFov(Lnet/minecraft/client/Camera;FZ)F",
-		at = @At("RETURN"))
-	private float onGetFov(float original)
-	{
-		return WurstClient.INSTANCE.getOtfs().zoomOtf
-			.changeFovBasedOnZoom(original);
 	}
 	
 	/**

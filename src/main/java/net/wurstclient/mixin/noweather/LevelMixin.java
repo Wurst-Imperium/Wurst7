@@ -25,6 +25,9 @@ public abstract class LevelMixin implements LevelAccessor, AutoCloseable
 	@Inject(method = "getRainLevel(F)F", at = @At("HEAD"), cancellable = true)
 	private void onGetRainLevel(float delta, CallbackInfoReturnable<Float> cir)
 	{
+		if(!isClientSide())
+			return;
+		
 		if(WurstClient.INSTANCE.getHax().noWeatherHack.isRainDisabled())
 			cir.setReturnValue(0F);
 	}
@@ -32,6 +35,9 @@ public abstract class LevelMixin implements LevelAccessor, AutoCloseable
 	@ModifyReturnValue(method = "getDayTime()J", at = @At("RETURN"))
 	public long onGetTimeOfDay(long original)
 	{
+		if(!isClientSide())
+			return original;
+		
 		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
 		return noWeather.isTimeChanged() ? noWeather.getChangedTime()
 			: original;

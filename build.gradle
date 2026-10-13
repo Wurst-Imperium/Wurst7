@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
 	id "fabric-loom" version "${loom_version}"
-	id "com.diffplug.spotless" version "8.10.3"
+	id "com.diffplug.spotless" version "8.10.4"
 	id "net.wimods.github-compile-summary" version "0.1.1"
 }
 
@@ -44,14 +44,6 @@ dependencies {
 	
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-	
-	// net.wurstclient.ai.PathPos extends net.minecraft.util.math.BlockPos,
-	// which uses javax.annotation.concurrent.Immutable, which is part of
-	// the JSR305 library.
-	//
-	// In other words, Wurst won't compile without this library,
-	// even though it's Minecraft that actually uses it.
-	modImplementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 fabricApi.configureTests {

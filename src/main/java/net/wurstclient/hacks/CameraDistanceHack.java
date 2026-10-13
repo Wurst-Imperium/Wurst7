@@ -26,10 +26,11 @@ public final class CameraDistanceHack extends Hack
 		addSetting(distance);
 	}
 	
-	public float getDistance()
+	public float getDistance(float original)
 	{
+		if(!isEnabled())
+			return original;
+		
 		return distance.getValueF();
 	}
-	
-	// See CameraMixin.changeGetMaxZoomDistance()
 }

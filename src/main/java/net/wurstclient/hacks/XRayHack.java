@@ -27,7 +27,7 @@ import net.wurstclient.clickgui.screens.EditBlockListScreen;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.events.VisGraphListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.ISimpleOption;
+import net.wurstclient.mixinterface.IOptionInstance;
 import net.wurstclient.settings.BlockListSetting;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -148,15 +148,15 @@ public final class XRayHack extends Hack
 		// reset gamma
 		FullbrightHack fullbright = WURST.getHax().fullbrightHack;
 		if(!fullbright.isChangingGamma())
-			ISimpleOption.get(MC.options.gamma())
-				.forceSetValue(fullbright.getDefaultGamma());
+			IOptionInstance.get(MC.options.gamma())
+				.forceSet(fullbright.getDefaultGamma());
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		// force gamma to 16 so that ores are bright enough to see
-		ISimpleOption.get(MC.options.gamma()).forceSetValue(16.0);
+		IOptionInstance.get(MC.options.gamma()).forceSet(16.0);
 	}
 	
 	@Override

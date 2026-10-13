@@ -245,7 +245,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			faceTarget.face(hitVec);
 			
 			// place block
-			IMC.getInteractionManager().rightClickBlock(pos, side, hitVec);
+			IMC.getGameMode().rightClickBlock(pos, side, hitVec);
 			
 			return true;
 		}
@@ -291,8 +291,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 			faceTarget.face(hitVec);
 			
 			// place block
-			IMC.getInteractionManager().rightClickBlock(neighbor,
-				side.getOpposite(), hitVec);
+			IMC.getGameMode().rightClickBlock(neighbor, side.getOpposite(),
+				hitVec);
 			
 			return true;
 		}

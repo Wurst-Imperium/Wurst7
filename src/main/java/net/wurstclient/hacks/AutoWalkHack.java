@@ -32,7 +32,7 @@ public final class AutoWalkHack extends Hack implements UpdateListener
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		IKeyMapping.get(MC.options.keyUp).resetPressedState();
+		IKeyMapping.get(MC.options.keyUp).resetDownState();
 	}
 	
 	@Override

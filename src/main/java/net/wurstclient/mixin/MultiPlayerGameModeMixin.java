@@ -36,11 +36,10 @@ import net.wurstclient.event.EventManager;
 import net.wurstclient.events.BlockBreakingProgressListener.BlockBreakingProgressEvent;
 import net.wurstclient.events.PlayerAttacksEntityListener.PlayerAttacksEntityEvent;
 import net.wurstclient.events.StopUsingItemListener.StopUsingItemEvent;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 
 @Mixin(MultiPlayerGameMode.class)
-public abstract class MultiPlayerGameModeMixin
-	implements IClientPlayerInteractionManager
+public abstract class MultiPlayerGameModeMixin implements IMultiPlayerGameMode
 {
 	@Shadow
 	@Final

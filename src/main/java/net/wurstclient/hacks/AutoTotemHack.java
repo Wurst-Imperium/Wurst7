@@ -16,7 +16,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.mixinterface.IClientPlayerInteractionManager;
+import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -125,9 +125,9 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	{
 		boolean offhandEmpty = MC.player.getOffhandItem().isEmpty();
 		
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		im.windowClick_PICKUP(itemSlot);
-		im.windowClick_PICKUP(45);
+		IMultiPlayerGameMode gm = IMC.getGameMode();
+		gm.windowClick_PICKUP(itemSlot);
+		gm.windowClick_PICKUP(45);
 		
 		if(!offhandEmpty)
 			nextTickSlot = itemSlot;
@@ -138,8 +138,8 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		if(nextTickSlot == -1)
 			return;
 		
-		IClientPlayerInteractionManager im = IMC.getInteractionManager();
-		im.windowClick_PICKUP(nextTickSlot);
+		IMultiPlayerGameMode gm = IMC.getGameMode();
+		gm.windowClick_PICKUP(nextTickSlot);
 		nextTickSlot = -1;
 	}
 	

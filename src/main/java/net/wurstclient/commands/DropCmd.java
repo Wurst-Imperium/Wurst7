@@ -48,7 +48,7 @@ public final class DropCmd extends Command implements UpdateListener
 	private void dropAllItems()
 	{
 		for(int i = 9; i < 45; i++)
-			IMC.getInteractionManager().windowClick_THROW(i);
+			IMC.getGameMode().windowClick_THROW(i);
 	}
 	
 	@Override
@@ -59,7 +59,7 @@ public final class DropCmd extends Command implements UpdateListener
 			return;
 		
 		skipEmptySlots();
-		IMC.getInteractionManager().windowClick_THROW(slowModeSlotCounter);
+		IMC.getGameMode().windowClick_THROW(slowModeSlotCounter);
 		
 		slowModeSlotCounter++;
 		slowModeTimer = 5;

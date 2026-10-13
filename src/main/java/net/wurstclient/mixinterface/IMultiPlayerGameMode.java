@@ -14,7 +14,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
-public interface IClientPlayerInteractionManager
+public interface IMultiPlayerGameMode
 {
 	public void windowClick_PICKUP(int slot);
 	
