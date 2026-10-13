@@ -14,10 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
@@ -85,7 +85,6 @@ public final class NewChunksHack extends Hack
 		new NewChunksReasonsRenderer(drawDistance);
 	
 	private RegionPos lastRegion;
-	private DimensionType lastDimension;
 	
 	public NewChunksHack()
 	{
@@ -101,6 +100,9 @@ public final class NewChunksHack extends Hack
 		addSetting(newChunksColor);
 		addSetting(oldChunksColor);
 		addSetting(logChunks);
+		
+		ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE
+			.register((client, level) -> reset());
 	}
 	
 	@Override
@@ -119,7 +121,6 @@ public final class NewChunksHack extends Hack
 		oldChunkReasons.clear();
 		newChunkReasons.clear();
 		lastRegion = null;
-		lastDimension = MC.level.dimensionType();
 	}
 	
 	@Override
@@ -245,9 +246,6 @@ public final class NewChunksHack extends Hack
 	@Override
 	public void onRender(PoseStack matrixStack, float partialTicks)
 	{
-		if(MC.level.dimensionType() != lastDimension)
-			reset();
-		
 		RegionPos region = RenderUtils.getCameraRegion();
 		if(!region.equals(lastRegion))
 		{
