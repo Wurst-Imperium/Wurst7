@@ -8,9 +8,9 @@
 package net.wurstclient.hacks;
 
 import java.awt.Color;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -18,6 +18,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
@@ -36,7 +37,6 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.chunk.ChunkUtils;
 
 public final class NewChunksHack extends Hack
 	implements UpdateListener, RenderListener
@@ -72,12 +72,12 @@ public final class NewChunksHack extends Hack
 	private final CheckboxSetting logChunks = new CheckboxSetting("Log chunks",
 		"Writes to the log file when a new/old chunk is found.", false);
 	
-	private final Set<ChunkPos> newChunks = ConcurrentHashMap.newKeySet();
-	private final Set<ChunkPos> oldChunks = ConcurrentHashMap.newKeySet();
-	private final Set<ChunkPos> dontCheckAgain = ConcurrentHashMap.newKeySet();
+	private final Set<ChunkPos> newChunks = new HashSet<>();
+	private final Set<ChunkPos> oldChunks = new HashSet<>();
+	private final Set<ChunkPos> notOldChunks = new HashSet<>();
 	
-	private final Set<BlockPos> newChunkReasons = ConcurrentHashMap.newKeySet();
-	private final Set<BlockPos> oldChunkReasons = ConcurrentHashMap.newKeySet();
+	private final Set<BlockPos> newChunkReasons = new HashSet<>();
+	private final Set<BlockPos> oldChunkReasons = new HashSet<>();
 	
 	private final NewChunksRenderer renderer = new NewChunksRenderer(altitude,
 		opacity, newChunksColor, oldChunksColor);
@@ -115,11 +115,11 @@ public final class NewChunksHack extends Hack
 	
 	private void reset()
 	{
-		oldChunks.clear();
 		newChunks.clear();
-		dontCheckAgain.clear();
-		oldChunkReasons.clear();
+		oldChunks.clear();
+		notOldChunks.clear();
 		newChunkReasons.clear();
+		oldChunkReasons.clear();
 		lastRegion = null;
 	}
 	
@@ -179,48 +179,57 @@ public final class NewChunksHack extends Hack
 		if(!isEnabled())
 			return;
 		
-		new Thread(() -> checkLoadedChunk(chunk), "NewChunks " + chunk.getPos())
-			.start();
-	}
-	
-	private void checkLoadedChunk(LevelChunk chunk)
-	{
 		ChunkPos chunkPos = chunk.getPos();
 		if(newChunks.contains(chunkPos) || oldChunks.contains(chunkPos)
-			|| dontCheckAgain.contains(chunkPos))
+			|| notOldChunks.contains(chunkPos))
 			return;
+			
+		// Fluids should always generate still, with flow starting later through
+		// block updates. Therefore any chunk that contains flowing fluids in
+		// the initial chunk data should be an old chunk.
+		BlockPos reasonForOld = findFlowingFluid(chunk);
 		
-		int minX = chunkPos.getMinBlockX();
-		int minY = chunk.getMinY();
-		int minZ = chunkPos.getMinBlockZ();
-		int maxX = chunkPos.getMaxBlockX();
-		int maxY = ChunkUtils.getHighestNonEmptySectionYOffset(chunk) + 16;
-		int maxZ = chunkPos.getMaxBlockZ();
+		if(reasonForOld == null)
+		{
+			notOldChunks.add(chunkPos);
+			return;
+		}
 		
-		for(int x = minX; x <= maxX; x++)
-			for(int y = minY; y <= maxY; y++)
-				for(int z = minZ; z <= maxZ; z++)
-				{
-					BlockPos pos = new BlockPos(x, y, z);
-					FluidState fluidState = chunk.getFluidState(pos);
-					
-					if(fluidState.isEmpty() || fluidState.isSource())
-						continue;
-						
-					// Liquid always generates still, the flowing happens later
-					// through block updates. Therefore any chunk that contains
-					// flowing liquids from the start should be an old chunk.
-					oldChunks.add(chunkPos);
-					oldChunkReasons.add(pos);
-					if(logChunks.isChecked())
-						System.out.println("old chunk at " + chunkPos);
-					return;
-				}
-				
-		// If the whole loop ran through without finding anything, make sure it
-		// never runs again on that chunk, as that would be a huge waste of CPU
-		// time.
-		dontCheckAgain.add(chunkPos);
+		oldChunks.add(chunkPos);
+		oldChunkReasons.add(reasonForOld);
+		if(logChunks.isChecked())
+			System.out.println("old chunk at " + chunkPos);
+	}
+	
+	private BlockPos findFlowingFluid(LevelChunk chunk)
+	{
+		LevelChunkSection[] sections = chunk.getSections();
+		for(int i = 0; i < sections.length; i++)
+		{
+			LevelChunkSection section = sections[i];
+			
+			// Skip checking every block if flowing fluid doesn't exist in the
+			// block state palette.
+			if(section.hasOnlyAir()
+				|| !section.maybeHas(state -> isFlowing(state.getFluidState())))
+				continue;
+			
+			for(int y = 0; y < 16; y++)
+				for(int z = 0; z < 16; z++)
+					for(int x = 0; x < 16; x++)
+						if(isFlowing(section.getFluidState(x, y, z)))
+							return new BlockPos(
+								chunk.getPos().getMinBlockX() + x,
+								chunk.getMinY() + i * 16 + y,
+								chunk.getPos().getMinBlockZ() + z);
+		}
+		
+		return null;
+	}
+	
+	private boolean isFlowing(FluidState fluidState)
+	{
+		return !fluidState.isEmpty() && !fluidState.isSource();
 	}
 	
 	public void afterUpdateBlock(BlockPos pos)
@@ -230,7 +239,7 @@ public final class NewChunksHack extends Hack
 		
 		// Liquid starts flowing -> probably a new chunk
 		FluidState fluidState = BlockUtils.getState(pos).getFluidState();
-		if(fluidState.isEmpty() || fluidState.isSource())
+		if(!isFlowing(fluidState))
 			return;
 		
 		ChunkPos chunkPos = ChunkPos.containing(pos);
