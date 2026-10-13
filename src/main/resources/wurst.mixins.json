@@ -29,6 +29,7 @@
     "KeyMappingMixin",
     "KeyboardHandlerMixin",
     "LanguageManagerMixin",
+    "LevelExtractorMixin",
     "LevelRendererMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",
