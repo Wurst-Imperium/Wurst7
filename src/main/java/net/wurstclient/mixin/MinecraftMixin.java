@@ -40,13 +40,13 @@ import net.wurstclient.events.HandleInputListener.HandleInputEvent;
 import net.wurstclient.events.LeftClickListener.LeftClickEvent;
 import net.wurstclient.events.RightClickListener.RightClickEvent;
 import net.wurstclient.mixinterface.ILocalPlayer;
-import net.wurstclient.mixinterface.IMinecraftClient;
+import net.wurstclient.mixinterface.IMinecraft;
 import net.wurstclient.mixinterface.IMultiPlayerGameMode;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin
 	extends ReentrantBlockableEventLoop<Runnable>
-	implements WindowEventHandler, IMinecraftClient
+	implements WindowEventHandler, IMinecraft
 {
 	@Shadow
 	@Final
@@ -59,7 +59,7 @@ public abstract class MinecraftMixin
 	@Unique
 	private YggdrasilAuthenticationService wurstAuthenticationService;
 	
-	private User wurstSession;
+	private User wurstUser;
 	private ProfileKeyPairManager wurstProfileKeys;
 	
 	private MinecraftMixin(WurstClient wurst, String name,
@@ -156,8 +156,8 @@ public abstract class MinecraftMixin
 		cancellable = true)
 	private void onGetUser(CallbackInfoReturnable<User> cir)
 	{
-		if(wurstSession != null)
-			cir.setReturnValue(wurstSession);
+		if(wurstUser != null)
+			cir.setReturnValue(wurstUser);
 	}
 	
 	@Inject(method = "getGameProfile()Lcom/mojang/authlib/GameProfile;",
@@ -165,12 +165,12 @@ public abstract class MinecraftMixin
 		cancellable = true)
 	public void onGetGameProfile(CallbackInfoReturnable<GameProfile> cir)
 	{
-		if(wurstSession == null)
+		if(wurstUser == null)
 			return;
 		
 		GameProfile oldProfile = cir.getReturnValue();
-		GameProfile newProfile = new GameProfile(wurstSession.getProfileId(),
-			wurstSession.getName(), oldProfile.properties());
+		GameProfile newProfile = new GameProfile(wurstUser.getProfileId(),
+			wurstUser.getName(), oldProfile.properties());
 		cir.setReturnValue(newProfile);
 	}
 	
@@ -190,22 +190,6 @@ public abstract class MinecraftMixin
 		cir.setReturnValue(wurstProfileKeys);
 	}
 	
-	@Inject(method = "allowsTelemetry()Z", at = @At("HEAD"), cancellable = true)
-	private void onAllowsTelemetry(CallbackInfoReturnable<Boolean> cir)
-	{
-		cir.setReturnValue(
-			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
-	}
-	
-	@Inject(method = "extraTelemetryAvailable()Z",
-		at = @At("HEAD"),
-		cancellable = true)
-	private void onExtraTelemetryAvailable(CallbackInfoReturnable<Boolean> cir)
-	{
-		cir.setReturnValue(
-			!WurstClient.INSTANCE.getOtfs().noTelemetryOtf.isEnabled());
-	}
-	
 	@Override
 	public ILocalPlayer getPlayer()
 	{
@@ -213,33 +197,33 @@ public abstract class MinecraftMixin
 	}
 	
 	@Override
-	public IMultiPlayerGameMode getInteractionManager()
+	public IMultiPlayerGameMode getGameMode()
 	{
 		return (IMultiPlayerGameMode)gameMode;
 	}
 	
 	@Override
-	public User getWurstSession()
+	public User getWurstUser()
 	{
-		return wurstSession;
+		return wurstUser;
 	}
 	
 	@Override
-	public void setWurstSession(User session)
+	public void setWurstUser(User user)
 	{
-		wurstSession = session;
-		if(session == null)
+		wurstUser = user;
+		if(user == null)
 		{
 			wurstProfileKeys = null;
 			return;
 		}
 		
-		String accessToken = session.getAccessToken();
+		String accessToken = user.getAccessToken();
 		boolean isOffline = accessToken == null || accessToken.isBlank()
 			|| accessToken.equals("0") || accessToken.equals("null");
 		UserApiService userApiService = isOffline ? UserApiService.OFFLINE
 			: wurstAuthenticationService.createUserApiService(accessToken);
-		wurstProfileKeys = ProfileKeyPairManager.create(userApiService, session,
+		wurstProfileKeys = ProfileKeyPairManager.create(userApiService, user,
 			gameDirectory.toPath());
 	}
 }

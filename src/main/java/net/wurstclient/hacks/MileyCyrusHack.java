@@ -43,7 +43,7 @@ public final class MileyCyrusHack extends Hack implements UpdateListener
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
-		IKeyMapping.get(MC.options.keyShift).resetPressedState();
+		IKeyMapping.get(MC.options.keyShift).resetDownState();
 	}
 	
 	@Override

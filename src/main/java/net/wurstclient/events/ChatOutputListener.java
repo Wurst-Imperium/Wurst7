@@ -44,11 +44,6 @@ public interface ChatOutputListener extends Listener
 			return originalMessage;
 		}
 		
-		public boolean isModified()
-		{
-			return !originalMessage.equals(message);
-		}
-		
 		@Override
 		public void fire(ArrayList<ChatOutputListener> listeners)
 		{

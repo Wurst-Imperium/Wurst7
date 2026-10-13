@@ -19,6 +19,4 @@ public final class NoPumpkinHack extends Hack
 		super("NoPumpkin");
 		setCategory(Category.RENDER);
 	}
-	
-	// See GuiMixin.onExtractTextureOverlay()
 }

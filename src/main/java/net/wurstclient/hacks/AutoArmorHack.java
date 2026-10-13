@@ -159,9 +159,8 @@ public final class AutoArmorHack extends Hack
 			
 			// swap armor
 			if(!oldArmor.isEmpty())
-				IMC.getInteractionManager()
-					.windowClick_QUICK_MOVE(8 - type.getIndex());
-			IMC.getInteractionManager().windowClick_QUICK_MOVE(
+				IMC.getGameMode().windowClick_QUICK_MOVE(8 - type.getIndex());
+			IMC.getGameMode().windowClick_QUICK_MOVE(
 				InventoryUtils.toNetworkSlot(data.invSlot()));
 			
 			break;

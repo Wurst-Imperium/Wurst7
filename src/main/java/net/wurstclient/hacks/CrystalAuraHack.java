@@ -210,8 +210,8 @@ public final class CrystalAuraHack extends Hack implements UpdateListener
 			faceTarget.face(hitVec);
 			
 			// place block
-			IMC.getInteractionManager().rightClickBlock(neighbor,
-				side.getOpposite(), hitVec);
+			IMC.getGameMode().rightClickBlock(neighbor, side.getOpposite(),
+				hitVec);
 			
 			return true;
 		}

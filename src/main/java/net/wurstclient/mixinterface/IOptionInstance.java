@@ -9,21 +9,21 @@ package net.wurstclient.mixinterface;
 
 import net.minecraft.client.OptionInstance;
 
-public interface ISimpleOption<T>
+public interface IOptionInstance<T>
 {
 	/**
 	 * Forces the value of the option to the specified value, even if it's
 	 * outside of the normal range.
 	 */
-	public void forceSetValue(T newValue);
+	public void forceSet(T newValue);
 	
 	/**
-	 * Returns the given SimpleOption object as an ISimpleOption, allowing you
-	 * to access the forceSetValue() method.
+	 * Returns the given OptionInstance object as an IOptionInstance, allowing
+	 * you to access the forceSet() method.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> ISimpleOption<T> get(OptionInstance<T> option)
+	public static <T> IOptionInstance<T> get(OptionInstance<T> option)
 	{
-		return (ISimpleOption<T>)(Object)option;
+		return (IOptionInstance<T>)(Object)option;
 	}
 }

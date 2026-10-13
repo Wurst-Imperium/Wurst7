@@ -125,9 +125,9 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 	{
 		boolean offhandEmpty = MC.player.getOffhandItem().isEmpty();
 		
-		IMultiPlayerGameMode im = IMC.getInteractionManager();
-		im.windowClick_PICKUP(itemSlot);
-		im.windowClick_PICKUP(45);
+		IMultiPlayerGameMode gm = IMC.getGameMode();
+		gm.windowClick_PICKUP(itemSlot);
+		gm.windowClick_PICKUP(45);
 		
 		if(!offhandEmpty)
 			nextTickSlot = itemSlot;
@@ -138,8 +138,8 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 		if(nextTickSlot == -1)
 			return;
 		
-		IMultiPlayerGameMode im = IMC.getInteractionManager();
-		im.windowClick_PICKUP(nextTickSlot);
+		IMultiPlayerGameMode gm = IMC.getGameMode();
+		gm.windowClick_PICKUP(nextTickSlot);
 		nextTickSlot = -1;
 	}
 	

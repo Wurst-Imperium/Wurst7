@@ -84,6 +84,6 @@ public final class ItemGeneratorHack extends Hack implements UpdateListener
 		}
 		
 		for(int i = 9; i < 9 + stacks; i++)
-			IMC.getInteractionManager().windowClick_THROW(i);
+			IMC.getGameMode().windowClick_THROW(i);
 	}
 }
