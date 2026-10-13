@@ -11,14 +11,22 @@ import java.awt.Color;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.GlobalPalette;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.Palette;
+import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.PalettedContainerRO;
+import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.material.FluidState;
 import net.wurstclient.Category;
 import net.wurstclient.events.RenderListener;
@@ -47,7 +55,8 @@ public final class NewChunksHack extends Hack
 	
 	private final CheckboxSetting showReasons = new CheckboxSetting(
 		"Show reasons",
-		"Highlights the block that caused each chunk to be marked as new/old.",
+		"Highlights the fluid blocks that caused chunks to be marked as new/old.\n\n"
+			+ "Chunks that were marked based on biome or block palette have no block to highlight.",
 		false);
 	
 	private final CheckboxSetting showCounter =
@@ -184,6 +193,20 @@ public final class NewChunksHack extends Hack
 			|| notOldChunks.contains(chunkPos))
 			return;
 			
+		// Chunk generation can leave unused local palette entries until a disk
+		// round-trip.
+		for(LevelChunkSection section : chunk.getSections())
+			if(hasUnusedEntry(section.getBiomes(),
+				biome -> biome.is(Biomes.PLAINS))
+				|| hasUnusedEntry(section.getStates(),
+					state -> state.is(Blocks.AIR)))
+			{
+				newChunks.add(chunkPos);
+				if(logChunks.isChecked())
+					System.out.println("new chunk (palette) at " + chunkPos);
+				return;
+			}
+			
 		// Fluids should always generate still, with flow starting later through
 		// block updates. Therefore any chunk that contains flowing fluids in
 		// the initial chunk data should be an old chunk.
@@ -198,7 +221,24 @@ public final class NewChunksHack extends Hack
 		oldChunks.add(chunkPos);
 		oldChunkReasons.add(reasonForOld);
 		if(logChunks.isChecked())
-			System.out.println("old chunk at " + chunkPos);
+			System.out.println("old chunk (fluid) at " + chunkPos);
+	}
+	
+	private static <T> boolean hasUnusedEntry(PalettedContainerRO<T> container,
+		Predicate<T> predicate)
+	{
+		Palette<T> palette = ((PalettedContainer<T>)container).data.palette();
+		
+		// Global palettes describe the registry, not this section's history
+		// Single-value palettes cannot have unused entries
+		if(palette instanceof GlobalPalette<?>
+			|| palette instanceof SingleValuePalette<?>
+			|| !palette.maybeHas(predicate))
+			return false;
+		
+		Set<T> usedEntries = new HashSet<>();
+		container.count((entry, count) -> usedEntries.add(entry));
+		return usedEntries.stream().noneMatch(predicate);
 	}
 	
 	private BlockPos findFlowingFluid(LevelChunk chunk)
@@ -249,7 +289,7 @@ public final class NewChunksHack extends Hack
 		newChunks.add(chunkPos);
 		newChunkReasons.add(pos.immutable());
 		if(logChunks.isChecked())
-			System.out.println("new chunk at " + chunkPos);
+			System.out.println("new chunk (fluid) at " + chunkPos);
 	}
 	
 	@Override

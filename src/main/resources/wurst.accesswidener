@@ -1,5 +1,6 @@
 accessWidener	v1	official
 accessible	class	net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack
+accessible	class	net/minecraft/world/level/chunk/PalettedContainer$Data
 accessible	method	net/minecraft/client/KeyboardHandler	keyPress	(JILnet/minecraft/client/input/KeyEvent;)V
 accessible	method	net/minecraft/client/Minecraft	startUseItem	()V
 accessible	method	net/minecraft/client/MouseHandler	onButton	(JLnet/minecraft/client/input/MouseButtonInfo;I)V
@@ -44,3 +45,4 @@ accessible	field	net/minecraft/world/entity/LivingEntity	jumping	Z
 accessible	field	net/minecraft/world/entity/Mob	DATA_MOB_FLAGS_ID	Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible	field	net/minecraft/world/entity/animal/goat/Goat	isLoweringHead	Z
 accessible	field	net/minecraft/world/entity/monster/zombie/ZombifiedPiglin	SPEED_MODIFIER_ATTACKING_ID	Lnet/minecraft/resources/Identifier;
+accessible	field	net/minecraft/world/level/chunk/PalettedContainer	data	Lnet/minecraft/world/level/chunk/PalettedContainer$Data;
