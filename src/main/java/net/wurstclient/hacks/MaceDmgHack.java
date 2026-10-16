@@ -9,6 +9,8 @@ package net.wurstclient.hacks;
 
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
@@ -45,12 +47,25 @@ public final class MaceDmgHack extends Hack
 			|| MC.hitResult.getType() != HitResult.Type.ENTITY)
 			return;
 		
+		if(target instanceof Player targetPlayer)
+		{
+			if(targetPlayer.isCreative() || targetPlayer.isSpectator())
+			{
+				return;
+			}
+		}
+		
+		if(target instanceof LivingEntity livingTarget)
+		{
+			if(livingTarget.hurtTime > 0)
+			{
+				return;
+			}
+		}
+		
 		if(!MC.player.getMainHandItem().is(Items.MACE))
 			return;
-			
-		// See ServerGamePacketListenerImpl.handleMovePlayer()
-		// for why it's using these numbers.
-		// Also, let me know if you find a way to bypass that check.
+		
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
 		sendFakeY(Math.sqrt(500));
