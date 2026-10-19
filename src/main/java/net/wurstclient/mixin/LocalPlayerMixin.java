@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -95,13 +95,16 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
-	@Inject(method = "isAutoJumpEnabled()Z",
-		at = @At("HEAD"),
-		cancellable = true)
-	private void onIsAutoJumpEnabled(CallbackInfoReturnable<Boolean> cir)
+	/**
+	 * Prevents vanilla auto-jump from interfering with Step and .goto.
+	 */
+	@ModifyExpressionValue(method = "updateAutoJump(FF)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;canAutoJump()Z"))
+	private boolean modifyCanAutoJump(boolean original)
 	{
-		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
-			cir.setReturnValue(false);
+		return original && !WurstClient.INSTANCE.getHax().stepHack.isEnabled()
+			&& !WurstClient.INSTANCE.getCmds().goToCmd.isActive();
 	}
 	
 	/**
