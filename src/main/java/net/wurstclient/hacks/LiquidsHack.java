@@ -17,6 +17,4 @@ public final class LiquidsHack extends Hack
 		super("Liquids");
 		setCategory(Category.BLOCKS);
 	}
-	
-	// See LocalPlayerMixin
 }

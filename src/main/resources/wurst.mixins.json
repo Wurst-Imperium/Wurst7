@@ -61,6 +61,7 @@
     "highjump.LivingEntityMixin",
     "infinichat.ChatScreenMixin",
     "jesus.BlockStateBaseMixin",
+    "liquids.LocalPlayerMixin",
     "nameprotect.StringDecomposerMixin",
     "nametags.EntityRendererMixin",
     "nametags.LivingEntityRendererMixin",

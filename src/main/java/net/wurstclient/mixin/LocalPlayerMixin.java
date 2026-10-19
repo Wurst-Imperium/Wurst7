@@ -10,7 +10,6 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -132,20 +131,5 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 			new MobEffectEvent(effect, super.getEffect(effect));
 		EventManager.fire(event);
 		return event.getInstance();
-	}
-	
-	/**
-	 * Makes Liquids work. Must take priority over Freecam's raycast wrapper.
-	 */
-	@ModifyArg(
-		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;",
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;",
-			ordinal = 0),
-		index = 2)
-	private static boolean modifyIncludeFluidsForLiquids(boolean includeFluids)
-	{
-		return includeFluids
-			|| WurstClient.INSTANCE.getHax().liquidsHack.isEnabled();
 	}
 }
