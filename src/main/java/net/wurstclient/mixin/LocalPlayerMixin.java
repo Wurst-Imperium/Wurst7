@@ -151,13 +151,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		return super.isInWater();
 	}
 	
-	@Override
-	protected float getJumpPower()
-	{
-		return super.getJumpPower() + WurstClient.INSTANCE.getHax().highJumpHack
-			.getAdditionalJumpMotion();
-	}
-	
 	/**
 	 * This is the part that makes SafeWalk work.
 	 */

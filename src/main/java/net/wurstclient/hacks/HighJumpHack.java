@@ -26,7 +26,7 @@ public final class HighJumpHack extends Hack
 		addSetting(height);
 	}
 	
-	public float getAdditionalJumpMotion()
+	public float getAddedJumpPower()
 	{
 		if(!isEnabled())
 			return 0;
