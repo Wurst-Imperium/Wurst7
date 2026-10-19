@@ -22,19 +22,15 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.phys.Vec3;
 import net.wurstclient.InputFaker;
 import net.wurstclient.InputFaker.TempRealInput;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.FlyingSpeedListener.FlyingSpeedEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.MobEffectListener.MobEffectEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
-import net.wurstclient.hack.HackList;
 import net.wurstclient.mixinterface.ILocalPlayer;
 
 @Mixin(LocalPlayer.class)
@@ -107,34 +103,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 			&& !WurstClient.INSTANCE.getCmds().goToCmd.isActive();
 	}
 	
-	/**
-	 * Prevents flying up with Flight activating elytra.
-	 */
-	@Override
-	public boolean canGlide()
-	{
-		return !WurstClient.INSTANCE.getHax().flightHack.isEnabled()
-			&& super.canGlide();
-	}
-	
-	/**
-	 * Prevents Flight getting horizontally stuck if elytra is already active.
-	 */
-	@Override
-	public boolean isFallFlying()
-	{
-		return !WurstClient.INSTANCE.getHax().flightHack.isEnabled()
-			&& super.isFallFlying();
-	}
-	
-	@Override
-	protected float getFlyingSpeed()
-	{
-		FlyingSpeedEvent event = new FlyingSpeedEvent(super.getFlyingSpeed());
-		EventManager.fire(event);
-		return event.getSpeed();
-	}
-	
 	@Override
 	public boolean isInWater()
 	{
@@ -151,32 +119,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		return super.isInWater();
 	}
 	
-	/**
-	 * This is the part that makes SafeWalk work.
-	 */
-	@Override
-	protected boolean isStayingOnGroundSurface()
-	{
-		return super.isStayingOnGroundSurface()
-			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
-	}
-	
-	/**
-	 * This mixin allows SafeWalk to sneak visibly when the player is
-	 * near a ledge.
-	 */
-	@Override
-	protected Vec3 maybeBackOffFromEdge(Vec3 movement, MoverType type)
-	{
-		Vec3 result = super.maybeBackOffFromEdge(movement, type);
-		
-		if(movement != null)
-			WurstClient.INSTANCE.getHax().safeWalkHack
-				.onMaybeBackOffFromEdge(!movement.equals(result));
-		
-		return result;
-	}
-	
 	@Override
 	public boolean hasEffect(Holder<MobEffect> effect)
 	{
@@ -190,33 +132,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 			new MobEffectEvent(effect, super.getEffect(effect));
 		EventManager.fire(event);
 		return event.getInstance();
-	}
-	
-	@Override
-	public float maxUpStep()
-	{
-		return WurstClient.INSTANCE.getHax().stepHack
-			.adjustStepHeight(super.maxUpStep());
-	}
-	
-	@Override
-	public double blockInteractionRange()
-	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.reachHack.isEnabled())
-			return super.blockInteractionRange();
-		
-		return hax.reachHack.getReachDistance();
-	}
-	
-	@Override
-	public double entityInteractionRange()
-	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.reachHack.isEnabled())
-			return super.entityInteractionRange();
-		
-		return hax.reachHack.getReachDistance();
 	}
 	
 	/**

@@ -10,58 +10,67 @@ package net.wurstclient.mixin.autosteal;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ChestMenu;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoStealHack;
 
-@Mixin(ContainerScreen.class)
-public abstract class ContainerScreenMixin
-	extends AbstractContainerScreen<ChestMenu>
+@Mixin(AbstractContainerScreen.class)
+public abstract class AbstractContainerScreenMixin extends Screen
 {
 	@Shadow
 	@Final
-	private int containerRows;
+	protected int imageWidth;
+	@Shadow
+	protected int leftPos;
+	@Shadow
+	protected int topPos;
 	
-	@Unique
-	private final AutoStealHack autoSteal =
-		WurstClient.INSTANCE.getHax().autoStealHack;
-	
-	public ContainerScreenMixin(WurstClient wurst, ChestMenu container,
-		Inventory playerInventory, Component name)
+	private AbstractContainerScreenMixin(WurstClient wurst, Component title)
 	{
-		super(container, playerInventory, name);
+		super(title);
 	}
 	
-	@Override
-	public void init()
+	@Inject(method = "init()V", at = @At("TAIL"))
+	private void onInit(CallbackInfo ci)
 	{
-		super.init();
+		AbstractContainerScreen<?> screen =
+			(AbstractContainerScreen<?>)(Object)this;
+		int rows;
+		if(screen instanceof ContainerScreen chest)
+			rows = chest.getMenu().getRowCount();
+		else if(screen instanceof ShulkerBoxScreen)
+			rows = 3;
+		else
+			return;
 		
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
+		AutoStealHack autoSteal = WurstClient.INSTANCE.getHax().autoStealHack;
 		if(autoSteal.areButtonsVisible())
 		{
 			addRenderableWidget(Button
 				.builder(Component.literal("Steal"),
-					b -> autoSteal.steal(this, containerRows))
+					b -> autoSteal.steal(screen, rows))
 				.bounds(leftPos + imageWidth - 108, topPos + 4, 50, 12)
 				.build());
 			
 			addRenderableWidget(Button
 				.builder(Component.literal("Store"),
-					b -> autoSteal.store(this, containerRows))
+					b -> autoSteal.store(screen, rows))
 				.bounds(leftPos + imageWidth - 56, topPos + 4, 50, 12).build());
 		}
 		
 		if(autoSteal.isEnabled())
-			autoSteal.steal(this, containerRows);
+			autoSteal.steal(screen, rows);
 	}
 }

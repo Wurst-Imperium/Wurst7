@@ -87,7 +87,4 @@ public final class SafeWalkHack extends Hack
 		
 		this.sneaking = sneaking;
 	}
-	
-	// See LocalPlayerMixin.isStayingOnGroundSurface() and
-	// LocalPlayerMixin.maybeBackOffFromEdge()
 }
