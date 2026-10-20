@@ -176,7 +176,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		
 		if(movement != null)
 			WurstClient.INSTANCE.getHax().safeWalkHack
-				.onClipAtLedge(!movement.equals(result));
+				.onMaybeBackOffFromEdge(!movement.equals(result));
 		
 		return result;
 	}
