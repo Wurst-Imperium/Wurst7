@@ -9,7 +9,6 @@ package net.wurstclient.clickgui;
 
 import java.util.stream.Stream;
 
-import net.minecraft.util.Mth;
 import net.wurstclient.Feature;
 import net.wurstclient.WurstClient;
 import net.wurstclient.settings.Setting;
@@ -44,8 +43,8 @@ public final class SettingsWindow extends Window
 		if(y + getHeight() > mcWindow.getGuiScaledHeight())
 			y -= getHeight() - 14;
 		
-		x = Mth.clamp(x, 0, mcWindow.getGuiScaledWidth());
-		y = Mth.clamp(y, 0, mcWindow.getGuiScaledHeight());
+		x = Math.clamp(x, 0, mcWindow.getGuiScaledWidth());
+		y = Math.clamp(y, 0, mcWindow.getGuiScaledHeight());
 		
 		setX(x);
 		setY(y);
