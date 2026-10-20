@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -205,7 +204,7 @@ public final class FlightHack extends Hack implements UpdateListener,
 		boolean limitVerticalSpeed = !allowUnsafeVerticalSpeed.isChecked()
 			&& !MC.player.getAbilities().invulnerable;
 		
-		return Mth.clamp(horizontalSpeed.getValue() * verticalSpeed.getValue(),
+		return Math.clamp(horizontalSpeed.getValue() * verticalSpeed.getValue(),
 			0.05, limitVerticalSpeed ? 3.95 : 10);
 	}
 }

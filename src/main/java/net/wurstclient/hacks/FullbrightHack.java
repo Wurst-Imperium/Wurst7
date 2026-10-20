@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.OptionInstance;
-import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.wurstclient.Category;
@@ -168,7 +167,7 @@ public final class FullbrightHack extends Hack
 			else
 				nightVisionStrength -= 0.03125;
 			
-			nightVisionStrength = Mth.clamp(nightVisionStrength, 0, 1);
+			nightVisionStrength = Math.clamp(nightVisionStrength, 0, 1);
 			
 		}else if(shouldGiveNightVision)
 			nightVisionStrength = 1;
