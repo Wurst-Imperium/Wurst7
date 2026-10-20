@@ -54,7 +54,7 @@ public final class SafeWalkHack extends Hack
 			setSneaking(false);
 	}
 	
-	public void onClipAtLedge(boolean clipping)
+	public void onMaybeBackOffFromEdge(boolean backingOff)
 	{
 		LocalPlayer player = MC.player;
 		
@@ -71,9 +71,9 @@ public final class SafeWalkHack extends Hack
 			.inflate(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
 		
 		if(MC.level.noCollision(player, adjustedBox))
-			clipping = true;
+			backingOff = true;
 		
-		setSneaking(clipping);
+		setSneaking(backingOff);
 	}
 	
 	private void setSneaking(boolean sneaking)

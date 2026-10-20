@@ -9,7 +9,6 @@ package net.wurstclient.settings;
 
 import java.util.function.Function;
 
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -67,9 +66,9 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 		if(box.contains(eyes))
 			return eyes;
 		
-		double clampedX = Mth.clamp(eyes.x, box.minX, box.maxX);
-		double clampedY = Mth.clamp(eyes.y, box.minY, box.maxY);
-		double clampedZ = Mth.clamp(eyes.z, box.minZ, box.maxZ);
+		double clampedX = Math.clamp(eyes.x, box.minX, box.maxX);
+		double clampedY = Math.clamp(eyes.y, box.minY, box.maxY);
+		double clampedZ = Math.clamp(eyes.z, box.minZ, box.maxZ);
 		
 		return new Vec3(clampedX, clampedY, clampedZ);
 	}
