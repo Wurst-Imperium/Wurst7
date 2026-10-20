@@ -520,7 +520,7 @@ public final class ExcavatorHack extends Hack
 			sizeZ = Math.abs(startZ - endZ);
 			
 			totalBlocks = (sizeX + 1) * (sizeY + 1) * (sizeZ + 1);
-			scanSpeed = Mth.clamp(totalBlocks / 30, 1, 16384);
+			scanSpeed = Math.clamp(totalBlocks / 30, 1, 16384);
 			iterator = BlockUtils.getAllInBox(start, end).iterator();
 		}
 	}
