@@ -42,8 +42,7 @@ public final class AimAssistHack extends Hack
 		new SliderSetting("FOV", "description.wurst.setting.aimassist.fov", 120,
 			30, 360, 10, ValueDisplay.DEGREES);
 	
-	private final AimAtSetting aimAt = new AimAtSetting(
-		"What point in the target's hitbox AimAssist should aim at.");
+	private final AimAtSetting aimAt = new AimAtSetting(this);
 	
 	private final SliderSetting ignoreMouseInput =
 		new SliderSetting("Ignore mouse input",
