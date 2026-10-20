@@ -143,8 +143,7 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final void extractRenderState(GuiGraphicsExtractor context,
-		int mouseX, int mouseY, float partialTicks)
+	public final void extractRenderState(GuiGraphicsExtractor context)
 	{
 		// background
 		int bgx1 = middleX - 154;
@@ -178,12 +177,12 @@ public abstract class NavigatorScreen extends Screen
 				drawDownShadow(context, x1, y1, x2, y2);
 		}
 		
-		onRender(context, mouseX, mouseY, partialTicks);
+		onRender(context, context.mouseX(), context.mouseY(),
+			context.deltaTracker().getGameTimeDeltaTicks());
 	}
 	
 	@Override
-	public void extractBackground(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float deltaTicks)
+	public void extractBackground(GuiGraphicsExtractor context)
 	{
 		// Don't blur
 	}

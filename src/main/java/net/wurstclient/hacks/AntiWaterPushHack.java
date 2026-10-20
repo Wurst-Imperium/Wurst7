@@ -71,8 +71,8 @@ public final class AntiWaterPushHack extends Hack
 	
 	public boolean isPreventingSlowdown()
 	{
-		return preventSlowdown.isChecked();
+		return isEnabled() && preventSlowdown.isChecked();
 	}
 	
-	// See EntityMixin.wrapUpdateFluidInteractionIsPushedByFluid()
+	// See LivingEntityMixin
 }

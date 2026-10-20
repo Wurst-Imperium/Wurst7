@@ -214,8 +214,7 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		context.centeredText(font, "Clean Up", width / 2, 20,
 			CommonColors.WHITE);
@@ -224,9 +223,9 @@ public class CleanUpScreen extends Screen
 			CommonColors.LIGHT_GRAY);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 		
-		renderButtonTooltip(context, mouseX, mouseY);
+		renderButtonTooltip(context, context.mouseX(), context.mouseY());
 	}
 	
 	private void renderButtonTooltip(GuiGraphicsExtractor context, int mouseX,
@@ -294,8 +293,7 @@ public class CleanUpScreen extends Screen
 		}
 		
 		@Override
-		protected void extractContents(GuiGraphicsExtractor drawContext, int i,
-			int j, float f)
+		protected void extractContents(GuiGraphicsExtractor drawContext)
 		{
 			extractDefaultSprite(drawContext);
 			extractDefaultLabel(drawContext.textRendererForWidget(this,

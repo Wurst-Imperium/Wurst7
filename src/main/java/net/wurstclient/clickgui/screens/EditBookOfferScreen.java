@@ -272,8 +272,7 @@ public final class EditBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		Matrix3x2fStack matrixStack = context.pose();
 		
@@ -314,11 +313,11 @@ public final class EditBookOfferScreen extends Screen
 		
 		context.text(tr, price, x + 28, y + 18, CommonColors.LIGHT_GRAY, false);
 		
-		levelField.extractRenderState(context, mouseX, mouseY, partialTicks);
-		priceField.extractRenderState(context, mouseX, mouseY, partialTicks);
+		levelField.extractRenderState(context);
+		priceField.extractRenderState(context);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 		
 		matrixStack.translate(width / 2 - 100, 112);
 		

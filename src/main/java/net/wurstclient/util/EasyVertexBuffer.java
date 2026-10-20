@@ -130,7 +130,8 @@ public final class EasyVertexBuffer implements AutoCloseable
 		
 		RenderTarget framebuffer =
 			WurstClient.MC.gameRenderer.mainRenderTarget();
-		RenderPipeline pipeline = layer.pipeline();
+		RenderPipeline pipeline =
+			layer.prepare().pipelineProvider().apply(null);
 		GpuBuffer indexBuffer = shapeIndexBuffer.getBuffer(indexCount);
 		
 		try(RenderPass renderPass =

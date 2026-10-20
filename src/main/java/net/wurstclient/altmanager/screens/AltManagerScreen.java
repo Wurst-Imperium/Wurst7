@@ -408,10 +408,9 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
-		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(context);
 		
 		// skin preview
 		Alt alt = listGui.getSelectedAlt();
@@ -444,10 +443,10 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 		
-		renderButtonTooltip(context, mouseX, mouseY);
-		renderAltTooltip(context, mouseX, mouseY);
+		renderButtonTooltip(context, context.mouseX(), context.mouseY());
+		renderAltTooltip(context, context.mouseX(), context.mouseY());
 	}
 	
 	private void renderAltTooltip(GuiGraphicsExtractor context, int mouseX,
@@ -577,8 +576,8 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context, int mouseX,
-			int mouseY, boolean hovered, float tickDelta)
+		public void extractContent(GuiGraphicsExtractor context,
+			boolean hovered)
 		{
 			int x = getContentX();
 			int y = getContentY();

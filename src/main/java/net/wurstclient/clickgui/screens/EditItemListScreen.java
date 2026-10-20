@@ -140,12 +140,11 @@ public final class EditItemListScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		Matrix3x2fStack matrixStack = context.pose();
 		
-		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(context);
 		
 		context.centeredText(minecraft.font,
 			itemList.getName() + " (" + itemList.getItemNames().size() + ")",
@@ -153,10 +152,10 @@ public final class EditItemListScreen extends Screen
 		
 		matrixStack.pushMatrix();
 		
-		itemNameField.extractRenderState(context, mouseX, mouseY, partialTicks);
+		itemNameField.extractRenderState(context);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 		
 		context.guiRenderState.up();
 		matrixStack.pushMatrix();
@@ -224,8 +223,8 @@ public final class EditItemListScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context, int mouseX,
-			int mouseY, boolean hovered, float tickDelta)
+		public void extractContent(GuiGraphicsExtractor context,
+			boolean hovered)
 		{
 			int x = getContentX();
 			int y = getContentY();

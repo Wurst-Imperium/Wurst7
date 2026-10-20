@@ -57,13 +57,12 @@ public class PressAKeyScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		context.centeredText(font, "Press a key or mouse button", width / 2,
 			height / 4 + 48, CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 	}
 }

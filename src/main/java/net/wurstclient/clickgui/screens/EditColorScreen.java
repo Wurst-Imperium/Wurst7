@@ -24,7 +24,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
@@ -161,8 +161,7 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		Font tr = minecraft.font;
 		
@@ -191,12 +190,10 @@ public final class EditColorScreen extends Screen
 		context.text(tr, "B:", fieldsX + 150 - 3 - tr.width("B:"),
 			fieldsY + 6 + 35, CommonColors.BLUE, false);
 		
-		hexValueField.extractRenderState(context, mouseX, mouseY, partialTicks);
-		redValueField.extractRenderState(context, mouseX, mouseY, partialTicks);
-		greenValueField.extractRenderState(context, mouseX, mouseY,
-			partialTicks);
-		blueValueField.extractRenderState(context, mouseX, mouseY,
-			partialTicks);
+		hexValueField.extractRenderState(context);
+		redValueField.extractRenderState(context);
+		greenValueField.extractRenderState(context);
+		blueValueField.extractRenderState(context);
 		
 		// Color preview
 		
@@ -216,7 +213,7 @@ public final class EditColorScreen extends Screen
 			color.getRGB());
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 	}
 	
 	@Override

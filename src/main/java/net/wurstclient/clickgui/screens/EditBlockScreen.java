@@ -96,8 +96,7 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		Matrix3x2fStack matrixStack = context.pose();
 		Font tr = minecraft.font;
@@ -105,10 +104,10 @@ public final class EditBlockScreen extends Screen
 		context.centeredText(tr, setting.getName(), width / 2, 20,
 			CommonColors.WHITE);
 		
-		blockField.extractRenderState(context, mouseX, mouseY, partialTicks);
+		blockField.extractRenderState(context);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 		
 		context.guiRenderState.up();
 		matrixStack.pushMatrix();

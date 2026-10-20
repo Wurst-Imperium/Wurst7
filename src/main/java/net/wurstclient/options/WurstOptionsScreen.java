@@ -152,15 +152,14 @@ public class WurstOptionsScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		renderTitles(context);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 		
-		renderButtonTooltip(context, mouseX, mouseY);
+		renderButtonTooltip(context, context.mouseX(), context.mouseY());
 	}
 	
 	private void renderTitles(GuiGraphicsExtractor context)
@@ -241,8 +240,7 @@ public class WurstOptionsScreen extends Screen
 		}
 		
 		@Override
-		protected void extractContents(GuiGraphicsExtractor drawContext, int i,
-			int j, float f)
+		protected void extractContents(GuiGraphicsExtractor drawContext)
 		{
 			extractDefaultSprite(drawContext);
 			extractDefaultLabel(drawContext.textRendererForWidget(this,

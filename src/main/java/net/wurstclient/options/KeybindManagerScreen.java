@@ -145,10 +145,9 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
-		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(context);
 		
 		context.centeredText(font, "Keybind Manager", width / 2, 8,
 			CommonColors.WHITE);
@@ -158,7 +157,7 @@ public final class KeybindManagerScreen extends Screen
 			CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 	}
 	
 	@Override
@@ -185,8 +184,8 @@ public final class KeybindManagerScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context, int mouseX,
-			int mouseY, boolean hovered, float tickDelta)
+		public void extractContent(GuiGraphicsExtractor context,
+			boolean hovered)
 		{
 			int x = getContentX();
 			int y = getContentY();

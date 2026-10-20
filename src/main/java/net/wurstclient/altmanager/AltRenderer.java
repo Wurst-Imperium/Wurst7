@@ -21,7 +21,7 @@ import com.mojang.authlib.services.ProfileResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.Identifier;

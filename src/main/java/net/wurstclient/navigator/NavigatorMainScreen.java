@@ -228,7 +228,7 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		{
 			context.text(WurstClient.MC.font, "Search: ", middleX - 150, 32,
 				txtColor);
-			searchBar.extractRenderState(context, mouseX, mouseY, partialTicks);
+			searchBar.extractRenderState(context);
 		}
 		
 		// feature list

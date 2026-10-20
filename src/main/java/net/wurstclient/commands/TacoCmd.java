@@ -8,7 +8,7 @@
 package net.wurstclient.commands;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.wurstclient.Category;
 import net.wurstclient.command.CmdException;

@@ -80,8 +80,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			}
 			
 			@Override
-			protected void extractContents(GuiGraphicsExtractor drawContext,
-				int i, int j, float f)
+			protected void extractContents(GuiGraphicsExtractor drawContext)
 			{
 				extractDefaultSprite(drawContext);
 				extractDefaultLabel(drawContext.textRendererForWidget(this,

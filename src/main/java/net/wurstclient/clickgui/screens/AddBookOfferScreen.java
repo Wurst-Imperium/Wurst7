@@ -288,12 +288,11 @@ public final class AddBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		Matrix3x2fStack matrixStack = context.pose();
 		
-		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(context);
 		
 		matrixStack.pushMatrix();
 		
@@ -302,11 +301,11 @@ public final class AddBookOfferScreen extends Screen
 			"Available Books (" + listGui.children().size() + ")";
 		context.centeredText(tr, titleText, width / 2, 12, CommonColors.WHITE);
 		
-		levelField.extractRenderState(context, mouseX, mouseY, partialTicks);
-		priceField.extractRenderState(context, mouseX, mouseY, partialTicks);
+		levelField.extractRenderState(context);
+		priceField.extractRenderState(context);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 		
 		matrixStack.translate(width / 2 - 100, 0);
 		
@@ -381,8 +380,8 @@ public final class AddBookOfferScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context, int mouseX,
-			int mouseY, boolean hovered, float tickDelta)
+		public void extractContent(GuiGraphicsExtractor context,
+			boolean hovered)
 		{
 			int x = getContentX();
 			int y = getContentY();

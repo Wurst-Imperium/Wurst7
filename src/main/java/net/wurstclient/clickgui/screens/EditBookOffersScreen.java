@@ -147,17 +147,16 @@ public final class EditBookOffersScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
-		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(context);
 		
 		context.centeredText(minecraft.font,
 			bookOffers.getName() + " (" + bookOffers.getOffers().size() + ")",
 			width / 2, 12, CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 	}
 	
 	@Override
@@ -191,8 +190,8 @@ public final class EditBookOffersScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context, int mouseX,
-			int mouseY, boolean hovered, float tickDelta)
+		public void extractContent(GuiGraphicsExtractor context,
+			boolean hovered)
 		{
 			int x = getContentX();
 			int y = getContentY();

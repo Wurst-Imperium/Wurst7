@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Hud;
 import net.wurstclient.WurstClient;
@@ -27,15 +26,17 @@ public class HudMixin
 	 * rendered.
 	 */
 	@Inject(
-		method = "extractTabList(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V",
-		at = @At("HEAD"))
-	private void onExtractTabList(GuiGraphicsExtractor context,
-		DeltaTracker tickCounter, CallbackInfo ci)
+		method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/gui/components/PlayerTabOverlay;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"))
+	private void onExtractRenderState(GuiGraphicsExtractor context,
+		CallbackInfo ci)
 	{
 		if(WurstClient.MC.debugEntries.isOverlayVisible())
 			return;
 		
-		float tickDelta = tickCounter.getGameTimeDeltaPartialTick(true);
+		float tickDelta =
+			context.deltaTracker().getGameTimeDeltaPartialTick(true);
 		EventManager.fire(new GUIRenderEvent(context, tickDelta));
 	}
 }

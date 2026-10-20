@@ -219,8 +219,7 @@ public class ServerFinderScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		context.centeredText(font, "Server Finder", width / 2, 20,
 			CommonColors.WHITE);
@@ -235,11 +234,11 @@ public class ServerFinderScreen extends Screen
 		
 		context.text(font, "Server address:", width / 2 - 100, height / 4 + 24,
 			CommonColors.LIGHT_GRAY);
-		ipBox.extractRenderState(context, mouseX, mouseY, partialTicks);
+		ipBox.extractRenderState(context);
 		
 		context.text(font, "Max. threads:", width / 2 - 100, height / 4 + 60,
 			CommonColors.LIGHT_GRAY);
-		maxThreadsBox.extractRenderState(context, mouseX, mouseY, partialTicks);
+		maxThreadsBox.extractRenderState(context);
 		
 		context.centeredText(font, state.toString(), width / 2, height / 4 + 73,
 			CommonColors.LIGHT_GRAY);
@@ -250,7 +249,7 @@ public class ServerFinderScreen extends Screen
 			height / 4 + 94, CommonColors.LIGHT_GRAY);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 	}
 	
 	@Override

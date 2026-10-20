@@ -225,8 +225,7 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		// skin preview
 		AltRenderer.drawAltBack(context, nameOrEmailBox.getValue(),
@@ -252,9 +251,8 @@ public abstract class AltEditorScreen extends Screen
 				CommonColors.WHITE);
 		
 		// text boxes
-		nameOrEmailBox.extractRenderState(context, mouseX, mouseY,
-			partialTicks);
-		passwordBox.extractRenderState(context, mouseX, mouseY, partialTicks);
+		nameOrEmailBox.extractRenderState(context);
+		passwordBox.extractRenderState(context);
 		
 		// red flash for errors
 		if(errorTimer > 0)
@@ -266,7 +264,7 @@ public abstract class AltEditorScreen extends Screen
 		}
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 	}
 	
 	@Override

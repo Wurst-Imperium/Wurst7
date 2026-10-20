@@ -122,8 +122,7 @@ public final class NcrModRequiredScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
@@ -136,7 +135,7 @@ public final class NcrModRequiredScreen extends Screen
 			otherContext);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 	}
 	
 	@Override

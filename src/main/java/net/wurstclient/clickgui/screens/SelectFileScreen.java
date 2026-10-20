@@ -129,22 +129,21 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-		int mouseY, float partialTicks)
+	public void extractRenderState(GuiGraphicsExtractor context)
 	{
-		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(context);
 		
 		context.centeredText(minecraft.font, setting.getName(), width / 2, 12,
 			CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(context);
 		
 		if(doneButton.isHoveredOrFocused() && !doneButton.active)
 			context.setComponentTooltipForNextFrame(font,
 				Arrays
 					.asList(Component.literal("You must first select a file.")),
-				mouseX, mouseY);
+				context.mouseX(), context.mouseY());
 	}
 	
 	@Override
@@ -177,8 +176,8 @@ public final class SelectFileScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context, int mouseX,
-			int mouseY, boolean hovered, float tickDelta)
+		public void extractContent(GuiGraphicsExtractor context,
+			boolean hovered)
 		{
 			int x = getContentX();
 			int y = getContentY();

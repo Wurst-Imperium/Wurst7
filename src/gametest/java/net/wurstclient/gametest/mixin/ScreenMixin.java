@@ -33,8 +33,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler
 	 * screenshots consistent.
 	 */
 	@Inject(method = "extractPanorama", at = @At("HEAD"), cancellable = true)
-	public void onExtractPanorama(GuiGraphicsExtractor context,
-		float deltaTicks, CallbackInfo ci)
+	public void onExtractPanorama(GuiGraphicsExtractor context, CallbackInfo ci)
 	{
 		context.fill(0, 0, width, height, CommonColors.GRAY);
 		ci.cancel();

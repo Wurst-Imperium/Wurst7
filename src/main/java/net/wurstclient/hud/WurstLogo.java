@@ -9,7 +9,7 @@ package net.wurstclient.hud;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.WurstLogoOtf;
