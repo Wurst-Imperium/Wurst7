@@ -9,19 +9,13 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.world.entity.LivingEntity;
-import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.CameraTransformViewBobbingListener.CameraTransformViewBobbingEvent;
 
@@ -44,48 +38,5 @@ public abstract class GameRendererMixin implements AutoCloseable
 		
 		if(!event.isCancelled())
 			original.call(instance, cameraState, matrices);
-	}
-	
-	/**
-	 * Disables nausea and portal wobble when using AntiWobble,
-	 * without the green tint that the vanilla setting creates.
-	 */
-	@ModifyExpressionValue(
-		method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
-		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/renderer/state/OptionsRenderState;screenEffectScale:F"),
-		require = 1)
-	private float onRenderLevelScreenEffectScale(float original)
-	{
-		return WurstClient.INSTANCE.getHax().antiWobbleHack.isEnabled() ? 0
-			: original;
-	}
-	
-	@Inject(
-		method = "nightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
-		at = @At("HEAD"),
-		cancellable = true)
-	private static void onNightVisionScale(LivingEntity entity, float tickDelta,
-		CallbackInfoReturnable<Float> cir)
-	{
-		float nightVisionStrength = WurstClient.INSTANCE.getHax().fullbrightHack
-			.getNightVisionStrength();
-		
-		if(nightVisionStrength > 0)
-			cir.setReturnValue(nightVisionStrength);
-	}
-	
-	/**
-	 * Makes NoHurtcam work.
-	 */
-	@Inject(
-		method = "bobHurt(Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
-		at = @At("HEAD"),
-		cancellable = true)
-	private void onBobHurt(CameraRenderState cameraState, PoseStack matrices,
-		CallbackInfo ci)
-	{
-		if(WurstClient.INSTANCE.getHax().noHurtcamHack.isEnabled())
-			ci.cancel();
 	}
 }
