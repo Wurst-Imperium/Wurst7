@@ -3,5 +3,7 @@
 *.java text eol=crlf whitespace=-blank-at-eol
 *.json text eol=crlf
 *.mcmeta text eol=crlf
-*.bat text=auto eol=crlf
+*.bat text eol=crlf
 *.cmd text eol=crlf
+# Dependabot commits gradlew.bat as CRLF with no good way to prevent it
+gradlew.bat -text whitespace=cr-at-eol
