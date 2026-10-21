@@ -218,38 +218,40 @@ public class ServerFinderScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+	public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks)
 	{
-		context.centeredText(font, "Server Finder", width / 2, 20,
+		extractor.centeredText(font, "Server Finder", width / 2, 20,
 			CommonColors.WHITE);
-		context.centeredText(font,
+		extractor.centeredText(font,
 			"This will search for servers with similar IPs", width / 2, 40,
 			CommonColors.LIGHT_GRAY);
-		context.centeredText(font, "to the IP you type into the field below.",
+		extractor.centeredText(font, "to the IP you type into the field below.",
 			width / 2, 50, CommonColors.LIGHT_GRAY);
-		context.centeredText(font,
+		extractor.centeredText(font,
 			"The servers it finds will be added to your server list.",
 			width / 2, 60, CommonColors.LIGHT_GRAY);
 		
-		context.text(font, "Server address:", width / 2 - 100, height / 4 + 24,
-			CommonColors.LIGHT_GRAY);
-		ipBox.extractRenderState(context, mouseX, mouseY, partialTicks);
+		extractor.text(font, "Server address:", width / 2 - 100,
+			height / 4 + 24, CommonColors.LIGHT_GRAY);
+		ipBox.extractRenderState(extractor, mouseX, mouseY, partialTicks);
 		
-		context.text(font, "Max. threads:", width / 2 - 100, height / 4 + 60,
+		extractor.text(font, "Max. threads:", width / 2 - 100, height / 4 + 60,
 			CommonColors.LIGHT_GRAY);
-		maxThreadsBox.extractRenderState(context, mouseX, mouseY, partialTicks);
+		maxThreadsBox.extractRenderState(extractor, mouseX, mouseY,
+			partialTicks);
 		
-		context.centeredText(font, state.toString(), width / 2, height / 4 + 73,
-			CommonColors.LIGHT_GRAY);
+		extractor.centeredText(font, state.toString(), width / 2,
+			height / 4 + 73, CommonColors.LIGHT_GRAY);
 		
-		context.text(font, "Checked: " + checked + " / 1792", width / 2 - 100,
+		extractor.text(font, "Checked: " + checked + " / 1792", width / 2 - 100,
 			height / 4 + 84, CommonColors.LIGHT_GRAY);
-		context.text(font, "Working: " + working, width / 2 - 100,
+		extractor.text(font, "Working: " + working, width / 2 - 100,
 			height / 4 + 94, CommonColors.LIGHT_GRAY);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(extractor, mouseX, mouseY,
+				partialTicks);
 	}
 	
 	@Override

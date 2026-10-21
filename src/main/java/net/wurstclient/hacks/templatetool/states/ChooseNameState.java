@@ -150,10 +150,10 @@ public final class ChooseNameState extends TemplateToolState
 		}
 		
 		@Override
-		public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
-			int mouseY, float partialTicks)
+		public void extractRenderState(GuiGraphicsExtractor extractor,
+			int mouseX, int mouseY, float partialTicks)
 		{
-			super.extractRenderState(context, mouseX, mouseY, partialTicks);
+			super.extractRenderState(extractor, mouseX, mouseY, partialTicks);
 			
 			// middle
 			int middleX = width / 2;
@@ -166,15 +166,16 @@ public final class ChooseNameState extends TemplateToolState
 			int y2 = middleY + 26;
 			
 			// background
-			context.fill(x1, y1, x2, y2, 0x80000000);
+			extractor.fill(x1, y1, x2, y2, 0x80000000);
 			
 			// name field
-			nameField.extractRenderState(context, mouseX, mouseY, partialTicks);
+			nameField.extractRenderState(extractor, mouseX, mouseY,
+				partialTicks);
 		}
 		
 		@Override
-		public void extractBackground(GuiGraphicsExtractor context, int mouseX,
-			int mouseY, float deltaTicks)
+		public void extractBackground(GuiGraphicsExtractor extractor,
+			int mouseX, int mouseY, float deltaTicks)
 		{
 			// Don't blur
 		}

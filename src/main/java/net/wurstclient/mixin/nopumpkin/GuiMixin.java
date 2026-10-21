@@ -27,7 +27,7 @@ public class GuiMixin
 		method = "extractTextureOverlay(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/resources/Identifier;F)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onExtractTextureOverlay(GuiGraphicsExtractor context,
+	private void onExtractTextureOverlay(GuiGraphicsExtractor extractor,
 		Identifier texture, float opacity, CallbackInfo ci)
 	{
 		if(texture == null)

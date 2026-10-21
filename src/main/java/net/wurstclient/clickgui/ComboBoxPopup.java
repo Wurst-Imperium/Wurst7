@@ -62,7 +62,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 	}
 	
 	@Override
-	public void render(GuiGraphicsExtractor context, int mouseX, int mouseY)
+	public void render(GuiGraphicsExtractor extractor, int mouseX, int mouseY)
 	{
 		int x1 = getX();
 		int x2 = x1 + getWidth();
@@ -74,7 +74,7 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 		if(hovering)
 			GUI.setTooltip("");
 		
-		RenderUtils.drawBorder2D(context, x1, y1, x2, y2,
+		RenderUtils.drawBorder2D(extractor, x1, y1, x2, y2,
 			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
 		int yi1 = y1 - 11;
@@ -87,11 +87,11 @@ public final class ComboBoxPopup<T extends Enum<T>> extends Popup
 			int yi2 = yi1 + 11;
 			
 			boolean hValue = hovering && mouseY >= yi1 && mouseY < yi2;
-			context.fill(x1, yi1, x2, yi2, RenderUtils.toIntColor(
+			extractor.fill(x1, yi1, x2, yi2, RenderUtils.toIntColor(
 				GUI.getBgColor(), GUI.getOpacity() * (hValue ? 1.5F : 1)));
 			
-			context.guiRenderState.up();
-			context.text(TR, value.toString(), x1 + 2, yi1 + 2,
+			extractor.guiRenderState.up();
+			extractor.text(TR, value.toString(), x1 + 2, yi1 + 2,
 				GUI.getTxtColor(), false);
 		}
 	}

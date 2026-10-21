@@ -131,19 +131,20 @@ public final class KeybindProfilesScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+	public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks)
 	{
-		listGui.extractRenderState(context, mouseX, mouseY, partialTicks);
+		listGui.extractRenderState(extractor, mouseX, mouseY, partialTicks);
 		
-		context.centeredText(minecraft.font, "Keybind Profiles", width / 2, 12,
-			CommonColors.WHITE);
+		extractor.centeredText(minecraft.font, "Keybind Profiles", width / 2,
+			12, CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(extractor, mouseX, mouseY,
+				partialTicks);
 		
 		if(loadButton.isHoveredOrFocused() && !loadButton.active)
-			context.setComponentTooltipForNextFrame(font,
+			extractor.setComponentTooltipForNextFrame(font,
 				Arrays
 					.asList(Component.literal("You must first select a file.")),
 				mouseX, mouseY);
@@ -173,7 +174,7 @@ public final class KeybindProfilesScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context, int mouseX,
+		public void extractContent(GuiGraphicsExtractor extractor, int mouseX,
 			int mouseY, boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
@@ -182,11 +183,12 @@ public final class KeybindProfilesScreen extends Screen
 			Font tr = minecraft.font;
 			
 			String fileName = "" + path.getFileName();
-			context.text(tr, fileName, x + 28, y, WurstColors.VERY_LIGHT_GRAY);
+			extractor.text(tr, fileName, x + 28, y,
+				WurstColors.VERY_LIGHT_GRAY);
 			
 			String relPath =
 				"" + minecraft.gameDirectory.toPath().relativize(path);
-			context.text(tr, relPath, x + 28, y + 9, CommonColors.LIGHT_GRAY);
+			extractor.text(tr, relPath, x + 28, y + 9, CommonColors.LIGHT_GRAY);
 		}
 	}
 	
