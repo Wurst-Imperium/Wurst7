@@ -27,7 +27,7 @@ public abstract class Popup
 	public abstract void handleMouseClick(int mouseX, int mouseY,
 		int mouseButton);
 	
-	public abstract void render(GuiGraphics context, int mouseX, int mouseY);
+	public abstract void render(GuiGraphics graphics, int mouseX, int mouseY);
 	
 	public abstract int getDefaultWidth();
 	

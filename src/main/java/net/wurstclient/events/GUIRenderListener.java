@@ -15,16 +15,16 @@ import net.wurstclient.event.Listener;
 
 public interface GUIRenderListener extends Listener
 {
-	public void onRenderGUI(GuiGraphics context, float partialTicks);
+	public void onRenderGUI(GuiGraphics graphics, float partialTicks);
 	
 	public static class GUIRenderEvent extends Event<GUIRenderListener>
 	{
 		private final float partialTicks;
-		private final GuiGraphics context;
+		private final GuiGraphics graphics;
 		
-		public GUIRenderEvent(GuiGraphics context, float partialTicks)
+		public GUIRenderEvent(GuiGraphics graphics, float partialTicks)
 		{
-			this.context = context;
+			this.graphics = graphics;
 			this.partialTicks = partialTicks;
 		}
 		
@@ -32,7 +32,7 @@ public interface GUIRenderListener extends Listener
 		public void fire(ArrayList<GUIRenderListener> listeners)
 		{
 			for(GUIRenderListener listener : listeners)
-				listener.onRenderGUI(context, partialTicks);
+				listener.onRenderGUI(graphics, partialTicks);
 		}
 		
 		@Override

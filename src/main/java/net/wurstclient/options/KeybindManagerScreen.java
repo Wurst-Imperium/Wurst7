@@ -140,20 +140,20 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		listGui.render(context, mouseX, mouseY, partialTicks);
+		listGui.render(graphics, mouseX, mouseY, partialTicks);
 		
-		context.drawCenteredString(font, "Keybind Manager", width / 2, 8,
+		graphics.drawCenteredString(font, "Keybind Manager", width / 2, 8,
 			CommonColors.WHITE);
 		
 		int count = WurstClient.INSTANCE.getKeybinds().getAllKeybinds().size();
-		context.drawCenteredString(font, "Keybinds: " + count, width / 2, 20,
+		graphics.drawCenteredString(font, "Keybinds: " + count, width / 2, 20,
 			CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
@@ -180,7 +180,7 @@ public final class KeybindManagerScreen extends Screen
 		}
 		
 		@Override
-		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
+		public void renderContent(GuiGraphics graphics, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
@@ -189,11 +189,11 @@ public final class KeybindManagerScreen extends Screen
 			Font tr = minecraft.font;
 			
 			String keyText = "Key: " + Keybind.getDisplayKey(keybind.getKey());
-			context.drawString(tr, keyText, x + 3, y + 3,
+			graphics.drawString(tr, keyText, x + 3, y + 3,
 				WurstColors.VERY_LIGHT_GRAY, false);
 			
 			String cmdText = "Commands: " + keybind.getCommands();
-			context.drawString(tr, cmdText, x + 3, y + 15,
+			graphics.drawString(tr, cmdText, x + 3, y + 15,
 				CommonColors.LIGHT_GRAY, false);
 		}
 	}

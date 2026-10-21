@@ -50,7 +50,7 @@ public final class CheckboxComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -69,23 +69,23 @@ public final class CheckboxComponent extends Component
 			hovering = false;
 		
 		// background
-		context.fill(x3, y1, x2, y2, getFillColor(false));
+		graphics.fill(x3, y1, x2, y2, getFillColor(false));
 		
 		// box
-		context.fill(x1, y1, x3, y2, getFillColor(hovering));
+		graphics.fill(x1, y1, x3, y2, getFillColor(hovering));
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
-		RenderUtils.drawBorder2D(context, x1, y1, x3, y2, outlineColor);
+		RenderUtils.drawBorder2D(graphics, x1, y1, x3, y2, outlineColor);
 		
-		context.guiRenderState.up();
+		graphics.guiRenderState.up();
 		
 		// check
 		if(setting.isChecked())
-			ClickGuiIcons.drawCheck(context, x1, y1, x3, y2, hovering,
+			ClickGuiIcons.drawCheck(graphics, x1, y1, x3, y2, hovering,
 				setting.isLocked());
 		
 		// text
 		String name = setting.getName();
-		context.drawString(TR, name, x3 + 2, y1 + 2, GUI.getTxtColor(), false);
+		graphics.drawString(TR, name, x3 + 2, y1 + 2, GUI.getTxtColor(), false);
 	}
 	
 	private int getFillColor(boolean hovering)

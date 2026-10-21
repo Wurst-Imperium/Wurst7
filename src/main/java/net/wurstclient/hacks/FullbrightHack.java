@@ -223,6 +223,4 @@ public final class FullbrightHack extends Hack
 			return name;
 		}
 	}
-	
-	// See GameRendererMixin.onGetNightVisionScale()
 }

@@ -93,19 +93,19 @@ public class ZoomManagerScreen extends Screen implements PressAKeyCallback
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ZoomOtf zoom = WurstClient.INSTANCE.getOtfs().zoomOtf;
 		SliderSetting level = zoom.getLevelSetting();
 		
-		context.drawCenteredString(font, "Zoom Manager", width / 2, 40,
+		graphics.drawCenteredString(font, "Zoom Manager", width / 2, 40,
 			CommonColors.WHITE);
-		context.drawString(font, "Zoom Level: " + level.getValueString(),
+		graphics.drawString(font, "Zoom Level: " + level.getValueString(),
 			width / 2 - 75, height / 4 + 44, WurstColors.VERY_LIGHT_GRAY);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

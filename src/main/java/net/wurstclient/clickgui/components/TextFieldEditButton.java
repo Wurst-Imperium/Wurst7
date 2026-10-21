@@ -57,7 +57,7 @@ public final class TextFieldEditButton extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		float[] bgColor = GUI.getBgColor();
@@ -79,25 +79,25 @@ public final class TextFieldEditButton extends Component
 			GUI.setTooltip(ChatUtils.wrapText(setting.getValue(), 200));
 		
 		// background
-		context.fill(x1, y1, x2, y3, RenderUtils.toIntColor(bgColor, opacity));
+		graphics.fill(x1, y1, x2, y3, RenderUtils.toIntColor(bgColor, opacity));
 		
 		// box
-		context.fill(x1, y3, x2, y2,
+		graphics.fill(x1, y3, x2, y2,
 			RenderUtils.toIntColor(bgColor, opacity * (hBox ? 1.5F : 1)));
-		RenderUtils.drawBorder2D(context, x1, y3, x2, y2,
+		RenderUtils.drawBorder2D(graphics, x1, y3, x2, y2,
 			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
 		// text
 		int txtColor = GUI.getTxtColor();
-		context.guiRenderState.up();
-		context.drawString(TR, setting.getName(), x1, y1 + 2, txtColor, false);
+		graphics.guiRenderState.up();
+		graphics.drawString(TR, setting.getName(), x1, y1 + 2, txtColor, false);
 		String value = setting.getValue();
 		int maxWidth = getWidth() - TR.width("...") - 2;
 		int maxLength =
 			TR.getSplitter().plainIndexAtWidth(value, maxWidth, Style.EMPTY);
 		if(maxLength < value.length())
 			value = value.substring(0, maxLength) + "...";
-		context.drawString(TR, value, x1 + 2, y3 + 2, txtColor, false);
+		graphics.drawString(TR, value, x1 + 2, y3 + 2, txtColor, false);
 	}
 	
 	@Override

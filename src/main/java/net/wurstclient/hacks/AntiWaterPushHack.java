@@ -73,6 +73,4 @@ public final class AntiWaterPushHack extends Hack
 	{
 		return preventSlowdown.isChecked();
 	}
-	
-	// See EntityMixin.shouldSetVelocity()
 }

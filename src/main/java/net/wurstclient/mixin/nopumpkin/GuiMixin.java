@@ -27,8 +27,8 @@ public class GuiMixin
 		method = "renderTextureOverlay(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/resources/Identifier;F)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	private void onRenderTextureOverlay(GuiGraphics context, Identifier texture,
-		float opacity, CallbackInfo ci)
+	private void onRenderTextureOverlay(GuiGraphics graphics,
+		Identifier texture, float opacity, CallbackInfo ci)
 	{
 		if(texture == null)
 			return;

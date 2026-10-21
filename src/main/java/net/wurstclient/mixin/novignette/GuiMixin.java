@@ -26,7 +26,7 @@ public class GuiMixin
 	 * NoVignette is enabled.
 	 */
 	@Inject(method = "renderVignette", at = @At("HEAD"), cancellable = true)
-	private void onRenderVignette(GuiGraphics context, Entity entity,
+	private void onRenderVignette(GuiGraphics graphics, Entity entity,
 		CallbackInfo ci)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();

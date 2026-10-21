@@ -42,20 +42,20 @@ public abstract class TemplateToolState
 		
 	}
 	
-	public final void onRenderGUI(TemplateToolHack hack, GuiGraphics context,
+	public final void onRenderGUI(TemplateToolHack hack, GuiGraphics graphics,
 		float partialTicks)
 	{
 		String message = getMessage(hack);
 		Font tr = MC.font;
 		int msgWidth = tr.width(message);
 		
-		int msgX1 = context.guiWidth() / 2 - msgWidth / 2;
+		int msgX1 = graphics.guiWidth() / 2 - msgWidth / 2;
 		int msgX2 = msgX1 + msgWidth + 2;
-		int msgY1 = context.guiHeight() / 2 + 1;
+		int msgY1 = graphics.guiHeight() / 2 + 1;
 		int msgY2 = msgY1 + 10;
 		
-		context.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
-		context.drawString(tr, message, msgX1 + 2, msgY1 + 1,
+		graphics.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
+		graphics.drawString(tr, message, msgX1 + 2, msgY1 + 1,
 			CommonColors.WHITE, false);
 	}
 	

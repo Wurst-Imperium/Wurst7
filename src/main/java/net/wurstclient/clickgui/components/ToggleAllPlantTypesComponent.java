@@ -69,7 +69,7 @@ public final class ToggleAllPlantTypesComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int harvestWidth = TR.width(HARVEST);
@@ -101,38 +101,38 @@ public final class ToggleAllPlantTypesComponent extends Component
 		
 		// background
 		int bgColor = getFillColor(false);
-		context.fill(x1, y1, x2, y3, bgColor);
-		context.fill(x1, y3, x3, y2, bgColor);
-		context.fill(x4, y3, x5, y2, bgColor);
-		context.fill(x6, y3, x2, y2, bgColor);
+		graphics.fill(x1, y1, x2, y3, bgColor);
+		graphics.fill(x1, y3, x3, y2, bgColor);
+		graphics.fill(x4, y3, x5, y2, bgColor);
+		graphics.fill(x6, y3, x2, y2, bgColor);
 		
 		// boxes
-		context.fill(x3, y3, x4, y2, getFillColor(hHarvest));
-		context.fill(x5, y3, x6, y2, getFillColor(hReplant));
+		graphics.fill(x3, y3, x4, y2, getFillColor(hHarvest));
+		graphics.fill(x5, y3, x6, y2, getFillColor(hReplant));
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
-		RenderUtils.drawBorder2D(context, x3, y3, x4, y2, outlineColor);
-		RenderUtils.drawBorder2D(context, x5, y3, x6, y2, outlineColor);
+		RenderUtils.drawBorder2D(graphics, x3, y3, x4, y2, outlineColor);
+		RenderUtils.drawBorder2D(graphics, x5, y3, x6, y2, outlineColor);
 		
 		// checks
 		Boolean harvestingEnabled = setting.isHarvestingEnabled();
 		if(harvestingEnabled == Boolean.TRUE)
-			ClickGuiIcons.drawCheck(context, x3, y3, x4, y2, hHarvest, false);
+			ClickGuiIcons.drawCheck(graphics, x3, y3, x4, y2, hHarvest, false);
 		else if(harvestingEnabled == null)
-			ClickGuiIcons.drawIndeterminateCheck(context, x3, y3, x4, y2,
+			ClickGuiIcons.drawIndeterminateCheck(graphics, x3, y3, x4, y2,
 				hHarvest, false);
 		Boolean replantingEnabled = setting.isReplantingEnabled();
 		if(replantingEnabled == Boolean.TRUE)
-			ClickGuiIcons.drawCheck(context, x5, y3, x6, y2, hReplant, false);
+			ClickGuiIcons.drawCheck(graphics, x5, y3, x6, y2, hReplant, false);
 		else if(replantingEnabled == null)
-			ClickGuiIcons.drawIndeterminateCheck(context, x5, y3, x6, y2,
+			ClickGuiIcons.drawIndeterminateCheck(graphics, x5, y3, x6, y2,
 				hReplant, false);
 		
 		// text
 		String name = setting.getName();
-		context.drawString(TR, name, x3 + 2, y1 + 3, GUI.getTxtColor(), false);
-		context.drawString(TR, HARVEST, x4 + 2, y3 + 2, GUI.getTxtColor(),
+		graphics.drawString(TR, name, x3 + 2, y1 + 3, GUI.getTxtColor(), false);
+		graphics.drawString(TR, HARVEST, x4 + 2, y3 + 2, GUI.getTxtColor(),
 			false);
-		context.drawString(TR, REPLANT, x6 + 2, y3 + 2, GUI.getTxtColor(),
+		graphics.drawString(TR, REPLANT, x6 + 2, y3 + 2, GUI.getTxtColor(),
 			false);
 	}
 	

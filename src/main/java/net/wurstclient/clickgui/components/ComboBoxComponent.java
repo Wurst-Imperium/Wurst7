@@ -88,7 +88,7 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -107,28 +107,28 @@ public final class ComboBoxComponent<T extends Enum<T>> extends Component
 			GUI.setTooltip(setting.getWrappedDescription(200));
 		
 		// background
-		context.fill(x1, y1, x4, y2, getFillColor(false));
+		graphics.fill(x1, y1, x4, y2, getFillColor(false));
 		
 		// box
-		context.fill(x4, y1, x2, y2, getFillColor(hBox));
+		graphics.fill(x4, y1, x2, y2, getFillColor(hBox));
 		
-		context.guiRenderState.up();
+		graphics.guiRenderState.up();
 		
 		// outlines
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
-		RenderUtils.drawBorder2D(context, x4, y1, x2, y2, outlineColor);
-		RenderUtils.drawLine2D(context, x3, y1, x3, y2, outlineColor);
+		RenderUtils.drawBorder2D(graphics, x4, y1, x2, y2, outlineColor);
+		RenderUtils.drawLine2D(graphics, x3, y1, x3, y2, outlineColor);
 		
 		// arrow
-		ClickGuiIcons.drawMinimizeArrow(context, x3, y1 + 0.5F, x2, y2 - 0.5F,
+		ClickGuiIcons.drawMinimizeArrow(graphics, x3, y1 + 0.5F, x2, y2 - 0.5F,
 			hBox, !isPopupOpen());
 		
 		// text
 		String name = setting.getName();
 		String value = "" + setting.getSelected();
 		int txtColor = GUI.getTxtColor();
-		context.drawString(TR, name, x1, y1 + 2, txtColor, false);
-		context.drawString(TR, value, x4 + 2, y1 + 2, txtColor, false);
+		graphics.drawString(TR, name, x1, y1 + 2, txtColor, false);
+		graphics.drawString(TR, value, x4 + 2, y1 + 2, txtColor, false);
 	}
 	
 	private int getFillColor(boolean hovering)

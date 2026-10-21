@@ -21,7 +21,7 @@ public final class WurstLogo
 	private static final Identifier LOGO_TEXTURE =
 		Identifier.fromNamespaceAndPath("wurst", "wurst_128.png");
 	
-	public void render(GuiGraphics context)
+	public void render(GuiGraphics graphics)
 	{
 		WurstLogoOtf otf = WURST.getOtfs().wurstLogoOtf;
 		if(!otf.isVisible())
@@ -36,16 +36,16 @@ public final class WurstLogo
 			bgColor = RenderUtils.toIntColor(WURST.getGui().getAcColor(), 0.5F);
 		else
 			bgColor = otf.getBackgroundColor();
-		context.fill(0, 6, tr.width(version) + 76, 17, bgColor);
+		graphics.fill(0, 6, tr.width(version) + 76, 17, bgColor);
 		
-		context.guiRenderState.up();
+		graphics.guiRenderState.up();
 		
 		// version string
-		context.drawString(tr, version, 74, 8, otf.getTextColor(), false);
+		graphics.drawString(tr, version, 74, 8, otf.getTextColor(), false);
 		
 		// Wurst logo
-		context.blit(RenderPipelines.GUI_TEXTURED, LOGO_TEXTURE, 0, 3, 0, 0, 72,
-			18, 72, 18);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, LOGO_TEXTURE, 0, 3, 0, 0,
+			72, 18, 72, 18);
 	}
 	
 	private String getVersionString()

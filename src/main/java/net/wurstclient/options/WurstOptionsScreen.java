@@ -149,36 +149,36 @@ public class WurstOptionsScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		renderTitles(context);
+		renderTitles(graphics);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 		
-		renderButtonTooltip(context, mouseX, mouseY);
+		renderButtonTooltip(graphics, mouseX, mouseY);
 	}
 	
-	private void renderTitles(GuiGraphics context)
+	private void renderTitles(GuiGraphics graphics)
 	{
 		Font tr = minecraft.font;
 		int middleX = width / 2;
 		int y1 = 40;
 		int y2 = height / 4 + 24 - 28;
 		
-		context.drawCenteredString(tr, "Wurst Options", middleX, y1,
+		graphics.drawCenteredString(tr, "Wurst Options", middleX, y1,
 			CommonColors.WHITE);
 		
-		context.drawCenteredString(tr, "Settings", middleX - 104, y2,
+		graphics.drawCenteredString(tr, "Settings", middleX - 104, y2,
 			WurstColors.VERY_LIGHT_GRAY);
-		context.drawCenteredString(tr, "Managers", middleX, y2,
+		graphics.drawCenteredString(tr, "Managers", middleX, y2,
 			WurstColors.VERY_LIGHT_GRAY);
-		context.drawCenteredString(tr, "Links", middleX + 104, y2,
+		graphics.drawCenteredString(tr, "Links", middleX + 104, y2,
 			WurstColors.VERY_LIGHT_GRAY);
 	}
 	
-	private void renderButtonTooltip(GuiGraphics context, int mouseX,
+	private void renderButtonTooltip(GuiGraphics graphics, int mouseX,
 		int mouseY)
 	{
 		for(AbstractWidget button : Screens.getButtons(this))
@@ -192,7 +192,7 @@ public class WurstOptionsScreen extends Screen
 			if(woButton.tooltip.isEmpty())
 				continue;
 			
-			context.setComponentTooltipForNextFrame(font, woButton.tooltip,
+			graphics.setComponentTooltipForNextFrame(font, woButton.tooltip,
 				mouseX, mouseY);
 			break;
 		}

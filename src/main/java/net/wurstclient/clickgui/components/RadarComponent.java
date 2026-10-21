@@ -36,7 +36,7 @@ public final class RadarComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		// Can't make this a field because RadarComponent is initialized earlier
@@ -55,10 +55,10 @@ public final class RadarComponent extends Component
 			gui.setTooltip("");
 		
 		// background
-		context.fill(x1, y1, x2, y2,
+		graphics.fill(x1, y1, x2, y2,
 			RenderUtils.toIntColor(gui.getBgColor(), gui.getOpacity()));
 		
-		Matrix3x2fStack matrixStack = context.pose();
+		Matrix3x2fStack matrixStack = graphics.pose();
 		matrixStack.pushMatrix();
 		matrixStack.translate(middleX, middleY);
 		
@@ -67,7 +67,7 @@ public final class RadarComponent extends Component
 			matrixStack.rotate((180 + player.getYRot()) * Mth.DEG_TO_RAD);
 		
 		// arrow
-		ClickGuiIcons.drawRadarArrow(context, -2, -2, 2, 2);
+		ClickGuiIcons.drawRadarArrow(graphics, -2, -2, 2, 2);
 		
 		matrixStack.popMatrix();
 		Vec3 lerpedPlayerPos = EntityUtils.getLerpedPos(player, partialTicks);
@@ -97,7 +97,7 @@ public final class RadarComponent extends Component
 			float ex2 = middleX + (float)renderX + 0.5F;
 			float ey1 = middleY + (float)renderY - 0.5F;
 			float ey2 = middleY + (float)renderY + 0.5F;
-			RenderUtils.fill2D(context, ex1, ey1, ex2, ey2, getEntityColor(e));
+			RenderUtils.fill2D(graphics, ex1, ey1, ex2, ey2, getEntityColor(e));
 		}
 	}
 	

@@ -126,7 +126,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(GuiGraphics context, int mouseX, int mouseY,
+	protected void onRender(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -134,7 +134,8 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		context.drawCenteredString(tr, "Remove Keybind", middleX, 32, txtColor);
+		graphics.drawCenteredString(tr, "Remove Keybind", middleX, 32,
+			txtColor);
 		
 		// background
 		int bgx1 = middleX - 154;
@@ -144,7 +145,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		boolean noButtons = Screens.getButtons(this).isEmpty();
 		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		
-		context.enableScissor(bgx1, bgy1, bgx2, bgy3);
+		graphics.enableScissor(bgx1, bgy1, bgx2, bgy3);
 		
 		// possible keybinds
 		hoveredKey = "";
@@ -176,26 +177,26 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 				buttonColor = 0x40404040;
 			
 			// button
-			drawBox(context, x1, y1, x2, y2, buttonColor);
+			drawBox(graphics, x1, y1, x2, y2, buttonColor);
 			
 			// text
-			context.guiRenderState.up();
-			context.drawString(tr, key.replace("key.keyboard.", "") + ": "
+			graphics.guiRenderState.up();
+			graphics.drawString(tr, key.replace("key.keyboard.", "") + ": "
 				+ keybind.getDescription(), x1 + 1, y1 + 1, txtColor);
-			context.drawString(tr, keybind.getCommand(), x1 + 1,
+			graphics.drawString(tr, keybind.getCommand(), x1 + 1,
 				y1 + 1 + tr.lineHeight, txtColor);
 		}
 		
 		// text
 		int textY = bgy1 + scroll + 2;
-		context.guiRenderState.up();
+		graphics.guiRenderState.up();
 		for(String line : text.split("\n"))
 		{
-			context.drawString(tr, line, bgx1 + 2, textY, txtColor);
+			graphics.drawString(tr, line, bgx1 + 2, textY, txtColor);
 			textY += tr.lineHeight;
 		}
 		
-		context.disableScissor();
+		graphics.disableScissor();
 		
 		// buttons below scissor box
 		for(AbstractWidget button : Screens.getButtons(this))
@@ -217,12 +218,12 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 				buttonColor = 0x40404040;
 			
 			// button
-			drawBox(context, x1, y1, x2, y2, buttonColor);
+			drawBox(graphics, x1, y1, x2, y2, buttonColor);
 			
 			// text
 			String buttonText = button.getMessage().getString();
-			context.guiRenderState.up();
-			context.drawCenteredString(tr, buttonText, (x1 + x2) / 2, y1 + 5,
+			graphics.guiRenderState.up();
+			graphics.drawCenteredString(tr, buttonText, (x1 + x2) / 2, y1 + 5,
 				txtColor);
 		}
 	}

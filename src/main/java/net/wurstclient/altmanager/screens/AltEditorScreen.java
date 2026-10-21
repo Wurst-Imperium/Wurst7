@@ -225,47 +225,47 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		// skin preview
-		AltRenderer.drawAltBack(context, nameOrEmailBox.getValue(),
+		AltRenderer.drawAltBack(graphics, nameOrEmailBox.getValue(),
 			(width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
-		AltRenderer.drawAltBody(context, nameOrEmailBox.getValue(),
+		AltRenderer.drawAltBody(graphics, nameOrEmailBox.getValue(),
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
 		String accountType = getPassword().isEmpty() ? "cracked" : "premium";
 		
 		// text
-		context.drawString(font, "Name (for cracked alts), or", width / 2 - 100,
-			37, CommonColors.LIGHT_GRAY);
-		context.drawString(font, "E-Mail (for premium alts)", width / 2 - 100,
+		graphics.drawString(font, "Name (for cracked alts), or",
+			width / 2 - 100, 37, CommonColors.LIGHT_GRAY);
+		graphics.drawString(font, "E-Mail (for premium alts)", width / 2 - 100,
 			47, CommonColors.LIGHT_GRAY);
-		context.drawString(font, "Password (for premium alts)", width / 2 - 100,
-			87, CommonColors.LIGHT_GRAY);
-		context.drawString(font, "Account type: " + accountType,
+		graphics.drawString(font, "Password (for premium alts)",
+			width / 2 - 100, 87, CommonColors.LIGHT_GRAY);
+		graphics.drawString(font, "Account type: " + accountType,
 			width / 2 - 100, 127, CommonColors.LIGHT_GRAY);
 		
 		String[] lines = message.split("\n");
 		for(int i = 0; i < lines.length; i++)
-			context.drawCenteredString(font, lines[i], width / 2, 142 + 10 * i,
+			graphics.drawCenteredString(font, lines[i], width / 2, 142 + 10 * i,
 				CommonColors.WHITE);
 		
 		// text boxes
-		nameOrEmailBox.render(context, mouseX, mouseY, partialTicks);
-		passwordBox.render(context, mouseX, mouseY, partialTicks);
+		nameOrEmailBox.render(graphics, mouseX, mouseY, partialTicks);
+		passwordBox.render(graphics, mouseX, mouseY, partialTicks);
 		
 		// red flash for errors
 		if(errorTimer > 0)
 		{
 			int alpha = (int)(Math.min(1, errorTimer / 16F) * 255);
 			int color = 0xFF0000 | alpha << 24;
-			context.fill(0, 0, width, height, color);
+			graphics.fill(0, 0, width, height, color);
 			errorTimer--;
 		}
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

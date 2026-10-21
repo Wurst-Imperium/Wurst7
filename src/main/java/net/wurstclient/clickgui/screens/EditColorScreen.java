@@ -161,12 +161,12 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		Font tr = minecraft.font;
 		
-		context.drawCenteredString(minecraft.font, colorSetting.getName(),
+		graphics.drawCenteredString(minecraft.font, colorSetting.getName(),
 			width / 2, 16, WurstColors.VERY_LIGHT_GRAY);
 		
 		// Draw palette
@@ -178,23 +178,23 @@ public final class EditColorScreen extends Screen
 		int fh = paletteHeight;
 		float u = 0;
 		float v = 0;
-		context.blit(RenderPipelines.GUI_TEXTURED, paletteIdentifier, x, y, u,
+		graphics.blit(RenderPipelines.GUI_TEXTURED, paletteIdentifier, x, y, u,
 			v, w, h, fw, fh);
 		
 		// RGB letters
-		context.drawString(tr, "#", fieldsX - 3 - tr.width("#"), fieldsY + 6,
+		graphics.drawString(tr, "#", fieldsX - 3 - tr.width("#"), fieldsY + 6,
 			WurstColors.VERY_LIGHT_GRAY, false);
-		context.drawString(tr, "R:", fieldsX - 3 - tr.width("R:"),
+		graphics.drawString(tr, "R:", fieldsX - 3 - tr.width("R:"),
 			fieldsY + 6 + 35, CommonColors.RED, false);
-		context.drawString(tr, "G:", fieldsX + 75 - 3 - tr.width("G:"),
+		graphics.drawString(tr, "G:", fieldsX + 75 - 3 - tr.width("G:"),
 			fieldsY + 6 + 35, CommonColors.GREEN, false);
-		context.drawString(tr, "B:", fieldsX + 150 - 3 - tr.width("B:"),
+		graphics.drawString(tr, "B:", fieldsX + 150 - 3 - tr.width("B:"),
 			fieldsY + 6 + 35, CommonColors.BLUE, false);
 		
-		hexValueField.render(context, mouseX, mouseY, partialTicks);
-		redValueField.render(context, mouseX, mouseY, partialTicks);
-		greenValueField.render(context, mouseX, mouseY, partialTicks);
-		blueValueField.render(context, mouseX, mouseY, partialTicks);
+		hexValueField.render(graphics, mouseX, mouseY, partialTicks);
+		redValueField.render(graphics, mouseX, mouseY, partialTicks);
+		greenValueField.render(graphics, mouseX, mouseY, partialTicks);
+		blueValueField.render(graphics, mouseX, mouseY, partialTicks);
 		
 		// Color preview
 		
@@ -205,16 +205,16 @@ public final class EditColorScreen extends Screen
 		int boxY = fieldsY;
 		
 		// Border
-		context.fill(boxX - borderSize, boxY - borderSize,
+		graphics.fill(boxX - borderSize, boxY - borderSize,
 			boxX + boxWidth + borderSize, boxY + boxHeight + borderSize,
 			CommonColors.LIGHT_GRAY);
 		
 		// Color box
-		context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight,
+		graphics.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight,
 			color.getRGB());
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

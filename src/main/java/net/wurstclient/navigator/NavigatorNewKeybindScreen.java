@@ -182,7 +182,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	}
 	
 	@Override
-	protected void onRender(GuiGraphics context, int mouseX, int mouseY,
+	protected void onRender(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		ClickGui gui = WurstClient.INSTANCE.getGui();
@@ -190,7 +190,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		int txtColor = gui.getTxtColor();
 		
 		// title bar
-		context.drawCenteredString(tr, "New Keybind", middleX, 32, txtColor);
+		graphics.drawCenteredString(tr, "New Keybind", middleX, 32, txtColor);
 		
 		// background
 		int bgx1 = middleX - 154;
@@ -200,7 +200,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		boolean noButtons = Screens.getButtons(this).isEmpty();
 		int bgy3 = bgy2 - (noButtons ? 0 : 24);
 		
-		context.enableScissor(bgx1, bgy1, bgx2, bgy3);
+		graphics.enableScissor(bgx1, bgy1, bgx2, bgy3);
 		
 		// possible keybinds
 		if(!choosingKey)
@@ -233,27 +233,27 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 					buttonColor = 0x40404040;
 				
 				// button
-				drawBox(context, x1, y1, x2, y2, buttonColor);
+				drawBox(graphics, x1, y1, x2, y2, buttonColor);
 				
 				// text
-				context.guiRenderState.up();
-				context.drawString(tr, pkb.getDescription(), x1 + 1, y1 + 1,
+				graphics.guiRenderState.up();
+				graphics.drawString(tr, pkb.getDescription(), x1 + 1, y1 + 1,
 					txtColor);
-				context.drawString(tr, pkb.getCommand(), x1 + 1,
+				graphics.drawString(tr, pkb.getCommand(), x1 + 1,
 					y1 + 1 + tr.lineHeight, txtColor);
 			}
 		}
 		
 		// text
 		int textY = bgy1 + scroll + 2;
-		context.guiRenderState.up();
+		graphics.guiRenderState.up();
 		for(String line : text.split("\n"))
 		{
-			context.drawString(tr, line, bgx1 + 2, textY, txtColor);
+			graphics.drawString(tr, line, bgx1 + 2, textY, txtColor);
 			textY += tr.lineHeight;
 		}
 		
-		context.disableScissor();
+		graphics.disableScissor();
 		
 		// buttons below scissor box
 		for(AbstractWidget button : Screens.getButtons(this))
@@ -275,11 +275,11 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				buttonColor = 0x40404040;
 			
 			// button
-			drawBox(context, x1, y1, x2, y2, buttonColor);
+			drawBox(graphics, x1, y1, x2, y2, buttonColor);
 			
 			// text
-			context.guiRenderState.up();
-			context.drawCenteredString(tr, button.getMessage().getString(),
+			graphics.guiRenderState.up();
+			graphics.drawCenteredString(tr, button.getMessage().getString(),
 				(x1 + x2) / 2, y1 + 5, txtColor);
 		}
 	}

@@ -408,28 +408,29 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		listGui.render(context, mouseX, mouseY, partialTicks);
+		listGui.render(graphics, mouseX, mouseY, partialTicks);
 		
 		// skin preview
 		Alt alt = listGui.getSelectedAlt();
 		if(alt != null)
 		{
-			AltRenderer.drawAltBack(context, alt.getName(),
+			AltRenderer.drawAltBack(graphics, alt.getName(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
-			AltRenderer.drawAltBody(context, alt.getName(),
+			AltRenderer.drawAltBody(graphics, alt.getName(),
 				width - (width / 2 - 140) / 2 - 32, height / 2 - 64 - 9, 64,
 				128);
 		}
 		
 		// title text
-		context.drawCenteredString(font, "Alt Manager", width / 2, 4,
+		graphics.drawCenteredString(font, "Alt Manager", width / 2, 4,
 			CommonColors.WHITE);
-		context.drawCenteredString(font, "Alts: " + altManager.getList().size(),
-			width / 2, 14, CommonColors.LIGHT_GRAY);
-		context.drawCenteredString(font,
+		graphics.drawCenteredString(font,
+			"Alts: " + altManager.getList().size(), width / 2, 14,
+			CommonColors.LIGHT_GRAY);
+		graphics.drawCenteredString(font,
 			"premium: " + altManager.getNumPremium() + ", cracked: "
 				+ altManager.getNumCracked(),
 			width / 2, 24, CommonColors.LIGHT_GRAY);
@@ -439,18 +440,18 @@ public final class AltManagerScreen extends Screen
 		{
 			int alpha = (int)(Math.min(1, errorTimer / 16F) * 255);
 			int color = 0xFF0000 | alpha << 24;
-			context.fill(0, 0, width, height, color);
+			graphics.fill(0, 0, width, height, color);
 			errorTimer--;
 		}
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 		
-		renderButtonTooltip(context, mouseX, mouseY);
-		renderAltTooltip(context, mouseX, mouseY);
+		renderButtonTooltip(graphics, mouseX, mouseY);
+		renderAltTooltip(graphics, mouseX, mouseY);
 	}
 	
-	private void renderAltTooltip(GuiGraphics context, int mouseX, int mouseY)
+	private void renderAltTooltip(GuiGraphics graphics, int mouseX, int mouseY)
 	{
 		if(!listGui.isMouseOver(mouseX, mouseY))
 			return;
@@ -490,10 +491,10 @@ public final class AltManagerScreen extends Screen
 		if(alt.isFavorite())
 			addTooltip(tooltip, "favorite");
 		
-		context.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
+		graphics.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(GuiGraphics context, int mouseX,
+	private void renderButtonTooltip(GuiGraphics graphics, int mouseX,
 		int mouseY)
 	{
 		for(AbstractWidget button : Screens.getButtons(this))
@@ -512,7 +513,7 @@ public final class AltManagerScreen extends Screen
 			else
 				addTooltip(tooltip, "window_freeze");
 			
-			context.setComponentTooltipForNextFrame(font, tooltip, mouseX,
+			graphics.setComponentTooltipForNextFrame(font, tooltip, mouseX,
 				mouseY);
 			break;
 		}
@@ -576,7 +577,7 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
+		public void renderContent(GuiGraphics graphics, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
@@ -590,21 +591,21 @@ public final class AltManagerScreen extends Screen
 						/ 10000F * (float)Math.PI * 2.0F) * 0.15F);
 				
 				int color = 0x00FF00 | (int)(opacity * 255) << 24;
-				context.fill(x - 2, y - 2, x + 218, y + 28, color);
+				graphics.fill(x - 2, y - 2, x + 218, y + 28, color);
 			}
 			
 			// face
-			AltRenderer.drawAltFace(context, alt.getName(), x + 1, y + 1, 24,
+			AltRenderer.drawAltFace(graphics, alt.getName(), x + 1, y + 1, 24,
 				24, listGui.getSelected() == this);
 			
 			Font tr = minecraft.font;
 			
 			// name / email
-			context.drawString(tr, "Name: " + alt.getDisplayName(), x + 31,
+			graphics.drawString(tr, "Name: " + alt.getDisplayName(), x + 31,
 				y + 3, CommonColors.LIGHT_GRAY, false);
 			
 			// status
-			context.drawString(tr, getBottomText(), x + 31, y + 15,
+			graphics.drawString(tr, getBottomText(), x + 31, y + 15,
 				CommonColors.LIGHT_GRAY, false);
 		}
 		

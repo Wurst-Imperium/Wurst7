@@ -117,34 +117,34 @@ public final class TabGui implements KeyPressListener
 			}
 	}
 	
-	public void render(GuiGraphics context, float partialTicks)
+	public void render(GuiGraphics graphics, float partialTicks)
 	{
 		if(tabGuiOtf.isHidden())
 			return;
 		
-		Matrix3x2fStack matrixStack = context.pose();
+		Matrix3x2fStack matrixStack = graphics.pose();
 		matrixStack.pushMatrix();
 		matrixStack.translate(2, 23);
-		context.guiRenderState.up();
+		graphics.guiRenderState.up();
 		
-		drawBox(context, 0, 0, width, height);
-		context.enableScissor(0, 0, width, height);
+		drawBox(graphics, 0, 0, width, height);
+		graphics.enableScissor(0, 0, width, height);
 		
 		int textY = 1;
 		int txtColor = WURST.getGui().getTxtColor();
 		Font tr = MC.font;
-		context.guiRenderState.up();
+		graphics.guiRenderState.up();
 		for(int i = 0; i < tabs.size(); i++)
 		{
 			String tabName = tabs.get(i).name;
 			if(i == selected)
 				tabName = (tabOpened ? "<" : ">") + tabName;
 			
-			context.drawString(tr, tabName, 2, textY, txtColor, false);
+			graphics.drawString(tr, tabName, 2, textY, txtColor, false);
 			textY += 10;
 		}
 		
-		context.disableScissor();
+		graphics.disableScissor();
 		
 		if(tabOpened)
 		{
@@ -153,11 +153,11 @@ public final class TabGui implements KeyPressListener
 			matrixStack.pushMatrix();
 			matrixStack.translate(width + 2, 0);
 			
-			drawBox(context, 0, 0, tab.width, tab.height);
-			context.enableScissor(0, 0, tab.width, tab.height);
+			drawBox(graphics, 0, 0, tab.width, tab.height);
+			graphics.enableScissor(0, 0, tab.width, tab.height);
 			
 			int tabTextY = 1;
-			context.guiRenderState.up();
+			graphics.guiRenderState.up();
 			for(int i = 0; i < tab.features.size(); i++)
 			{
 				Feature feature = tab.features.get(i);
@@ -169,25 +169,25 @@ public final class TabGui implements KeyPressListener
 				if(i == tab.selected)
 					fName = ">" + fName;
 				
-				context.drawString(tr, fName, 2, tabTextY, txtColor, false);
+				graphics.drawString(tr, fName, 2, tabTextY, txtColor, false);
 				tabTextY += 10;
 			}
 			
-			context.disableScissor();
+			graphics.disableScissor();
 			matrixStack.popMatrix();
 		}
 		
 		matrixStack.popMatrix();
 	}
 	
-	private void drawBox(GuiGraphics context, int x1, int y1, int x2, int y2)
+	private void drawBox(GuiGraphics graphics, int x1, int y1, int x2, int y2)
 	{
 		ClickGui gui = WURST.getGui();
 		int bgColor =
 			RenderUtils.toIntColor(gui.getBgColor(), gui.getOpacity());
 		
-		context.fill(x1, y1, x2, y2, bgColor);
-		RenderUtils.drawBoxShadow2D(context, x1, y1, x2, y2);
+		graphics.fill(x1, y1, x2, y2, bgColor);
+		RenderUtils.drawBoxShadow2D(graphics, x1, y1, x2, y2);
 	}
 	
 	private static final class Tab

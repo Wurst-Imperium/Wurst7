@@ -95,21 +95,21 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		Matrix3x2fStack matrixStack = context.pose();
+		Matrix3x2fStack matrixStack = graphics.pose();
 		Font tr = minecraft.font;
 		
-		context.drawCenteredString(tr, setting.getName(), width / 2, 20,
+		graphics.drawCenteredString(tr, setting.getName(), width / 2, 20,
 			CommonColors.WHITE);
 		
-		blockField.render(context, mouseX, mouseY, partialTicks);
+		blockField.render(graphics, mouseX, mouseY, partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 		
-		context.guiRenderState.up();
+		graphics.guiRenderState.up();
 		matrixStack.pushMatrix();
 		matrixStack.translate(-64 + width / 2 - 100, 115);
 		
@@ -121,16 +121,16 @@ public final class EditBlockScreen extends Screen
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor =
 			lblAbove ? WurstColors.VERY_LIGHT_GRAY : CommonColors.GRAY;
-		context.drawString(tr, lblText, lblX, lblY, lblColor);
+		graphics.drawString(tr, lblText, lblX, lblY, lblColor);
 		
 		int border = blockField.isFocused() ? CommonColors.WHITE
 			: CommonColors.LIGHT_GRAY;
 		int black = CommonColors.BLACK;
 		
-		context.fill(48, -56, 64, -36, border);
-		context.fill(49, -55, 65, -37, black);
-		context.fill(242, -56, 246, -36, border);
-		context.fill(241, -55, 245, -37, black);
+		graphics.fill(48, -56, 64, -36, border);
+		graphics.fill(49, -55, 65, -37, black);
+		graphics.fill(242, -56, 246, -36, border);
+		graphics.fill(241, -55, 245, -37, black);
 		
 		matrixStack.popMatrix();
 		
@@ -140,7 +140,7 @@ public final class EditBlockScreen extends Screen
 		if(blockToAdd == null)
 			blockToAdd = Blocks.AIR;
 		
-		RenderUtils.drawItem(context, new ItemStack(blockToAdd),
+		RenderUtils.drawItem(graphics, new ItemStack(blockToAdd),
 			-64 + width / 2 - 100 + 52, 115 - 52, false);
 	}
 	

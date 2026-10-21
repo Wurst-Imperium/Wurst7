@@ -95,22 +95,22 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		context.drawCenteredString(font,
+		graphics.drawCenteredString(font,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			CommonColors.WHITE);
 		
-		context.drawString(font, "Key: " + Keybind.getDisplayKey(key),
+		graphics.drawString(font, "Key: " + Keybind.getDisplayKey(key),
 			width / 2 - 100, 47, WurstColors.VERY_LIGHT_GRAY);
-		context.drawString(font, "Commands (separated by ';')", width / 2 - 100,
-			87, WurstColors.VERY_LIGHT_GRAY);
+		graphics.drawString(font, "Commands (separated by ';')",
+			width / 2 - 100, 87, WurstColors.VERY_LIGHT_GRAY);
 		
-		commandField.render(context, mouseX, mouseY, partialTicks);
+		commandField.render(graphics, mouseX, mouseY, partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

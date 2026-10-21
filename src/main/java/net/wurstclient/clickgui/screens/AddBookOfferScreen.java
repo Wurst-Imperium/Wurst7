@@ -273,45 +273,45 @@ public final class AddBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		Matrix3x2fStack matrixStack = context.pose();
+		Matrix3x2fStack matrixStack = graphics.pose();
 		
-		listGui.render(context, mouseX, mouseY, partialTicks);
+		listGui.render(graphics, mouseX, mouseY, partialTicks);
 		
 		matrixStack.pushMatrix();
 		
 		Font tr = minecraft.font;
 		String titleText =
 			"Available Books (" + listGui.children().size() + ")";
-		context.drawCenteredString(tr, titleText, width / 2, 12,
+		graphics.drawCenteredString(tr, titleText, width / 2, 12,
 			CommonColors.WHITE);
 		
-		levelField.render(context, mouseX, mouseY, partialTicks);
-		priceField.render(context, mouseX, mouseY, partialTicks);
+		levelField.render(graphics, mouseX, mouseY, partialTicks);
+		priceField.render(graphics, mouseX, mouseY, partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 		
 		matrixStack.translate(width / 2 - 100, 0);
 		
-		context.drawString(tr, "Level:", 0, height - 72,
+		graphics.drawString(tr, "Level:", 0, height - 72,
 			WurstColors.VERY_LIGHT_GRAY);
-		context.drawString(tr, "Max price:", 0, height - 56,
+		graphics.drawString(tr, "Max price:", 0, height - 56,
 			WurstColors.VERY_LIGHT_GRAY);
 		
 		if(alreadyAdded && offerToAdd != null)
 		{
 			String errorText = offerToAdd.getEnchantmentNameWithLevel()
 				+ " is already on your list!";
-			context.drawString(tr, errorText, 0, height - 40,
+			graphics.drawString(tr, errorText, 0, height - 40,
 				WurstColors.LIGHT_RED);
 		}
 		
 		matrixStack.popMatrix();
 		
-		RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
+		RenderUtils.drawItem(graphics, new ItemStack(Items.EMERALD),
 			width / 2 - 16, height - 58, false);
 	}
 	
@@ -369,7 +369,7 @@ public final class AddBookOfferScreen extends Screen
 		}
 		
 		@Override
-		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
+		public void renderContent(GuiGraphics graphics, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
@@ -378,7 +378,7 @@ public final class AddBookOfferScreen extends Screen
 			Item item = BuiltInRegistries.ITEM
 				.getValue(Identifier.parse("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
-			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
+			RenderUtils.drawItem(graphics, stack, x + 1, y + 1, true);
 			
 			Font tr = minecraft.font;
 			Holder<Enchantment> enchantment =
@@ -387,14 +387,14 @@ public final class AddBookOfferScreen extends Screen
 			String name = bookOffer.getEnchantmentName();
 			int nameColor = enchantment.is(EnchantmentTags.CURSE)
 				? WurstColors.LIGHT_RED : WurstColors.VERY_LIGHT_GRAY;
-			context.drawString(tr, name, x + 28, y, nameColor, false);
+			graphics.drawString(tr, name, x + 28, y, nameColor, false);
 			
-			context.drawString(tr, bookOffer.id(), x + 28, y + 9,
+			graphics.drawString(tr, bookOffer.id(), x + 28, y + 9,
 				CommonColors.LIGHT_GRAY, false);
 			
 			int maxLevel = enchantment.value().getMaxLevel();
 			String levels = maxLevel + (maxLevel == 1 ? " level" : " levels");
-			context.drawString(tr, levels, x + 28, y + 18,
+			graphics.drawString(tr, levels, x + 28, y + 18,
 				CommonColors.LIGHT_GRAY, false);
 		}
 	}

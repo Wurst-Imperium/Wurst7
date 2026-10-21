@@ -257,16 +257,16 @@ public final class EditBookOfferScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		Matrix3x2fStack matrixStack = context.pose();
+		Matrix3x2fStack matrixStack = graphics.pose();
 		
 		matrixStack.pushMatrix();
 		
 		Font tr = minecraft.font;
 		String titleText = "Edit Book Offer";
-		context.drawCenteredString(tr, titleText, width / 2, 12,
+		graphics.drawCenteredString(tr, titleText, width / 2, 12,
 			CommonColors.WHITE);
 		
 		int x = width / 2 - 100;
@@ -275,7 +275,7 @@ public final class EditBookOfferScreen extends Screen
 		Item item =
 			BuiltInRegistries.ITEM.getValue(Identifier.parse("enchanted_book"));
 		ItemStack stack = new ItemStack(item);
-		RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
+		RenderUtils.drawItem(graphics, stack, x + 1, y + 1, true);
 		
 		BookOffer bookOffer = offerToSave;
 		String name = bookOffer.getEnchantmentNameWithLevel();
@@ -283,9 +283,9 @@ public final class EditBookOfferScreen extends Screen
 		Holder<Enchantment> enchantment = bookOffer.getEnchantmentEntry().get();
 		int nameColor = enchantment.is(EnchantmentTags.CURSE)
 			? WurstColors.LIGHT_RED : CommonColors.WHITE;
-		context.drawString(tr, name, x + 28, y, nameColor);
+		graphics.drawString(tr, name, x + 28, y, nameColor);
 		
-		context.drawString(tr, bookOffer.id(), x + 28, y + 9,
+		graphics.drawString(tr, bookOffer.id(), x + 28, y + 9,
 			CommonColors.LIGHT_GRAY, false);
 		
 		String price;
@@ -294,35 +294,35 @@ public final class EditBookOfferScreen extends Screen
 		else
 		{
 			price = "max " + bookOffer.price();
-			RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
+			RenderUtils.drawItem(graphics, new ItemStack(Items.EMERALD),
 				x + 28 + tr.width(price), y + 16, false);
 		}
 		
-		context.drawString(tr, price, x + 28, y + 18, CommonColors.LIGHT_GRAY,
+		graphics.drawString(tr, price, x + 28, y + 18, CommonColors.LIGHT_GRAY,
 			false);
 		
-		levelField.render(context, mouseX, mouseY, partialTicks);
-		priceField.render(context, mouseX, mouseY, partialTicks);
+		levelField.render(graphics, mouseX, mouseY, partialTicks);
+		priceField.render(graphics, mouseX, mouseY, partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 		
 		matrixStack.translate(width / 2 - 100, 112);
 		
-		context.drawString(tr, "Level:", 0, 0, WurstColors.VERY_LIGHT_GRAY);
-		context.drawString(tr, "Max price:", 0, 16,
+		graphics.drawString(tr, "Level:", 0, 0, WurstColors.VERY_LIGHT_GRAY);
+		graphics.drawString(tr, "Max price:", 0, 16,
 			WurstColors.VERY_LIGHT_GRAY);
 		
 		if(alreadyAdded && offerToSave != null)
 		{
 			String errorText = offerToSave.getEnchantmentNameWithLevel()
 				+ " is already on your list!";
-			context.drawString(tr, errorText, 0, 32, WurstColors.LIGHT_RED);
+			graphics.drawString(tr, errorText, 0, 32, WurstColors.LIGHT_RED);
 		}
 		
 		matrixStack.popMatrix();
 		
-		RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
+		RenderUtils.drawItem(graphics, new ItemStack(Items.EMERALD),
 			width / 2 - 16, 126, false);
 	}
 	

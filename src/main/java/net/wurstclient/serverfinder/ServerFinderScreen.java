@@ -218,39 +218,39 @@ public class ServerFinderScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		context.drawCenteredString(font, "Server Finder", width / 2, 20,
+		graphics.drawCenteredString(font, "Server Finder", width / 2, 20,
 			CommonColors.WHITE);
-		context.drawCenteredString(font,
+		graphics.drawCenteredString(font,
 			"This will search for servers with similar IPs", width / 2, 40,
 			CommonColors.LIGHT_GRAY);
-		context.drawCenteredString(font,
+		graphics.drawCenteredString(font,
 			"to the IP you type into the field below.", width / 2, 50,
 			CommonColors.LIGHT_GRAY);
-		context.drawCenteredString(font,
+		graphics.drawCenteredString(font,
 			"The servers it finds will be added to your server list.",
 			width / 2, 60, CommonColors.LIGHT_GRAY);
 		
-		context.drawString(font, "Server address:", width / 2 - 100,
+		graphics.drawString(font, "Server address:", width / 2 - 100,
 			height / 4 + 24, CommonColors.LIGHT_GRAY);
-		ipBox.render(context, mouseX, mouseY, partialTicks);
+		ipBox.render(graphics, mouseX, mouseY, partialTicks);
 		
-		context.drawString(font, "Max. threads:", width / 2 - 100,
+		graphics.drawString(font, "Max. threads:", width / 2 - 100,
 			height / 4 + 60, CommonColors.LIGHT_GRAY);
-		maxThreadsBox.render(context, mouseX, mouseY, partialTicks);
+		maxThreadsBox.render(graphics, mouseX, mouseY, partialTicks);
 		
-		context.drawCenteredString(font, state.toString(), width / 2,
+		graphics.drawCenteredString(font, state.toString(), width / 2,
 			height / 4 + 73, CommonColors.LIGHT_GRAY);
 		
-		context.drawString(font, "Checked: " + checked + " / 1792",
+		graphics.drawString(font, "Checked: " + checked + " / 1792",
 			width / 2 - 100, height / 4 + 84, CommonColors.LIGHT_GRAY);
-		context.drawString(font, "Working: " + working, width / 2 - 100,
+		graphics.drawString(font, "Working: " + working, width / 2 - 100,
 			height / 4 + 94, CommonColors.LIGHT_GRAY);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

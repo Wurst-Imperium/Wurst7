@@ -46,7 +46,7 @@ public final class FileComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -66,20 +66,20 @@ public final class FileComponent extends Component
 			GUI.setTooltip("\u00a7e[left-click]\u00a7r to select file");
 		
 		// background
-		context.fill(x1, y1, x3, y2, getFillColor(false));
+		graphics.fill(x1, y1, x3, y2, getFillColor(false));
 		
 		// button
-		context.fill(x3, y1, x2, y2, getFillColor(hBox));
+		graphics.fill(x3, y1, x2, y2, getFillColor(hBox));
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
-		RenderUtils.drawBorder2D(context, x3, y1, x2, y2, outlineColor);
+		RenderUtils.drawBorder2D(graphics, x3, y1, x2, y2, outlineColor);
 		
 		// text
 		int txtColor = GUI.getTxtColor();
 		String labelText = setting.getName() + ":";
 		String buttonText = setting.getSelectedFileName();
-		context.guiRenderState.up();
-		context.drawString(TR, labelText, x1, y1 + 2, txtColor, false);
-		context.drawString(TR, buttonText, x3 + 2, y1 + 2, txtColor, false);
+		graphics.guiRenderState.up();
+		graphics.drawString(TR, labelText, x1, y1 + 2, txtColor, false);
+		graphics.drawString(TR, buttonText, x3 + 2, y1 + 2, txtColor, false);
 	}
 	
 	private int getFillColor(boolean hovering)

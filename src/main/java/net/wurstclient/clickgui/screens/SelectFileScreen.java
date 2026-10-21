@@ -129,19 +129,19 @@ public final class SelectFileScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		listGui.render(context, mouseX, mouseY, partialTicks);
+		listGui.render(graphics, mouseX, mouseY, partialTicks);
 		
-		context.drawCenteredString(minecraft.font, setting.getName(), width / 2,
-			12, CommonColors.WHITE);
+		graphics.drawCenteredString(minecraft.font, setting.getName(),
+			width / 2, 12, CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 		
 		if(doneButton.isHoveredOrFocused() && !doneButton.active)
-			context.setComponentTooltipForNextFrame(font,
+			graphics.setComponentTooltipForNextFrame(font,
 				Arrays
 					.asList(Component.literal("You must first select a file.")),
 				mouseX, mouseY);
@@ -177,7 +177,7 @@ public final class SelectFileScreen extends Screen
 		}
 		
 		@Override
-		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
+		public void renderContent(GuiGraphics graphics, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
@@ -186,12 +186,12 @@ public final class SelectFileScreen extends Screen
 			Font tr = minecraft.font;
 			
 			String fileName = "" + path.getFileName();
-			context.drawString(tr, fileName, x + 28, y,
+			graphics.drawString(tr, fileName, x + 28, y,
 				WurstColors.VERY_LIGHT_GRAY);
 			
 			String relPath =
 				"" + minecraft.gameDirectory.toPath().relativize(path);
-			context.drawString(tr, relPath, x + 28, y + 9,
+			graphics.drawString(tr, relPath, x + 28, y + 9,
 				CommonColors.LIGHT_GRAY);
 		}
 	}

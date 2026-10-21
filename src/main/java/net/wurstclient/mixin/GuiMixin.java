@@ -29,13 +29,13 @@ public class GuiMixin
 	@Inject(
 		method = "renderTabList(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V",
 		at = @At("HEAD"))
-	private void onRenderTabList(GuiGraphics context, DeltaTracker tickCounter,
+	private void onRenderTabList(GuiGraphics graphics, DeltaTracker tickCounter,
 		CallbackInfo ci)
 	{
 		if(WurstClient.MC.debugEntries.isOverlayVisible())
 			return;
 		
 		float tickDelta = tickCounter.getGameTimeDeltaPartialTick(true);
-		EventManager.fire(new GUIRenderEvent(context, tickDelta));
+		EventManager.fire(new GUIRenderEvent(graphics, tickDelta));
 	}
 }

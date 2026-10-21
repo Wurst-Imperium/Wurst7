@@ -122,21 +122,21 @@ public final class NcrModRequiredScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - font.lineHeight * 2;
 		
-		context.drawCenteredString(font, title, centerX, titleY,
+		graphics.drawCenteredString(font, title, centerX, titleY,
 			CommonColors.LIGHT_GRAY);
-		ActiveTextCollector otherContext = context.textRenderer();
+		ActiveTextCollector otherContext = graphics.textRenderer();
 		reasonFormatted.visitLines(TextAlignment.CENTER, centerX, reasonY, 9,
 			otherContext);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

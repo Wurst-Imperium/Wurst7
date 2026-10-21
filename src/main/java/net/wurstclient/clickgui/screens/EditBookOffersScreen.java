@@ -147,17 +147,17 @@ public final class EditBookOffersScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		listGui.render(context, mouseX, mouseY, partialTicks);
+		listGui.render(graphics, mouseX, mouseY, partialTicks);
 		
-		context.drawCenteredString(minecraft.font,
+		graphics.drawCenteredString(minecraft.font,
 			bookOffers.getName() + " (" + bookOffers.getOffers().size() + ")",
 			width / 2, 12, CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
@@ -191,7 +191,7 @@ public final class EditBookOffersScreen extends Screen
 		}
 		
 		@Override
-		public void renderContent(GuiGraphics context, int mouseX, int mouseY,
+		public void renderContent(GuiGraphics graphics, int mouseX, int mouseY,
 			boolean hovered, float tickDelta)
 		{
 			int x = getContentX();
@@ -200,7 +200,7 @@ public final class EditBookOffersScreen extends Screen
 			Item item = BuiltInRegistries.ITEM
 				.getValue(Identifier.parse("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
-			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
+			RenderUtils.drawItem(graphics, stack, x + 1, y + 1, true);
 			
 			Font tr = minecraft.font;
 			String name = bookOffer.getEnchantmentNameWithLevel();
@@ -209,17 +209,17 @@ public final class EditBookOffersScreen extends Screen
 				bookOffer.getEnchantmentEntry().get();
 			int nameColor = enchantment.is(EnchantmentTags.CURSE)
 				? WurstColors.LIGHT_RED : WurstColors.VERY_LIGHT_GRAY;
-			context.drawString(tr, name, x + 28, y, nameColor, false);
+			graphics.drawString(tr, name, x + 28, y, nameColor, false);
 			
-			context.drawString(tr, bookOffer.id(), x + 28, y + 9,
+			graphics.drawString(tr, bookOffer.id(), x + 28, y + 9,
 				CommonColors.LIGHT_GRAY, false);
 			
 			String price = getPriceText();
-			context.drawString(tr, price, x + 28, y + 18,
+			graphics.drawString(tr, price, x + 28, y + 18,
 				CommonColors.LIGHT_GRAY, false);
 			
 			if(bookOffer.price() < 64)
-				RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
+				RenderUtils.drawItem(graphics, new ItemStack(Items.EMERALD),
 					x + 28 + tr.width(price), y + 16, false);
 		}
 		

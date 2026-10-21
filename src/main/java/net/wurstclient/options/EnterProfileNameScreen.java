@@ -85,16 +85,16 @@ public final class EnterProfileNameScreen extends Screen
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
-		context.drawCenteredString(minecraft.font, "Name your new profile",
+		graphics.drawCenteredString(minecraft.font, "Name your new profile",
 			width / 2, 20, CommonColors.WHITE);
 		
-		valueField.render(context, mouseX, mouseY, partialTicks);
+		valueField.render(graphics, mouseX, mouseY, partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.render(context, mouseX, mouseY, partialTicks);
+			drawable.render(graphics, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override

@@ -55,7 +55,7 @@ public final class ColorComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphics context, int mouseX, int mouseY,
+	public void render(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -76,22 +76,23 @@ public final class ColorComponent extends Component
 		// background
 		float opacity = GUI.getOpacity();
 		int bgColor = RenderUtils.toIntColor(GUI.getBgColor(), opacity);
-		context.fill(x1, y1, x2, y3, bgColor);
+		graphics.fill(x1, y1, x2, y3, bgColor);
 		
 		// box
-		context.fill(x1, y3, x2, y2,
+		graphics.fill(x1, y3, x2, y2,
 			setting.getColorI(hovering ? 1F : opacity));
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
-		RenderUtils.drawBorder2D(context, x1, y3, x2, y2, outlineColor);
+		RenderUtils.drawBorder2D(graphics, x1, y3, x2, y2, outlineColor);
 		
 		// text
 		String name = setting.getName();
 		String value = ColorUtils.toHex(setting.getColor());
 		int valueWidth = TR.width(value);
 		int txtColor = GUI.getTxtColor();
-		context.guiRenderState.up();
-		context.drawString(TR, name, x1, y1 + 2, txtColor, false);
-		context.drawString(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
+		graphics.guiRenderState.up();
+		graphics.drawString(TR, name, x1, y1 + 2, txtColor, false);
+		graphics.drawString(TR, value, x2 - valueWidth, y1 + 2, txtColor,
+			false);
 	}
 	
 	private String getColorTooltip()

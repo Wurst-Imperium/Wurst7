@@ -78,11 +78,11 @@ public abstract class StatsScreenMixin extends Screen
 	
 	@Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
 		at = @At("TAIL"))
-	private void onRender(GuiGraphics context, int mouseX, int mouseY,
+	private void onRender(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getOtfs().wurstOptionsOtf
-			.drawWurstLogoOnButton(context, wurstOptionsButton);
+			.drawWurstLogoOnButton(graphics, wurstOptionsButton);
 	}
 	
 	@Unique

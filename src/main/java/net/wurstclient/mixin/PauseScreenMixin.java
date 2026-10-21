@@ -47,14 +47,14 @@ public abstract class PauseScreenMixin extends Screen
 	
 	@Inject(method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
 		at = @At("TAIL"))
-	private void onRender(GuiGraphics context, int mouseX, int mouseY,
+	private void onRender(GuiGraphics graphics, int mouseX, int mouseY,
 		float partialTicks, CallbackInfo ci)
 	{
 		WurstClient wurst = WurstClient.INSTANCE;
 		if(!wurst.isEnabled())
 			return;
 		
-		wurst.getOtfs().wurstOptionsOtf.drawWurstLogoOnButton(context,
+		wurst.getOtfs().wurstOptionsOtf.drawWurstLogoOnButton(graphics,
 			wurstOptionsButton);
 	}
 	

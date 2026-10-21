@@ -34,7 +34,7 @@ public final class HackListHUD implements UpdateListener
 		WurstClient.INSTANCE.getEventManager().add(UpdateListener.class, this);
 	}
 	
-	public void render(GuiGraphics context, float partialTicks)
+	public void render(GuiGraphics graphics, float partialTicks)
 	{
 		if(otf.getMode() == Mode.HIDDEN)
 			return;
@@ -57,27 +57,27 @@ public final class HackListHUD implements UpdateListener
 		
 		int height = posY + activeHax.size() * 9;
 		
-		if(otf.getMode() == Mode.COUNT || height > context.guiHeight())
-			drawCounter(context);
+		if(otf.getMode() == Mode.COUNT || height > graphics.guiHeight())
+			drawCounter(graphics);
 		else
-			drawHackList(context, partialTicks);
+			drawHackList(graphics, partialTicks);
 	}
 	
-	private void drawCounter(GuiGraphics context)
+	private void drawCounter(GuiGraphics graphics)
 	{
 		long size = activeHax.stream().filter(e -> e.hack.isEnabled()).count();
 		String s = size + " hack" + (size != 1 ? "s" : "") + " active";
-		drawString(context, s);
+		drawString(graphics, s);
 	}
 	
-	private void drawHackList(GuiGraphics context, float partialTicks)
+	private void drawHackList(GuiGraphics graphics, float partialTicks)
 	{
 		if(otf.isAnimations())
 			for(HackListEntry e : activeHax)
-				drawWithOffset(context, e, partialTicks);
+				drawWithOffset(graphics, e, partialTicks);
 		else
 			for(HackListEntry e : activeHax)
-				drawString(context, e.hack.getRenderName());
+				drawString(graphics, e.hack.getRenderName());
 	}
 	
 	public void updateState(Hack hack)
@@ -128,7 +128,7 @@ public final class HackListHUD implements UpdateListener
 		}
 	}
 	
-	private void drawString(GuiGraphics context, String s)
+	private void drawString(GuiGraphics graphics, String s)
 	{
 		Font tr = WurstClient.MC.font;
 		int posX;
@@ -137,22 +137,22 @@ public final class HackListHUD implements UpdateListener
 			posX = 2;
 		else
 		{
-			int screenWidth = context.guiWidth();
+			int screenWidth = graphics.guiWidth();
 			int stringWidth = tr.width(s);
 			
 			posX = screenWidth - stringWidth - 2;
 		}
 		
-		context.drawString(tr, s, posX + 1, posY + 1, CommonColors.BLACK,
+		graphics.drawString(tr, s, posX + 1, posY + 1, CommonColors.BLACK,
 			false);
-		context.guiRenderState.up();
-		context.drawString(tr, s, posX, posY, textColor | CommonColors.BLACK,
+		graphics.guiRenderState.up();
+		graphics.drawString(tr, s, posX, posY, textColor | CommonColors.BLACK,
 			false);
 		
 		posY += 9;
 	}
 	
-	private void drawWithOffset(GuiGraphics context, HackListEntry e,
+	private void drawWithOffset(GuiGraphics graphics, HackListEntry e,
 		float partialTicks)
 	{
 		Font tr = WurstClient.MC.font;
@@ -166,17 +166,17 @@ public final class HackListHUD implements UpdateListener
 			posX = 2 - 5 * offset;
 		else
 		{
-			int screenWidth = context.guiWidth();
+			int screenWidth = graphics.guiWidth();
 			int stringWidth = tr.width(s);
 			
 			posX = screenWidth - stringWidth - 2 + 5 * offset;
 		}
 		
 		int alpha = (int)(255 * (1 - offset / 4)) << 24;
-		context.drawString(tr, s, (int)posX + 1, posY + 1, 0x04000000 | alpha,
+		graphics.drawString(tr, s, (int)posX + 1, posY + 1, 0x04000000 | alpha,
 			false);
-		context.guiRenderState.up();
-		context.drawString(tr, s, (int)posX, posY, textColor | alpha, false);
+		graphics.guiRenderState.up();
+		graphics.drawString(tr, s, (int)posX, posY, textColor | alpha, false);
 		
 		posY += 9;
 	}
