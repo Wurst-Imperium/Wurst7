@@ -26,8 +26,8 @@ public class HudMixin
 	 * NoVignette is enabled.
 	 */
 	@Inject(method = "extractVignette", at = @At("HEAD"), cancellable = true)
-	private void onExtractVignette(GuiGraphicsExtractor context, Entity entity,
-		CallbackInfo ci)
+	private void onExtractVignette(GuiGraphicsExtractor extractor,
+		Entity entity, CallbackInfo ci)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
 		if(hax == null || !hax.noVignetteHack.isEnabled())

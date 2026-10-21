@@ -58,7 +58,7 @@ public final class BlockComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphicsExtractor context, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor extractor, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -80,17 +80,17 @@ public final class BlockComponent extends Component
 		// background
 		int bgColor =
 			RenderUtils.toIntColor(GUI.getBgColor(), GUI.getOpacity());
-		context.fill(x1, y1, x2, y2, bgColor);
+		extractor.fill(x1, y1, x2, y2, bgColor);
 		
-		context.guiRenderState.up();
+		extractor.guiRenderState.up();
 		
 		// text
 		String name = setting.getName() + ":";
-		context.text(TR, name, x1, y1 + 2, GUI.getTxtColor(), false);
+		extractor.text(TR, name, x1, y1 + 2, GUI.getTxtColor(), false);
 		
 		// block
 		ItemStack stack = new ItemStack(setting.getBlock());
-		RenderUtils.drawItem(context, stack, x3, y1, true);
+		RenderUtils.drawItem(extractor, stack, x3, y1, true);
 	}
 	
 	private boolean isHovering(int mouseX, int mouseY, int x1, int y1, int x2,

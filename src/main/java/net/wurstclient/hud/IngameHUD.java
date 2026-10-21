@@ -20,7 +20,7 @@ public final class IngameHUD implements GUIRenderListener
 	private TabGui tabGui;
 	
 	@Override
-	public void onRenderGUI(GuiGraphicsExtractor context, float partialTicks)
+	public void onRenderGUI(GuiGraphicsExtractor extractor, float partialTicks)
 	{
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
@@ -32,13 +32,13 @@ public final class IngameHUD implements GUIRenderListener
 		
 		clickGui.updateColors();
 		
-		wurstLogo.render(context);
-		hackList.render(context, partialTicks);
-		tabGui.render(context, partialTicks);
+		wurstLogo.render(extractor);
+		hackList.render(extractor, partialTicks);
+		tabGui.render(extractor, partialTicks);
 		
 		// pinned windows
 		if(!(WurstClient.MC.gui.screen() instanceof ClickGuiScreen))
-			clickGui.renderPinnedWindows(context, partialTicks);
+			clickGui.renderPinnedWindows(extractor, partialTicks);
 	}
 	
 	public HackListHUD getHackList()

@@ -95,21 +95,22 @@ public final class EditBlockScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+	public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks)
 	{
-		Matrix3x2fStack matrixStack = context.pose();
+		Matrix3x2fStack matrixStack = extractor.pose();
 		Font tr = minecraft.font;
 		
-		context.centeredText(tr, setting.getName(), width / 2, 20,
+		extractor.centeredText(tr, setting.getName(), width / 2, 20,
 			CommonColors.WHITE);
 		
-		blockField.extractRenderState(context, mouseX, mouseY, partialTicks);
+		blockField.extractRenderState(extractor, mouseX, mouseY, partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(extractor, mouseX, mouseY,
+				partialTicks);
 		
-		context.guiRenderState.up();
+		extractor.guiRenderState.up();
 		matrixStack.pushMatrix();
 		matrixStack.translate(-64 + width / 2 - 100, 115);
 		
@@ -121,16 +122,16 @@ public final class EditBlockScreen extends Screen
 		int lblY = lblAbove ? -66 : -50;
 		int lblColor =
 			lblAbove ? WurstColors.VERY_LIGHT_GRAY : CommonColors.GRAY;
-		context.text(tr, lblText, lblX, lblY, lblColor);
+		extractor.text(tr, lblText, lblX, lblY, lblColor);
 		
 		int border = blockField.isFocused() ? CommonColors.WHITE
 			: CommonColors.LIGHT_GRAY;
 		int black = CommonColors.BLACK;
 		
-		context.fill(48, -56, 64, -36, border);
-		context.fill(49, -55, 65, -37, black);
-		context.fill(242, -56, 246, -36, border);
-		context.fill(241, -55, 245, -37, black);
+		extractor.fill(48, -56, 64, -36, border);
+		extractor.fill(49, -55, 65, -37, black);
+		extractor.fill(242, -56, 246, -36, border);
+		extractor.fill(241, -55, 245, -37, black);
 		
 		matrixStack.popMatrix();
 		
@@ -140,7 +141,7 @@ public final class EditBlockScreen extends Screen
 		if(blockToAdd == null)
 			blockToAdd = Blocks.AIR;
 		
-		RenderUtils.drawItem(context, new ItemStack(blockToAdd),
+		RenderUtils.drawItem(extractor, new ItemStack(blockToAdd),
 			-64 + width / 2 - 100 + 52, 115 - 52, false);
 	}
 	

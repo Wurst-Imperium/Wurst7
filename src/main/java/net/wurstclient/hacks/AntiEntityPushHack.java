@@ -19,6 +19,4 @@ public final class AntiEntityPushHack extends Hack
 		super("AntiEntityPush");
 		setCategory(Category.MOVEMENT);
 	}
-	
-	// See EntityMixin.onPush()
 }
