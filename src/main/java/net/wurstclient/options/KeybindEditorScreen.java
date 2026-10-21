@@ -95,22 +95,24 @@ public final class KeybindEditorScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+	public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks)
 	{
-		context.centeredText(font,
+		extractor.centeredText(font,
 			(oldKey != null ? "Edit" : "Add") + " Keybind", width / 2, 20,
 			CommonColors.WHITE);
 		
-		context.text(font, "Key: " + Keybind.getDisplayKey(key),
+		extractor.text(font, "Key: " + Keybind.getDisplayKey(key),
 			width / 2 - 100, 47, WurstColors.VERY_LIGHT_GRAY);
-		context.text(font, "Commands (separated by ';')", width / 2 - 100, 87,
+		extractor.text(font, "Commands (separated by ';')", width / 2 - 100, 87,
 			WurstColors.VERY_LIGHT_GRAY);
 		
-		commandField.extractRenderState(context, mouseX, mouseY, partialTicks);
+		commandField.extractRenderState(extractor, mouseX, mouseY,
+			partialTicks);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(extractor, mouseX, mouseY,
+				partialTicks);
 	}
 	
 	@Override

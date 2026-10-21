@@ -161,13 +161,13 @@ public final class EditColorScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+	public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks)
 	{
 		Font tr = minecraft.font;
 		
-		context.centeredText(minecraft.font, colorSetting.getName(), width / 2,
-			16, WurstColors.VERY_LIGHT_GRAY);
+		extractor.centeredText(minecraft.font, colorSetting.getName(),
+			width / 2, 16, WurstColors.VERY_LIGHT_GRAY);
 		
 		// Draw palette
 		int x = paletteX;
@@ -178,24 +178,26 @@ public final class EditColorScreen extends Screen
 		int fh = paletteHeight;
 		float u = 0;
 		float v = 0;
-		context.blit(RenderPipelines.GUI_TEXTURED, paletteIdentifier, x, y, u,
+		extractor.blit(RenderPipelines.GUI_TEXTURED, paletteIdentifier, x, y, u,
 			v, w, h, fw, fh);
 		
 		// RGB letters
-		context.text(tr, "#", fieldsX - 3 - tr.width("#"), fieldsY + 6,
+		extractor.text(tr, "#", fieldsX - 3 - tr.width("#"), fieldsY + 6,
 			WurstColors.VERY_LIGHT_GRAY, false);
-		context.text(tr, "R:", fieldsX - 3 - tr.width("R:"), fieldsY + 6 + 35,
+		extractor.text(tr, "R:", fieldsX - 3 - tr.width("R:"), fieldsY + 6 + 35,
 			CommonColors.RED, false);
-		context.text(tr, "G:", fieldsX + 75 - 3 - tr.width("G:"),
+		extractor.text(tr, "G:", fieldsX + 75 - 3 - tr.width("G:"),
 			fieldsY + 6 + 35, CommonColors.GREEN, false);
-		context.text(tr, "B:", fieldsX + 150 - 3 - tr.width("B:"),
+		extractor.text(tr, "B:", fieldsX + 150 - 3 - tr.width("B:"),
 			fieldsY + 6 + 35, CommonColors.BLUE, false);
 		
-		hexValueField.extractRenderState(context, mouseX, mouseY, partialTicks);
-		redValueField.extractRenderState(context, mouseX, mouseY, partialTicks);
-		greenValueField.extractRenderState(context, mouseX, mouseY,
+		hexValueField.extractRenderState(extractor, mouseX, mouseY,
 			partialTicks);
-		blueValueField.extractRenderState(context, mouseX, mouseY,
+		redValueField.extractRenderState(extractor, mouseX, mouseY,
+			partialTicks);
+		greenValueField.extractRenderState(extractor, mouseX, mouseY,
+			partialTicks);
+		blueValueField.extractRenderState(extractor, mouseX, mouseY,
 			partialTicks);
 		
 		// Color preview
@@ -207,16 +209,17 @@ public final class EditColorScreen extends Screen
 		int boxY = fieldsY;
 		
 		// Border
-		context.fill(boxX - borderSize, boxY - borderSize,
+		extractor.fill(boxX - borderSize, boxY - borderSize,
 			boxX + boxWidth + borderSize, boxY + boxHeight + borderSize,
 			CommonColors.LIGHT_GRAY);
 		
 		// Color box
-		context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight,
+		extractor.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight,
 			color.getRGB());
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(extractor, mouseX, mouseY,
+				partialTicks);
 	}
 	
 	@Override

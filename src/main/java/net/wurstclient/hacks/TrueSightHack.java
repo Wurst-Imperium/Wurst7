@@ -51,6 +51,4 @@ public final class TrueSightHack extends Hack
 	{
 		return isEnabled() && entityFilters.testOne(entity);
 	}
-	
-	// See EntityMixin.onIsInvisibleTo()
 }
