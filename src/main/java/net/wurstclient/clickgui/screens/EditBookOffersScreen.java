@@ -147,16 +147,16 @@ public final class EditBookOffersScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context)
+	public void extractRenderState(GuiGraphicsExtractor extractor)
 	{
-		listGui.extractRenderState(context);
+		listGui.extractRenderState(extractor);
 		
-		context.centeredText(minecraft.font,
+		extractor.centeredText(minecraft.font,
 			bookOffers.getName() + " (" + bookOffers.getOffers().size() + ")",
 			width / 2, 12, CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context);
+			drawable.extractRenderState(extractor);
 	}
 	
 	@Override
@@ -190,7 +190,7 @@ public final class EditBookOffersScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context,
+		public void extractContent(GuiGraphicsExtractor extractor,
 			boolean hovered)
 		{
 			int x = getContentX();
@@ -199,7 +199,7 @@ public final class EditBookOffersScreen extends Screen
 			Item item = BuiltInRegistries.ITEM
 				.getValue(Identifier.parse("enchanted_book"));
 			ItemStack stack = new ItemStack(item);
-			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
+			RenderUtils.drawItem(extractor, stack, x + 1, y + 1, true);
 			
 			Font tr = minecraft.font;
 			String name = bookOffer.getEnchantmentNameWithLevel();
@@ -208,17 +208,17 @@ public final class EditBookOffersScreen extends Screen
 				bookOffer.getEnchantmentEntry().get();
 			int nameColor = enchantment.is(EnchantmentTags.CURSE)
 				? WurstColors.LIGHT_RED : WurstColors.VERY_LIGHT_GRAY;
-			context.text(tr, name, x + 28, y, nameColor, false);
+			extractor.text(tr, name, x + 28, y, nameColor, false);
 			
-			context.text(tr, bookOffer.id(), x + 28, y + 9,
+			extractor.text(tr, bookOffer.id(), x + 28, y + 9,
 				CommonColors.LIGHT_GRAY, false);
 			
 			String price = getPriceText();
-			context.text(tr, price, x + 28, y + 18, CommonColors.LIGHT_GRAY,
+			extractor.text(tr, price, x + 28, y + 18, CommonColors.LIGHT_GRAY,
 				false);
 			
 			if(bookOffer.price() < 64)
-				RenderUtils.drawItem(context, new ItemStack(Items.EMERALD),
+				RenderUtils.drawItem(extractor, new ItemStack(Items.EMERALD),
 					x + 28 + tr.width(price), y + 16, false);
 		}
 		

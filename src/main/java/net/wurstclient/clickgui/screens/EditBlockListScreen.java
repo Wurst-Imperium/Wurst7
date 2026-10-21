@@ -138,48 +138,48 @@ public final class EditBlockListScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context)
+	public void extractRenderState(GuiGraphicsExtractor extractor)
 	{
-		Matrix3x2fStack matrixStack = context.pose();
+		Matrix3x2fStack matrixStack = extractor.pose();
 		
-		listGui.extractRenderState(context);
+		listGui.extractRenderState(extractor);
 		
-		context.centeredText(minecraft.font,
+		extractor.centeredText(minecraft.font,
 			blockList.getName() + " (" + blockList.size() + ")", width / 2, 12,
 			CommonColors.WHITE);
 		
 		matrixStack.pushMatrix();
 		
-		blockNameField.extractRenderState(context);
+		blockNameField.extractRenderState(extractor);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context);
+			drawable.extractRenderState(extractor);
 		
-		context.guiRenderState.up();
+		extractor.guiRenderState.up();
 		matrixStack.pushMatrix();
 		matrixStack.translate(-64 + width / 2 - 152, 0);
 		
 		if(blockNameField.getValue().isEmpty() && !blockNameField.isFocused())
-			context.text(minecraft.font, "block name or ID", 68, height - 50,
+			extractor.text(minecraft.font, "block name or ID", 68, height - 50,
 				CommonColors.GRAY);
 		
 		int border = blockNameField.isFocused() ? CommonColors.WHITE
 			: CommonColors.LIGHT_GRAY;
 		int black = CommonColors.BLACK;
 		
-		context.fill(48, height - 56, 64, height - 36, border);
-		context.fill(49, height - 55, 65, height - 37, black);
-		context.fill(214, height - 56, 244, height - 55, border);
-		context.fill(214, height - 37, 244, height - 36, border);
-		context.fill(244, height - 56, 246, height - 36, border);
-		context.fill(213, height - 55, 243, height - 52, black);
-		context.fill(213, height - 40, 243, height - 37, black);
-		context.fill(213, height - 55, 216, height - 37, black);
-		context.fill(242, height - 55, 245, height - 37, black);
+		extractor.fill(48, height - 56, 64, height - 36, border);
+		extractor.fill(49, height - 55, 65, height - 37, black);
+		extractor.fill(214, height - 56, 244, height - 55, border);
+		extractor.fill(214, height - 37, 244, height - 36, border);
+		extractor.fill(244, height - 56, 246, height - 36, border);
+		extractor.fill(213, height - 55, 243, height - 52, black);
+		extractor.fill(213, height - 40, 243, height - 37, black);
+		extractor.fill(213, height - 55, 216, height - 37, black);
+		extractor.fill(242, height - 55, 245, height - 37, black);
 		
 		matrixStack.popMatrix();
 		
-		RenderUtils.drawItem(context,
+		RenderUtils.drawItem(extractor,
 			blockToAdd == null ? ItemStack.EMPTY : new ItemStack(blockToAdd),
 			width / 2 - 164, height - 52, false);
 		
@@ -220,7 +220,7 @@ public final class EditBlockListScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context,
+		public void extractContent(GuiGraphicsExtractor extractor,
 			boolean hovered)
 		{
 			int x = getContentX();
@@ -230,12 +230,12 @@ public final class EditBlockListScreen extends Screen
 			ItemStack stack = new ItemStack(block);
 			Font tr = minecraft.font;
 			
-			RenderUtils.drawItem(context, stack, x + 1, y + 1, true);
-			context.text(tr, getDisplayName(stack), x + 28, y,
+			RenderUtils.drawItem(extractor, stack, x + 1, y + 1, true);
+			extractor.text(tr, getDisplayName(stack), x + 28, y,
 				WurstColors.VERY_LIGHT_GRAY, false);
-			context.text(tr, blockName, x + 28, y + 9, CommonColors.LIGHT_GRAY,
-				false);
-			context.text(tr, getIdText(block), x + 28, y + 18,
+			extractor.text(tr, blockName, x + 28, y + 9,
+				CommonColors.LIGHT_GRAY, false);
+			extractor.text(tr, getIdText(block), x + 28, y + 18,
 				CommonColors.LIGHT_GRAY, false);
 		}
 		

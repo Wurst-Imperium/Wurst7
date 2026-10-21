@@ -225,46 +225,46 @@ public abstract class AltEditorScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context)
+	public void extractRenderState(GuiGraphicsExtractor extractor)
 	{
 		// skin preview
-		AltRenderer.drawAltBack(context, nameOrEmailBox.getValue(),
+		AltRenderer.drawAltBack(extractor, nameOrEmailBox.getValue(),
 			(width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
-		AltRenderer.drawAltBody(context, nameOrEmailBox.getValue(),
+		AltRenderer.drawAltBody(extractor, nameOrEmailBox.getValue(),
 			width - (width / 2 - 100) / 2 - 64, height / 2 - 128, 128, 256);
 		
 		String accountType = getPassword().isEmpty() ? "cracked" : "premium";
 		
 		// text
-		context.text(font, "Name (for cracked alts), or", width / 2 - 100, 37,
+		extractor.text(font, "Name (for cracked alts), or", width / 2 - 100, 37,
 			CommonColors.LIGHT_GRAY);
-		context.text(font, "E-Mail (for premium alts)", width / 2 - 100, 47,
+		extractor.text(font, "E-Mail (for premium alts)", width / 2 - 100, 47,
 			CommonColors.LIGHT_GRAY);
-		context.text(font, "Password (for premium alts)", width / 2 - 100, 87,
+		extractor.text(font, "Password (for premium alts)", width / 2 - 100, 87,
 			CommonColors.LIGHT_GRAY);
-		context.text(font, "Account type: " + accountType, width / 2 - 100, 127,
-			CommonColors.LIGHT_GRAY);
+		extractor.text(font, "Account type: " + accountType, width / 2 - 100,
+			127, CommonColors.LIGHT_GRAY);
 		
 		String[] lines = message.split("\n");
 		for(int i = 0; i < lines.length; i++)
-			context.centeredText(font, lines[i], width / 2, 142 + 10 * i,
+			extractor.centeredText(font, lines[i], width / 2, 142 + 10 * i,
 				CommonColors.WHITE);
 		
 		// text boxes
-		nameOrEmailBox.extractRenderState(context);
-		passwordBox.extractRenderState(context);
+		nameOrEmailBox.extractRenderState(extractor);
+		passwordBox.extractRenderState(extractor);
 		
 		// red flash for errors
 		if(errorTimer > 0)
 		{
 			int alpha = (int)(Math.min(1, errorTimer / 16F) * 255);
 			int color = 0xFF0000 | alpha << 24;
-			context.fill(0, 0, width, height, color);
+			extractor.fill(0, 0, width, height, color);
 			errorTimer--;
 		}
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context);
+			drawable.extractRenderState(extractor);
 	}
 	
 	@Override

@@ -82,7 +82,7 @@ public final class SliderComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphicsExtractor context, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor extractor, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int x1 = getX();
@@ -118,10 +118,10 @@ public final class SliderComponent extends Component
 		
 		// background (around the rail)
 		int bgColor = RenderUtils.toIntColor(GUI.getBgColor(), opacity);
-		RenderUtils.fill2D(context, x1, y1, x2, y4, bgColor);
-		RenderUtils.fill2D(context, x1, y5, x2, y2, bgColor);
-		RenderUtils.fill2D(context, x1, y4, x3, y5, bgColor);
-		RenderUtils.fill2D(context, x4, y4, x2, y5, bgColor);
+		RenderUtils.fill2D(extractor, x1, y1, x2, y4, bgColor);
+		RenderUtils.fill2D(extractor, x1, y5, x2, y2, bgColor);
+		RenderUtils.fill2D(extractor, x1, y4, x3, y5, bgColor);
+		RenderUtils.fill2D(extractor, x4, y4, x2, y5, bgColor);
 		
 		// limit
 		float xl1 = x3;
@@ -134,17 +134,17 @@ public final class SliderComponent extends Component
 			
 			int limitColor =
 				RenderUtils.toIntColor(new float[]{1, 0, 0}, railOpacity);
-			RenderUtils.fill2D(context, x3, y4, xl1, y5, limitColor);
-			RenderUtils.fill2D(context, xl2, y4, x4, y5, limitColor);
+			RenderUtils.fill2D(extractor, x3, y4, xl1, y5, limitColor);
+			RenderUtils.fill2D(extractor, xl2, y4, x4, y5, limitColor);
 		}
 		
 		// rail
-		RenderUtils.fill2D(context, xl1, y4, xl2, y5,
+		RenderUtils.fill2D(extractor, xl1, y4, xl2, y5,
 			RenderUtils.toIntColor(GUI.getBgColor(), railOpacity));
-		RenderUtils.drawBorder2D(context, x3, y4, x4, y5,
+		RenderUtils.drawBorder2D(extractor, x3, y4, x4, y5,
 			RenderUtils.toIntColor(GUI.getAcColor(), 0.5F));
 		
-		context.guiRenderState.up();
+		extractor.guiRenderState.up();
 		
 		// knob
 		float xk1 = x1 + (x2 - x1 - 8) * (float)setting.getPercentage();
@@ -153,16 +153,16 @@ public final class SliderComponent extends Component
 		float yk2 = y2 - 1.5F;
 		int knobColor = grayedOut ? 0xC0808080 : RenderUtils
 			.toIntColor(setting.getKnobColor(), hSlider ? 1 : 0.75F);
-		RenderUtils.fill2D(context, xk1, yk1, xk2, yk2, knobColor);
-		RenderUtils.drawBorder2D(context, xk1, yk1, xk2, yk2, 0x80101010);
+		RenderUtils.fill2D(extractor, xk1, yk1, xk2, yk2, knobColor);
+		RenderUtils.drawBorder2D(extractor, xk1, yk1, xk2, yk2, 0x80101010);
 		
 		// text
 		String name = setting.getName();
 		String value = setting.getValueString();
 		int valueWidth = TR.width(value);
 		int txtColor = GUI.getTxtColor();
-		context.text(TR, name, x1, y1 + 2, txtColor, false);
-		context.text(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
+		extractor.text(TR, name, x1, y1 + 2, txtColor, false);
+		extractor.text(TR, value, x2 - valueWidth, y1 + 2, txtColor, false);
 	}
 	
 	private String getTextTooltip()

@@ -29,14 +29,14 @@ public class HudMixin
 		method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/client/gui/components/PlayerTabOverlay;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"))
-	private void onExtractRenderState(GuiGraphicsExtractor context,
+	private void onExtractRenderState(GuiGraphicsExtractor extractor,
 		CallbackInfo ci)
 	{
 		if(WurstClient.MC.debugEntries.isOverlayVisible())
 			return;
 		
 		float tickDelta =
-			context.deltaTracker().getGameTimeDeltaPartialTick(true);
-		EventManager.fire(new GUIRenderEvent(context, tickDelta));
+			extractor.deltaTracker().getGameTimeDeltaPartialTick(true);
+		EventManager.fire(new GUIRenderEvent(extractor, tickDelta));
 	}
 }

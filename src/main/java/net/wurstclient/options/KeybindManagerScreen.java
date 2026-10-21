@@ -145,19 +145,19 @@ public final class KeybindManagerScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context)
+	public void extractRenderState(GuiGraphicsExtractor extractor)
 	{
-		listGui.extractRenderState(context);
+		listGui.extractRenderState(extractor);
 		
-		context.centeredText(font, "Keybind Manager", width / 2, 8,
+		extractor.centeredText(font, "Keybind Manager", width / 2, 8,
 			CommonColors.WHITE);
 		
 		int count = WurstClient.INSTANCE.getKeybinds().getAllKeybinds().size();
-		context.centeredText(font, "Keybinds: " + count, width / 2, 20,
+		extractor.centeredText(font, "Keybinds: " + count, width / 2, 20,
 			CommonColors.WHITE);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context);
+			drawable.extractRenderState(extractor);
 	}
 	
 	@Override
@@ -184,7 +184,7 @@ public final class KeybindManagerScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context,
+		public void extractContent(GuiGraphicsExtractor extractor,
 			boolean hovered)
 		{
 			int x = getContentX();
@@ -193,11 +193,11 @@ public final class KeybindManagerScreen extends Screen
 			Font tr = minecraft.font;
 			
 			String keyText = "Key: " + Keybind.getDisplayKey(keybind.getKey());
-			context.text(tr, keyText, x + 3, y + 3, WurstColors.VERY_LIGHT_GRAY,
-				false);
+			extractor.text(tr, keyText, x + 3, y + 3,
+				WurstColors.VERY_LIGHT_GRAY, false);
 			
 			String cmdText = "Commands: " + keybind.getCommands();
-			context.text(tr, cmdText, x + 3, y + 15, CommonColors.LIGHT_GRAY,
+			extractor.text(tr, cmdText, x + 3, y + 15, CommonColors.LIGHT_GRAY,
 				false);
 		}
 	}

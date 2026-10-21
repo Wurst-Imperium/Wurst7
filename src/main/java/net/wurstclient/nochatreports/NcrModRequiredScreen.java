@@ -122,20 +122,20 @@ public final class NcrModRequiredScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context)
+	public void extractRenderState(GuiGraphicsExtractor extractor)
 	{
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - font.lineHeight * 2;
 		
-		context.centeredText(font, title, centerX, titleY,
+		extractor.centeredText(font, title, centerX, titleY,
 			CommonColors.LIGHT_GRAY);
-		ActiveTextCollector otherContext = context.textRenderer();
+		ActiveTextCollector otherContext = extractor.textRenderer();
 		reasonFormatted.visitLines(TextAlignment.CENTER, centerX, reasonY, 9,
 			otherContext);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context);
+			drawable.extractRenderState(extractor);
 	}
 	
 	@Override

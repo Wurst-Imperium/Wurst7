@@ -89,15 +89,15 @@ public final class EditSliderScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context)
+	public void extractRenderState(GuiGraphicsExtractor extractor)
 	{
-		context.centeredText(minecraft.font, slider.getName(), width / 2, 20,
+		extractor.centeredText(minecraft.font, slider.getName(), width / 2, 20,
 			CommonColors.WHITE);
 		
-		valueField.extractRenderState(context);
+		valueField.extractRenderState(extractor);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context);
+			drawable.extractRenderState(extractor);
 	}
 	
 	@Override

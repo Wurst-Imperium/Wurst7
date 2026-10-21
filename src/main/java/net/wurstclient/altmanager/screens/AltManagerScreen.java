@@ -408,27 +408,27 @@ public final class AltManagerScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context)
+	public void extractRenderState(GuiGraphicsExtractor extractor)
 	{
-		listGui.extractRenderState(context);
+		listGui.extractRenderState(extractor);
 		
 		// skin preview
 		Alt alt = listGui.getSelectedAlt();
 		if(alt != null)
 		{
-			AltRenderer.drawAltBack(context, alt.getName(),
+			AltRenderer.drawAltBack(extractor, alt.getName(),
 				(width / 2 - 125) / 2 - 32, height / 2 - 64 - 9, 64, 128);
-			AltRenderer.drawAltBody(context, alt.getName(),
+			AltRenderer.drawAltBody(extractor, alt.getName(),
 				width - (width / 2 - 140) / 2 - 32, height / 2 - 64 - 9, 64,
 				128);
 		}
 		
 		// title text
-		context.centeredText(font, "Alt Manager", width / 2, 4,
+		extractor.centeredText(font, "Alt Manager", width / 2, 4,
 			CommonColors.WHITE);
-		context.centeredText(font, "Alts: " + altManager.getList().size(),
+		extractor.centeredText(font, "Alts: " + altManager.getList().size(),
 			width / 2, 14, CommonColors.LIGHT_GRAY);
-		context.centeredText(font,
+		extractor.centeredText(font,
 			"premium: " + altManager.getNumPremium() + ", cracked: "
 				+ altManager.getNumCracked(),
 			width / 2, 24, CommonColors.LIGHT_GRAY);
@@ -438,18 +438,18 @@ public final class AltManagerScreen extends Screen
 		{
 			int alpha = (int)(Math.min(1, errorTimer / 16F) * 255);
 			int color = 0xFF0000 | alpha << 24;
-			context.fill(0, 0, width, height, color);
+			extractor.fill(0, 0, width, height, color);
 			errorTimer--;
 		}
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context);
+			drawable.extractRenderState(extractor);
 		
-		renderButtonTooltip(context, context.mouseX(), context.mouseY());
-		renderAltTooltip(context, context.mouseX(), context.mouseY());
+		renderButtonTooltip(extractor, extractor.mouseX(), extractor.mouseY());
+		renderAltTooltip(extractor, extractor.mouseX(), extractor.mouseY());
 	}
 	
-	private void renderAltTooltip(GuiGraphicsExtractor context, int mouseX,
+	private void renderAltTooltip(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY)
 	{
 		if(!listGui.isMouseOver(mouseX, mouseY))
@@ -490,10 +490,11 @@ public final class AltManagerScreen extends Screen
 		if(alt.isFavorite())
 			addTooltip(tooltip, "favorite");
 		
-		context.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
+		extractor.setComponentTooltipForNextFrame(font, tooltip, mouseX,
+			mouseY);
 	}
 	
-	private void renderButtonTooltip(GuiGraphicsExtractor context, int mouseX,
+	private void renderButtonTooltip(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY)
 	{
 		for(AbstractWidget button : Screens.getWidgets(this))
@@ -512,7 +513,7 @@ public final class AltManagerScreen extends Screen
 			else
 				addTooltip(tooltip, "window_freeze");
 			
-			context.setComponentTooltipForNextFrame(font, tooltip, mouseX,
+			extractor.setComponentTooltipForNextFrame(font, tooltip, mouseX,
 				mouseY);
 			break;
 		}
@@ -576,7 +577,7 @@ public final class AltManagerScreen extends Screen
 		}
 		
 		@Override
-		public void extractContent(GuiGraphicsExtractor context,
+		public void extractContent(GuiGraphicsExtractor extractor,
 			boolean hovered)
 		{
 			int x = getContentX();
@@ -590,21 +591,21 @@ public final class AltManagerScreen extends Screen
 						/ 10000F * (float)Math.PI * 2.0F) * 0.15F);
 				
 				int color = 0x00FF00 | (int)(opacity * 255) << 24;
-				context.fill(x - 2, y - 2, x + 218, y + 28, color);
+				extractor.fill(x - 2, y - 2, x + 218, y + 28, color);
 			}
 			
 			// face
-			AltRenderer.drawAltFace(context, alt.getName(), x + 1, y + 1, 24,
+			AltRenderer.drawAltFace(extractor, alt.getName(), x + 1, y + 1, 24,
 				24, listGui.getSelected() == this);
 			
 			Font tr = minecraft.font;
 			
 			// name / email
-			context.text(tr, "Name: " + alt.getDisplayName(), x + 31, y + 3,
+			extractor.text(tr, "Name: " + alt.getDisplayName(), x + 31, y + 3,
 				CommonColors.LIGHT_GRAY, false);
 			
 			// status
-			context.text(tr, getBottomText(), x + 31, y + 15,
+			extractor.text(tr, getBottomText(), x + 31, y + 15,
 				CommonColors.LIGHT_GRAY, false);
 		}
 		

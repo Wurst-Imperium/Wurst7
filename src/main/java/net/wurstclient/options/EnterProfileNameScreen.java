@@ -85,15 +85,15 @@ public final class EnterProfileNameScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context)
+	public void extractRenderState(GuiGraphicsExtractor extractor)
 	{
-		context.centeredText(minecraft.font, "Name your new profile", width / 2,
-			20, CommonColors.WHITE);
+		extractor.centeredText(minecraft.font, "Name your new profile",
+			width / 2, 20, CommonColors.WHITE);
 		
-		valueField.extractRenderState(context);
+		valueField.extractRenderState(extractor);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context);
+			drawable.extractRenderState(extractor);
 	}
 	
 	@Override
