@@ -26,7 +26,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler
 		method = "extractTransparentBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	public void onExtractTransparentBackground(GuiGraphicsExtractor context,
+	public void onExtractTransparentBackground(GuiGraphicsExtractor extractor,
 		CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noBackgroundHack
@@ -38,7 +38,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler
 		method = "extractBlurredBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	public void onExtractBlurredBackground(GuiGraphicsExtractor context,
+	public void onExtractBlurredBackground(GuiGraphicsExtractor extractor,
 		CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noBackgroundHack
@@ -50,7 +50,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler
 		method = "extractMenuBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIII)V",
 		at = @At("HEAD"),
 		cancellable = true)
-	public void onExtractMenuBackground(GuiGraphicsExtractor context, int x,
+	public void onExtractMenuBackground(GuiGraphicsExtractor extractor, int x,
 		int y, int width, int height, CallbackInfo ci)
 	{
 		if(WurstClient.INSTANCE.getHax().noBackgroundHack

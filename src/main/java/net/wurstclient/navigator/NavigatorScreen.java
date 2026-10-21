@@ -143,7 +143,7 @@ public abstract class NavigatorScreen extends Screen
 	}
 	
 	@Override
-	public final void extractRenderState(GuiGraphicsExtractor context,
+	public final void extractRenderState(GuiGraphicsExtractor extractor,
 		int mouseX, int mouseY, float partialTicks)
 	{
 		// background
@@ -152,7 +152,7 @@ public abstract class NavigatorScreen extends Screen
 		int bgy1 = 60;
 		int bgy2 = height - 43;
 		if(hasBackground)
-			drawBackgroundBox(context, bgx1, bgy1, bgx2, bgy2);
+			drawBackgroundBox(extractor, bgx1, bgy1, bgx2, bgy2);
 		
 		// scrollbar
 		if(showScrollbar)
@@ -162,27 +162,27 @@ public abstract class NavigatorScreen extends Screen
 			int x2 = x1 + 12;
 			int y1 = bgy1;
 			int y2 = bgy2;
-			drawBackgroundBox(context, x1, y1, x2, y2);
+			drawBackgroundBox(extractor, x1, y1, x2, y2);
 			
 			// knob
 			x1 += 2;
 			x2 -= 2;
 			y1 += scrollKnobPosition;
 			y2 = y1 + 24;
-			drawBackgroundBox(context, x1, y1, x2, y2);
+			drawBackgroundBox(extractor, x1, y1, x2, y2);
 			x1++;
 			x2--;
 			y1 += 8;
 			y2 -= 15;
 			for(int i = 0; i < 3; y1 += 4, y2 += 4, i++)
-				drawDownShadow(context, x1, y1, x2, y2);
+				drawDownShadow(extractor, x1, y1, x2, y2);
 		}
 		
-		onRender(context, mouseX, mouseY, partialTicks);
+		onRender(extractor, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public void extractBackground(GuiGraphicsExtractor context, int mouseX,
+	public void extractBackground(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float deltaTicks)
 	{
 		// Don't blur
@@ -207,7 +207,7 @@ public abstract class NavigatorScreen extends Screen
 	
 	protected abstract void onUpdate();
 	
-	protected abstract void onRender(GuiGraphicsExtractor context, int mouseX,
+	protected abstract void onRender(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks);
 	
 	protected final int getStringHeight(String s)
@@ -233,27 +233,27 @@ public abstract class NavigatorScreen extends Screen
 			scroll = maxScroll;
 	}
 	
-	protected final void drawDownShadow(GuiGraphicsExtractor context, int x1,
+	protected final void drawDownShadow(GuiGraphicsExtractor extractor, int x1,
 		int y1, int x2, int y2)
 	{
 		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
 		
 		// line
 		int lineColor = RenderUtils.toIntColor(acColor, 0.5F);
-		RenderUtils.drawLine2D(context, x1 + 0.1F, y1, x2 + 0.1F, y1,
+		RenderUtils.drawLine2D(extractor, x1 + 0.1F, y1, x2 + 0.1F, y1,
 			lineColor);
 		
 		// shadow
 		int shadowColor1 = RenderUtils.toIntColor(acColor, 0.75F);
 		int shadowColor2 = 0x00000000;
-		context.fillGradient(x1, y1, x2, y2, shadowColor1, shadowColor2);
+		extractor.fillGradient(x1, y1, x2, y2, shadowColor1, shadowColor2);
 	}
 	
-	protected final void drawBox(GuiGraphicsExtractor context, int x1, int y1,
+	protected final void drawBox(GuiGraphicsExtractor extractor, int x1, int y1,
 		int x2, int y2, int color)
 	{
-		context.fill(x1, y1, x2, y2, color);
-		RenderUtils.drawBoxShadow2D(context, x1, y1, x2, y2);
+		extractor.fill(x1, y1, x2, y2, color);
+		RenderUtils.drawBoxShadow2D(extractor, x1, y1, x2, y2);
 	}
 	
 	protected final int getBackgroundColor()
@@ -263,9 +263,9 @@ public abstract class NavigatorScreen extends Screen
 		return RenderUtils.toIntColor(gui.getBgColor(), gui.getOpacity());
 	}
 	
-	protected final void drawBackgroundBox(GuiGraphicsExtractor context, int x1,
-		int y1, int x2, int y2)
+	protected final void drawBackgroundBox(GuiGraphicsExtractor extractor,
+		int x1, int y1, int x2, int y2)
 	{
-		drawBox(context, x1, y1, x2, y2, getBackgroundColor());
+		drawBox(extractor, x1, y1, x2, y2, getBackgroundColor());
 	}
 }
