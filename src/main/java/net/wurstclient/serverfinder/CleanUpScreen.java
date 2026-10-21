@@ -214,22 +214,23 @@ public class CleanUpScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+	public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks)
 	{
-		context.centeredText(font, "Clean Up", width / 2, 20,
+		extractor.centeredText(font, "Clean Up", width / 2, 20,
 			CommonColors.WHITE);
-		context.centeredText(font,
+		extractor.centeredText(font,
 			"Please select the servers you want to remove:", width / 2, 36,
 			CommonColors.LIGHT_GRAY);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(extractor, mouseX, mouseY,
+				partialTicks);
 		
-		renderButtonTooltip(context, mouseX, mouseY);
+		renderButtonTooltip(extractor, mouseX, mouseY);
 	}
 	
-	private void renderButtonTooltip(GuiGraphicsExtractor context, int mouseX,
+	private void renderButtonTooltip(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY)
 	{
 		for(AbstractWidget button : Screens.getWidgets(this))
@@ -243,7 +244,7 @@ public class CleanUpScreen extends Screen
 			if(cuButton.tooltip.isEmpty())
 				continue;
 			
-			context.setComponentTooltipForNextFrame(font, cuButton.tooltip,
+			extractor.setComponentTooltipForNextFrame(font, cuButton.tooltip,
 				mouseX, mouseY);
 			break;
 		}
