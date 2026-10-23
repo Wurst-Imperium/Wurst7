@@ -9,7 +9,6 @@ package net.wurstclient.hacks;
 
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Stream;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -63,7 +62,7 @@ public final class FeedAuraHack extends Hack
 			"description.wurst.setting.feedaura.filter_horses", false);
 	
 	private final Random random = new Random();
-	private LivingEntity target;
+	private LivingEntity clickTarget;
 	private LivingEntity renderTarget;
 	
 	public FeedAuraHack()
@@ -90,8 +89,7 @@ public final class FeedAuraHack extends Hack
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(HandleInputListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
-		
-		target = null;
+		clickTarget = null;
 		renderTarget = null;
 	}
 	
@@ -99,33 +97,28 @@ public final class FeedAuraHack extends Hack
 	public void onUpdate()
 	{
 		ItemStack heldStack = MC.player.getInventory().getSelectedItem();
-		
 		double rangeSq = range.getValueSq();
-		Stream<LivingEntity> stream =
-			EntityUtils.getAliveEntities(LivingEntity.class)
-				.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-				.filter(e -> canFeed(e, heldStack));
 		
-		if(filterBabies.isChecked())
-			stream = stream.filter(filterBabies);
+		List<LivingEntity> targets = EntityUtils
+			.getAliveEntities(LivingEntity.class)
+			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
+			.filter(e -> canFeed(e, heldStack)).filter(filterBabies)
+			.filter(e -> !filterUntamed.isChecked() || !isUntamed(e))
+			.filter(
+				e -> !filterHorses.isChecked() || !(e instanceof AbstractHorse))
+			.toList();
 		
-		if(filterUntamed.isChecked())
-			stream = stream.filter(e -> !isUntamed(e));
-		
-		if(filterHorses.isChecked())
-			stream = stream.filter(e -> !(e instanceof AbstractHorse));
-		
-		// Pick a target at random
-		List<LivingEntity> targets = stream.toList();
-		target = targets.isEmpty() ? null
-			: targets.get(random.nextInt(targets.size()));
-		
-		renderTarget = target;
-		if(target == null)
+		if(targets.isEmpty())
+		{
+			clickTarget = null;
+			renderTarget = null;
 			return;
+		}
 		
+		clickTarget = targets.get(random.nextInt(targets.size()));
+		renderTarget = clickTarget;
 		WURST.getRotationFaker()
-			.faceVectorPacket(target.getBoundingBox().getCenter());
+			.faceVectorPacket(clickTarget.getBoundingBox().getCenter());
 	}
 	
 	private boolean canFeed(LivingEntity entity, ItemStack stack)
@@ -139,21 +132,16 @@ public final class FeedAuraHack extends Hack
 		return false;
 	}
 	
-	private boolean isUntamed(LivingEntity e)
+	private boolean isUntamed(LivingEntity entity)
 	{
-		if(e instanceof AbstractHorse horse && !horse.isTamed())
-			return true;
-		
-		if(e instanceof TamableAnimal tame && !tame.isTame())
-			return true;
-		
-		return false;
+		return entity instanceof AbstractHorse horse && !horse.isTamed()
+			|| entity instanceof TamableAnimal animal && !animal.isTame();
 	}
 	
 	@Override
 	public void onHandleInput()
 	{
-		if(target == null)
+		if(clickTarget == null)
 			return;
 		
 		MultiPlayerGameMode gm = MC.gameMode;
@@ -162,17 +150,18 @@ public final class FeedAuraHack extends Hack
 		if(gm.isDestroying() || player.isHandsBusy())
 			return;
 		
-		EntityHitResult hitResult = EntityUtils.createHitResult(target);
+		EntityHitResult hitResult = EntityUtils.createHitResult(clickTarget);
 		InteractionHand hand = InteractionHand.MAIN_HAND;
 		SwingAnimation swingAnimation =
 			player.getItemInHand(hand).getInteractAnimation();
-		InteractionResult result = gm.interact(player, target, hitResult, hand);
+		InteractionResult result =
+			gm.interact(player, clickTarget, hitResult, hand);
 		
 		if(result instanceof InteractionResult.Success success
 			&& success.swingSource() == InteractionResult.SwingSource.PREDICTED)
 			InteractSwing.CLIENT.swing(hand, swingAnimation);
 		
-		target = null;
+		clickTarget = null;
 	}
 	
 	@Override
