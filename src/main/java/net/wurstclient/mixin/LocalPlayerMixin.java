@@ -82,11 +82,15 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	private void onSendPositionHEAD(CallbackInfo ci)
 	{
 		EventManager.fire(PreMotionEvent.INSTANCE);
+		
+		// Run RotationFaker after events so PreMotionListeners can use it
+		WurstClient.INSTANCE.getRotationFaker().applyIfNeeded();
 	}
 	
 	@Inject(method = "sendPosition()V", at = @At("TAIL"))
 	private void onSendPositionTAIL(CallbackInfo ci)
 	{
+		WurstClient.INSTANCE.getRotationFaker().restoreIfNeeded();
 		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
