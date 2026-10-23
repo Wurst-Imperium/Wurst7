@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.RenderListener;
@@ -30,7 +29,6 @@ import net.wurstclient.util.BlockBreaker.BlockBreakingParams;
 import net.wurstclient.util.BlockBreakingCache;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.OverlayRenderer;
-import net.wurstclient.util.RotationUtils;
 
 public final class NukerHack extends Hack
 	implements UpdateListener, RenderListener
@@ -105,8 +103,7 @@ public final class NukerHack extends Hack
 		if(MC.options.keyAttack.isDown() || commonSettings.isIdModeWithAir())
 			return;
 		
-		Vec3 eyesVec = RotationUtils.getEyesPos();
-		BlockPos eyesBlock = BlockPos.containing(eyesVec);
+		BlockPos eyesBlock = BlockPos.containing(MC.player.getEyePosition());
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
 		
