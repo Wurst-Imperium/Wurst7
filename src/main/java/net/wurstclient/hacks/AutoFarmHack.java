@@ -119,7 +119,7 @@ public final class AutoFarmHack extends Hack
 	public void onUpdate()
 	{
 		currentlyMining = null;
-		Vec3 eyesVec = RotationUtils.getEyesPos();
+		Vec3 eyesVec = MC.player.getEyePosition();
 		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
