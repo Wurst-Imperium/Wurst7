@@ -99,7 +99,7 @@ public enum BlockPlacer
 			hitVecs[i] = center.add(relHitVec);
 		}
 		
-		Vec3 eyesPos = RotationUtils.getEyesPos();
+		Vec3 eyesPos = MC.player.getEyePosition();
 		Vec3 posVec = Vec3.atCenterOf(pos);
 		
 		double distanceSqToPosVec = eyesPos.distanceToSqr(posVec);
