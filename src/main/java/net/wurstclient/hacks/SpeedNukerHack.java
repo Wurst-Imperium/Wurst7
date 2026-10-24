@@ -28,7 +28,6 @@ import net.wurstclient.settings.SwingHandSetting;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"speed nuker", "FastNuker", "fast nuker"})
 @DontSaveState
@@ -87,7 +86,7 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		if(commonSettings.isIdModeWithAir())
 			return;
 		
-		Vec3 eyesVec = RotationUtils.getEyesPos();
+		Vec3 eyesVec = MC.player.getEyePosition();
 		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
