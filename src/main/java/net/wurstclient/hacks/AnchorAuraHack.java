@@ -44,7 +44,6 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.InventoryUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"anchor aura", "CrystalAura", "crystal aura"})
 public final class AnchorAuraHack extends Hack implements UpdateListener
@@ -220,7 +219,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean rightClickBlock(BlockPos pos)
 	{
-		Vec3 eyesPos = RotationUtils.getEyesPos();
+		Vec3 eyesPos = MC.player.getEyePosition();
 		Vec3 posVec = Vec3.atCenterOf(pos);
 		double distanceSqPosVec = eyesPos.distanceToSqr(posVec);
 		
@@ -255,7 +254,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private boolean placeAnchor(BlockPos pos)
 	{
-		Vec3 eyesPos = RotationUtils.getEyesPos();
+		Vec3 eyesPos = MC.player.getEyePosition();
 		double rangeSq = range.getValueSq();
 		Vec3 posVec = Vec3.atCenterOf(pos);
 		double distanceSqPosVec = eyesPos.distanceToSqr(posVec);
@@ -302,8 +301,8 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private ArrayList<BlockPos> getNearbyAnchors()
 	{
-		Vec3 eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
-		BlockPos center = BlockPos.containing(RotationUtils.getEyesPos());
+		Vec3 eyesVec = MC.player.getEyePosition().subtract(0.5, 0.5, 0.5);
+		BlockPos center = BlockPos.containing(MC.player.getEyePosition());
 		int rangeI = range.getValueCeil();
 		double rangeSq = Mth.square(range.getValue() + 0.5);
 		
@@ -339,7 +338,7 @@ public final class AnchorAuraHack extends Hack implements UpdateListener
 	
 	private ArrayList<BlockPos> getFreeBlocksNear(Entity target)
 	{
-		Vec3 eyesVec = RotationUtils.getEyesPos().subtract(0.5, 0.5, 0.5);
+		Vec3 eyesVec = MC.player.getEyePosition().subtract(0.5, 0.5, 0.5);
 		double rangeSq = Mth.square(range.getValue() + 0.5);
 		
 		BlockPos center = target.blockPosition();

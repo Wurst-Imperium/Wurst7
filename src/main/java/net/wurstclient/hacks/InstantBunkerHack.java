@@ -25,7 +25,6 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SwingHandSetting.SwingHand;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.ChatUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"instant bunker"})
 public final class InstantBunkerHack extends Hack implements UpdateListener
@@ -125,7 +124,7 @@ public final class InstantBunkerHack extends Hack implements UpdateListener
 		Direction side = null;
 		Direction[] sides = Direction.values();
 		
-		Vec3 eyesPos = RotationUtils.getEyesPos();
+		Vec3 eyesPos = MC.player.getEyePosition();
 		Vec3 posVec = Vec3.atCenterOf(pos);
 		double distanceSqPosVec = eyesPos.distanceToSqr(posVec);
 		

@@ -12,7 +12,7 @@ import java.util.function.Function;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.wurstclient.util.RotationUtils;
+import net.wurstclient.WurstClient;
 
 public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 {
@@ -61,7 +61,7 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 	private static Vec3 aimAtClosestPoint(Entity e)
 	{
 		AABB box = e.getBoundingBox();
-		Vec3 eyes = RotationUtils.getEyesPos();
+		Vec3 eyes = WurstClient.MC.player.getEyePosition();
 		
 		if(box.contains(eyes))
 			return eyes;

@@ -18,7 +18,6 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.TextFieldSetting;
-import net.wurstclient.util.MathUtils;
 
 @SearchTags({"telescope", "optifine"})
 @DontBlock
@@ -95,7 +94,7 @@ public final class ZoomOtf extends OtherFeature implements MouseScrollListener
 		else if(amount < 0)
 			currentLevel *= 0.9;
 		
-		currentLevel = MathUtils.clamp(currentLevel, zoomLevel.getMinimum(),
+		currentLevel = Math.clamp(currentLevel, zoomLevel.getMinimum(),
 			zoomLevel.getMaximum());
 	}
 	
