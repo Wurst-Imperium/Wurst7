@@ -142,7 +142,7 @@ public final class BowAimbotHack extends Hack
 			velocity = 1;
 		
 		// set position to aim at
-		double d = RotationUtils.getEyesPos().distanceTo(
+		double d = player.getEyePosition().distanceTo(
 			target.getBoundingBox().getCenter()) * predictMovement.getValue();
 		double posX =
 			target.getX() + (target.getX() - target.xOld) * d - player.getX();

@@ -473,7 +473,7 @@ public final class AutoLibrarianHack extends Hack
 	
 	private void setTargetJobSite()
 	{
-		Vec3 eyesVec = RotationUtils.getEyesPos();
+		Vec3 eyesVec = MC.player.getEyePosition();
 		double rangeSq = range.getValueSq();
 		
 		Stream<BlockPos> stream = BlockUtils
