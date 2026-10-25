@@ -19,6 +19,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -84,23 +85,20 @@ public enum ItemUtils
 	{
 		ItemAttributeModifiers modifiers = item.components().getOrDefault(
 			DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+		AttributeInstance instance =
+			new AttributeInstance(attribute, ignored -> {});
+		instance.setBaseValue(base);
 		
-		double result = base;
 		for(ItemAttributeModifiers.Entry entry : modifiers.modifiers())
 		{
 			if(entry.attribute() != attribute || !entry.slot().test(slot))
 				continue;
 			
-			double value = entry.modifier().amount();
-			result += switch(entry.modifier().operation())
-			{
-				case ADD_VALUE -> value;
-				case ADD_MULTIPLIED_BASE -> value * base;
-				case ADD_MULTIPLIED_TOTAL -> value * result;
-			};
+			instance.removeModifier(entry.modifier().id());
+			instance.addTransientModifier(entry.modifier());
 		}
 		
-		return result;
+		return instance.getValue();
 	}
 	
 	public static double getArmorAttribute(Item item,
