@@ -75,6 +75,9 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPreMotion()
 	{
+		if(MC.player.isPassenger())
+			return;
+		
 		IKeyMapping sneakKey = IKeyMapping.get(MC.options.keyShift);
 		
 		switch(mode.getSelected())

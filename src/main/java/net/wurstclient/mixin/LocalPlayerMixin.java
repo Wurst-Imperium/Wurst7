@@ -78,11 +78,24 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		}
 	}
 	
+	@Inject(method = "sendChanges()V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;isPassenger()Z"))
+	private void onSendChangesPreMotion(CallbackInfo ci)
+	{
+		EventManager.fire(PreMotionEvent.INSTANCE);
+	}
+	
+	// TAIL excludes the early return if !hasClientLoaded()
+	@Inject(method = "sendChanges()V", at = @At("TAIL"))
+	private void onSendChangesPostMotion(CallbackInfo ci)
+	{
+		EventManager.fire(PostMotionEvent.INSTANCE);
+	}
+	
 	@Inject(method = "sendPosition()V", at = @At("HEAD"))
 	private void onSendPositionHEAD(CallbackInfo ci)
 	{
-		EventManager.fire(PreMotionEvent.INSTANCE);
-		
 		// Run RotationFaker after events so PreMotionListeners can use it
 		WurstClient.INSTANCE.getRotationFaker().applyIfNeeded();
 	}
@@ -91,7 +104,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	private void onSendPositionTAIL(CallbackInfo ci)
 	{
 		WurstClient.INSTANCE.getRotationFaker().restoreIfNeeded();
-		EventManager.fire(PostMotionEvent.INSTANCE);
 	}
 	
 	/**
