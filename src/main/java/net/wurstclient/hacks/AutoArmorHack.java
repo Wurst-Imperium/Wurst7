@@ -23,7 +23,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -131,8 +130,9 @@ public final class AutoArmorHack extends Hack
 		{
 			ItemStack stack = inventory.getItem(slot);
 			
-			EquipmentSlot armorType = ItemUtils.getArmorSlot(stack.getItem());
-			if(armorType == null)
+			EquipmentSlot armorType = ItemUtils.getArmorSlot(stack);
+			if(armorType == null
+				|| !player.isEquippableInSlot(stack, armorType))
 				continue;
 			
 			int armorValue = getArmorValue(stack);
@@ -176,10 +176,9 @@ public final class AutoArmorHack extends Hack
 	
 	private int getArmorValue(ItemStack stack)
 	{
-		Item item = stack.getItem();
-		int armorPoints = (int)ItemUtils.getArmorPoints(item);
+		int armorPoints = (int)ItemUtils.getArmorPoints(stack);
 		int prtPoints = 0;
-		int armorToughness = (int)ItemUtils.getToughness(item);
+		int armorToughness = (int)ItemUtils.getToughness(stack);
 		
 		if(useEnchantments.isChecked())
 		{
