@@ -164,7 +164,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 			
 			// Check for mace, get bonus damage from fall
 			if(item instanceof MaceItem mace)
-				dmg = mace.getAttackDamageBonus(MC.player, dmg,
+				dmg += mace.getAttackDamageBonus(entity, dmg,
 					entity.damageSources().playerAttack(MC.player));
 			// dmg += EnchantmentHelper.getAttackDamage(stack, group);
 			return dmg;
