@@ -80,14 +80,15 @@ public enum ItemUtils
 			.mapToDouble(modifier -> modifier.modifier().amount()).findFirst();
 	}
 	
-	public static double calculateModifiedAttribute(ItemStack stack,
-		Holder<Attribute> attribute, double base, EquipmentSlot slot)
+	public static OptionalDouble calculateModifiedAttribute(ItemStack stack,
+		Holder<Attribute> attribute, EquipmentSlot slot)
 	{
 		ItemAttributeModifiers modifiers = stack.getOrDefault(
 			DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 		AttributeInstance instance =
 			new AttributeInstance(attribute, ignored -> {});
-		instance.setBaseValue(base);
+		instance.setBaseValue(MC.player.getAttributeBaseValue(attribute));
+		boolean hasModifier = false;
 		
 		for(ItemAttributeModifiers.Entry entry : modifiers.modifiers())
 		{
@@ -96,30 +97,29 @@ public enum ItemUtils
 			
 			instance.removeModifier(entry.modifier().id());
 			instance.addTransientModifier(entry.modifier());
+			hasModifier = true;
 		}
 		
-		return instance.getValue();
+		return hasModifier ? OptionalDouble.of(instance.getValue())
+			: OptionalDouble.empty();
 	}
 	
-	public static double getArmorAttribute(ItemStack stack,
+	public static OptionalDouble getArmorAttribute(ItemStack stack,
 		Holder<Attribute> attribute)
 	{
 		Equippable equippable = stack.get(DataComponents.EQUIPPABLE);
-		
-		double base = MC.player.getAttributeBaseValue(attribute);
 		if(equippable == null)
-			return base;
+			return OptionalDouble.empty();
 		
-		return calculateModifiedAttribute(stack, attribute, base,
-			equippable.slot());
+		return calculateModifiedAttribute(stack, attribute, equippable.slot());
 	}
 	
-	public static double getArmorPoints(ItemStack stack)
+	public static OptionalDouble getArmorPoints(ItemStack stack)
 	{
 		return getArmorAttribute(stack, Attributes.ARMOR);
 	}
 	
-	public static double getToughness(ItemStack stack)
+	public static OptionalDouble getToughness(ItemStack stack)
 	{
 		return getArmorAttribute(stack, Attributes.ARMOR_TOUGHNESS);
 	}

@@ -176,9 +176,9 @@ public final class AutoArmorHack extends Hack
 	
 	private int getArmorValue(ItemStack stack)
 	{
-		int armorPoints = (int)ItemUtils.getArmorPoints(stack);
+		int armorPoints = (int)ItemUtils.getArmorPoints(stack).orElse(0);
 		int prtPoints = 0;
-		int armorToughness = (int)ItemUtils.getToughness(stack);
+		int armorToughness = (int)ItemUtils.getToughness(stack).orElse(0);
 		
 		if(useEnchantments.isChecked())
 		{
