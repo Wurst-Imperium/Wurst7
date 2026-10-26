@@ -83,25 +83,20 @@ public enum ItemUtils
 	public static OptionalDouble calculateModifiedAttribute(ItemStack stack,
 		Holder<Attribute> attribute, EquipmentSlot slot)
 	{
-		ItemAttributeModifiers modifiers = stack.getOrDefault(
-			DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 		AttributeInstance instance =
 			new AttributeInstance(attribute, ignored -> {});
 		instance.setBaseValue(MC.player.getAttributeBaseValue(attribute));
-		boolean hasModifier = false;
 		
-		for(ItemAttributeModifiers.Entry entry : modifiers.modifiers())
-		{
-			if(entry.attribute() != attribute || !entry.slot().test(slot))
-				continue;
+		stack.forEachModifier(slot, (modifierAttribute, modifier) -> {
+			if(modifierAttribute != attribute)
+				return;
 			
-			instance.removeModifier(entry.modifier().id());
-			instance.addTransientModifier(entry.modifier());
-			hasModifier = true;
-		}
+			instance.removeModifier(modifier.id());
+			instance.addTransientModifier(modifier);
+		});
 		
-		return hasModifier ? OptionalDouble.of(instance.getValue())
-			: OptionalDouble.empty();
+		return instance.getModifiers().isEmpty() ? OptionalDouble.empty()
+			: OptionalDouble.of(instance.getValue());
 	}
 	
 	public static OptionalDouble getArmorAttribute(ItemStack stack,
