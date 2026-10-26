@@ -24,7 +24,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.equipment.Equippable;
 import net.wurstclient.WurstClient;
 
@@ -65,19 +64,6 @@ public enum ItemUtils
 		{
 			return null;
 		}
-	}
-	
-	// TODO: Update AutoSword to use calculateModifiedAttribute() instead,
-	// then remove this method.
-	public static OptionalDouble getAttribute(Item item,
-		Holder<Attribute> attribute)
-	{
-		return item.components()
-			.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS,
-				ItemAttributeModifiers.EMPTY)
-			.modifiers().stream()
-			.filter(modifier -> modifier.attribute() == attribute)
-			.mapToDouble(modifier -> modifier.modifier().amount()).findFirst();
 	}
 	
 	public static OptionalDouble calculateModifiedAttribute(ItemStack stack,
