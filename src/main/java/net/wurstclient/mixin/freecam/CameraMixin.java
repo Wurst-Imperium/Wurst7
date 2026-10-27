@@ -39,8 +39,12 @@ public abstract class CameraMixin implements TrackedWaypoint.Camera
 		float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(true);
 		detached = true;
 		setPosition(freecam.getCamPos(partialTicks));
-		setRotation(freecam.getCamYaw(), freecam.getCamPitch());
+		if(!isPanoramicMode())
+			setRotation(freecam.getCamYaw(), freecam.getCamPitch());
 	}
+	
+	@Shadow
+	public abstract boolean isPanoramicMode();
 	
 	@Shadow
 	protected abstract void setPosition(Vec3 pos);
