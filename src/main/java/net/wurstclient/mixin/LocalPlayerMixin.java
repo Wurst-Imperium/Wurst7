@@ -42,26 +42,21 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		super(world, profile);
 	}
 	
-	@Inject(method = "tick()V", at = @At("HEAD"))
+	@Inject(method = {"tick()V", "rideTick()V"}, at = @At("HEAD"))
 	private void onTickHead(CallbackInfo ci)
 	{
-		InputFaker.swapIfNeeded();
+		InputFaker.swapIfNeeded(true);
 	}
 	
-	@Inject(method = "tick()V", at = @At("RETURN"))
-	private void onTickReturn(CallbackInfo ci)
+	@Inject(method = "sendChanges()V", at = @At("HEAD"))
+	private void onSendChangesHead(CallbackInfo ci)
 	{
-		InputFaker.restoreIfNeeded();
+		InputFaker.swapIfNeeded(false);
 	}
 	
-	@Inject(method = "rideTick()V", at = @At("HEAD"))
-	private void onRideTickHead(CallbackInfo ci)
-	{
-		InputFaker.swapIfNeeded();
-	}
-	
-	@Inject(method = "rideTick()V", at = @At("RETURN"))
-	private void onRideTickReturn(CallbackInfo ci)
+	@Inject(method = {"tick()V", "rideTick()V", "sendChanges()V"},
+		at = @At("RETURN"))
+	private void onInputFakerReturn(CallbackInfo ci)
 	{
 		InputFaker.restoreIfNeeded();
 	}
