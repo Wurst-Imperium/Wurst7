@@ -9,7 +9,7 @@ package net.wurstclient.hud;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.resources.Identifier;
 import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.WurstLogoOtf;
@@ -44,8 +44,8 @@ public final class WurstLogo
 		extractor.text(tr, version, 74, 8, otf.getTextColor(), false);
 		
 		// Wurst logo
-		extractor.blit(RenderPipelines.GUI_TEXTURED, LOGO_TEXTURE, 0, 3, 0, 0,
-			72, 18, 72, 18);
+		extractor.blit(GuiPipeline.TEXTURED, LOGO_TEXTURE, 0, 3, 0, 0, 72, 18,
+			72, 18);
 	}
 	
 	private String getVersionString()

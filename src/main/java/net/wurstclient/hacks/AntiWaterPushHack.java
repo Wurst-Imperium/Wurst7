@@ -9,14 +9,11 @@ package net.wurstclient.hacks;
 
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.IsPlayerInWaterListener;
-import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"anti water push", "NoWaterPush", "no water push"})
 public final class AntiWaterPushHack extends Hack
-	implements UpdateListener, IsPlayerInWaterListener
 {
 	private final CheckboxSetting preventSlowdown = new CheckboxSetting(
 		"Prevent slowdown", "Allows you to walk underwater at full speed.\n"
@@ -30,49 +27,8 @@ public final class AntiWaterPushHack extends Hack
 		addSetting(preventSlowdown);
 	}
 	
-	@Override
-	protected void onEnable()
-	{
-		EVENTS.add(UpdateListener.class, this);
-		EVENTS.add(IsPlayerInWaterListener.class, this);
-	}
-	
-	@Override
-	protected void onDisable()
-	{
-		EVENTS.remove(UpdateListener.class, this);
-		EVENTS.remove(IsPlayerInWaterListener.class, this);
-	}
-	
-	@Override
-	public void onUpdate()
-	{
-		if(!preventSlowdown.isChecked())
-			return;
-		
-		if(!MC.options.keyJump.isDown())
-			return;
-		
-		if(!MC.player.onGround())
-			return;
-		
-		if(!IMC.getPlayer().isInWaterBypass())
-			return;
-		
-		MC.player.jumpFromGround();
-	}
-	
-	@Override
-	public void onIsPlayerInWater(IsPlayerInWaterEvent event)
-	{
-		if(preventSlowdown.isChecked())
-			event.setInWater(false);
-	}
-	
 	public boolean isPreventingSlowdown()
 	{
 		return isEnabled() && preventSlowdown.isChecked();
 	}
-	
-	// See LivingEntityMixin
 }

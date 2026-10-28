@@ -51,7 +51,7 @@ public enum WurstShaderPipelines
 	public static final RenderPipeline ESP_LINES =
 		RenderPipeline.builder(FOGLESS_LINES_SNIPPET)
 			.withLocation(Identifier.parse("wurst:pipeline/wurst_esp_lines"))
-			.withDepthStencilState(DepthStencilState.OFF).build();
+			.build();
 	
 	private static final Snippet QUADS_SNIPPET = RenderPipeline.builder()
 		.withBindGroupLayout(BindGroupLayouts.GLOBALS)
@@ -76,17 +76,17 @@ public enum WurstShaderPipelines
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with culling enabled
 	 * and no depth test.
 	 */
-	public static final RenderPipeline ESP_QUADS = RenderPipeline
-		.builder(QUADS_SNIPPET)
-		.withLocation(Identifier.parse("wurst:pipeline/wurst_esp_quads"))
-		.withDepthStencilState(DepthStencilState.OFF).withCull(true).build();
+	public static final RenderPipeline ESP_QUADS =
+		RenderPipeline.builder(QUADS_SNIPPET)
+			.withLocation(Identifier.parse("wurst:pipeline/wurst_esp_quads"))
+			.withCull(true).build();
 	
 	/**
 	 * Similar to the DEBUG_QUADS ShaderPipeline, but with no depth test.
 	 */
-	public static final RenderPipeline ESP_QUADS_NO_CULLING = RenderPipeline
-		.builder(QUADS_SNIPPET)
-		.withLocation(
-			Identifier.parse("wurst:pipeline/wurst_esp_quads_no_culling"))
-		.withDepthStencilState(DepthStencilState.OFF).withCull(false).build();
+	public static final RenderPipeline ESP_QUADS_NO_CULLING =
+		RenderPipeline.builder(QUADS_SNIPPET)
+			.withLocation(
+				Identifier.parse("wurst:pipeline/wurst_esp_quads_no_culling"))
+			.withCull(false).build();
 }

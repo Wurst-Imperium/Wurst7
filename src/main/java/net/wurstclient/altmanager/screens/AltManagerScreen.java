@@ -44,7 +44,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
@@ -528,7 +527,8 @@ public final class AltManagerScreen extends Screen
 		// line-wrap
 		StringJoiner joiner = new StringJoiner("\n");
 		font.getSplitter().splitLines(translated, 200, Style.EMPTY).stream()
-			.map(FormattedText::getString).forEach(s -> joiner.add(s));
+			.map(line -> line.getString(Component.STRING_SIZE_LIMIT))
+			.forEach(s -> joiner.add(s));
 		String wrapped = joiner.toString();
 		
 		// add to tooltip

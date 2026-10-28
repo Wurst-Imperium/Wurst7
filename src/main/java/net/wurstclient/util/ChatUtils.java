@@ -95,7 +95,7 @@ public enum ChatUtils
 			MC.font.getSplitter().splitLines(text, width, Style.EMPTY);
 		
 		StringJoiner joiner = new StringJoiner("\n");
-		lines.stream().map(FormattedText::getString)
+		lines.stream().map(line -> line.getString(Component.STRING_SIZE_LIMIT))
 			.forEach(s -> joiner.add(s));
 		
 		return joiner.toString();

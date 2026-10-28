@@ -8,10 +8,10 @@
 package net.wurstclient.other_features;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Button.OnPress;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -77,8 +77,8 @@ public final class WurstOptionsOtf extends OtherFeature
 		float u = 0;
 		float v = 0;
 		extractor.guiRenderState.up();
-		extractor.blit(RenderPipelines.GUI_TEXTURED, WURST_TEXTURE, x, y, u, v,
-			w, h, fw, fh);
+		extractor.blit(GuiPipeline.TEXTURED, WURST_TEXTURE, x, y, u, v, w, h,
+			fw, fh);
 	}
 	
 	private enum Location

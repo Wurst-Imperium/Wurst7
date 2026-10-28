@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.mixin;
+package net.wurstclient.mixin.flight;
 
 import java.util.List;
 
@@ -13,36 +13,40 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.FluidIds;
 import net.wurstclient.WurstClient;
-import net.wurstclient.hack.HackList;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin
 {
 	/**
-	 * Prevents water jumping from interfering with Flight or AntiWaterPush's
-	 * "Prevent slowdown" setting.
+	 * Prevents travelInFluid() from changing Flight's movement.
+	 */
+	@ModifyReturnValue(
+		method = "shouldTravelInFluid(Lnet/minecraft/world/level/material/FluidState;)Z",
+		at = @At("RETURN"))
+	private boolean modifyShouldTravelInFluid(boolean original)
+	{
+		return original && !((Object)this == WurstClient.MC.player
+			&& WurstClient.INSTANCE.getHax().flightHack.isEnabled());
+	}
+	
+	/**
+	 * Prevents fluid jumping from adding to Flight's vertical movement.
 	 */
 	@ModifyExpressionValue(method = "aiStep()V",
 		at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/world/entity/EntityFluidInteraction;getFluidsToJumpIn(D)Ljava/util/List;"))
 	private List<Holder<Fluid>> modifyFluidsToJumpIn(List<Holder<Fluid>> fluids)
 	{
-		if((Object)this != WurstClient.MC.player
-			|| !WurstClient.INSTANCE.isEnabled())
-			return fluids;
+		if((Object)this == WurstClient.MC.player
+			&& WurstClient.INSTANCE.getHax().flightHack.isEnabled())
+			return List.of();
 		
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(!hax.flightHack.isEnabled()
-			&& !hax.antiWaterPushHack.isPreventingSlowdown())
-			return fluids;
-		
-		return fluids.stream().filter(fluid -> !fluid.is(FluidIds.WATER))
-			.toList();
+		return fluids;
 	}
 }

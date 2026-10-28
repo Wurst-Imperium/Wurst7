@@ -803,7 +803,8 @@ public final class ClickGui
 		Font tr = MC.font;
 		String title = tr.substrByWidth(
 			net.minecraft.network.chat.Component.literal(window.getTitle()),
-			x3 - x1).getString();
+			x3 - x1)
+			.getString(net.minecraft.network.chat.Component.STRING_SIZE_LIMIT);
 		extractor.guiRenderState.up();
 		extractor.text(tr, title, x1 + 2, y1 + 3, txtColor, false);
 	}

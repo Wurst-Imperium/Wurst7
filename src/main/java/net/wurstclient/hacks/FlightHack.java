@@ -207,6 +207,4 @@ public final class FlightHack extends Hack implements UpdateListener,
 		return Math.clamp(horizontalSpeed.getValue() * verticalSpeed.getValue(),
 			0.05, limitVerticalSpeed ? 3.95 : 10);
 	}
-	
-	// See LivingEntityMixin
 }

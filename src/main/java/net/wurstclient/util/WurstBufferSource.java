@@ -17,6 +17,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.renderer.RenderPassLayouts;
 import net.minecraft.client.renderer.StagedVertexBuffer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.wurstclient.WurstClient;
@@ -60,8 +61,8 @@ public final class WurstBufferSource
 				WurstClient.MC.gameRenderer.mainRenderTarget();
 			
 			try(RenderPass renderPass = RenderSystem.getDevice()
-				.createCommandEncoder()
-				.createRenderPass(() -> "WurstBufferSource",
+				.createCommandEncoder().createRenderPass(
+					() -> "WurstBufferSource", RenderPassLayouts.COLOR_DEPTH,
 					renderTarget.getColorTextureView(), Optional.empty(),
 					renderTarget.getDepthTextureView(), OptionalDouble.empty()))
 			{

@@ -8,7 +8,7 @@
 package net.wurstclient.commands;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.resources.Identifier;
 import net.wurstclient.Category;
 import net.wurstclient.command.CmdException;
@@ -89,7 +89,7 @@ public final class TacoCmd extends Command
 		int y = extractor.guiHeight() - 32 - 19;
 		int w = 64;
 		int h = 32;
-		extractor.blit(RenderPipelines.GUI_TEXTURED, tacos[ticks / 8], x, y, 0,
-			0, w, h, w, h, color);
+		extractor.blit(GuiPipeline.TEXTURED, tacos[ticks / 8], x, y, 0, 0, w, h,
+			w, h, color);
 	}
 }

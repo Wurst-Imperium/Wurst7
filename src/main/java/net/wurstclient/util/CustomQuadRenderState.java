@@ -10,15 +10,14 @@ package net.wurstclient.util;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 
-public record CustomQuadRenderState(RenderPipeline pipeline,
+public record CustomQuadRenderState(GuiPipeline pipeline,
 	TextureSetup textureSetup, Matrix3x2f pose, float x1, float y1, float x2,
 	float y2, float x3, float y3, float x4, float y4, int color1, int color2,
 	int color3, int color4, @Nullable ScreenRectangle scissorArea,
@@ -29,7 +28,7 @@ public record CustomQuadRenderState(RenderPipeline pipeline,
 		int color2, int color3, int color4,
 		@Nullable ScreenRectangle scissorArea)
 	{
-		this(RenderPipelines.GUI, TextureSetup.noTexture(), pose, x1, y1, x2,
+		this(GuiPipeline.DEFAULT, TextureSetup.noTexture(), pose, x1, y1, x2,
 			y2, x3, y3, x4, y4, color1, color2, color3, color4, scissorArea,
 			createBounds(x1, y1, x2, y2, x3, y3, x4, y4, pose, scissorArea));
 	}

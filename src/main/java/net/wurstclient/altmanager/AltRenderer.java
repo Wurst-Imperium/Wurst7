@@ -20,8 +20,8 @@ import com.mojang.authlib.services.ProfileResult;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.Identifier;
@@ -109,16 +109,16 @@ public final class AltRenderer
 			int fh = 192;
 			float u = 24;
 			float v = 24;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh, color);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh, color);
 			
 			// Hat
 			fw = 192;
 			fh = 192;
 			u = 120;
 			v = 24;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh, color);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh, color);
 			
 		}catch(Exception e)
 		{
@@ -146,8 +146,8 @@ public final class AltRenderer
 			int fh = height * 2;
 			float u = height / 4;
 			float v = height / 4;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Hat
 			x = x + 0;
@@ -156,8 +156,8 @@ public final class AltRenderer
 			h = height / 4;
 			u = height / 4 * 5;
 			v = height / 4;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Chest
 			x = x + 0;
@@ -166,8 +166,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 2.5F;
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Jacket
 			x = x + 0;
@@ -176,8 +176,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 2.5F;
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Left Arm
 			x = x - width / 16 * (slim ? 3 : 4);
@@ -186,8 +186,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Left Sleeve
 			x = x + 0;
@@ -196,8 +196,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Right Arm
 			x = x + width / 16 * (slim ? 11 : 12);
@@ -206,8 +206,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Right Sleeve
 			x = x + 0;
@@ -216,8 +216,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 5.5F;
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Left Leg
 			x = x - width / 2;
@@ -226,8 +226,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Left Pants
 			x = x + 0;
@@ -236,8 +236,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Right Leg
 			x = x + width / 4;
@@ -246,8 +246,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Right Pants
 			x = x + 0;
@@ -256,8 +256,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 0.5F;
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 		}catch(Exception e)
 		{
@@ -285,8 +285,8 @@ public final class AltRenderer
 			int fh = height * 2;
 			float u = height / 4 * 3;
 			float v = height / 4;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Hat
 			x = x + 0;
@@ -295,8 +295,8 @@ public final class AltRenderer
 			h = height / 4;
 			u = height / 4 * 7;
 			v = height / 4;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Chest
 			x = x + 0;
@@ -305,8 +305,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 4;
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Jacket
 			x = x + 0;
@@ -315,8 +315,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 4;
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Left Arm
 			x = x - width / 16 * (slim ? 3 : 4);
@@ -325,8 +325,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Left Sleeve
 			x = x + 0;
@@ -335,8 +335,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Right Arm
 			x = x + width / 16 * (slim ? 11 : 12);
@@ -345,8 +345,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Right Sleeve
 			x = x + 0;
@@ -355,8 +355,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * (slim ? 6.375F : 6.5F);
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Left Leg
 			x = x - width / 2;
@@ -365,8 +365,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Left Pants
 			x = x + 0;
@@ -375,8 +375,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Right Leg
 			x = x + width / 4;
@@ -385,8 +385,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 2.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 			// Right Pants
 			x = x + 0;
@@ -395,8 +395,8 @@ public final class AltRenderer
 			h = height / 8 * 3;
 			u = height / 4 * 1.5F;
 			v = height / 4 * 4.5F;
-			extractor.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, w,
-				h, fw, fh);
+			extractor.blit(GuiPipeline.TEXTURED, texture, x, y, u, v, w, h, fw,
+				fh);
 			
 		}catch(Exception e)
 		{

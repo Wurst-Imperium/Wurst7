@@ -30,6 +30,7 @@ import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 
+import net.minecraft.client.renderer.RenderPassLayouts;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.TextureTransform;
 import net.wurstclient.WurstClient;
@@ -136,11 +137,12 @@ public final class EasyVertexBuffer implements AutoCloseable
 		
 		try(RenderPass renderPass =
 			RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-				() -> "something from Wurst", framebuffer.getColorTextureView(),
-				Optional.empty(), framebuffer.getDepthTextureView(),
-				OptionalDouble.empty()))
+				() -> "something from Wurst", RenderPassLayouts.COLOR_DEPTH,
+				framebuffer.getColorTextureView(), Optional.empty(),
+				framebuffer.getDepthTextureView(), OptionalDouble.empty()))
 		{
-			renderPass.setPipeline(RenderSystem.getCompiledPipeline(pipeline));
+			renderPass.setPipeline(RenderSystem.getCompiledPipeline(pipeline,
+				renderPass.activeSubpass()));
 			RenderSystem.bindDefaultUniforms(renderPass);
 			renderPass.setUniform("DynamicTransforms", gpuBufferSlice);
 			renderPass.setVertexBuffer(0, vertexBuffer.slice());

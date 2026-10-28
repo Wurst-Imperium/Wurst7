@@ -18,13 +18,13 @@ import javax.imageio.ImageIO;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
@@ -177,8 +177,8 @@ public final class EditColorScreen extends Screen
 		int fh = paletteHeight;
 		float u = 0;
 		float v = 0;
-		extractor.blit(RenderPipelines.GUI_TEXTURED, paletteIdentifier, x, y, u,
-			v, w, h, fw, fh);
+		extractor.blit(GuiPipeline.TEXTURED, paletteIdentifier, x, y, u, v, w,
+			h, fw, fh);
 		
 		// RGB letters
 		extractor.text(tr, "#", fieldsX - 3 - tr.width("#"), fieldsY + 6,

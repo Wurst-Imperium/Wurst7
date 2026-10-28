@@ -62,6 +62,7 @@ public final class PauseScreenTest extends SingleplayerTest
 		
 		logger.info("Opening game menu without Wurst Options");
 		input.pressKey(InputConstants.KEY_ESCAPE);
+		input.pressKey(InputConstants.KEY_TAB);
 		assertScreenshotEquals("game_menu_alt",
 			"https://i.imgur.com/g7RRSkR.png");
 		
