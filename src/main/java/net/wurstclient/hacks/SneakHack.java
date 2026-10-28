@@ -7,6 +7,8 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
+import net.minecraft.world.entity.player.Input;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PostMotionListener;
@@ -32,6 +34,8 @@ public final class SneakHack extends Hack
 				+ "Keep in mind that this also means you won't be hidden from"
 				+ " other players while doing these things.",
 			false);
+	
+	private boolean packetSneaking;
 	
 	public SneakHack()
 	{
@@ -60,16 +64,8 @@ public final class SneakHack extends Hack
 		EVENTS.remove(PreMotionListener.class, this);
 		EVENTS.remove(PostMotionListener.class, this);
 		
-		switch(mode.getSelected())
-		{
-			case LEGIT:
-			IKeyMapping.get(MC.options.keyShift).resetDownState();
-			break;
-			
-			case PACKET:
-			// sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
-			break;
-		}
+		IKeyMapping.get(MC.options.keyShift).resetDownState();
+		stopPacketSneaking();
 	}
 	
 	@Override
@@ -91,8 +87,8 @@ public final class SneakHack extends Hack
 			
 			case PACKET:
 			sneakKey.resetDownState();
-			// sendSneakPacket(Mode.PRESS_SHIFT_KEY);
-			// sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
+			sendSneakPacket(true);
+			sendSneakPacket(false);
 			break;
 		}
 	}
@@ -100,11 +96,15 @@ public final class SneakHack extends Hack
 	@Override
 	public void onPostMotion()
 	{
-		// if(mode.getSelected() != SneakMode.PACKET)
-		// return;
-		//
-		// sendSneakPacket(Mode.RELEASE_SHIFT_KEY);
-		// sendSneakPacket(Mode.PRESS_SHIFT_KEY);
+		if(mode.getSelected() != SneakMode.PACKET || MC.player.isPassenger())
+		{
+			stopPacketSneaking();
+			return;
+		}
+		
+		sendSneakPacket(false);
+		sendSneakPacket(true);
+		packetSneaking = true;
 	}
 	
 	private boolean isFlying()
@@ -121,13 +121,25 @@ public final class SneakHack extends Hack
 		return false;
 	}
 	
-	// private void sendSneakPacket(Mode mode)
-	// {
-	// ClientPlayerEntity player = MC.player;
-	// ClientCommandC2SPacket packet =
-	// new ClientCommandC2SPacket(player, mode);
-	// player.networkHandler.sendPacket(packet);
-	// }
+	private void stopPacketSneaking()
+	{
+		if(!packetSneaking)
+			return;
+		
+		packetSneaking = false;
+		if(MC.player != null)
+			sendSneakPacket(MC.player.getLastSentInput().shift());
+	}
+	
+	private void sendSneakPacket(boolean sneaking)
+	{
+		Input input = MC.player.getLastSentInput();
+		Input packetInput =
+			new Input(input.forward(), input.backward(), input.left(),
+				input.right(), input.jump(), sneaking, input.sprint());
+		MC.player.connection
+			.send(new ServerboundPlayerInputPacket(packetInput));
+	}
 	
 	private enum SneakMode
 	{
