@@ -16,7 +16,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -76,10 +75,9 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(MC.hitResult != null
-			&& MC.hitResult.getType() == HitResult.Type.ENTITY)
+		if(MC.hitResult instanceof EntityHitResult entityHitResult)
 		{
-			Entity entity = ((EntityHitResult)MC.hitResult).getEntity();
+			Entity entity = entityHitResult.getEntity();
 			
 			if(entity instanceof LivingEntity
 				&& EntityUtils.IS_ATTACKABLE_MELEE.test(entity))

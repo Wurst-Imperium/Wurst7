@@ -260,15 +260,14 @@ public final class ExcavatorHack extends Hack
 			return;
 		}
 		
-		if(MC.hitResult instanceof BlockHitResult)
+		if(MC.hitResult instanceof BlockHitResult hit)
 		{
 			// set posLookingAt
-			posLookingAt = ((BlockHitResult)MC.hitResult).getBlockPos();
+			posLookingAt = hit.getBlockPos();
 			
 			// offset if sneaking
 			if(MC.options.keyShift.isDown())
-				posLookingAt = posLookingAt
-					.relative(((BlockHitResult)MC.hitResult).getDirection());
+				posLookingAt = posLookingAt.relative(hit.getDirection());
 			
 		}else
 			posLookingAt = null;
