@@ -10,10 +10,9 @@ package net.wurstclient.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -22,19 +21,15 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.phys.Vec3;
 import net.wurstclient.InputFaker;
 import net.wurstclient.InputFaker.TempRealInput;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.FlyingSpeedListener.FlyingSpeedEvent;
 import net.wurstclient.events.IsPlayerInWaterListener.IsPlayerInWaterEvent;
 import net.wurstclient.events.MobEffectListener.MobEffectEvent;
 import net.wurstclient.events.PostMotionListener.PostMotionEvent;
 import net.wurstclient.events.PreMotionListener.PreMotionEvent;
 import net.wurstclient.events.UpdateListener.UpdateEvent;
-import net.wurstclient.hack.HackList;
 import net.wurstclient.mixinterface.ILocalPlayer;
 
 @Mixin(LocalPlayer.class)
@@ -47,26 +42,14 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		super(world, profile);
 	}
 	
-	@Inject(method = "tick()V", at = @At("HEAD"))
+	@Inject(method = {"tick()V", "rideTick()V"}, at = @At("HEAD"))
 	private void onTickHead(CallbackInfo ci)
 	{
 		InputFaker.swapIfNeeded();
 	}
 	
-	@Inject(method = "tick()V", at = @At("RETURN"))
-	private void onTickReturn(CallbackInfo ci)
-	{
-		InputFaker.restoreIfNeeded();
-	}
-	
-	@Inject(method = "rideTick()V", at = @At("HEAD"))
-	private void onRideTickHead(CallbackInfo ci)
-	{
-		InputFaker.swapIfNeeded();
-	}
-	
-	@Inject(method = "rideTick()V", at = @At("RETURN"))
-	private void onRideTickReturn(CallbackInfo ci)
+	@Inject(method = {"tick()V", "rideTick()V"}, at = @At("RETURN"))
+	private void onInputFakerReturn(CallbackInfo ci)
 	{
 		InputFaker.restoreIfNeeded();
 	}
@@ -83,53 +66,45 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 		}
 	}
 	
+	@Inject(method = "tick()V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;isPassenger()Z"))
+	private void onTickPreMotion(CallbackInfo ci)
+	{
+		EventManager.fire(PreMotionEvent.INSTANCE);
+	}
+	
+	@Inject(method = "tick()V",
+		at = @At(value = "FIELD",
+			target = "Lnet/minecraft/client/player/LocalPlayer;ambientSoundHandlers:Ljava/util/List;"))
+	private void onTickPostMotion(CallbackInfo ci)
+	{
+		EventManager.fire(PostMotionEvent.INSTANCE);
+	}
+	
 	@Inject(method = "sendPosition()V", at = @At("HEAD"))
 	private void onSendPositionHEAD(CallbackInfo ci)
 	{
-		EventManager.fire(PreMotionEvent.INSTANCE);
+		// Run RotationFaker after events so PreMotionListeners can use it
+		WurstClient.INSTANCE.getRotationFaker().applyIfNeeded();
 	}
 	
 	@Inject(method = "sendPosition()V", at = @At("TAIL"))
 	private void onSendPositionTAIL(CallbackInfo ci)
 	{
-		EventManager.fire(PostMotionEvent.INSTANCE);
-	}
-	
-	@Inject(method = "isAutoJumpEnabled()Z",
-		at = @At("HEAD"),
-		cancellable = true)
-	private void onIsAutoJumpEnabled(CallbackInfoReturnable<Boolean> cir)
-	{
-		if(!WurstClient.INSTANCE.getHax().stepHack.isAutoJumpAllowed())
-			cir.setReturnValue(false);
+		WurstClient.INSTANCE.getRotationFaker().restoreIfNeeded();
 	}
 	
 	/**
-	 * Prevents flying up with Flight activating elytra.
+	 * Prevents vanilla auto-jump from interfering with Step and .goto.
 	 */
-	@Override
-	public boolean canGlide()
+	@ModifyExpressionValue(method = "updateAutoJump(FF)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/player/LocalPlayer;canAutoJump()Z"))
+	private boolean modifyCanAutoJump(boolean original)
 	{
-		return !WurstClient.INSTANCE.getHax().flightHack.isEnabled()
-			&& super.canGlide();
-	}
-	
-	/**
-	 * Prevents Flight getting horizontally stuck if elytra is already active.
-	 */
-	@Override
-	public boolean isFallFlying()
-	{
-		return !WurstClient.INSTANCE.getHax().flightHack.isEnabled()
-			&& super.isFallFlying();
-	}
-	
-	@Override
-	protected float getFlyingSpeed()
-	{
-		FlyingSpeedEvent event = new FlyingSpeedEvent(super.getFlyingSpeed());
-		EventManager.fire(event);
-		return event.getSpeed();
+		return original && !WurstClient.INSTANCE.getHax().stepHack.isEnabled()
+			&& !WurstClient.INSTANCE.getCmds().goToCmd.isActive();
 	}
 	
 	@Override
@@ -149,39 +124,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 	}
 	
 	@Override
-	protected float getJumpPower()
-	{
-		return super.getJumpPower() + WurstClient.INSTANCE.getHax().highJumpHack
-			.getAdditionalJumpMotion();
-	}
-	
-	/**
-	 * This is the part that makes SafeWalk work.
-	 */
-	@Override
-	protected boolean isStayingOnGroundSurface()
-	{
-		return super.isStayingOnGroundSurface()
-			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
-	}
-	
-	/**
-	 * This mixin allows SafeWalk to sneak visibly when the player is
-	 * near a ledge.
-	 */
-	@Override
-	protected Vec3 maybeBackOffFromEdge(Vec3 movement, MoverType type)
-	{
-		Vec3 result = super.maybeBackOffFromEdge(movement, type);
-		
-		if(movement != null)
-			WurstClient.INSTANCE.getHax().safeWalkHack
-				.onMaybeBackOffFromEdge(!movement.equals(result));
-		
-		return result;
-	}
-	
-	@Override
 	public boolean hasEffect(Holder<MobEffect> effect)
 	{
 		return getEffect(effect) != null;
@@ -194,47 +136,5 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer
 			new MobEffectEvent(effect, super.getEffect(effect));
 		EventManager.fire(event);
 		return event.getInstance();
-	}
-	
-	@Override
-	public float maxUpStep()
-	{
-		return WurstClient.INSTANCE.getHax().stepHack
-			.adjustStepHeight(super.maxUpStep());
-	}
-	
-	@Override
-	public double blockInteractionRange()
-	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.reachHack.isEnabled())
-			return super.blockInteractionRange();
-		
-		return hax.reachHack.getReachDistance();
-	}
-	
-	@Override
-	public double entityInteractionRange()
-	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.reachHack.isEnabled())
-			return super.entityInteractionRange();
-		
-		return hax.reachHack.getReachDistance();
-	}
-	
-	/**
-	 * Makes Liquids work. Must take priority over Freecam's raycast wrapper.
-	 */
-	@ModifyArg(
-		method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;",
-		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/world/entity/Entity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;",
-			ordinal = 0),
-		index = 2)
-	private static boolean modifyIncludeFluidsForLiquids(boolean includeFluids)
-	{
-		return includeFluids
-			|| WurstClient.INSTANCE.getHax().liquidsHack.isEnabled();
 	}
 }

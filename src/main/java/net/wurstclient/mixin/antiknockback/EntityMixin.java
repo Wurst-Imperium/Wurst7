@@ -8,32 +8,29 @@
 package net.wurstclient.mixin.antiknockback;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-import com.mojang.authlib.GameProfile;
-
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.WurstClient;
 
-@Mixin(LocalPlayer.class)
-public abstract class LocalPlayerMixin extends AbstractClientPlayer
+@Mixin(Entity.class)
+public abstract class EntityMixin
 {
-	private LocalPlayerMixin(WurstClient wurst, ClientLevel world,
-		GameProfile profile)
-	{
-		super(world, profile);
-	}
-	
 	/**
 	 * Applies AntiKnockback's strength settings to regular knockback for the
 	 * local player.
 	 */
-	@Override
-	public void lerpMotion(Vec3 vec)
+	@ModifyVariable(method = "lerpMotion(Lnet/minecraft/world/phys/Vec3;)V",
+		at = @At("HEAD"),
+		argsOnly = true)
+	private Vec3 modifyLerpMotion(Vec3 original)
 	{
-		super.lerpMotion(WurstClient.INSTANCE.getHax().antiKnockbackHack
-			.modifyKnockback(vec));
+		if((Object)this != WurstClient.MC.player)
+			return original;
+		
+		return WurstClient.INSTANCE.getHax().antiKnockbackHack
+			.modifyKnockback(original);
 	}
 }
