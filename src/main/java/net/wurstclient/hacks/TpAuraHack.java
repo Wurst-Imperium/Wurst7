@@ -126,10 +126,6 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		player.setPos(entity.getX() + random.nextInt(3) * 2 - 2, entity.getY(),
 			entity.getZ() + random.nextInt(3) * 2 - 2);
 		
-		// check cooldown
-		if(player.getAttackStrengthScale(0) < 1)
-			return;
-		
 		// attack entity
 		RotationUtils.getNeededRotations(entity.getBoundingBox().getCenter())
 			.sendPlayerLookPacket();

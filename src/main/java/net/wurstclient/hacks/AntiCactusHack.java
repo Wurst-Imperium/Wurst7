@@ -60,6 +60,9 @@ public final class AntiCactusHack extends Hack implements PreMotionListener
 	@Override
 	public void onPreMotion()
 	{
+		if(MC.player.isPassenger())
+			return;
+		
 		if(!preventCactusTopDamage.isChecked()
 			|| MC.player.getDeltaMovement().y > 0 || !isAboveCactus())
 			return;
