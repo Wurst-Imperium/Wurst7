@@ -9,13 +9,13 @@ package net.wurstclient.hacks;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
@@ -75,10 +75,9 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(MC.hitResult != null
-			&& MC.hitResult.getType() == HitResult.Type.ENTITY)
+		if(MC.hitResult instanceof EntityHitResult entityHitResult)
 		{
-			Entity entity = ((EntityHitResult)MC.hitResult).getEntity();
+			Entity entity = entityHitResult.getEntity();
 			
 			if(entity instanceof LivingEntity
 				&& EntityUtils.IS_ATTACKABLE_MELEE.test(entity))
@@ -151,22 +150,20 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		switch(priority.getSelected())
 		{
 			case SPEED:
-			return (float)ItemUtils.getAttribute(item, Attributes.ATTACK_SPEED)
+			return (float)ItemUtils.calculateModifiedAttribute(stack,
+				Attributes.ATTACK_SPEED, EquipmentSlot.MAINHAND)
 				.orElse(Integer.MIN_VALUE);
 			
-			// Client-side item-specific attack damage calculation no
-			// longer exists as of 24w18a (1.21). Related bug: MC-196250
 			case DAMAGE:
-			// EntityType<?> group = entity.getType();
-			float dmg =
-				(float)ItemUtils.getAttribute(item, Attributes.ATTACK_DAMAGE)
-					.orElse(Integer.MIN_VALUE);
+			float dmg = (float)ItemUtils.calculateModifiedAttribute(stack,
+				Attributes.ATTACK_DAMAGE, EquipmentSlot.MAINHAND)
+				.orElse(Integer.MIN_VALUE);
 			
 			// Check for mace, get bonus damage from fall
 			if(item instanceof MaceItem mace)
-				dmg = mace.getAttackDamageBonus(MC.player, dmg,
+				dmg += mace.getAttackDamageBonus(entity, dmg,
 					entity.damageSources().playerAttack(MC.player));
-			// dmg += EnchantmentHelper.getAttackDamage(stack, group);
+			
 			return dmg;
 		}
 		
