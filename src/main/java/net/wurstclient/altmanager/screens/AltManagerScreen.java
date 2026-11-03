@@ -498,7 +498,7 @@ public final class AltManagerScreen extends Screen
 	{
 		for(AbstractWidget button : Screens.getWidgets(this))
 		{
-			if(!button.isHoveredOrFocused())
+			if(!button.isHighlighted())
 				continue;
 			
 			if(button != importButton && button != exportButton)

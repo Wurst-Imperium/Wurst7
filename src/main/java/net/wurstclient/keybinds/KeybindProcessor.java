@@ -85,7 +85,8 @@ public final class KeybindProcessor
 		int keyCode = event.getKeyCode();
 		int scanCode = event.getScanCode();
 		return InputConstants
-			.getKey(new KeyEvent(keyCode, scanCode, event.getModifiers()))
+			.getKey(
+				new KeyEvent(keyCode, scanCode, event.getModifiers(), false))
 			.getName();
 	}
 	

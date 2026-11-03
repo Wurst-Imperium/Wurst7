@@ -64,7 +64,7 @@ public abstract class KeyMappingMixin implements IKeyMapping
 			case KEYBOARD:
 			mc.keyboardHandler.keyPress(window.handle(), action,
 				new KeyEvent(key.getValue(), SDLKeyboard.SDL_GetKeyFromScancode(
-					key.getValue(), (short)0, false), 0));
+					key.getValue(), (short)0, false), 0, false));
 			break;
 			
 			case MOUSE:

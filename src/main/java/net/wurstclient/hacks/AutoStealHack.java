@@ -7,12 +7,13 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.IntStream;
 
+import net.minecraft.client.gui.components.inventory.SlotGroup;
+import net.minecraft.client.gui.components.inventory.SlotWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.ContainerInput;
-import net.minecraft.world.inventory.Slot;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -70,16 +71,21 @@ public final class AutoStealHack extends Hack
 	private void shiftClickSlots(AbstractContainerScreen<?> screen, int from,
 		int to, boolean steal)
 	{
-		List<Slot> slots = IntStream.range(from, to)
-			.mapToObj(i -> screen.getMenu().slots.get(i)).toList();
+		List<SlotWidget> slots = screen.children().stream()
+			.filter(SlotGroup.class::isInstance).map(SlotGroup.class::cast)
+			.flatMap(group -> group.children().stream())
+			.filter(widget -> widget.slot().index >= from
+				&& widget.slot().index < to)
+			.sorted(Comparator.comparingInt(widget -> widget.slot().index))
+			.toList();
 		
 		if(reverseSteal.isChecked() && steal)
 			slots = slots.reversed();
 		
-		for(Slot slot : slots)
+		for(SlotWidget widget : slots)
 			try
 			{
-				if(slot.getItem().isEmpty())
+				if(widget.slot().getItem().isEmpty())
 					continue;
 				
 				Thread.sleep(delay.getValueI());
@@ -87,7 +93,7 @@ public final class AutoStealHack extends Hack
 				if(MC.gui.screen() == null)
 					break;
 				
-				screen.slotClicked(slot, slot.index, 0,
+				screen.slotClicked(widget, widget.slot().index, 0,
 					ContainerInput.QUICK_MOVE);
 				
 			}catch(InterruptedException e)

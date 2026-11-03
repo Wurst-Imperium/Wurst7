@@ -233,8 +233,7 @@ public class CleanUpScreen extends Screen
 	{
 		for(AbstractWidget button : Screens.getWidgets(this))
 		{
-			if(!button.isHoveredOrFocused()
-				|| !(button instanceof CleanUpButton))
+			if(!button.isHighlighted() || !(button instanceof CleanUpButton))
 				continue;
 			
 			CleanUpButton cuButton = (CleanUpButton)button;

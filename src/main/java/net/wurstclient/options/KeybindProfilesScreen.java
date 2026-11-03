@@ -141,7 +141,7 @@ public final class KeybindProfilesScreen extends Screen
 		for(Renderable drawable : renderables)
 			drawable.extractRenderState(extractor);
 		
-		if(loadButton.isHoveredOrFocused() && !loadButton.active)
+		if(loadButton.isHighlighted() && !loadButton.active)
 			extractor.setComponentTooltipForNextFrame(font,
 				Arrays
 					.asList(Component.literal("You must first select a file.")),

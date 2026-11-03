@@ -116,9 +116,10 @@ public class WurstTest implements FabricClientGameTest
 		
 		LOGGER.info("Opening inventory");
 		input.pressKey(InputConstants.KEY_E);
-		input.setCursorPos(427, 240);
-		assertScreenshotEquals(context, "inventory",
-			"https://i.imgur.com/LyQ5FSD.png");
+		input.setCursorPos(0, 0);
+		input.setCursorPos(410, 228);
+		waitForScreenshotMatch(context, "inventory",
+			"https://i.imgur.com/q2dhdSl.png");
 		input.pressKey(InputConstants.KEY_ESCAPE);
 		
 		runWurstCommand(context,

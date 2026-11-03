@@ -139,7 +139,7 @@ public final class SelectFileScreen extends Screen
 		for(Renderable drawable : renderables)
 			drawable.extractRenderState(extractor);
 		
-		if(doneButton.isHoveredOrFocused() && !doneButton.active)
+		if(doneButton.isHighlighted() && !doneButton.active)
 			extractor.setComponentTooltipForNextFrame(font,
 				Arrays
 					.asList(Component.literal("You must first select a file.")),

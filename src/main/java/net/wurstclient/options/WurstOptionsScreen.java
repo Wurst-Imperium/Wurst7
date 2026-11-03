@@ -185,7 +185,7 @@ public class WurstOptionsScreen extends Screen
 	{
 		for(AbstractWidget button : Screens.getWidgets(this))
 		{
-			if(!button.isHoveredOrFocused()
+			if(!button.isHighlighted()
 				|| !(button instanceof WurstOptionsButton))
 				continue;
 			

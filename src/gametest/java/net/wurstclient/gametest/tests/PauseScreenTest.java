@@ -27,24 +27,23 @@ public final class PauseScreenTest extends SingleplayerTest
 	{
 		logger.info("Opening game menu");
 		input.pressKey(InputConstants.KEY_ESCAPE);
+		input.setCursorPos(0, 0);
 		input.setCursorPos(427, 240);
-		context.waitTick();// for the tooltip to appear
-		assertScreenshotEquals("game_menu", "https://i.imgur.com/WxuKtG6.png");
+		waitForScreenshotMatch("game_menu", "https://i.imgur.com/WxuKtG6.png");
 		
 		logger.info("Opening Wurst Options screen");
 		for(int i = 0; i < 7; i++)
 			input.pressKey(InputConstants.KEY_TAB);
 		input.pressKey(InputConstants.KEY_RETURN);
+		input.setCursorPos(0, 0);
 		input.setCursorPos(427, 240);
-		assertScreenshotEquals("wurst_options_screen",
-			"https://i.imgur.com/JpzrcP1.png");
+		waitForScreenshotMatch("wurst_options_screen",
+			"https://i.imgur.com/HR0AmQO.png");
 		// TODO: Test manager screens
 		input.pressKey(InputConstants.KEY_ESCAPE);
 		
 		logger.info("Opening statistics screen");
-		for(int i = 0; i < 2; i++)
-			input.pressKey(InputConstants.KEY_TAB);
-		input.pressKey(InputConstants.KEY_RETURN);
+		context.clickScreenButton("gui.stats");
 		context.waitFor(mc -> mc.gui.screen() instanceof StatsScreen statsScreen
 			&& !statsScreen.isLoading);
 		assertScreenshotEquals("statistics_screen",
@@ -67,9 +66,7 @@ public final class PauseScreenTest extends SingleplayerTest
 			"https://i.imgur.com/g7RRSkR.png");
 		
 		logger.info("Opening statistics screen with Wurst Options");
-		for(int i = 0; i < 2; i++)
-			input.pressKey(InputConstants.KEY_TAB);
-		input.pressKey(InputConstants.KEY_RETURN);
+		context.clickScreenButton("gui.stats");
 		context.waitFor(mc -> mc.gui.screen() instanceof StatsScreen statsScreen
 			&& !statsScreen.isLoading);
 		assertScreenshotEquals("statistics_screen_alt",

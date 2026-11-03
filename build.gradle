@@ -53,6 +53,10 @@ fabricApi.configureTests {
 	username = "Wurst-Bot"
 }
 
+tasks.named("runClientGameTest") {
+	systemProperty "renderpearl.vulkan.allowcpudevice", "true"
+}
+
 loom {
 	accessWidenerPath = file("src/main/resources/wurst.accesswidener")
 	
@@ -140,6 +144,7 @@ def prepareClientGameTestWithMods = tasks.register("prepareClientGameTestWithMod
 }
 
 tasks.named("runClientGameTestWithMods") {
+	systemProperty "renderpearl.vulkan.allowcpudevice", "true"
 	onlyIf { hasCompatMods.get() }
 	dependsOn prepareClientGameTestWithMods
 }
