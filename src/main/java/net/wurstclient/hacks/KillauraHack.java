@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleInputListener;
+import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -39,8 +40,8 @@ import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"kill aura", "ForceField", "force field", "CrystalAura",
 	"crystal aura", "AutoCrystal", "auto crystal"})
-public final class KillauraHack extends Hack
-	implements UpdateListener, HandleInputListener, RenderListener
+public final class KillauraHack extends Hack implements UpdateListener,
+	PreMotionListener, HandleInputListener, RenderListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
 		"Determines how far Killaura will reach to attack entities.\n"
@@ -126,6 +127,7 @@ public final class KillauraHack extends Hack
 		
 		speed.resetTimer(speedRandMS.getValue());
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PreMotionListener.class, this);
 		EVENTS.add(HandleInputListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -134,6 +136,7 @@ public final class KillauraHack extends Hack
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PreMotionListener.class, this);
 		EVENTS.remove(HandleInputListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
@@ -171,12 +174,17 @@ public final class KillauraHack extends Hack
 		
 		Vec3 hitVec = target.getBoundingBox().getCenter();
 		if(checkLOS.isChecked() && !BlockUtils.hasLineOfSight(hitVec))
-		{
 			target = null;
+	}
+	
+	@Override
+	public void onPreMotion()
+	{
+		if(target == null)
 			return;
-		}
 		
-		WURST.getRotationFaker().faceVectorPacket(hitVec);
+		WURST.getRotationFaker()
+			.faceVectorPacket(target.getBoundingBox().getCenter());
 	}
 	
 	@Override

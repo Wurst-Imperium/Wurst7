@@ -1,6 +1,7 @@
 {
   "description.wurst.hack.aimassist": "Helps you aim at nearby entities.",
   "description.wurst.setting.aimassist.fov": "Field Of View - how far away from your crosshair an entity can be before it's ignored.\n360° = aims at entities all around you.",
+  "description.wurst.setting.aimassist.aim_at": "What point in the target's hitbox AimAssist should aim at.",
   "description.wurst.setting.aimassist.ignore_mouse_input": "Ignores some of your mouse input while AimAssist is aiming. This makes it harder for you to accidentally aim away from the target.",
   "description.wurst.setting.aimassist.check_line_of_sight": "Won't aim at entities behind blocks.",
   "description.wurst.setting.aimassist.aim_while_blocking": "Keeps aiming at entities while you're blocking with a shield or using items.",
@@ -353,6 +354,10 @@
   "description.wurst.setting.wurstoptions.location": "Where to show the \"Wurst Options\" button.",
   "button.wurst.nochatreports.disable_signatures": "Disable Signatures",
   "button.wurst.nochatreports.re-enable_signatures": "Re-enable Signatures",
+  "description.wurst.setting.generic.aim_at.auto": "Aims at the closest point of the target's hitbox.",
+  "description.wurst.setting.generic.aim_at.head": "Aims at the target's eye position.",
+  "description.wurst.setting.generic.aim_at.center": "Aims at the center of the target's hitbox.",
+  "description.wurst.setting.generic.aim_at.feet": "Aims at the bottom of the target's hitbox.",
   "description.wurst.setting.generic.attack_speed": "Attack speed in clicks per second.\n0 = dynamically adjusts the speed to match your attack cooldown.",
   "description.wurst.setting.generic.face_target.off": "Don't face the target at all. Will be detected by anti-cheat plugins.",
   "description.wurst.setting.generic.face_target.server": "Face the target on the server-side, while still letting you move the camera freely on the client-side.",

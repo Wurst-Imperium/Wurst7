@@ -32,7 +32,6 @@ import net.minecraft.client.multiplayer.ProfileKeyPairManager;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.HandleBlockBreakingListener.HandleBlockBreakingEvent;
@@ -130,11 +129,10 @@ public abstract class MinecraftMixin
 		if(!WurstClient.INSTANCE.isEnabled())
 			return;
 		
-		HitResult hitResult = WurstClient.MC.hitResult;
-		if(!(hitResult instanceof EntityHitResult eHitResult))
+		if(!(WurstClient.MC.hitResult instanceof EntityHitResult hit))
 			return;
 		
-		WurstClient.INSTANCE.getFriends().middleClick(eHitResult.getEntity());
+		WurstClient.INSTANCE.getFriends().middleClick(hit.getEntity());
 	}
 	
 	/**

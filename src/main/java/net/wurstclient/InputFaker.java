@@ -32,7 +32,7 @@ public enum InputFaker
 	private static ClientInput realInput;
 	private static int swapDepth;
 	
-	public static void swapIfNeeded()
+	public static void swapIfNeeded(boolean tickInput)
 	{
 		if(!WurstClient.INSTANCE.getHax().freecamHack.isMovingCamera())
 			return;
@@ -43,7 +43,8 @@ public enum InputFaker
 		
 		LocalPlayer player = MC.player;
 		realInput = player.input;
-		player.input.tick();
+		if(tickInput)
+			player.input.tick();
 		player.input = new ClientInput();
 	}
 	
