@@ -22,6 +22,7 @@ import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.events.HandleInputListener;
 import net.wurstclient.events.MouseUpdateListener;
+import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -41,7 +42,7 @@ import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
 
 public final class KillauraLegitHack extends Hack implements UpdateListener,
-	HandleInputListener, MouseUpdateListener, RenderListener
+	PreMotionListener, HandleInputListener, MouseUpdateListener, RenderListener
 {
 	private final SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 4.25, 0.05, ValueDisplay.DECIMAL);
@@ -153,6 +154,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		
 		speed.resetTimer(speedRandMS.getValue());
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PreMotionListener.class, this);
 		EVENTS.add(HandleInputListener.class, this);
 		EVENTS.add(MouseUpdateListener.class, this);
 		EVENTS.add(RenderListener.class, this);
@@ -162,6 +164,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PreMotionListener.class, this);
 		EVENTS.remove(HandleInputListener.class, this);
 		EVENTS.remove(MouseUpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
@@ -199,8 +202,15 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 			return;
 		}
 		
-		// face entity
 		WURST.getHax().autoSwordHack.setSlot(target);
+	}
+	
+	@Override
+	public void onPreMotion()
+	{
+		if(target == null)
+			return;
+		
 		faceEntityClient(target);
 	}
 	

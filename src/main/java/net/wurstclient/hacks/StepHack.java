@@ -103,11 +103,6 @@ public final class StepHack extends Hack implements UpdateListener
 		return stepHeight;
 	}
 	
-	public boolean isAutoJumpAllowed()
-	{
-		return !isEnabled() && !WURST.getCmds().goToCmd.isActive();
-	}
-	
 	private enum Mode
 	{
 		SIMPLE("Simple"),
