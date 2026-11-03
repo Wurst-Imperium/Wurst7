@@ -49,4 +49,17 @@ public abstract class LivingEntityMixin
 		
 		return fluids;
 	}
+	
+	/**
+	 * Prevents Flight getting horizontally stuck if elytra is already active.
+	 */
+	@ModifyReturnValue(method = "isFallFlying()Z", at = @At("RETURN"))
+	private boolean modifyIsFallFlying(boolean original)
+	{
+		if((Object)this != WurstClient.MC.player)
+			return original;
+		
+		return original
+			&& !WurstClient.INSTANCE.getHax().flightHack.isEnabled();
+	}
 }

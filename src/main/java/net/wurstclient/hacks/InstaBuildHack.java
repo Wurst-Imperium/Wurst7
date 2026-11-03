@@ -124,17 +124,15 @@ public final class InstaBuildHack extends Hack
 		if(status != Status.IDLE)
 			return;
 		
-		HitResult hitResult = MC.hitResult;
-		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
-			|| !(hitResult instanceof BlockHitResult blockHitResult))
+		if(!(MC.hitResult instanceof BlockHitResult hit)
+			|| hit.getType() != HitResult.Type.BLOCK)
 			return;
 		
-		BlockPos hitResultPos = blockHitResult.getBlockPos();
-		if(!BlockUtils.canBeClicked(hitResultPos))
+		BlockPos hitPos = hit.getBlockPos();
+		if(!BlockUtils.canBeClicked(hitPos))
 			return;
 		
-		BlockPos startPos =
-			hitResultPos.relative(blockHitResult.getDirection());
+		BlockPos startPos = hitPos.relative(hit.getDirection());
 		Direction direction = MC.player.getDirection();
 		remainingBlocks = template.getBlocksToPlace(startPos, direction);
 		

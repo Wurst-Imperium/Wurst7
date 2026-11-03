@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+
 import net.minecraft.world.entity.player.Player;
 import net.wurstclient.WurstClient;
 
@@ -31,5 +33,18 @@ public abstract class PlayerMixin
 		
 		WurstClient.MC.player.setSwimming(false);
 		ci.cancel();
+	}
+	
+	/**
+	 * Prevents flying up with Flight activating elytra.
+	 */
+	@ModifyReturnValue(method = "canGlide()Z", at = @At("RETURN"))
+	private boolean modifyCanGlide(boolean original)
+	{
+		if((Object)this != WurstClient.MC.player)
+			return original;
+		
+		return original
+			&& !WurstClient.INSTANCE.getHax().flightHack.isEnabled();
 	}
 }
