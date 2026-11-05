@@ -224,7 +224,11 @@ public final class AimAssistHack extends Hack
 		int mouseInputX = (int)(event.getDefaultDeltaX() * inputFactor);
 		int mouseInputY = (int)(event.getDefaultDeltaY() * inputFactor);
 		
-		event.setDeltaX(mouseInputX + diffYaw);
-		event.setDeltaY(mouseInputY + diffPitch);
+		double sensitivity = MC.options.sensitivity().get() * 0.6F + 0.2F;
+		double mouseFactor =
+			Math.min(1, sensitivity * sensitivity * sensitivity * 8);
+		
+		event.setDeltaX(mouseInputX + (int)(diffYaw / mouseFactor));
+		event.setDeltaY(mouseInputY + (int)(diffPitch / mouseFactor));
 	}
 }
