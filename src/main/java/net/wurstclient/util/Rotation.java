@@ -42,6 +42,14 @@ public record Rotation(float yaw, float pitch)
 	
 	public double getAngleTo(Rotation other)
 	{
+		Vec3 lookVec = toLookVec();
+		Vec3 otherLookVec = other.toLookVec();
+		return Math.toDegrees(Math.atan2(lookVec.cross(otherLookVec).length(),
+			lookVec.dot(otherLookVec)));
+	}
+	
+	public double getYawPitchDistanceTo(Rotation other)
+	{
 		float yaw1 = Mth.wrapDegrees(yaw);
 		float yaw2 = Mth.wrapDegrees(other.yaw);
 		float diffYaw = Mth.wrapDegrees(yaw1 - yaw2);

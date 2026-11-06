@@ -197,8 +197,8 @@ public final class AimAssistHack extends Hack
 		stream = entityFilters.applyTo(stream);
 		
 		target = stream
-			.min(Comparator.comparingDouble(
-				e -> RotationUtils.getAngleToLookVec(aimAt.getAimPoint(e))))
+			.min(Comparator.comparingDouble(e -> RotationUtils
+				.getYawPitchDistanceToLookVec(aimAt.getAimPoint(e))))
 			.orElse(null);
 	}
 	

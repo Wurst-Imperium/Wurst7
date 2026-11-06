@@ -57,6 +57,14 @@ public enum RotationUtils
 		return current.getAngleTo(needed);
 	}
 	
+	public static double getYawPitchDistanceToLookVec(Vec3 vec)
+	{
+		LocalPlayer player = MC.player;
+		Rotation current = new Rotation(player.getYRot(), player.getXRot());
+		Rotation needed = getNeededRotations(vec);
+		return current.getYawPitchDistanceTo(needed);
+	}
+	
 	public static float getHorizontalAngleToLookVec(Vec3 vec)
 	{
 		float currentYaw = Mth.wrapDegrees(MC.player.getYRot());
@@ -64,31 +72,20 @@ public enum RotationUtils
 		return Mth.wrapDegrees(currentYaw - neededYaw);
 	}
 	
-	/**
-	 * Returns true if the player is already facing within 1 degree of the
-	 * specified rotation.
-	 */
-	public static boolean isAlreadyFacing(Rotation rotation)
-	{
-		return getAngleToLastReportedLookVec(rotation) <= 1.0;
-	}
-	
 	public static double getAngleToLastReportedLookVec(Vec3 vec)
 	{
 		Rotation needed = getNeededRotations(vec);
-		return getAngleToLastReportedLookVec(needed);
+		return getLastReportedRotation().getAngleTo(needed);
 	}
 	
-	public static double getAngleToLastReportedLookVec(Rotation rotation)
+	public static Rotation getLastReportedRotation()
 	{
 		LocalPlayer player = MC.player;
 		
 		// lastYaw/Pitch do not get updated when the player is in a vehicle
-		Rotation lastReported = player.isPassenger()
+		return player.isPassenger()
 			? new Rotation(player.getYRot(), player.getXRot())
 			: new Rotation(player.yRotLast, player.xRotLast);
-		
-		return lastReported.getAngleTo(rotation);
 	}
 	
 	/**

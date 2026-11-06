@@ -236,7 +236,7 @@ public final class KillauraHack extends Hack implements UpdateListener,
 		
 		ANGLE("Angle",
 			e -> RotationUtils
-				.getAngleToLookVec(e.getBoundingBox().getCenter())),
+				.getYawPitchDistanceToLookVec(e.getBoundingBox().getCenter())),
 		
 		HEALTH("Health", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);

@@ -246,7 +246,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		nextPitch = next.pitch();
 		
 		// check if facing center
-		if(RotationUtils.isAlreadyFacing(needed))
+		if(RotationUtils.getLastReportedRotation().getAngleTo(needed) <= 1)
 			return true;
 		
 		// if not facing center, check if facing anything in boundingBox
@@ -298,7 +298,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		
 		ANGLE("Angle",
 			e -> RotationUtils
-				.getAngleToLookVec(e.getBoundingBox().getCenter())),
+				.getYawPitchDistanceToLookVec(e.getBoundingBox().getCenter())),
 		
 		HEALTH("Health", e -> e instanceof LivingEntity
 			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);

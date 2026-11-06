@@ -232,12 +232,12 @@ public final class BowAimbotHack extends Hack
 		
 		ANGLE("Angle",
 			e -> RotationUtils
-				.getAngleToLookVec(e.getBoundingBox().getCenter())),
+				.getYawPitchDistanceToLookVec(e.getBoundingBox().getCenter())),
 		
 		ANGLE_DIST("Angle+Dist",
 			e -> Math
-				.pow(RotationUtils
-					.getAngleToLookVec(e.getBoundingBox().getCenter()), 2)
+				.pow(RotationUtils.getYawPitchDistanceToLookVec(
+					e.getBoundingBox().getCenter()), 2)
 				+ EntityUtils.distanceToHitboxSq(e)),
 		
 		HEALTH("Health", e -> e instanceof LivingEntity
