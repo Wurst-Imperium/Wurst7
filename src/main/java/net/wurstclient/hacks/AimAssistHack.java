@@ -19,6 +19,7 @@ import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AimAtSetting;
+import net.wurstclient.settings.AimAtSetting.AimAt;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -43,7 +44,8 @@ public final class AimAssistHack extends Hack
 		new SliderSetting("FOV", "description.wurst.setting.aimassist.fov", 120,
 			30, 360, 10, ValueDisplay.DEGREES);
 	
-	private final AimAtSetting aimAt = new AimAtSetting(this);
+	private final AimAtSetting aimAt =
+		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.AUTO);
 	
 	private final SliderSetting ignoreMouseInput =
 		new SliderSetting("Ignore mouse input",
