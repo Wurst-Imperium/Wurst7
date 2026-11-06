@@ -147,9 +147,9 @@ public final class KillauraHack extends Hack implements UpdateListener,
 	@Override
 	public void onUpdate()
 	{
+		target = null;
+		renderTarget = null;
 		speed.updateTimer();
-		if(!speed.isTimeToAttack())
-			return;
 		
 		if(pauseOnContainers.shouldPause())
 			return;
@@ -182,6 +182,12 @@ public final class KillauraHack extends Hack implements UpdateListener,
 	{
 		if(target == null)
 			return;
+		
+		if(!speed.isTimeToAttack())
+		{
+			target = null;
+			return;
+		}
 		
 		WURST.getRotationFaker()
 			.faceVectorPacket(target.getBoundingBox().getCenter());
