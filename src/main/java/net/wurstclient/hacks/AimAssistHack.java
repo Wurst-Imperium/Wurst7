@@ -21,6 +21,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AimAtSetting;
 import net.wurstclient.settings.AimAtSetting.AimAt;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.FovSliderSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
@@ -40,9 +41,7 @@ public final class AimAssistHack extends Hack
 		new SliderSetting("Rotation Speed", 600, 10, 3600, 10,
 			ValueDisplay.DEGREES.withSuffix("/s"));
 	
-	private final SliderSetting fov =
-		new SliderSetting("FOV", "description.wurst.setting.aimassist.fov", 120,
-			30, 360, 10, ValueDisplay.DEGREES);
+	private final FovSliderSetting fov = new FovSliderSetting(this, 120);
 	
 	private final AimAtSetting aimAt =
 		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.AUTO);
@@ -188,11 +187,8 @@ public final class AimAssistHack extends Hack
 		
 		double rangeSq = range.getValueSq();
 		stream =
-			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);
-		
-		if(fov.getValue() < 360.0)
-			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
-				aimAt.getAimPoint(e)) <= fov.getValue() / 2.0);
+			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
+				.filter(fov.asEntityPredicate(aimAt::getAimPoint));
 		
 		stream = entityFilters.applyTo(stream);
 		

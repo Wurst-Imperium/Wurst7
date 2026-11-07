@@ -415,6 +415,7 @@
   "description.wurst.setting.generic.filter_zombie_piglins_vision": "§lOn§r: Won't show zombified piglins.\n\n§lIf calm§r: Only shows zombified piglins if it detects they have become aggressive (toward any target, not just you).\n\n§lOff§r: This filter does nothing.\n\nAnger detection is less reliable for babies.",
   "description.wurst.setting.generic.filter_zombie_villagers_combat": "Won't attack zombified villagers.",
   "description.wurst.setting.generic.filter_zombie_villagers_vision": "Won't show zombified villagers.",
+  "description.wurst.setting.generic.fov_combat": "Field Of View - how far away from your crosshair an entity can be before it's ignored.\n360° = entities can be attacked all around you.",
   "description.wurst.setting.generic.interact_from.camera": "Clicks target what the camera is looking at. This allows you to interact with blocks and entities behind walls as long as they're not too far away from your character.",
   "description.wurst.setting.generic.interact_from.player": "Clicks target what your character is looking at.",
   "description.wurst.setting.generic.pause_attack_on_containers": "Won't attack while a container screen (chest, hopper, etc.) is open.\nUseful for minigame servers that display chest-like menus.",
