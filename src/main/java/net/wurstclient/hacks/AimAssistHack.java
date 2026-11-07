@@ -93,6 +93,7 @@ public final class AimAssistHack extends Hack
 	private Entity target;
 	private float nextYaw;
 	private float nextPitch;
+	private boolean nudgeYaw;
 	
 	public AimAssistHack()
 	{
@@ -210,12 +211,15 @@ public final class AimAssistHack extends Hack
 		int diffPitch = (int)(nextPitch - curPitch);
 		
 		// If we are <1 degree off but still missing the hitbox,
-		// slightly exaggerate the difference to fix that.
+		// nudge the aim slightly to fix that.
 		if(diffYaw == 0 && diffPitch == 0 && !RotationUtils
 			.isFacingBox(target.getBoundingBox(), range.getValue()))
 		{
-			diffYaw = nextYaw < curYaw ? -1 : 1;
-			diffPitch = nextPitch < curPitch ? -1 : 1;
+			nudgeYaw = !nudgeYaw;
+			if(nudgeYaw)
+				diffYaw = nextYaw < curYaw ? -1 : 1;
+			else
+				diffPitch = nextPitch < curPitch ? -1 : 1;
 		}
 		
 		double inputFactor = 1 - ignoreMouseInput.getValue();
