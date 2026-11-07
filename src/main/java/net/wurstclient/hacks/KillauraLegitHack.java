@@ -8,13 +8,11 @@
 package net.wurstclient.hacks;
 
 import java.util.Comparator;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -25,6 +23,8 @@ import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AimAtSetting;
+import net.wurstclient.settings.AimAtSetting.AimAt;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.AttackSwingSetting;
 import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
@@ -71,6 +71,9 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		Priority.values(), Priority.ANGLE);
 	
 	private final FovSliderSetting fov = FovSliderSetting.genericCombat(360);
+	
+	private final AimAtSetting aimAt =
+		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.AUTO);
 	
 	private final AttackSwingSetting attackSwing = AttackSwingSetting
 		.withoutOffOption(AttackSwingSetting.genericCombatDescription(this),
@@ -129,6 +132,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		addSetting(rotationSpeed);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(aimAt);
 		addSetting(attackSwing);
 		addSetting(damageIndicator);
 		
@@ -179,18 +183,19 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		
 		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		double rangeSq = range.getValueSq();
-		stream = stream
-			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-			.filter(fov.asEntityPredicate(e -> e.getBoundingBox().getCenter()));
+		stream =
+			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
+				.filter(fov.asEntityPredicate(aimAt::getAimPoint));
 		
 		stream = entityFilters.applyTo(stream);
 		
-		target = stream.min(priority.getSelected().comparator).orElse(null);
+		target = stream.min(priority.getSelected().getComparator(aimAt))
+			.orElse(null);
 		if(target == null)
 			return;
 		
 		// check line of sight
-		if(!BlockUtils.hasLineOfSight(target.getBoundingBox().getCenter()))
+		if(!BlockUtils.hasLineOfSight(aimAt.getAimPoint(target)))
 		{
 			target = null;
 			return;
@@ -205,7 +210,13 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		if(target == null)
 			return;
 		
-		faceEntityClient(target);
+		Rotation needed =
+			RotationUtils.getNeededRotations(aimAt.getAimPoint(target));
+		
+		Rotation next = RotationUtils.slowlyTurnTowards(needed,
+			rotationSpeed.getValueI() / 20F);
+		nextYaw = next.yaw();
+		nextPitch = next.pitch();
 	}
 	
 	@Override
@@ -228,36 +239,25 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		speed.resetTimer(speedRandMS.getValue());
 	}
 	
-	private boolean faceEntityClient(Entity entity)
-	{
-		// get needed rotation
-		AABB box = entity.getBoundingBox();
-		Rotation needed = RotationUtils.getNeededRotations(box.getCenter());
-		
-		// turn towards center of boundingBox
-		Rotation next = RotationUtils.slowlyTurnTowards(needed,
-			rotationSpeed.getValueI() / 20F);
-		nextYaw = next.yaw();
-		nextPitch = next.pitch();
-		
-		// check if facing center
-		if(RotationUtils.getLastReportedRotation().getAngleTo(needed) <= 1)
-			return true;
-		
-		// if not facing center, check if facing anything in boundingBox
-		return RotationUtils.isFacingBox(box, range.getValue());
-	}
-	
 	@Override
 	public void onMouseUpdate(MouseUpdateEvent event)
 	{
 		if(target == null || MC.player == null)
 			return;
 		
-		int diffYaw = (int)(nextYaw - MC.player.getYRot());
-		int diffPitch = (int)(nextPitch - MC.player.getXRot());
-		if(Mth.abs(diffYaw) < 1 && Mth.abs(diffPitch) < 1)
-			return;
+		float curYaw = MC.player.getYRot();
+		float curPitch = MC.player.getXRot();
+		int diffYaw = (int)(nextYaw - curYaw);
+		int diffPitch = (int)(nextPitch - curPitch);
+		
+		// If we are <1 degree off but still missing the hitbox,
+		// slightly exaggerate the difference to fix that
+		if(diffYaw == 0 && diffPitch == 0 && !RotationUtils
+			.isFacingBox(target.getBoundingBox(), range.getValue()))
+		{
+			diffYaw = nextYaw < curYaw ? -1 : 1;
+			diffPitch = nextPitch < curPitch ? -1 : 1;
+		}
 		
 		event.setDeltaX(event.getDefaultDeltaX() + diffYaw);
 		event.setDeltaY(event.getDefaultDeltaY() + diffPitch);
@@ -289,22 +289,29 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", EntityUtils::distanceToHitboxSq),
-		
-		ANGLE("Angle",
-			e -> RotationUtils
-				.getYawPitchDistanceToLookVec(e.getBoundingBox().getCenter())),
-		
-		HEALTH("Health", e -> e instanceof LivingEntity
-			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
+		DISTANCE("Distance"),
+		ANGLE("Angle"),
+		HEALTH("Health");
 		
 		private final String name;
-		private final Comparator<Entity> comparator;
 		
-		private Priority(String name, ToDoubleFunction<Entity> keyExtractor)
+		private Priority(String name)
 		{
 			this.name = name;
-			comparator = Comparator.comparingDouble(keyExtractor);
+		}
+		
+		public Comparator<Entity> getComparator(AimAtSetting aimAt)
+		{
+			return switch(this)
+			{
+				case DISTANCE -> Comparator
+					.comparingDouble(EntityUtils::distanceToHitboxSq);
+				case ANGLE -> Comparator.comparingDouble(e -> RotationUtils
+					.getYawPitchDistanceToLookVec(aimAt.getAimPoint(e)));
+				case HEALTH -> Comparator
+					.comparingDouble(e -> e instanceof LivingEntity le
+						? le.getHealth() : Integer.MAX_VALUE);
+			};
 		}
 		
 		@Override
