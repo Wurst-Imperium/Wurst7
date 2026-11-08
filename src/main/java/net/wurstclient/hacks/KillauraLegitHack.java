@@ -203,7 +203,8 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 			return;
 		}
 		
-		WURST.getHax().autoSwordHack.setSlot(target);
+		if(!MC.player.isUsingItem())
+			WURST.getHax().autoSwordHack.setSlot(target);
 	}
 	
 	@Override
@@ -224,7 +225,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	@Override
 	public void onHandleInput()
 	{
-		if(target == null)
+		if(target == null || MC.player.isUsingItem())
 			return;
 		
 		speed.updateTimer();
