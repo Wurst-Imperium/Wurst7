@@ -57,7 +57,7 @@ public final class AimAssistHack extends Hack
 	
 	private final CheckboxSetting aimWhileBlocking =
 		new CheckboxSetting("Aim while blocking",
-			"description.wurst.setting.aimassist.aim_while_blocking", false);
+			"description.wurst.setting.aimassist.aim_while_blocking", true);
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
