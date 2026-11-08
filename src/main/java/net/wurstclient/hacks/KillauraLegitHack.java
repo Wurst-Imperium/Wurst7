@@ -263,8 +263,14 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 				diffPitch = nextPitch < curPitch ? -1 : 1;
 		}
 		
-		event.setDeltaX(event.getDefaultDeltaX() + diffYaw);
-		event.setDeltaY(event.getDefaultDeltaY() + diffPitch);
+		double sensitivity = MC.options.sensitivity().get() * 0.6F + 0.2F;
+		double mouseFactor =
+			Math.min(1, sensitivity * sensitivity * sensitivity * 8);
+		
+		event
+			.setDeltaX(event.getDefaultDeltaX() + (int)(diffYaw / mouseFactor));
+		event.setDeltaY(
+			event.getDefaultDeltaY() + (int)(diffPitch / mouseFactor));
 	}
 	
 	@Override
