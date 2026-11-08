@@ -40,6 +40,7 @@ import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.text.WText;
 
 public final class KillauraLegitHack extends Hack implements UpdateListener,
 	PreMotionListener, HandleInputListener, MouseUpdateListener, RenderListener
@@ -74,6 +75,13 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	
 	private final AimAtSetting aimAt =
 		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.AUTO);
+	
+	private final SliderSetting ignoreMouseInput =
+		new SliderSetting("Ignore mouse input",
+			WText.translated(
+				"description.wurst.setting.generic.ignore_mouse_input",
+				getName()),
+			0, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private final AttackSwingSetting attackSwing = AttackSwingSetting
 		.withoutOffOption(AttackSwingSetting.genericCombatDescription(this),
@@ -134,6 +142,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		addSetting(priority);
 		addSetting(fov);
 		addSetting(aimAt);
+		addSetting(ignoreMouseInput);
 		addSetting(attackSwing);
 		addSetting(damageIndicator);
 		
@@ -265,14 +274,16 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 				diffPitch = nextPitch < curPitch ? -1 : 1;
 		}
 		
+		double inputFactor = 1 - ignoreMouseInput.getValue();
+		int mouseInputX = (int)(event.getDefaultDeltaX() * inputFactor);
+		int mouseInputY = (int)(event.getDefaultDeltaY() * inputFactor);
+		
 		double sensitivity = MC.options.sensitivity().get() * 0.6F + 0.2F;
 		double mouseFactor =
 			Math.min(1, sensitivity * sensitivity * sensitivity * 8);
 		
-		event
-			.setDeltaX(event.getDefaultDeltaX() + (int)(diffYaw / mouseFactor));
-		event.setDeltaY(
-			event.getDefaultDeltaY() + (int)(diffPitch / mouseFactor));
+		event.setDeltaX(mouseInputX + (int)(diffYaw / mouseFactor));
+		event.setDeltaY(mouseInputY + (int)(diffPitch / mouseFactor));
 	}
 	
 	@Override

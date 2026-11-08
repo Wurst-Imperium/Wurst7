@@ -30,6 +30,7 @@ import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
+import net.wurstclient.util.text.WText;
 
 public final class AimAssistHack extends Hack
 	implements UpdateListener, PreMotionListener, MouseUpdateListener
@@ -48,8 +49,10 @@ public final class AimAssistHack extends Hack
 	
 	private final SliderSetting ignoreMouseInput =
 		new SliderSetting("Ignore mouse input",
-			"description.wurst.setting.aimassist.ignore_mouse_input", 0, 0, 1,
-			0.01, ValueDisplay.PERCENTAGE);
+			WText.translated(
+				"description.wurst.setting.generic.ignore_mouse_input",
+				getName()),
+			0, 0, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private final CheckboxSetting checkLOS =
 		new CheckboxSetting("Check line of sight",
