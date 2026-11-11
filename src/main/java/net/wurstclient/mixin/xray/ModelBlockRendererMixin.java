@@ -11,10 +11,11 @@ import java.util.List;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.vertex.QuadInstance;
+import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.BlockQuadOutput;
@@ -32,9 +33,6 @@ import net.wurstclient.hacks.XRayHack;
 @Mixin(ModelBlockRenderer.class)
 public abstract class ModelBlockRendererMixin implements ItemLike
 {
-	private static ThreadLocal<Float> currentOpacity =
-		ThreadLocal.withInitial(() -> 1F);
-	
 	/**
 	 * Makes X-Ray work when neither Sodium nor Indigo are running. Also gets
 	 * called while Indigo is running when breaking a block in survival mode or
@@ -53,11 +51,6 @@ public abstract class ModelBlockRendererMixin implements ItemLike
 		BlockPos pos = neighborPos.relative(side.getOpposite());
 		Boolean shouldDrawSide = xray.shouldDrawSide(state, pos);
 		
-		if(!xray.isOpacityMode() || xray.isVisible(state.getBlock(), pos))
-			currentOpacity.set(1F);
-		else
-			currentOpacity.set(xray.getOpacityFloat());
-		
 		if(shouldDrawSide != null)
 			return shouldDrawSide;
 		
@@ -68,25 +61,20 @@ public abstract class ModelBlockRendererMixin implements ItemLike
 	 * Applies X-Ray's opacity mask to the block color after all the normal
 	 * coloring and shading is done, if neither Sodium nor Indigo are running.
 	 */
-	@WrapOperation(
+	@ModifyArg(
 		method = "putQuadWithTint(Lnet/minecraft/client/renderer/block/BlockQuadOutput;FFFLnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/resources/model/geometry/BakedQuad;)V",
 		at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/block/BlockQuadOutput;put(FFFLnet/minecraft/client/resources/model/geometry/BakedQuad;Lcom/mojang/blaze3d/vertex/QuadInstance;)V"))
-	private void modifyOpacity(BlockQuadOutput output, float x, float y,
-		float z, BakedQuad quad, QuadInstance instance,
-		Operation<Void> original)
+			target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V"))
+	private int modifyOpacity(int color,
+		@Local(argsOnly = true) BlockState state,
+		@Local(argsOnly = true) BlockPos pos)
 	{
-		float opacity = currentOpacity.get();
-		if(opacity < 1F)
-			for(int i = 0; i < 4; i++)
-			{
-				int color = instance.getColor(i);
-				instance.setColor(i,
-					ARGB.color(Math.round(ARGB.alpha(color) * opacity),
-						ARGB.red(color), ARGB.green(color), ARGB.blue(color)));
-			}
+		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
+		if(xray.isOpacityMode() && !xray.isVisible(state.getBlock(), pos))
+			return ARGB.color(
+				Math.round(ARGB.alpha(color) * xray.getOpacityFloat()), color);
 		
-		original.call(output, x, y, z, quad, instance);
+		return color;
 	}
 	
 	/**

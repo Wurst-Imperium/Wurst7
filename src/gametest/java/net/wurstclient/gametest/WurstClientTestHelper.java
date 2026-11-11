@@ -24,7 +24,6 @@ import org.joml.Vector2i;
 import org.lwjgl.system.MemoryUtil;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -35,6 +34,9 @@ import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotCompari
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.ParseBox;
+import net.minecraft.commands.ParseContext;
 import net.wurstclient.WurstClient;
 
 public enum WurstClientTestHelper
@@ -236,21 +238,20 @@ public enum WurstClientTestHelper
 	{
 		String commandWithPlayer = "execute as @p at @s run " + command;
 		server.runOnServer(mc -> {
-			ParseResults<CommandSourceStack> results =
-				mc.getCommands().getDispatcher().parse(commandWithPlayer,
-					mc.createCommandSourceStack());
+			CommandSourceStack source = mc.createCommandSourceStack();
+			ParseBox.Result result = mc.getCommands().parseBox()
+				.parse(commandWithPlayer, ParseContext.of(source));
 			
-			if(!results.getExceptions().isEmpty())
+			try
 			{
-				StringBuilder errors =
-					new StringBuilder("Invalid command: /" + commandWithPlayer);
-				for(CommandSyntaxException e : results.getExceptions().values())
-					errors.append("\n").append(e.getMessage());
-				
-				throw new RuntimeException(errors.toString());
+				result.unpack();
+			}catch(CommandSyntaxException e)
+			{
+				throw new RuntimeException("Invalid command: /"
+					+ commandWithPlayer + "\n" + e.getMessage(), e);
 			}
 			
-			mc.getCommands().performCommand(results, commandWithPlayer);
+			Commands.performCommand(source, result, commandWithPlayer);
 		});
 	}
 	

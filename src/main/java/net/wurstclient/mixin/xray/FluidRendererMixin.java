@@ -8,12 +8,12 @@
 package net.wurstclient.mixin.xray;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidRenderer;
@@ -28,10 +28,6 @@ import net.wurstclient.hacks.XRayHack;
 @Mixin(FluidRenderer.class)
 public class FluidRendererMixin
 {
-	@Unique
-	private static final ThreadLocal<Float> currentOpacity =
-		ThreadLocal.withInitial(() -> 1F);
-	
 	/**
 	 * Hides and shows fluids when using X-Ray without Sodium installed.
 	 */
@@ -49,11 +45,6 @@ public class FluidRendererMixin
 		// Note: the null BlockPos is here to skip the "exposed only" check
 		Boolean shouldDrawSide = xray.shouldDrawSide(blockState, null);
 		
-		if(!xray.isOpacityMode() || xray.isVisible(blockState.getBlock(), pos))
-			currentOpacity.set(1F);
-		else
-			currentOpacity.set(xray.getOpacityFloat());
-		
 		if(shouldDrawSide != null)
 			return !shouldDrawSide;
 		
@@ -62,18 +53,26 @@ public class FluidRendererMixin
 	
 	/**
 	 * Modifies opacity of fluids when using X-Ray without Sodium installed.
+	 * Wraps the output after Fabric's handler dispatch, so recursive default
+	 * rendering doesn't apply opacity twice.
 	 */
-	@ModifyArg(at = @At(value = "INVOKE",
-		target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;addVertex(FFFIFFIIFFF)V"),
-		method = "vertex(Lcom/mojang/blaze3d/vertex/VertexConsumer;FFFIFFI)V",
-		index = 3)
-	private int modifyOpacity(int color)
+	@ModifyVariable(
+		method = "tesselate(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/renderer/block/FluidRenderer$Output;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/material/FluidState;)V",
+		at = @At(value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/block/FluidStateModelSet;get(Lnet/minecraft/world/level/material/FluidState;)Lnet/minecraft/client/renderer/block/FluidModel;"),
+		argsOnly = true)
+	private FluidRenderer.Output modifyOpacity(FluidRenderer.Output original,
+		@Local(argsOnly = true) BlockState state,
+		@Local(argsOnly = true) BlockPos pos)
 	{
-		float opacity = currentOpacity.get();
-		if(opacity >= 1F)
-			return color;
+		XRayHack xray = WurstClient.INSTANCE.getHax().xRayHack;
+		if(!xray.isOpacityMode() || xray.isVisible(state.getBlock(), pos))
+			return original;
 		
-		return ARGB.color(Math.round(255F * opacity), ARGB.red(color),
-			ARGB.green(color), ARGB.blue(color));
+		float opacity = xray.getOpacityFloat();
+		return (layer, x, y, z, quad, color, brightness,
+			lightCoords) -> original.put(layer, x, y, z, quad,
+				ARGB.color(Math.round(ARGB.alpha(color) * opacity), color),
+				brightness, lightCoords);
 	}
 }
