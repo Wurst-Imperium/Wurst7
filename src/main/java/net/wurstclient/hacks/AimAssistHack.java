@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
@@ -94,9 +95,8 @@ public final class AimAssistHack extends Hack
 			FilterInteractionsSetting.genericCombat(true));
 	
 	private Entity target;
-	private float nextYaw;
-	private float nextPitch;
-	private boolean nudgeYaw;
+	private Rotation curTickRot;
+	private Rotation nextTickRot;
 	
 	public AimAssistHack()
 	{
@@ -140,6 +140,8 @@ public final class AimAssistHack extends Hack
 		EVENTS.remove(PreMotionListener.class, this);
 		EVENTS.remove(MouseUpdateListener.class, this);
 		target = null;
+		curTickRot = null;
+		nextTickRot = null;
 	}
 	
 	@Override
@@ -172,17 +174,31 @@ public final class AimAssistHack extends Hack
 	public void onPreMotion()
 	{
 		if(target == null)
+		{
+			nextTickRot = null;
 			return;
+		}
+		
+		curTickRot = nextTickRot != null ? nextTickRot
+			: new Rotation(MC.player.getYRot(), MC.player.getXRot());
 		
 		// get needed rotation
 		Rotation needed =
 			RotationUtils.getNeededRotations(aimAt.getAimPoint(target));
 		
 		// turn towards center of boundingBox
-		Rotation next = RotationUtils.slowlyTurnTowards(needed,
+		nextTickRot = curTickRot.slowlyTurnTowards(needed,
 			rotationSpeed.getValueI() / 20F);
-		nextYaw = next.yaw();
-		nextPitch = next.pitch();
+		
+		// Vulcan D/F flag >1.825° yaw changes with unchanged pitch
+		if(Math.abs(nextTickRot.yaw() - curTickRot.yaw()) > 1.825F
+			&& nextTickRot.pitch() == curTickRot.pitch())
+		{
+			float pitchOffset = (float)(RotationUtils.getDegreesPerMouseUnit()
+				* (Math.random() < 0.5 ? -1 : 1));
+			nextTickRot = nextTickRot.withPitch(
+				Math.clamp(nextTickRot.pitch() + pitchOffset, -90F, 90F));
+		}
 	}
 	
 	private void chooseTarget()
@@ -205,35 +221,29 @@ public final class AimAssistHack extends Hack
 	@Override
 	public void onMouseUpdate(MouseUpdateEvent event)
 	{
-		if(target == null || MC.player == null)
+		if(target == null || MC.player == null || nextTickRot == null)
 			return;
 		
-		float curYaw = MC.player.getYRot();
-		float curPitch = MC.player.getXRot();
-		int diffYaw = (int)(nextYaw - curYaw);
-		int diffPitch = (int)(nextPitch - curPitch);
+		Rotation curFrameRot =
+			new Rotation(MC.player.getYRot(), MC.player.getXRot());
 		
-		// If we are <1 degree off but still missing the hitbox,
-		// nudge the aim slightly to fix that.
-		if(diffYaw == 0 && diffPitch == 0 && !RotationUtils
-			.isFacingBox(target.getBoundingBox(), range.getValue()))
-		{
-			nudgeYaw = !nudgeYaw;
-			if(nudgeYaw)
-				diffYaw = nextYaw < curYaw ? -1 : 1;
-			else
-				diffPitch = nextPitch < curPitch ? -1 : 1;
-		}
+		float partialTicks =
+			MC.getDeltaTracker().getGameTimeDeltaPartialTick(true);
+		Rotation nextFrameRot = new Rotation(
+			Mth.lerp(partialTicks, curTickRot.yaw(), nextTickRot.yaw()),
+			Mth.lerp(partialTicks, curTickRot.pitch(), nextTickRot.pitch()));
 		
 		double inputFactor = 1 - ignoreMouseInput.getValue();
-		int mouseInputX = (int)(event.getDefaultDeltaX() * inputFactor);
-		int mouseInputY = (int)(event.getDefaultDeltaY() * inputFactor);
+		double inputX = Math.rint(event.getDefaultDeltaX() * inputFactor);
+		double inputY = Math.rint(event.getDefaultDeltaY() * inputFactor);
 		
-		double sensitivity = MC.options.sensitivity().get() * 0.6F + 0.2F;
-		double mouseFactor =
-			Math.min(1, sensitivity * sensitivity * sensitivity * 8);
+		float yawDiff = nextFrameRot.yaw() - curFrameRot.yaw();
+		float pitchDiff = nextFrameRot.pitch() - curFrameRot.pitch();
+		double degPerMouseUnit = RotationUtils.getDegreesPerMouseUnit();
+		double aimX = Math.rint(yawDiff / degPerMouseUnit);
+		double aimY = Math.rint(pitchDiff / degPerMouseUnit);
 		
-		event.setDeltaX(mouseInputX + (int)(diffYaw / mouseFactor));
-		event.setDeltaY(mouseInputY + (int)(diffPitch / mouseFactor));
+		event.setDeltaX(inputX + aimX);
+		event.setDeltaY(inputY + aimY);
 	}
 }

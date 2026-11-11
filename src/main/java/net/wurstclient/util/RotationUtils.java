@@ -88,15 +88,25 @@ public enum RotationUtils
 			: new Rotation(player.yRotLast, player.xRotLast);
 	}
 	
+	public static double getDegreesPerMouseUnit()
+	{
+		double sensitivity = MC.options.sensitivity().get() * 0.6F + 0.2F;
+		return sensitivity * sensitivity * sensitivity * 8 * 0.15F;
+	}
+	
 	/**
-	 * Returns true if the player is facing anywhere within the given box
-	 * and is no further away than the given range.
+	 * Returns true if the last sent rotation has the player already facing the
+	 * given box. Falls back to current-tick rotation while riding.
+	 *
+	 * Even though vanilla clients can send an attack before the rotation that
+	 * makes it possible, older anti-cheats like NoCheat+ flag that case.
 	 */
-	public static boolean isFacingBox(AABB box, double range)
+	public static boolean isFacingBoxServerSide(AABB box, double range)
 	{
 		Vec3 start = MC.player.getEyePosition();
-		Vec3 end = start.add(getServerLookVec().scale(range));
-		return box.clip(start, end).isPresent();
+		Vec3 end =
+			start.add(getLastReportedRotation().toLookVec().scale(range));
+		return box.contains(start) || box.clip(start, end).isPresent();
 	}
 	
 	/**
@@ -106,28 +116,7 @@ public enum RotationUtils
 	 */
 	public static Rotation slowlyTurnTowards(Rotation end, float maxChange)
 	{
-		LocalPlayer player = MC.player;
-		
-		float startYaw =
-			player.isPassenger() ? player.getYRot() : player.yRotLast;
-		float startPitch =
-			player.isPassenger() ? player.getXRot() : player.xRotLast;
-		float endYaw = end.yaw();
-		float endPitch = end.pitch();
-		
-		float yawChange = Math.abs(Mth.wrapDegrees(endYaw - startYaw));
-		float pitchChange = Math.abs(Mth.wrapDegrees(endPitch - startPitch));
-		
-		float maxChangeYaw = pitchChange == 0 ? maxChange
-			: Math.min(maxChange, maxChange * yawChange / pitchChange);
-		float maxChangePitch = yawChange == 0 ? maxChange
-			: Math.min(maxChange, maxChange * pitchChange / yawChange);
-		
-		float nextYaw = limitAngleChange(startYaw, endYaw, maxChangeYaw);
-		float nextPitch =
-			limitAngleChange(startPitch, endPitch, maxChangePitch);
-		
-		return new Rotation(nextYaw, nextPitch);
+		return getLastReportedRotation().slowlyTurnTowards(end, maxChange);
 	}
 	
 	/**

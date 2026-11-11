@@ -61,6 +61,24 @@ public record Rotation(float yaw, float pitch)
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
 	}
 	
+	public Rotation slowlyTurnTowards(Rotation end, float maxChange)
+	{
+		float yawChange = Math.abs(Mth.wrapDegrees(end.yaw - yaw));
+		float pitchChange = Math.abs(Mth.wrapDegrees(end.pitch - pitch));
+		
+		float maxChangeYaw = pitchChange == 0 ? maxChange
+			: Math.min(maxChange, maxChange * yawChange / pitchChange);
+		float maxChangePitch = yawChange == 0 ? maxChange
+			: Math.min(maxChange, maxChange * pitchChange / yawChange);
+		
+		float nextYaw =
+			RotationUtils.limitAngleChange(yaw, end.yaw, maxChangeYaw);
+		float nextPitch =
+			RotationUtils.limitAngleChange(pitch, end.pitch, maxChangePitch);
+		
+		return new Rotation(nextYaw, nextPitch);
+	}
+	
 	public Rotation withYaw(float yaw)
 	{
 		return new Rotation(yaw, pitch);
