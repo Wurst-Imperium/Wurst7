@@ -196,8 +196,7 @@ public final class AimAssistHack extends Hack
 		{
 			float pitchOffset = (float)(RotationUtils.getDegreesPerMouseUnit()
 				* (Math.random() < 0.5 ? -1 : 1));
-			nextTickRot = nextTickRot.withPitch(
-				Math.clamp(nextTickRot.pitch() + pitchOffset, -90F, 90F));
+			nextTickRot = nextTickRot.add(0, pitchOffset).clampPitch();
 		}
 	}
 	
@@ -245,5 +244,14 @@ public final class AimAssistHack extends Hack
 		
 		event.setDeltaX(inputX + aimX);
 		event.setDeltaY(inputY + aimY);
+		
+		if(!MC.mouseHandler.isMouseGrabbed())
+			return;
+		
+		// Carry manual movement into the aim path so later frames don't undo it
+		float inputYaw = (float)(inputX * degPerMouseUnit);
+		float inputPitch = (float)(inputY * degPerMouseUnit);
+		curTickRot = curTickRot.add(inputYaw, inputPitch).clampPitch();
+		nextTickRot = nextTickRot.add(inputYaw, inputPitch).clampPitch();
 	}
 }

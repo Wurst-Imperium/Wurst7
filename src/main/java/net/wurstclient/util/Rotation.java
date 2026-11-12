@@ -89,6 +89,16 @@ public record Rotation(float yaw, float pitch)
 		return new Rotation(yaw, pitch);
 	}
 	
+	public Rotation add(float yawOffset, float pitchOffset)
+	{
+		return new Rotation(yaw + yawOffset, pitch + pitchOffset);
+	}
+	
+	public Rotation clampPitch()
+	{
+		return withPitch(Math.clamp(pitch, -90F, 90F));
+	}
+	
 	public Vec3 toLookVec()
 	{
 		double yawRad = Math.toRadians(Mth.wrapDegrees(yaw));
