@@ -198,7 +198,8 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		double rangeSq = range.getValueSq();
 		stream =
 			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-				.filter(fov.asEntityPredicate(aimAt::getAimPoint));
+				.filter(fov.asEntityPredicate(aimAt::getAimPoint))
+				.filter(e -> BlockUtils.hasLineOfSight(aimAt.getAimPoint(e)));
 		
 		stream = entityFilters.applyTo(stream);
 		
@@ -206,13 +207,6 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 			.orElse(null);
 		if(target == null)
 			return;
-		
-		// check line of sight
-		if(!BlockUtils.hasLineOfSight(aimAt.getAimPoint(target)))
-		{
-			target = null;
-			return;
-		}
 		
 		if(!MC.player.isUsingItem())
 			WURST.getHax().autoSwordHack.setSlot(target);

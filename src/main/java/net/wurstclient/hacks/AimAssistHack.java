@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.events.MouseUpdateListener;
 import net.wurstclient.events.PreMotionListener;
@@ -160,13 +159,6 @@ public final class AimAssistHack extends Hack
 		if(target == null)
 			return;
 		
-		Vec3 hitVec = aimAt.getAimPoint(target);
-		if(checkLOS.isChecked() && !BlockUtils.hasLineOfSight(hitVec))
-		{
-			target = null;
-			return;
-		}
-		
 		WURST.getHax().autoSwordHack.setSlot(target);
 	}
 	
@@ -208,6 +200,10 @@ public final class AimAssistHack extends Hack
 		stream =
 			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
 				.filter(fov.asEntityPredicate(aimAt::getAimPoint));
+		
+		if(checkLOS.isChecked())
+			stream = stream
+				.filter(e -> BlockUtils.hasLineOfSight(aimAt.getAimPoint(e)));
 		
 		stream = entityFilters.applyTo(stream);
 		
