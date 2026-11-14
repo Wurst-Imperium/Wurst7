@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -194,12 +193,11 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		if(MC.gui.screen() instanceof AbstractContainerScreen)
 			return;
 		
-		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		double rangeSq = range.getValueSq();
-		stream =
-			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-				.filter(fov.asEntityPredicate(aimAt::getAimPoint))
-				.filter(e -> BlockUtils.hasLineOfSight(aimAt.getAimPoint(e)));
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
+			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
+			.filter(fov.asEntityPredicate(aimAt::getAimPoint))
+			.filter(e -> BlockUtils.hasLineOfSight(aimAt.getAimPoint(e)));
 		
 		stream = entityFilters.applyTo(stream);
 		
@@ -223,10 +221,9 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		
 		curTickRot = nextTickRot != null ? nextTickRot
 			: new Rotation(MC.player.getYRot(), MC.player.getXRot());
-		Rotation needed =
-			RotationUtils.getNeededRotations(aimAt.getAimPoint(target));
 		
-		nextTickRot = curTickRot.slowlyTurnTowards(needed,
+		nextTickRot = curTickRot.slowlyTurnTowards(
+			RotationUtils.getNeededRotations(aimAt.getAimPoint(target)),
 			rotationSpeed.getValueI() / 20F);
 		
 		// Vulcan D/F flag >1.825° yaw changes with unchanged pitch
@@ -270,9 +267,8 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		
 		float partialTicks =
 			MC.getDeltaTracker().getGameTimeDeltaPartialTick(true);
-		Rotation nextFrameRot = new Rotation(
-			Mth.lerp(partialTicks, curTickRot.yaw(), nextTickRot.yaw()),
-			Mth.lerp(partialTicks, curTickRot.pitch(), nextTickRot.pitch()));
+		Rotation nextFrameRot =
+			Rotation.lerp(partialTicks, curTickRot, nextTickRot);
 		
 		double inputFactor = 1 - ignoreMouseInput.getValue();
 		double inputX = Math.rint(event.getDefaultDeltaX() * inputFactor);

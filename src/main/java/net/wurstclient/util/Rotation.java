@@ -134,4 +134,12 @@ public record Rotation(float yaw, float pitch)
 	{
 		return new Rotation(Mth.wrapDegrees(yaw), Mth.wrapDegrees(pitch));
 	}
+	
+	public static Rotation lerp(float partialTicks, Rotation start,
+		Rotation end)
+	{
+		float yaw = Mth.lerp(partialTicks, start.yaw, end.yaw);
+		float pitch = Mth.lerp(partialTicks, start.pitch, end.pitch);
+		return new Rotation(yaw, pitch);
+	}
 }
