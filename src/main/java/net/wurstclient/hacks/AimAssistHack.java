@@ -38,13 +38,13 @@ public final class AimAssistHack extends Hack
 		new SliderSetting("Range", 4.5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private final SliderSetting rotationSpeed =
-		new SliderSetting("Rotation Speed", 600, 10, 3600, 10,
+		new SliderSetting("Rotation Speed", 300, 10, 3600, 10,
 			ValueDisplay.DEGREES.withSuffix("/s"));
 	
 	private final FovSliderSetting fov = new FovSliderSetting(this, 120);
 	
 	private final AimAtSetting aimAt =
-		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.AUTO);
+		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.CENTER);
 	
 	private final SliderSetting ignoreMouseInput =
 		new SliderSetting("Ignore mouse input",
