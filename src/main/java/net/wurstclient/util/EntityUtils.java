@@ -149,10 +149,14 @@ public enum EntityUtils
 	
 	public static EntityHitResult createHitResult(Entity e)
 	{
+		return createHitResult(e, e.getBoundingBox().getCenter());
+	}
+	
+	public static EntityHitResult createHitResult(Entity e, Vec3 aimPoint)
+	{
 		AABB box = e.getBoundingBox();
 		Vec3 start = MC.player.getEyePosition();
-		Vec3 end = box.getCenter();
-		Vec3 hitVec = box.clip(start, end).orElse(start);
+		Vec3 hitVec = box.clip(start, aimPoint).orElse(start);
 		return new EntityHitResult(e, hitVec);
 	}
 }
