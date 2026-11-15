@@ -74,7 +74,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	private final FovSliderSetting fov = FovSliderSetting.genericCombat(360);
 	
 	private final AimAtSetting aimAt =
-		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.AUTO);
+		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.CENTER);
 	
 	private final SliderSetting ignoreMouseInput =
 		new SliderSetting("Ignore mouse input",
