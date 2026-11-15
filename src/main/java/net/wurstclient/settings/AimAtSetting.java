@@ -32,11 +32,6 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 		this(hackDescription(hack), selected);
 	}
 	
-	public AimAtSetting(Hack hack)
-	{
-		this(hack, AimAt.AUTO);
-	}
-	
 	public static WText genericDescription(Hack hack)
 	{
 		return WText.translated("description.wurst.setting.generic.aim_at",
