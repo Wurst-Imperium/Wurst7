@@ -7,8 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
+import java.util.List;
 import java.util.stream.Stream;
 
 import net.minecraft.world.entity.Entity;
@@ -96,16 +95,14 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			return;
 		
 		// get entities
-		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
-		double rangeSq = Math.pow(range.getValue(), 2);
-		stream = stream
+		double rangeSq = range.getValueSq();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
 			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
 			.filter(fov.asEntityPredicate(e -> e.getBoundingBox().getCenter()));
 		
 		stream = entityFilters.applyTo(stream);
 		
-		ArrayList<Entity> entities =
-			stream.collect(Collectors.toCollection(ArrayList::new));
+		List<Entity> entities = stream.toList();
 		if(entities.isEmpty())
 			return;
 		

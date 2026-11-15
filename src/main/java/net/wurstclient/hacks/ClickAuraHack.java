@@ -113,10 +113,9 @@ public final class ClickAuraHack extends Hack
 	{
 		// set entity
 		LocalPlayer player = MC.player;
-		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
+		double rangeSq = range.getValueSq();
 		
-		double rangeSq = Math.pow(range.getValue(), 2);
-		stream = stream
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
 			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
 			.filter(fov.asEntityPredicate(e -> e.getBoundingBox().getCenter()));
 		

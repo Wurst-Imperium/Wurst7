@@ -135,12 +135,9 @@ public final class VeinMinerHack extends Hack
 			.getAllInBoxStream(eyesBlock, blockRange)
 			.filter(this::shouldBreakBlock)
 			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
-			.filter(params -> params.distanceSq() <= rangeSq);
-		
-		if(checkLOS.isChecked())
-			stream = stream.filter(BlockBreakingParams::lineOfSight);
-		
-		stream = stream.sorted(BlockBreaker.comparingParams());
+			.filter(params -> params.distanceSq() <= rangeSq)
+			.filter(params -> !checkLOS.isChecked() || params.lineOfSight())
+			.sorted(BlockBreaker.comparingParams());
 		
 		// Break all blocks in creative mode
 		if(MC.player.getAbilities().instabuild)

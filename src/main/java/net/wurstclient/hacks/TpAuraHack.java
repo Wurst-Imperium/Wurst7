@@ -108,10 +108,9 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		LocalPlayer player = MC.player;
 		
 		// set entity
-		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
-		double rangeSq = Math.pow(range.getValue(), 2);
-		stream =
-			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);
+		double rangeSq = range.getValueSq();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
+			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);
 		
 		stream = entityFilters.applyTo(stream);
 		

@@ -153,9 +153,8 @@ public final class KillauraHack extends Hack implements UpdateListener,
 		if(pauseOnContainers.shouldPause())
 			return;
 		
-		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		double rangeSq = range.getValueSq();
-		stream = stream
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
 			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
 			.filter(fov.asEntityPredicate(e -> e.getBoundingBox().getCenter()))
 			.filter(e -> !checkLOS.isChecked()
