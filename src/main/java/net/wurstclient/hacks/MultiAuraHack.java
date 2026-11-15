@@ -15,6 +15,8 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AimAtSetting;
+import net.wurstclient.settings.AimAtSetting.AimAt;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.AttackSwingSetting;
 import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
@@ -37,6 +39,9 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	
 	private final FovSliderSetting fov = FovSliderSetting.genericCombat(360);
 	
+	private final AimAtSetting aimAt =
+		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.AUTO);
+	
 	private final AttackSwingSetting attackSwing = new AttackSwingSetting(
 		AttackSwingSetting.genericCombatDescription(this), AttackSwing.CLIENT);
 	
@@ -54,6 +59,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		addSetting(range);
 		addSetting(speed);
 		addSetting(fov);
+		addSetting(aimAt);
 		addSetting(attackSwing);
 		addSetting(pauseOnContainers);
 		
@@ -98,7 +104,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		double rangeSq = range.getValueSq();
 		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
 			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-			.filter(fov.asEntityPredicate(e -> e.getBoundingBox().getCenter()));
+			.filter(fov.asEntityPredicate(aimAt::getAimPoint));
 		
 		stream = entityFilters.applyTo(stream);
 		
@@ -111,8 +117,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
-			RotationUtils
-				.getNeededRotations(entity.getBoundingBox().getCenter())
+			RotationUtils.getNeededRotations(aimAt.getAimPoint(entity))
 				.sendPlayerLookPacket();
 			
 			MC.gameMode.attack(MC.player, entity);

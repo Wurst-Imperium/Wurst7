@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import java.util.Comparator;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import net.minecraft.client.player.LocalPlayer;
@@ -19,6 +18,8 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AimAtSetting;
+import net.wurstclient.settings.AimAtSetting.AimAt;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.EnumSetting;
@@ -48,6 +49,9 @@ public final class ClickAuraHack extends Hack
 	
 	private final FovSliderSetting fov = FovSliderSetting.genericCombat(360);
 	
+	private final AimAtSetting aimAt =
+		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.CENTER);
+	
 	private final EntityFilterList entityFilters =
 		EntityFilterList.genericMeleeCombat();
 	
@@ -60,6 +64,7 @@ public final class ClickAuraHack extends Hack
 		addSetting(speed);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(aimAt);
 		
 		entityFilters.forEach(this::addSetting);
 	}
@@ -117,19 +122,19 @@ public final class ClickAuraHack extends Hack
 		
 		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
 			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-			.filter(fov.asEntityPredicate(e -> e.getBoundingBox().getCenter()));
+			.filter(fov.asEntityPredicate(aimAt::getAimPoint));
 		
 		stream = entityFilters.applyTo(stream);
 		
-		Entity target =
-			stream.min(priority.getSelected().comparator).orElse(null);
+		Entity target = stream.min(priority.getSelected().getComparator(aimAt))
+			.orElse(null);
 		if(target == null)
 			return;
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
 		
 		// face entity
-		RotationUtils.getNeededRotations(target.getBoundingBox().getCenter())
+		RotationUtils.getNeededRotations(aimAt.getAimPoint(target))
 			.sendPlayerLookPacket();
 		
 		// attack entity
@@ -140,22 +145,29 @@ public final class ClickAuraHack extends Hack
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", EntityUtils::distanceToHitboxSq),
-		
-		ANGLE("Angle",
-			e -> RotationUtils
-				.getYawPitchDistanceToLookVec(e.getBoundingBox().getCenter())),
-		
-		HEALTH("Health", e -> e instanceof LivingEntity
-			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
+		DISTANCE("Distance"),
+		ANGLE("Angle"),
+		HEALTH("Health");
 		
 		private final String name;
-		private final Comparator<Entity> comparator;
 		
-		private Priority(String name, ToDoubleFunction<Entity> keyExtractor)
+		private Priority(String name)
 		{
 			this.name = name;
-			comparator = Comparator.comparingDouble(keyExtractor);
+		}
+		
+		public Comparator<Entity> getComparator(AimAtSetting aimAt)
+		{
+			return switch(this)
+			{
+				case DISTANCE -> Comparator
+					.comparingDouble(EntityUtils::distanceToHitboxSq);
+				case ANGLE -> Comparator.comparingDouble(e -> RotationUtils
+					.getYawPitchDistanceToLookVec(aimAt.getAimPoint(e)));
+				case HEALTH -> Comparator
+					.comparingDouble(e -> e instanceof LivingEntity le
+						? le.getHealth() : Integer.MAX_VALUE);
+			};
 		}
 		
 		@Override

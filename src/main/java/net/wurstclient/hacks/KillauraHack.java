@@ -8,7 +8,6 @@
 package net.wurstclient.hacks;
 
 import java.util.Comparator;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -23,6 +22,8 @@ import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AimAtSetting;
+import net.wurstclient.settings.AimAtSetting.AimAt;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.AttackSwingSetting;
 import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
@@ -69,6 +70,9 @@ public final class KillauraHack extends Hack implements UpdateListener,
 	
 	private final FovSliderSetting fov = FovSliderSetting.genericCombat(360);
 	
+	private final AimAtSetting aimAt =
+		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.CENTER);
+	
 	private final AttackSwingSetting attackSwing = new AttackSwingSetting(
 		AttackSwingSetting.genericCombatDescription(this), AttackSwing.CLIENT);
 	
@@ -102,6 +106,7 @@ public final class KillauraHack extends Hack implements UpdateListener,
 		addSetting(speedRandMS);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(aimAt);
 		addSetting(attackSwing);
 		addSetting(damageIndicator);
 		addSetting(pauseOnContainers);
@@ -156,13 +161,14 @@ public final class KillauraHack extends Hack implements UpdateListener,
 		double rangeSq = range.getValueSq();
 		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
 			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-			.filter(fov.asEntityPredicate(e -> e.getBoundingBox().getCenter()))
+			.filter(fov.asEntityPredicate(aimAt::getAimPoint))
 			.filter(e -> !checkLOS.isChecked()
-				|| BlockUtils.hasLineOfSight(e.getBoundingBox().getCenter()));
+				|| BlockUtils.hasLineOfSight(aimAt.getAimPoint(e)));
 		
 		stream = entityFilters.applyTo(stream);
 		
-		target = stream.min(priority.getSelected().comparator).orElse(null);
+		target = stream.min(priority.getSelected().getComparator(aimAt))
+			.orElse(null);
 		renderTarget = target;
 		if(target == null)
 			return;
@@ -182,8 +188,7 @@ public final class KillauraHack extends Hack implements UpdateListener,
 			return;
 		}
 		
-		WURST.getRotationFaker()
-			.faceVectorPacket(target.getBoundingBox().getCenter());
+		WURST.getRotationFaker().faceVectorPacket(aimAt.getAimPoint(target));
 	}
 	
 	@Override
@@ -225,22 +230,29 @@ public final class KillauraHack extends Hack implements UpdateListener,
 	
 	private enum Priority
 	{
-		DISTANCE("Distance", EntityUtils::distanceToHitboxSq),
-		
-		ANGLE("Angle",
-			e -> RotationUtils
-				.getYawPitchDistanceToLookVec(e.getBoundingBox().getCenter())),
-		
-		HEALTH("Health", e -> e instanceof LivingEntity
-			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
+		DISTANCE("Distance"),
+		ANGLE("Angle"),
+		HEALTH("Health");
 		
 		private final String name;
-		private final Comparator<Entity> comparator;
 		
-		private Priority(String name, ToDoubleFunction<Entity> keyExtractor)
+		private Priority(String name)
 		{
 			this.name = name;
-			comparator = Comparator.comparingDouble(keyExtractor);
+		}
+		
+		public Comparator<Entity> getComparator(AimAtSetting aimAt)
+		{
+			return switch(this)
+			{
+				case DISTANCE -> Comparator
+					.comparingDouble(EntityUtils::distanceToHitboxSq);
+				case ANGLE -> Comparator.comparingDouble(e -> RotationUtils
+					.getYawPitchDistanceToLookVec(aimAt.getAimPoint(e)));
+				case HEALTH -> Comparator
+					.comparingDouble(e -> e instanceof LivingEntity le
+						? le.getHealth() : Integer.MAX_VALUE);
+			};
 		}
 		
 		@Override
