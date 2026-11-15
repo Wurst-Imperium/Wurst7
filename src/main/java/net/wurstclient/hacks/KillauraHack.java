@@ -16,7 +16,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleInputListener;
@@ -158,7 +157,9 @@ public final class KillauraHack extends Hack implements UpdateListener,
 		double rangeSq = range.getValueSq();
 		stream = stream
 			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
-			.filter(fov.asEntityPredicate(e -> e.getBoundingBox().getCenter()));
+			.filter(fov.asEntityPredicate(e -> e.getBoundingBox().getCenter()))
+			.filter(e -> !checkLOS.isChecked()
+				|| BlockUtils.hasLineOfSight(e.getBoundingBox().getCenter()));
 		
 		stream = entityFilters.applyTo(stream);
 		
@@ -168,10 +169,6 @@ public final class KillauraHack extends Hack implements UpdateListener,
 			return;
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
-		
-		Vec3 hitVec = target.getBoundingBox().getCenter();
-		if(checkLOS.isChecked() && !BlockUtils.hasLineOfSight(hitVec))
-			target = null;
 	}
 	
 	@Override
