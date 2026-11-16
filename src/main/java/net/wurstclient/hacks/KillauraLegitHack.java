@@ -236,11 +236,11 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	@Override
 	public void onHandleInput()
 	{
-		if(target == null || MC.player.isUsingItem())
-			return;
-		
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
+			return;
+		
+		if(target == null || MC.player.isUsingItem())
 			return;
 		
 		if(!RotationUtils.isFacingBoxServerSide(target.getBoundingBox(),
