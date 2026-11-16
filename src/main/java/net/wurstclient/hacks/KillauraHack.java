@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.Comparator;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -24,11 +23,12 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AimAtSetting;
 import net.wurstclient.settings.AimAtSetting.AimAt;
+import net.wurstclient.settings.AttackPrioritySetting;
+import net.wurstclient.settings.AttackPrioritySetting.AttackPriority;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.AttackSwingSetting;
 import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.FovSliderSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
@@ -37,7 +37,6 @@ import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"kill aura", "ForceField", "force field", "CrystalAura",
 	"crystal aura", "AutoCrystal", "auto crystal"})
@@ -61,12 +60,9 @@ public final class KillauraHack extends Hack implements UpdateListener,
 			100, 0, 1000, 50, ValueDisplay.INTEGER.withPrefix("\u00b1")
 				.withSuffix("ms").withLabel(0, "off"));
 	
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which entity will be attacked first.\n"
-			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
-		Priority.values(), Priority.ANGLE);
+	private final AttackPrioritySetting priority =
+		AttackPrioritySetting.withoutAngleDistOption(
+			AttackPrioritySetting.genericDescription(), AttackPriority.ANGLE);
 	
 	private final FovSliderSetting fov = FovSliderSetting.genericCombat(360);
 	
@@ -167,8 +163,8 @@ public final class KillauraHack extends Hack implements UpdateListener,
 		
 		stream = entityFilters.applyTo(stream);
 		
-		target = stream.min(priority.getSelected().getComparator(aimAt))
-			.orElse(null);
+		target =
+			stream.min(priority.getComparator(aimAt::getAimPoint)).orElse(null);
 		renderTarget = target;
 		if(target == null)
 			return;
@@ -226,39 +222,5 @@ public final class KillauraHack extends Hack implements UpdateListener,
 		
 		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
 		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);
-	}
-	
-	private enum Priority
-	{
-		DISTANCE("Distance"),
-		ANGLE("Angle"),
-		HEALTH("Health");
-		
-		private final String name;
-		
-		private Priority(String name)
-		{
-			this.name = name;
-		}
-		
-		public Comparator<Entity> getComparator(AimAtSetting aimAt)
-		{
-			return switch(this)
-			{
-				case DISTANCE -> Comparator
-					.comparingDouble(EntityUtils::distanceToHitboxSq);
-				case ANGLE -> Comparator.comparingDouble(e -> RotationUtils
-					.getYawPitchDistanceToLookVec(aimAt.getAimPoint(e)));
-				case HEALTH -> Comparator
-					.comparingDouble(e -> e instanceof LivingEntity le
-						? le.getHealth() : Integer.MAX_VALUE);
-			};
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }

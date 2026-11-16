@@ -7,12 +7,10 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.Comparator;
 import java.util.stream.Stream;
 
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.LeftClickListener;
@@ -20,9 +18,10 @@ import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AimAtSetting;
 import net.wurstclient.settings.AimAtSetting.AimAt;
+import net.wurstclient.settings.AttackPrioritySetting;
+import net.wurstclient.settings.AttackPrioritySetting.AttackPriority;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
-import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.FovSliderSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -40,12 +39,9 @@ public final class ClickAuraHack extends Hack
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
 	
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which entity will be attacked first.\n"
-			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
-		Priority.values(), Priority.ANGLE);
+	private final AttackPrioritySetting priority =
+		AttackPrioritySetting.withoutAngleDistOption(
+			AttackPrioritySetting.genericDescription(), AttackPriority.ANGLE);
 	
 	private final FovSliderSetting fov = FovSliderSetting.genericCombat(360);
 	
@@ -126,8 +122,8 @@ public final class ClickAuraHack extends Hack
 		
 		stream = entityFilters.applyTo(stream);
 		
-		Entity target = stream.min(priority.getSelected().getComparator(aimAt))
-			.orElse(null);
+		Entity target =
+			stream.min(priority.getComparator(aimAt::getAimPoint)).orElse(null);
 		if(target == null)
 			return;
 		
@@ -141,39 +137,5 @@ public final class ClickAuraHack extends Hack
 		MC.gameMode.attack(player, target);
 		AttackSwing.CLIENT.swing();
 		speed.resetTimer();
-	}
-	
-	private enum Priority
-	{
-		DISTANCE("Distance"),
-		ANGLE("Angle"),
-		HEALTH("Health");
-		
-		private final String name;
-		
-		private Priority(String name)
-		{
-			this.name = name;
-		}
-		
-		public Comparator<Entity> getComparator(AimAtSetting aimAt)
-		{
-			return switch(this)
-			{
-				case DISTANCE -> Comparator
-					.comparingDouble(EntityUtils::distanceToHitboxSq);
-				case ANGLE -> Comparator.comparingDouble(e -> RotationUtils
-					.getYawPitchDistanceToLookVec(aimAt.getAimPoint(e)));
-				case HEALTH -> Comparator
-					.comparingDouble(e -> e instanceof LivingEntity le
-						? le.getHealth() : Integer.MAX_VALUE);
-			};
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }
