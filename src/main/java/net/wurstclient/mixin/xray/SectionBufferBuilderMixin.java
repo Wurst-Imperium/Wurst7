@@ -30,7 +30,7 @@ public class SectionBufferBuilderMixin
 	
 	/**
 	 * Checks that vertex buffer face size is still 32, then places a dummy
-	 * value in the sixth word of each 32-byte terrain face before vanilla can
+	 * value in the seventh word of each 32-byte terrain face before vanilla can
 	 * write to it.
 	 */
 	@WrapOperation(
@@ -47,12 +47,12 @@ public class SectionBufferBuilderMixin
 				+ ". Review SectionBufferBuilderMixin and ShaderManagerMixin.");
 		
 		long pointer = original.call(buffer, size);
-		MemoryUtil.memPutInt(pointer + 20, OPACITY_DUMMY);
+		MemoryUtil.memPutInt(pointer + 24, OPACITY_DUMMY);
 		return pointer;
 	}
 	
 	/**
-	 * Checks if the dummy value is still there (meaning the sixth word is still
+	 * Checks if the dummy value is still there (meaning the seventh word is still
 	 * unused in vanilla), then replaces it with the alpha value of the face.
 	 */
 	@Inject(
@@ -63,11 +63,11 @@ public class SectionBufferBuilderMixin
 		@Local(argsOnly = true, ordinal = 0) int color,
 		@Local(ordinal = 1) long pointer)
 	{
-		if(MemoryUtil.memGetInt(pointer + 20) != OPACITY_DUMMY)
+		if(MemoryUtil.memGetInt(pointer + 24) != OPACITY_DUMMY)
 			throw new IllegalStateException("Wurst Opacity X-Ray: terrain face"
-				+ " bytes 20-23 are no longer unused. Review"
+				+ " bytes 24-27 are no longer unused. Review"
 				+ " SectionBufferBuilderMixin and ShaderManagerMixin.");
 		
-		MemoryUtil.memPutInt(pointer + 20, ARGB.alpha(color));
+		MemoryUtil.memPutInt(pointer + 24, ARGB.alpha(color));
 	}
 }

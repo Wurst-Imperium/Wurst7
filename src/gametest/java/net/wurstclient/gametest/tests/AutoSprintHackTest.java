@@ -26,7 +26,7 @@ public final class AutoSprintHackTest extends SingleplayerTest
 	protected void runImpl()
 	{
 		logger.info("Testing AutoSprint hack");
-		runCommand("tp @s 1 -60 0");
+		runCommand("tp @s 1 -60.0 0");
 		context.waitFor(mc -> mc.player.getY() == -60);
 		context.runOnClient(mc -> mc.options.fovEffectScale().set(0.0));
 		
@@ -48,7 +48,7 @@ public final class AutoSprintHackTest extends SingleplayerTest
 		// Clean up
 		runWurstCommand("t AutoSprint off");
 		runWurstCommand("setcheckbox AutoSprint omnidirectional_sprint off");
-		runCommand("tp @s 0 -57 0");
+		runCommand("tp @s 0 -57.0 0");
 		context.waitFor(mc -> mc.player.getY() == -57);
 		context.runOnClient(mc -> mc.options.fovEffectScale().set(1.0));
 		clearParticles();

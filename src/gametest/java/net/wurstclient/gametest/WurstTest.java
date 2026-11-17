@@ -96,7 +96,7 @@ public class WurstTest implements FabricClientGameTest
 		context.runOnClient(mc -> mc.options.chunkSectionFadeInTime().set(0.0));
 		
 		runCommand(server, "time set noon");
-		runCommand(server, "tp 0 -57 0");
+		runCommand(server, "tp 0 -57.0 0");
 		BlockTestHelper.setBlocksAndWait(context, spContext, blocks -> {
 			blocks.fill(0, -60, 0, 0, -58, 0, Blocks.SMOOTH_STONE);
 			blocks.fill(-12, -60, 10, 12, -48, 10, Blocks.SMOOTH_STONE);

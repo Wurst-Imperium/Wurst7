@@ -58,7 +58,7 @@ public final class OcclusionCullingTest extends SingleplayerTest
 	
 	private void teleportPlayer(int x, int y, int z)
 	{
-		runCommand("tp @s " + x + " " + y + " " + z + " 0 0");
+		runCommand("tp @s " + x + " " + y + ".0 " + z + " 0 0");
 		context.waitFor(
 			mc -> mc.player.blockPosition().equals(new BlockPos(x, y, z)));
 		connection.waitForChunksRender();

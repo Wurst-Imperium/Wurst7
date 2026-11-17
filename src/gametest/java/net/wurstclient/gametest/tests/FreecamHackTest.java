@@ -145,7 +145,7 @@ public final class FreecamHackTest extends SingleplayerTest
 		// Reset player and remove walkway
 		setBlocksAndWait(
 			blocks -> blocks.fill(0, -58, 1, 0, -58, 2, Blocks.AIR));
-		runCommand("tp @s 0 -57 0 0 0");
+		runCommand("tp @s 0 -57.0 0 0 0");
 		// Restore body rotation - /tp only rotates the head as of 1.21.11
 		context.runOnClient(mc -> mc.player.setYBodyRot(0));
 		

@@ -175,7 +175,7 @@ public class ServerFinderScreen extends Screen
 				working++;
 				String name = "Grief me #" + working;
 				String ip = pinger.getServerIP();
-				addServerToList(name, ip);
+				minecraft.execute(() -> addServerToList(name, ip));
 			}
 			
 			pingers.remove(i);

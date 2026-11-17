@@ -22,7 +22,7 @@ import net.minecraft.resources.Identifier;
 public class ShaderManagerMixin
 {
 	/**
-	 * Checks if terrain.vsh still matches the 26.4-snapshot-8 code, then
+	 * Checks if terrain.vsh still matches the 26.4-snapshot-10 code, then
 	 * modifies it to use the alpha value saved by SectionBufferBuilderMixin
 	 * instead of the hardcoded 1.0f.
 	 *
@@ -40,7 +40,7 @@ public class ShaderManagerMixin
 			return source;
 		
 		String expectedHash =
-			"cbfce26480627d0ecccaa7072c985377610fc0eb45b9c567f6c1a003832cd78d";
+			"ed7a8fc19bf72cb672eac4a1c0c8ab54a15261045e385e73758fc14ab69f6ed4";
 		String actualHash = Hashing.sha256()
 			.hashString(source.replace("\r\n", "\n"), StandardCharsets.UTF_8)
 			.toString();
@@ -51,7 +51,7 @@ public class ShaderManagerMixin
 				+ " before updating the expected shader hash.");
 		
 		return source.replace("return VertexData(position, color, UV0, UV2);",
-			"color.a = float(texelFetch(vertexBuffer, startOffset + 1).g) / 255.0;\n"
+			"color.a = float(texelFetch(vertexBuffer, startOffset + 1).b) / 255.0;\n"
 				+ "    return VertexData(position, color, UV0, UV2);");
 	}
 }
