@@ -52,8 +52,9 @@ public class SectionBufferBuilderMixin
 	}
 	
 	/**
-	 * Checks if the dummy value is still there (meaning the seventh word is still
-	 * unused in vanilla), then replaces it with the alpha value of the face.
+	 * Checks if the dummy value is still there (meaning the seventh word is
+	 * still unused in vanilla), then replaces it with the alpha value of the
+	 * face.
 	 */
 	@Inject(
 		method = "addQuad(Lnet/minecraft/client/resources/model/geometry/BakedQuad;FFFIIJ)V",
