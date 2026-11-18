@@ -37,8 +37,8 @@ import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.MouseAimController;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.Rotation;
 import net.wurstclient.util.RotationUtils;
 import net.wurstclient.util.text.WText;
 
@@ -122,9 +122,8 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 			FilterCrystalsSetting.genericCombat(false),
 			FilterInteractionsSetting.genericCombat(true));
 	
+	private final MouseAimController mouseAim = new MouseAimController();
 	private Entity target;
-	private Rotation curTickRot;
-	private Rotation nextTickRot;
 	
 	public KillauraLegitHack()
 	{
@@ -177,8 +176,7 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		EVENTS.remove(MouseUpdateListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		target = null;
-		curTickRot = null;
-		nextTickRot = null;
+		mouseAim.reset();
 	}
 	
 	@Override
@@ -212,25 +210,11 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	{
 		if(target == null)
 		{
-			nextTickRot = null;
+			mouseAim.reset();
 			return;
 		}
 		
-		curTickRot = nextTickRot != null ? nextTickRot
-			: new Rotation(MC.player.getYRot(), MC.player.getXRot());
-		
-		nextTickRot = curTickRot.slowlyTurnTowards(
-			RotationUtils.getNeededRotations(aimAt.getAimPoint(target)),
-			rotationSpeed.getValueI() / 20F);
-		
-		// Vulcan D/F flag >1.825° yaw changes with unchanged pitch
-		if(Math.abs(nextTickRot.yaw() - curTickRot.yaw()) > 1.825F
-			&& nextTickRot.pitch() == curTickRot.pitch())
-		{
-			float pitchOffset = (float)(RotationUtils.getDegreesPerMouseUnit()
-				* (Math.random() < 0.5 ? -1 : 1));
-			nextTickRot = nextTickRot.add(0, pitchOffset).clampPitch();
-		}
+		mouseAim.tick(aimAt.getAimPoint(target), rotationSpeed.getValueI());
 	}
 	
 	@Override
@@ -256,38 +240,8 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 	@Override
 	public void onMouseUpdate(MouseUpdateEvent event)
 	{
-		if(target == null || MC.player == null || nextTickRot == null)
-			return;
-		
-		Rotation curFrameRot =
-			new Rotation(MC.player.getYRot(), MC.player.getXRot());
-		
-		float partialTicks =
-			MC.getDeltaTracker().getGameTimeDeltaPartialTick(true);
-		Rotation nextFrameRot =
-			Rotation.lerp(partialTicks, curTickRot, nextTickRot);
-		
-		double inputFactor = 1 - ignoreMouseInput.getValue();
-		double inputX = Math.rint(event.getDefaultDeltaX() * inputFactor);
-		double inputY = Math.rint(event.getDefaultDeltaY() * inputFactor);
-		
-		float yawDiff = nextFrameRot.yaw() - curFrameRot.yaw();
-		float pitchDiff = nextFrameRot.pitch() - curFrameRot.pitch();
-		double degPerMouseUnit = RotationUtils.getDegreesPerMouseUnit();
-		double aimX = Math.rint(yawDiff / degPerMouseUnit);
-		double aimY = Math.rint(pitchDiff / degPerMouseUnit);
-		
-		event.setDeltaX(inputX + aimX);
-		event.setDeltaY(inputY + aimY);
-		
-		if(!MC.mouseHandler.isMouseGrabbed())
-			return;
-		
-		// Carry manual movement into the aim path so later frames don't undo it
-		float inputYaw = (float)(inputX * degPerMouseUnit);
-		float inputPitch = (float)(inputY * degPerMouseUnit);
-		curTickRot = curTickRot.add(inputYaw, inputPitch).clampPitch();
-		nextTickRot = nextTickRot.add(inputYaw, inputPitch).clampPitch();
+		if(target != null)
+			mouseAim.applyTo(event, ignoreMouseInput.getValue());
 	}
 	
 	@Override
