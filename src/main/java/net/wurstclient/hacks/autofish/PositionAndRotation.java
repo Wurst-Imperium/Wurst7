@@ -22,12 +22,12 @@ public record PositionAndRotation(Vec3 pos, Rotation rotation)
 	public boolean isNearlyIdenticalTo(PositionAndRotation other)
 	{
 		return pos.distanceTo(other.pos) < 0.5
-			&& rotation.getAngleTo(other.rotation) < 5;
+			&& rotation.getYawPitchDistanceTo(other.rotation) < 5;
 	}
 	
 	public double differenceTo(PositionAndRotation other)
 	{
 		return pos.distanceTo(other.pos)
-			+ rotation.getAngleTo(other.rotation) / 100;
+			+ rotation.getYawPitchDistanceTo(other.rotation) / 100;
 	}
 }

@@ -7,21 +7,19 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.Comparator;
 import java.util.Random;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackPrioritySetting;
+import net.wurstclient.settings.AttackPrioritySetting.AttackPriority;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
-import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -42,12 +40,9 @@ public final class TpAuraHack extends Hack implements UpdateListener
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
 	
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which entity will be attacked first.\n"
-			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
-		Priority.values(), Priority.ANGLE);
+	private final AttackPrioritySetting priority =
+		AttackPrioritySetting.withoutAngleDistOption(
+			AttackPrioritySetting.genericDescription(), AttackPriority.ANGLE);
 	
 	private final SwingHandSetting swingHand = new SwingHandSetting(
 		SwingHandSetting.genericCombatDescription(this), SwingHand.CLIENT);
@@ -109,15 +104,15 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		LocalPlayer player = MC.player;
 		
 		// set entity
-		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
-		double rangeSq = Math.pow(range.getValue(), 2);
-		stream =
-			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);
+		double rangeSq = range.getValueSq();
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
+			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);
 		
 		stream = entityFilters.applyTo(stream);
 		
-		Entity entity =
-			stream.min(priority.getSelected().comparator).orElse(null);
+		Entity entity = stream
+			.min(priority.getComparator(e -> e.getBoundingBox().getCenter()))
+			.orElse(null);
 		if(entity == null)
 			return;
 		
@@ -134,32 +129,5 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		MC.gameMode.attack(player, entity);
 		swingHand.swing(InteractionHand.MAIN_HAND);
 		speed.resetTimer();
-	}
-	
-	private enum Priority
-	{
-		DISTANCE("Distance", EntityUtils::distanceToHitboxSq),
-		
-		ANGLE("Angle",
-			e -> RotationUtils
-				.getAngleToLookVec(e.getBoundingBox().getCenter())),
-		
-		HEALTH("Health", e -> e instanceof LivingEntity
-			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
-		
-		private final String name;
-		private final Comparator<Entity> comparator;
-		
-		private Priority(String name, ToDoubleFunction<Entity> keyExtractor)
-		{
-			this.name = name;
-			comparator = Comparator.comparingDouble(keyExtractor);
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }

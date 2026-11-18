@@ -170,11 +170,9 @@ public final class BonemealAuraHack extends Hack implements HandleInputListener
 			.getAllInBoxStream(eyesBlock, range.getValueCeil())
 			.filter(this::isCorrectBlock)
 			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
-			.filter(params -> params.distanceSq() <= rangeSq);
+			.filter(params -> params.distanceSq() <= rangeSq)
+			.filter(params -> !checkLOS.isChecked() || params.lineOfSight());
 		
-		if(checkLOS.isChecked())
-			stream = stream.filter(BlockBreakingParams::lineOfSight);
-			
 		// As plants are bone-mealed, they will grow larger and prevent line of
 		// sight to other plants behind them. That's why we need to bone-meal
 		// the farthest plants first.
