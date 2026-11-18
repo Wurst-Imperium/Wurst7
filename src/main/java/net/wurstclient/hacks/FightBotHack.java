@@ -238,8 +238,9 @@ public final class FightBotHack extends Hack
 		@Override
 		protected boolean checkDone()
 		{
-			return done = entity.distanceToSqr(Vec3.atCenterOf(current)) <= Math
-				.pow(distance.getValue(), 2);
+			return done =
+				entity.distanceToSqr(Vec3.atCenterOf(current)) <= distance
+					.getValueSq();
 		}
 		
 		@Override

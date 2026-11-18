@@ -8,8 +8,6 @@
 package net.wurstclient.hacks;
 
 import java.awt.Color;
-import java.util.Comparator;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -18,7 +16,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
@@ -30,8 +27,9 @@ import net.wurstclient.events.GUIRenderListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AttackPrioritySetting;
+import net.wurstclient.settings.AttackPrioritySetting.AttackPriority;
 import net.wurstclient.settings.ColorSetting;
-import net.wurstclient.settings.EnumSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
@@ -43,13 +41,8 @@ import net.wurstclient.util.RotationUtils;
 public final class BowAimbotHack extends Hack
 	implements UpdateListener, RenderListener, GUIRenderListener
 {
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which entity will be attacked first.\n"
-			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
-			+ "\u00a7lAngle+Dist\u00a7r - A hybrid of Angle and Distance. This is usually the best at figuring out what you want to aim at.\n"
-			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
-		Priority.values(), Priority.ANGLE_DIST);
+	private final AttackPrioritySetting priority = new AttackPrioritySetting(
+		AttackPrioritySetting.genericDescription(), AttackPriority.ANGLE_DIST);
 	
 	private final SliderSetting predictMovement = new SliderSetting(
 		"Predict movement",
@@ -180,7 +173,9 @@ public final class BowAimbotHack extends Hack
 		Stream<Entity> stream = s.filter(EntityUtils.IS_ATTACKABLE_RANGED);
 		stream = entityFilters.applyTo(stream);
 		
-		return stream.min(priority.getSelected().comparator).orElse(null);
+		return stream
+			.min(priority.getComparator(e -> e.getBoundingBox().getCenter()))
+			.orElse(null);
 	}
 	
 	@Override
@@ -224,38 +219,5 @@ public final class BowAimbotHack extends Hack
 		
 		// text
 		extractor.text(tr, message, msgX1 + 2, msgY1 + 1, 0xFFFFFFFF, false);
-	}
-	
-	private enum Priority
-	{
-		DISTANCE("Distance", EntityUtils::distanceToHitboxSq),
-		
-		ANGLE("Angle",
-			e -> RotationUtils
-				.getAngleToLookVec(e.getBoundingBox().getCenter())),
-		
-		ANGLE_DIST("Angle+Dist",
-			e -> Math
-				.pow(RotationUtils
-					.getAngleToLookVec(e.getBoundingBox().getCenter()), 2)
-				+ EntityUtils.distanceToHitboxSq(e)),
-		
-		HEALTH("Health", e -> e instanceof LivingEntity
-			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
-		
-		private final String name;
-		private final Comparator<Entity> comparator;
-		
-		private Priority(String name, ToDoubleFunction<Entity> keyExtractor)
-		{
-			this.name = name;
-			comparator = Comparator.comparingDouble(keyExtractor);
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }

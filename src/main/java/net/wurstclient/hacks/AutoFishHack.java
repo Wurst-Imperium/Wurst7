@@ -117,6 +117,7 @@ public final class AutoFishHack extends Hack
 		
 		WURST.getHax().antiAfkHack.setEnabled(false);
 		WURST.getHax().aimAssistHack.setEnabled(false);
+		WURST.getHax().killauraLegitHack.setEnabled(false);
 		
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketInputListener.class, this);
