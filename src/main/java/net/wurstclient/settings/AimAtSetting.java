@@ -32,9 +32,10 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 		this(hackDescription(hack), selected);
 	}
 	
-	public AimAtSetting(Hack hack)
+	public static WText genericDescription(Hack hack)
 	{
-		this(hack, AimAt.AUTO);
+		return WText.translated("description.wurst.setting.generic.aim_at",
+			hack.getName());
 	}
 	
 	private static WText hackDescription(Hack hack)
@@ -59,9 +60,18 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 		return text;
 	}
 	
-	private static Vec3 aimAtClosestPoint(Entity e)
+	private static AABB getInsetBox(Entity e)
 	{
 		AABB box = e.getBoundingBox();
+		
+		return box.deflate(Math.min(0.05, box.getXsize() / 2),
+			Math.min(0.05, box.getYsize() / 2),
+			Math.min(0.05, box.getZsize() / 2));
+	}
+	
+	private static Vec3 aimAtClosestPoint(Entity e)
+	{
+		AABB box = getInsetBox(e);
 		Vec3 eyes = WurstClient.MC.player.getEyePosition();
 		
 		if(box.contains(eyes))
@@ -87,7 +97,7 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 	
 	private static Vec3 aimAtFeet(Entity e)
 	{
-		return e.position().add(0, 0.001, 0);
+		return getInsetBox(e).getBottomCenter();
 	}
 	
 	public enum AimAt
