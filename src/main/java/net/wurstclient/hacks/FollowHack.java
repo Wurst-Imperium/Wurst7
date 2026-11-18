@@ -242,7 +242,7 @@ public final class FollowHack extends Hack
 		protected boolean checkDone()
 		{
 			Vec3 center = Vec3.atCenterOf(current);
-			double distanceSq = Math.pow(distance.getValue(), 2);
+			double distanceSq = distance.getValueSq();
 			return done = entity.distanceToSqr(center) <= distanceSq;
 		}
 		

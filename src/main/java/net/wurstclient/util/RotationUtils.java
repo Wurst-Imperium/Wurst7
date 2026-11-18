@@ -57,6 +57,14 @@ public enum RotationUtils
 		return current.getAngleTo(needed);
 	}
 	
+	public static double getYawPitchDistanceToLookVec(Vec3 vec)
+	{
+		LocalPlayer player = MC.player;
+		Rotation current = new Rotation(player.getYRot(), player.getXRot());
+		Rotation needed = getNeededRotations(vec);
+		return current.getYawPitchDistanceTo(needed);
+	}
+	
 	public static float getHorizontalAngleToLookVec(Vec3 vec)
 	{
 		float currentYaw = Mth.wrapDegrees(MC.player.getYRot());
@@ -64,42 +72,41 @@ public enum RotationUtils
 		return Mth.wrapDegrees(currentYaw - neededYaw);
 	}
 	
-	/**
-	 * Returns true if the player is already facing within 1 degree of the
-	 * specified rotation.
-	 */
-	public static boolean isAlreadyFacing(Rotation rotation)
-	{
-		return getAngleToLastReportedLookVec(rotation) <= 1.0;
-	}
-	
 	public static double getAngleToLastReportedLookVec(Vec3 vec)
 	{
 		Rotation needed = getNeededRotations(vec);
-		return getAngleToLastReportedLookVec(needed);
+		return getLastReportedRotation().getAngleTo(needed);
 	}
 	
-	public static double getAngleToLastReportedLookVec(Rotation rotation)
+	public static Rotation getLastReportedRotation()
 	{
 		LocalPlayer player = MC.player;
 		
 		// lastYaw/Pitch do not get updated when the player is in a vehicle
-		Rotation lastReported = player.isPassenger()
+		return player.isPassenger()
 			? new Rotation(player.getYRot(), player.getXRot())
 			: new Rotation(player.yRotLast, player.xRotLast);
-		
-		return lastReported.getAngleTo(rotation);
+	}
+	
+	public static double getDegreesPerMouseUnit()
+	{
+		double sensitivity = MC.options.sensitivity().get() * 0.6F + 0.2F;
+		return sensitivity * sensitivity * sensitivity * 8 * 0.15F;
 	}
 	
 	/**
-	 * Returns true if the player is facing anywhere within the given box
-	 * and is no further away than the given range.
+	 * Returns true if the last sent rotation has the player already facing the
+	 * given box. Falls back to current-tick rotation while riding.
+	 *
+	 * Even though vanilla clients can send an attack before the rotation that
+	 * makes it possible, older anti-cheats like NoCheat+ flag that case.
 	 */
-	public static boolean isFacingBox(AABB box, double range)
+	public static boolean isFacingBoxServerSide(AABB box, double range)
 	{
 		Vec3 start = MC.player.getEyePosition();
-		Vec3 end = start.add(getServerLookVec().scale(range));
-		return box.clip(start, end).isPresent();
+		Vec3 end =
+			start.add(getLastReportedRotation().toLookVec().scale(range));
+		return box.contains(start) || box.clip(start, end).isPresent();
 	}
 	
 	/**
@@ -109,28 +116,7 @@ public enum RotationUtils
 	 */
 	public static Rotation slowlyTurnTowards(Rotation end, float maxChange)
 	{
-		LocalPlayer player = MC.player;
-		
-		float startYaw =
-			player.isPassenger() ? player.getYRot() : player.yRotLast;
-		float startPitch =
-			player.isPassenger() ? player.getXRot() : player.xRotLast;
-		float endYaw = end.yaw();
-		float endPitch = end.pitch();
-		
-		float yawChange = Math.abs(Mth.wrapDegrees(endYaw - startYaw));
-		float pitchChange = Math.abs(Mth.wrapDegrees(endPitch - startPitch));
-		
-		float maxChangeYaw = pitchChange == 0 ? maxChange
-			: Math.min(maxChange, maxChange * yawChange / pitchChange);
-		float maxChangePitch = yawChange == 0 ? maxChange
-			: Math.min(maxChange, maxChange * pitchChange / yawChange);
-		
-		float nextYaw = limitAngleChange(startYaw, endYaw, maxChangeYaw);
-		float nextPitch =
-			limitAngleChange(startPitch, endPitch, maxChangePitch);
-		
-		return new Rotation(nextYaw, nextPitch);
+		return getLastReportedRotation().slowlyTurnTowards(end, maxChange);
 	}
 	
 	/**

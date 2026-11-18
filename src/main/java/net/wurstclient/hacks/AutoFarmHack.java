@@ -292,12 +292,9 @@ public final class AutoFarmHack extends Hack
 		double rangeSq = range.getValueSq();
 		Stream<BlockBreakingParams> stream = blocksToMine.stream()
 			.map(BlockBreaker::getBlockBreakingParams).filter(Objects::nonNull)
-			.filter(params -> params.distanceSq() <= rangeSq);
-		
-		if(checkLOS.isChecked())
-			stream = stream.filter(BlockBreakingParams::lineOfSight);
-		
-		stream = stream.sorted(BlockBreaker.comparingParams());
+			.filter(params -> params.distanceSq() <= rangeSq)
+			.filter(params -> !checkLOS.isChecked() || params.lineOfSight())
+			.sorted(BlockBreaker.comparingParams());
 		
 		// Break all blocks in creative mode
 		if(MC.player.getAbilities().instabuild
