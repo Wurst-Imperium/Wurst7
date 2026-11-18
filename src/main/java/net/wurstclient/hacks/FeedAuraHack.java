@@ -31,6 +31,8 @@ import net.wurstclient.events.HandleInputListener;
 import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AimAtSetting;
+import net.wurstclient.settings.AimAtSetting.AimAt;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -47,6 +49,9 @@ public final class FeedAuraHack extends Hack
 		"Determines how far FeedAura will reach to feed animals.\n"
 			+ "Anything that is further away than the specified value will not be fed.",
 		5, 1, 10, 0.05, ValueDisplay.DECIMAL);
+	
+	private final AimAtSetting aimAt =
+		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.AUTO);
 	
 	private final FilterBabiesSetting filterBabies =
 		new FilterBabiesSetting(this, true);
@@ -68,6 +73,7 @@ public final class FeedAuraHack extends Hack
 		super("FeedAura");
 		setCategory(Category.OTHER);
 		addSetting(range);
+		addSetting(aimAt);
 		addSetting(filterBabies);
 		addSetting(filterUntamed);
 		addSetting(filterHorses);
@@ -116,7 +122,7 @@ public final class FeedAuraHack extends Hack
 		clickTarget = targets.get(random.nextInt(targets.size()));
 		renderTarget = clickTarget;
 		WURST.getRotationFaker()
-			.faceVectorPacket(clickTarget.getBoundingBox().getCenter());
+			.faceVectorPacket(aimAt.getAimPoint(clickTarget));
 	}
 	
 	private boolean canFeed(LivingEntity entity, ItemStack stack)
@@ -148,7 +154,8 @@ public final class FeedAuraHack extends Hack
 		if(gm.isDestroying() || player.isHandsBusy())
 			return;
 		
-		EntityHitResult hitResult = EntityUtils.createHitResult(clickTarget);
+		EntityHitResult hitResult = EntityUtils.createHitResult(clickTarget,
+			aimAt.getAimPoint(clickTarget));
 		InteractionHand hand = InteractionHand.MAIN_HAND;
 		InteractionResult result =
 			gm.interact(player, clickTarget, hitResult, hand);

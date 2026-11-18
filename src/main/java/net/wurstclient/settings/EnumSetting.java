@@ -7,6 +7,7 @@
  */
 package net.wurstclient.settings;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 
@@ -90,7 +91,7 @@ public class EnumSetting<T extends Enum<T>> extends Setting
 	
 	public void selectNext()
 	{
-		int next = selected.ordinal() + 1;
+		int next = Arrays.asList(values).indexOf(selected) + 1;
 		if(next >= values.length)
 			next = 0;
 		
@@ -99,7 +100,7 @@ public class EnumSetting<T extends Enum<T>> extends Setting
 	
 	public void selectPrev()
 	{
-		int prev = selected.ordinal() - 1;
+		int prev = Arrays.asList(values).indexOf(selected) - 1;
 		if(prev < 0)
 			prev = values.length - 1;
 		

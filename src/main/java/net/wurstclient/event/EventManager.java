@@ -50,23 +50,19 @@ public final class EventManager
 		try
 		{
 			Class<L> type = event.getListenerType();
-			@SuppressWarnings("unchecked")
-			ArrayList<L> listeners = (ArrayList<L>)listenerMap.get(type);
-			
-			if(listeners == null || listeners.isEmpty())
-				return;
+			ArrayList<L> snapshot;
+			synchronized(listenerMap)
+			{
+				@SuppressWarnings("unchecked")
+				ArrayList<L> listeners = (ArrayList<L>)listenerMap.get(type);
 				
-			// Creating a copy of the list to avoid concurrent modification
-			// issues.
-			ArrayList<L> listeners2 = new ArrayList<>(listeners);
+				if(listeners == null || listeners.isEmpty())
+					return;
+				
+				snapshot = new ArrayList<>(listeners);
+			}
 			
-			// remove() sets an element to null before removing it. When one
-			// thread calls remove() while another calls fire(), it is possible
-			// for this list to contain null elements, which need to be filtered
-			// out.
-			listeners2.removeIf(Objects::isNull);
-			
-			event.fire(listeners2);
+			event.fire(snapshot);
 			
 		}catch(Throwable e)
 		{
@@ -83,19 +79,25 @@ public final class EventManager
 	
 	public <L extends Listener> void add(Class<L> type, L listener)
 	{
+		Objects.requireNonNull(listener);
+		
 		try
 		{
-			@SuppressWarnings("unchecked")
-			ArrayList<L> listeners = (ArrayList<L>)listenerMap.get(type);
-			
-			if(listeners == null)
+			synchronized(listenerMap)
 			{
-				listeners = new ArrayList<>(Arrays.asList(listener));
-				listenerMap.put(type, listeners);
-				return;
+				@SuppressWarnings("unchecked")
+				ArrayList<L> listeners = (ArrayList<L>)listenerMap.get(type);
+				
+				if(listeners == null)
+				{
+					listeners = new ArrayList<>(Arrays.asList(listener));
+					listenerMap.put(type, listeners);
+					return;
+				}
+				
+				if(!listeners.contains(listener))
+					listeners.add(listener);
 			}
-			
-			listeners.add(listener);
 			
 		}catch(Throwable e)
 		{
@@ -117,11 +119,14 @@ public final class EventManager
 	{
 		try
 		{
-			@SuppressWarnings("unchecked")
-			ArrayList<L> listeners = (ArrayList<L>)listenerMap.get(type);
-			
-			if(listeners != null)
-				listeners.remove(listener);
+			synchronized(listenerMap)
+			{
+				@SuppressWarnings("unchecked")
+				ArrayList<L> listeners = (ArrayList<L>)listenerMap.get(type);
+				
+				if(listeners != null)
+					listeners.remove(listener);
+			}
 			
 		}catch(Throwable e)
 		{

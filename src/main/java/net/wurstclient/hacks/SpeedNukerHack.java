@@ -7,9 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.List;
 import java.util.stream.Stream;
 
 import net.minecraft.core.BlockPos;
@@ -94,16 +93,14 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		Stream<BlockPos> stream =
 			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 				.filter(BlockUtils::canBeClicked)
-				.filter(commonSettings::shouldBreakBlock);
+				.filter(commonSettings::shouldBreakBlock)
+				.filter(pos -> !commonSettings.isSphereShape()
+					|| pos.distToCenterSqr(eyesVec) <= rangeSq);
 		
-		if(commonSettings.isSphereShape())
-			stream =
-				stream.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq);
-		
-		ArrayList<BlockPos> blocks = stream
+		List<BlockPos> blocks = stream
 			.sorted(
 				Comparator.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
-			.collect(Collectors.toCollection(ArrayList::new));
+			.toList();
 		
 		if(blocks.isEmpty())
 			return;
