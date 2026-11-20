@@ -80,7 +80,6 @@ public final class RemoteViewHack extends Hack implements UpdateListener
 		}
 		
 		WURST.getHax().freecamHack.setEnabled(false);
-		WURST.getHax().lsdHack.setEnabled(false);
 		
 		MC.setCameraEntity(entity);
 		ChatUtils.message("Now viewing " + entity.getName().getString() + ".");
