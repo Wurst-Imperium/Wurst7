@@ -7,10 +7,7 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.List;
-
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.player.Player;
 import net.wurstclient.Category;
 import net.wurstclient.hack.DontSaveState;
 import net.wurstclient.hack.Hack;
@@ -25,28 +22,5 @@ public final class LsdHack extends Hack
 	{
 		super("LSD");
 		setCategory(Category.FUN);
-	}
-	
-	@Override
-	protected void onEnable()
-	{
-		WURST.getHax().remoteViewHack.setEnabled(false);
-		
-		if(!(MC.getCameraEntity() instanceof Player) || MC.player == null)
-		{
-			setEnabled(false);
-			return;
-		}
-		
-		List<Identifier> activePostEffects = MC.player.getActivePostEffects();
-		if(!activePostEffects.contains(LSD_POST_EFFECT))
-			activePostEffects.add(LSD_POST_EFFECT);
-	}
-	
-	@Override
-	protected void onDisable()
-	{
-		if(MC.player != null)
-			MC.player.getActivePostEffects().remove(LSD_POST_EFFECT);
 	}
 }
