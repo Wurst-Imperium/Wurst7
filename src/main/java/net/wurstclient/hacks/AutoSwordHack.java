@@ -7,14 +7,19 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.OptionalDouble;
+import java.util.function.Predicate;
+
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MaceItem;
+import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.phys.EntityHitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -30,19 +35,19 @@ import net.wurstclient.util.ItemUtils;
 @SearchTags({"auto sword"})
 public final class AutoSwordHack extends Hack implements UpdateListener
 {
-	private final EnumSetting<Priority> priority =
-		new EnumSetting<>("Priority", Priority.values(), Priority.SPEED);
+	private final EnumSetting<WeaponType> preferredType = new EnumSetting<>(
+		"Preferred type", "description.wurst.setting.autosword.preferred_type",
+		WeaponType.values(), WeaponType.ANY);
+	
+	private final SliderSetting maxDpsLoss = new SliderSetting("Max DPS loss",
+		"description.wurst.setting.autosword.max_dps_loss", 0.2, 0, 1, 0.01,
+		ValueDisplay.PERCENTAGE);
 	
 	private final CheckboxSetting switchBack = new CheckboxSetting(
-		"Switch back", "Switches back to the previously selected slot after"
-			+ " \u00a7lRelease time\u00a7r has passed.",
-		true);
+		"Switch back", "description.wurst.setting.autosword.switch_back", true);
 	
 	private final SliderSetting releaseTime = new SliderSetting("Release time",
-		"Time until AutoSword will switch back from the weapon to the"
-			+ " previously selected slot.\n\n"
-			+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
-		10, 1, 200, 1,
+		"description.wurst.setting.autosword.release_time", 10, 1, 200, 1,
 		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 	
 	private int oldSlot;
@@ -53,7 +58,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		super("AutoSword");
 		setCategory(Category.COMBAT);
 		
-		addSetting(priority);
+		addSetting(preferredType);
+		addSetting(maxDpsLoss);
 		addSetting(switchBack);
 		addSetting(releaseTime);
 	}
@@ -96,78 +102,81 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 	
 	public void setSlot(Entity entity)
 	{
-		// check if active
 		if(!isEnabled())
 			return;
 		
-		// wait for AutoEat
 		if(WURST.getHax().autoEatHack.isEating())
 			return;
 		
-		// find best weapon
-		float bestValue = Integer.MIN_VALUE;
-		int bestSlot = -1;
-		for(int i = 0; i < 9; i++)
-		{
-			// skip empty slots
-			if(MC.player.getInventory().getItem(i).isEmpty())
-				continue;
-			
-			// get weapon value
-			ItemStack stack = MC.player.getInventory().getItem(i);
-			float value = getValue(stack, entity);
-			
-			// compare with previous best weapon
-			if(value > bestValue)
-			{
-				bestValue = value;
-				bestSlot = i;
-			}
-		}
-		
-		// check if any weapon was found
+		Inventory inventory = MC.player.getInventory();
+		int bestSlot = getBestSlot(entity);
 		if(bestSlot == -1)
 			return;
 		
-		// save old slot
 		if(oldSlot == -1)
-			oldSlot = MC.player.getInventory().getSelectedSlot();
+			oldSlot = inventory.getSelectedSlot();
 		
-		// set slot
-		MC.player.getInventory().setSelectedSlot(bestSlot);
-		
-		// start timer
+		inventory.setSelectedSlot(bestSlot);
 		timer = releaseTime.getValueI();
 	}
 	
-	private float getValue(ItemStack stack, Entity entity)
+	private int getBestSlot(Entity entity)
 	{
-		Item item = stack.getItem();
-		if(stack.get(DataComponents.TOOL) == null
-			&& stack.get(DataComponents.WEAPON) == null)
-			return Integer.MIN_VALUE;
+		Inventory inventory = MC.player.getInventory();
+		WeaponType type = preferredType.getSelected();
+		int bestSlot = -1;
+		double bestDps = -1;
+		int preferredSlot = -1;
+		double preferredDps = -1;
 		
-		switch(priority.getSelected())
+		// Start with the held slot so ties don't cause an unnecessary switch
+		int selected = inventory.getSelectedSlot();
+		for(int i = 0; i < Inventory.SELECTION_SIZE; i++)
 		{
-			case SPEED:
-			return (float)ItemUtils.calculateModifiedAttribute(stack,
-				Attributes.ATTACK_SPEED, EquipmentSlot.MAINHAND)
-				.orElse(Integer.MIN_VALUE);
-			
-			case DAMAGE:
-			float dmg = (float)ItemUtils.calculateModifiedAttribute(stack,
-				Attributes.ATTACK_DAMAGE, EquipmentSlot.MAINHAND)
-				.orElse(Integer.MIN_VALUE);
-			
-			// Check for mace, get bonus damage from fall
-			if(item instanceof MaceItem mace)
-				dmg += mace.getAttackDamageBonus(entity, dmg,
-					entity.damageSources().playerAttack(MC.player));
-			
-			return dmg;
+			int slot = (selected + i) % Inventory.SELECTION_SIZE;
+			ItemStack stack = inventory.getItem(slot);
+			double dps = getDps(stack, entity);
+			if(dps > bestDps)
+			{
+				bestSlot = slot;
+				bestDps = dps;
+			}
+			if(dps > preferredDps && type.prefers.test(stack))
+			{
+				preferredSlot = slot;
+				preferredDps = dps;
+			}
 		}
 		
-		return Integer.MIN_VALUE;
+		if(preferredSlot != -1
+			&& preferredDps >= bestDps * (1 - maxDpsLoss.getValue()))
+			return preferredSlot;
+		
+		return bestSlot;
+	}
+	
+	private double getDps(ItemStack stack, Entity entity)
+	{
+		if(stack.isEmpty() || !stack.has(DataComponents.TOOL)
+			&& !stack.has(DataComponents.WEAPON))
+			return -1;
+		
+		OptionalDouble attackDamage = ItemUtils.calculateModifiedAttribute(
+			stack, Attributes.ATTACK_DAMAGE, EquipmentSlot.MAINHAND);
+		OptionalDouble attackSpeed = ItemUtils.calculateModifiedAttribute(stack,
+			Attributes.ATTACK_SPEED, EquipmentSlot.MAINHAND);
+		if(attackDamage.isEmpty() && attackSpeed.isEmpty())
+			return -1;
+		
+		double damage = attackDamage.orElseGet(
+			() -> MC.player.getAttributeBaseValue(Attributes.ATTACK_DAMAGE));
+		double speed = attackSpeed.orElseGet(
+			() -> MC.player.getAttributeBaseValue(Attributes.ATTACK_SPEED));
+		if(stack.getItem() instanceof MaceItem mace)
+			damage += mace.getAttackDamageBonus(entity, (float)damage,
+				entity.damageSources().playerAttack(MC.player));
+		
+		return damage * speed;
 	}
 	
 	private void resetSlot()
@@ -185,16 +194,25 @@ public final class AutoSwordHack extends Hack implements UpdateListener
 		}
 	}
 	
-	private enum Priority
+	private enum WeaponType
 	{
-		SPEED("Speed (swords)"),
-		DAMAGE("Damage (axes)");
+		ANY("Any", stack -> false),
+		SWORD("Sword", stack -> stack.is(ItemTags.SWORDS)),
+		AXE("Axe", stack -> stack.is(ItemTags.AXES)),
+		SPEAR("Spear", stack -> stack.is(ItemTags.SPEARS)),
+		TRIDENT("Trident", stack -> stack.getItem() instanceof TridentItem),
+		MACE("Mace", stack -> stack.getItem() instanceof MaceItem),
+		PICKAXE("Pickaxe", stack -> stack.is(ItemTags.PICKAXES)),
+		SHOVEL("Shovel", stack -> stack.is(ItemTags.SHOVELS)),
+		HOE("Hoe", stack -> stack.is(ItemTags.HOES));
 		
 		private final String name;
+		private final Predicate<ItemStack> prefers;
 		
-		private Priority(String name)
+		private WeaponType(String name, Predicate<ItemStack> prefers)
 		{
 			this.name = name;
+			this.prefers = prefers;
 		}
 		
 		@Override
