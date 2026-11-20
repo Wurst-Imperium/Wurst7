@@ -42,6 +42,14 @@ public record Rotation(float yaw, float pitch)
 	
 	public double getAngleTo(Rotation other)
 	{
+		Vec3 lookVec = toLookVec();
+		Vec3 otherLookVec = other.toLookVec();
+		return Math.toDegrees(Math.atan2(lookVec.cross(otherLookVec).length(),
+			lookVec.dot(otherLookVec)));
+	}
+	
+	public double getYawPitchDistanceTo(Rotation other)
+	{
 		float yaw1 = Mth.wrapDegrees(yaw);
 		float yaw2 = Mth.wrapDegrees(other.yaw);
 		float diffYaw = Mth.wrapDegrees(yaw1 - yaw2);
@@ -51,6 +59,24 @@ public record Rotation(float yaw, float pitch)
 		float diffPitch = Mth.wrapDegrees(pitch1 - pitch2);
 		
 		return Math.sqrt(diffYaw * diffYaw + diffPitch * diffPitch);
+	}
+	
+	public Rotation slowlyTurnTowards(Rotation end, float maxChange)
+	{
+		float yawChange = Math.abs(Mth.wrapDegrees(end.yaw - yaw));
+		float pitchChange = Math.abs(Mth.wrapDegrees(end.pitch - pitch));
+		
+		float maxChangeYaw = pitchChange == 0 ? maxChange
+			: Math.min(maxChange, maxChange * yawChange / pitchChange);
+		float maxChangePitch = yawChange == 0 ? maxChange
+			: Math.min(maxChange, maxChange * pitchChange / yawChange);
+		
+		float nextYaw =
+			RotationUtils.limitAngleChange(yaw, end.yaw, maxChangeYaw);
+		float nextPitch =
+			RotationUtils.limitAngleChange(pitch, end.pitch, maxChangePitch);
+		
+		return new Rotation(nextYaw, nextPitch);
 	}
 	
 	public Rotation withYaw(float yaw)
@@ -63,43 +89,57 @@ public record Rotation(float yaw, float pitch)
 		return new Rotation(yaw, pitch);
 	}
 	
+	public Rotation add(float yawOffset, float pitchOffset)
+	{
+		return new Rotation(yaw + yawOffset, pitch + pitchOffset);
+	}
+	
+	public Rotation clampPitch()
+	{
+		return withPitch(Math.clamp(pitch, -90F, 90F));
+	}
+	
 	public Vec3 toLookVec()
 	{
-		float radPerDeg = Mth.DEG_TO_RAD;
-		float pi = Mth.PI;
+		double yawRad = Math.toRadians(Mth.wrapDegrees(yaw));
+		double cosYaw = Math.cos(yawRad);
+		double sinYaw = Math.sin(yawRad);
 		
-		float adjustedYaw = -Mth.wrapDegrees(yaw) * radPerDeg - pi;
-		float cosYaw = Mth.cos(adjustedYaw);
-		float sinYaw = Mth.sin(adjustedYaw);
+		double pitchRad = Math.toRadians(Mth.wrapDegrees(pitch));
+		double cosPitch = Math.cos(pitchRad);
+		double sinPitch = Math.sin(pitchRad);
 		
-		float adjustedPitch = -Mth.wrapDegrees(pitch) * radPerDeg;
-		float nCosPitch = -Mth.cos(adjustedPitch);
-		float sinPitch = Mth.sin(adjustedPitch);
-		
-		return new Vec3(sinYaw * nCosPitch, sinPitch, cosYaw * nCosPitch);
+		return new Vec3(-sinYaw * cosPitch, -sinPitch, cosYaw * cosPitch);
 	}
 	
 	public Quaternionf toQuaternion()
 	{
-		float radPerDeg = Mth.DEG_TO_RAD;
-		float yawRad = -Mth.wrapDegrees(yaw) * radPerDeg;
-		float pitchRad = Mth.wrapDegrees(pitch) * radPerDeg;
+		double yawRad = -Math.toRadians(Mth.wrapDegrees(yaw));
+		double pitchRad = Math.toRadians(Mth.wrapDegrees(pitch));
 		
-		float sinYaw = Mth.sin(yawRad / 2);
-		float cosYaw = Mth.cos(yawRad / 2);
-		float sinPitch = Mth.sin(pitchRad / 2);
-		float cosPitch = Mth.cos(pitchRad / 2);
+		double sinYaw = Math.sin(yawRad / 2);
+		double cosYaw = Math.cos(yawRad / 2);
+		double sinPitch = Math.sin(pitchRad / 2);
+		double cosPitch = Math.cos(pitchRad / 2);
 		
-		float x = sinPitch * cosYaw;
-		float y = cosPitch * sinYaw;
-		float z = -sinPitch * sinYaw;
-		float w = cosPitch * cosYaw;
+		double x = sinPitch * cosYaw;
+		double y = cosPitch * sinYaw;
+		double z = -sinPitch * sinYaw;
+		double w = cosPitch * cosYaw;
 		
-		return new Quaternionf(x, y, z, w);
+		return new Quaternionf((float)x, (float)y, (float)z, (float)w);
 	}
 	
 	public static Rotation wrapped(float yaw, float pitch)
 	{
 		return new Rotation(Mth.wrapDegrees(yaw), Mth.wrapDegrees(pitch));
+	}
+	
+	public static Rotation lerp(float partialTicks, Rotation start,
+		Rotation end)
+	{
+		float yaw = Mth.lerp(partialTicks, start.yaw, end.yaw);
+		float pitch = Mth.lerp(partialTicks, start.pitch, end.pitch);
+		return new Rotation(yaw, pitch);
 	}
 }

@@ -24,6 +24,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -109,8 +110,8 @@ public final class AutoToolHack extends Hack
 		if(prevSelectedSlot == -1 || MC.gameMode.isDestroying())
 			return;
 		
-		HitResult hitResult = MC.hitResult;
-		if(hitResult != null && hitResult.getType() == HitResult.Type.BLOCK)
+		if(MC.hitResult instanceof BlockHitResult hit
+			&& hit.getType() == HitResult.Type.BLOCK)
 			return;
 		
 		if(switchBack.isChecked())

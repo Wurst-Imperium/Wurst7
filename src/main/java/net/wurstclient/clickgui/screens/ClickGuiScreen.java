@@ -54,17 +54,18 @@ public final class ClickGuiScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+	public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks)
 	{
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(extractor, mouseX, mouseY,
+				partialTicks);
 		
-		gui.render(context, mouseX, mouseY, partialTicks);
+		gui.render(extractor, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public void extractBackground(GuiGraphicsExtractor context, int mouseX,
+	public void extractBackground(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float deltaTicks)
 	{
 		// Don't blur

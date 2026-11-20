@@ -204,7 +204,7 @@ public final class FreecamHack extends Hack
 	
 	private double getActualVerticalSpeed()
 	{
-		return Mth.clamp(horizontalSpeed.getValue() * verticalSpeed.getValue(),
+		return Math.clamp(horizontalSpeed.getValue() * verticalSpeed.getValue(),
 			0.05, 10);
 	}
 	
@@ -284,7 +284,7 @@ public final class FreecamHack extends Hack
 		// This needs to be consistent with Entity.turn()
 		camYaw += (float)(deltaYaw * 0.15);
 		camPitch += (float)(deltaPitch * 0.15);
-		camPitch = Mth.clamp(camPitch, -90, 90);
+		camPitch = Math.clamp(camPitch, -90, 90);
 	}
 	
 	public float getCamYaw()

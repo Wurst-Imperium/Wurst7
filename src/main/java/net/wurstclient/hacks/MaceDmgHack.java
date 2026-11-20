@@ -12,7 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
@@ -43,8 +43,7 @@ public final class MaceDmgHack extends Hack
 	@Override
 	public void onPlayerAttacksEntity(Entity target)
 	{
-		if(MC.hitResult == null
-			|| MC.hitResult.getType() != HitResult.Type.ENTITY)
+		if(!(MC.hitResult instanceof EntityHitResult))
 			return;
 		
 		if(target instanceof Player targetPlayer)

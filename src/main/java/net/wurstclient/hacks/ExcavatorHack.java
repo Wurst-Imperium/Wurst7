@@ -40,7 +40,6 @@ import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.OverlayRenderer;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 public final class ExcavatorHack extends Hack
 	implements UpdateListener, RenderListener, GUIRenderListener
@@ -214,7 +213,7 @@ public final class ExcavatorHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(GuiGraphicsExtractor context, float partialTicks)
+	public void onRenderGUI(GuiGraphicsExtractor extractor, float partialTicks)
 	{
 		String message;
 		if(step.selectPos && step.pos != null)
@@ -225,16 +224,16 @@ public final class ExcavatorHack extends Hack
 		Font tr = MC.font;
 		int msgWidth = tr.width(message);
 		
-		int msgX1 = context.guiWidth() / 2 - msgWidth / 2;
+		int msgX1 = extractor.guiWidth() / 2 - msgWidth / 2;
 		int msgX2 = msgX1 + msgWidth + 2;
-		int msgY1 = context.guiHeight() / 2 + 1;
+		int msgY1 = extractor.guiHeight() / 2 + 1;
 		int msgY2 = msgY1 + 10;
 		
 		// background
-		context.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
+		extractor.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
 		
 		// text
-		context.text(tr, message, msgX1 + 2, msgY1 + 1, CommonColors.WHITE,
+		extractor.text(tr, message, msgX1 + 2, msgY1 + 1, CommonColors.WHITE,
 			false);
 	}
 	
@@ -261,15 +260,14 @@ public final class ExcavatorHack extends Hack
 			return;
 		}
 		
-		if(MC.hitResult instanceof BlockHitResult)
+		if(MC.hitResult instanceof BlockHitResult hit)
 		{
 			// set posLookingAt
-			posLookingAt = ((BlockHitResult)MC.hitResult).getBlockPos();
+			posLookingAt = hit.getBlockPos();
 			
 			// offset if sneaking
 			if(MC.options.keyShift.isDown())
-				posLookingAt = posLookingAt
-					.relative(((BlockHitResult)MC.hitResult).getDirection());
+				posLookingAt = posLookingAt.relative(hit.getDirection());
 			
 		}else
 			posLookingAt = null;
@@ -320,7 +318,7 @@ public final class ExcavatorHack extends Hack
 			return;
 		
 		// prioritize the closest block from the top layer
-		Vec3 eyesVec = RotationUtils.getEyesPos();
+		Vec3 eyesVec = MC.player.getEyePosition();
 		Comparator<BlockPos> cNextTargetBlock =
 			Comparator.<BlockPos> comparingInt(BlockPos::getY).reversed()
 				.thenComparingDouble(pos -> pos.distToCenterSqr(eyesVec));
@@ -428,7 +426,7 @@ public final class ExcavatorHack extends Hack
 	
 	private ArrayList<BlockPos> getValidBlocks()
 	{
-		Vec3 eyesVec = RotationUtils.getEyesPos();
+		Vec3 eyesVec = MC.player.getEyePosition();
 		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = Math.pow(range.getValue() + 0.5, 2);
 		int blockRange = range.getValueCeil();
@@ -520,7 +518,7 @@ public final class ExcavatorHack extends Hack
 			sizeZ = Math.abs(startZ - endZ);
 			
 			totalBlocks = (sizeX + 1) * (sizeY + 1) * (sizeZ + 1);
-			scanSpeed = Mth.clamp(totalBlocks / 30, 1, 16384);
+			scanSpeed = Math.clamp(totalBlocks / 30, 1, 16384);
 			iterator = BlockUtils.getAllInBox(start, end).iterator();
 		}
 	}

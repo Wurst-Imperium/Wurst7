@@ -112,10 +112,10 @@ public final class TemplateToolHack extends Hack
 	}
 	
 	@Override
-	public void onRenderGUI(GuiGraphicsExtractor context, float partialTicks)
+	public void onRenderGUI(GuiGraphicsExtractor extractor, float partialTicks)
 	{
 		if(state != null)
-			state.onRenderGUI(this, context, partialTicks);
+			state.onRenderGUI(this, extractor, partialTicks);
 	}
 	
 	public void setState(TemplateToolState state)

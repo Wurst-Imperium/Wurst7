@@ -35,7 +35,7 @@ public final class CreatingTemplateState extends TemplateToolState
 	public void onEnter(TemplateToolHack hack)
 	{
 		totalBlocks = hack.getNonEmptyBlocks().size();
-		blocksPerTick = Mth.clamp(totalBlocks / 15, 1, 1024);
+		blocksPerTick = Math.clamp(totalBlocks / 15, 1, 1024);
 		
 		unsortedBlocks = new ArrayDeque<>(hack.getNonEmptyBlocks().keySet());
 		

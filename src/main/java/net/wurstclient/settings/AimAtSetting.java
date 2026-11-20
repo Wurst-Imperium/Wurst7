@@ -9,37 +9,39 @@ package net.wurstclient.settings;
 
 import java.util.function.Function;
 
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.wurstclient.util.RotationUtils;
+import net.wurstclient.WurstClient;
+import net.wurstclient.hack.Hack;
+import net.wurstclient.util.text.WText;
 
 public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 {
-	private static final String FULL_DESCRIPTION_SUFFIX =
+	private static final WText FULL_DESCRIPTION_SUFFIX =
 		buildDescriptionSuffix();
 	
-	private AimAtSetting(String name, String description, AimAt[] values,
-		AimAt selected)
+	public AimAtSetting(WText description, AimAt selected)
 	{
-		super(name, description, values, selected);
+		super("Aim at", description.append(FULL_DESCRIPTION_SUFFIX),
+			AimAt.values(), selected);
 	}
 	
-	public AimAtSetting(String name, String description, AimAt selected)
+	public AimAtSetting(Hack hack, AimAt selected)
 	{
-		this(name, description + FULL_DESCRIPTION_SUFFIX, AimAt.values(),
-			selected);
+		this(hackDescription(hack), selected);
 	}
 	
-	public AimAtSetting(String description, AimAt selected)
+	public static WText genericDescription(Hack hack)
 	{
-		this("Aim at", description, selected);
+		return WText.translated("description.wurst.setting.generic.aim_at",
+			hack.getName());
 	}
 	
-	public AimAtSetting(String description)
+	private static WText hackDescription(Hack hack)
 	{
-		this(description, AimAt.AUTO);
+		return WText.translated("description.wurst.setting."
+			+ hack.getName().toLowerCase() + ".aim_at");
 	}
 	
 	public Vec3 getAimPoint(Entity e)
@@ -47,29 +49,37 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 		return getSelected().aimFunction.apply(e);
 	}
 	
-	private static String buildDescriptionSuffix()
+	private static WText buildDescriptionSuffix()
 	{
-		StringBuilder builder = new StringBuilder("\n\n");
-		AimAt[] values = AimAt.values();
+		WText text = WText.literal("\n\n");
 		
-		for(AimAt value : values)
-			builder.append("\u00a7l").append(value.name).append("\u00a7r - ")
+		for(AimAt value : AimAt.values())
+			text.append("\u00a7l" + value.name + "\u00a7r - ")
 				.append(value.description).append("\n\n");
 		
-		return builder.toString();
+		return text;
+	}
+	
+	private static AABB getInsetBox(Entity e)
+	{
+		AABB box = e.getBoundingBox();
+		
+		return box.deflate(Math.min(0.05, box.getXsize() / 2),
+			Math.min(0.05, box.getYsize() / 2),
+			Math.min(0.05, box.getZsize() / 2));
 	}
 	
 	private static Vec3 aimAtClosestPoint(Entity e)
 	{
-		AABB box = e.getBoundingBox();
-		Vec3 eyes = RotationUtils.getEyesPos();
+		AABB box = getInsetBox(e);
+		Vec3 eyes = WurstClient.MC.player.getEyePosition();
 		
 		if(box.contains(eyes))
 			return eyes;
 		
-		double clampedX = Mth.clamp(eyes.x, box.minX, box.maxX);
-		double clampedY = Mth.clamp(eyes.y, box.minY, box.maxY);
-		double clampedZ = Mth.clamp(eyes.z, box.minZ, box.maxZ);
+		double clampedX = Math.clamp(eyes.x, box.minX, box.maxX);
+		double clampedY = Math.clamp(eyes.y, box.minY, box.maxY);
+		double clampedZ = Math.clamp(eyes.z, box.minZ, box.maxZ);
 		
 		return new Vec3(clampedX, clampedY, clampedZ);
 	}
@@ -87,32 +97,31 @@ public final class AimAtSetting extends EnumSetting<AimAtSetting.AimAt>
 	
 	private static Vec3 aimAtFeet(Entity e)
 	{
-		return e.position().add(0, 0.001, 0);
+		return getInsetBox(e).getBottomCenter();
 	}
 	
 	public enum AimAt
 	{
-		AUTO("Auto", "Aims at the closest point of the target's hitbox.",
-			AimAtSetting::aimAtClosestPoint),
+		AUTO("Auto", AimAtSetting::aimAtClosestPoint),
 		
-		HEAD("Head", "Aims at the target's eye position.",
-			AimAtSetting::aimAtHead),
+		HEAD("Head", AimAtSetting::aimAtHead),
 		
-		CENTER("Center", "Aims at the center of the target's hitbox.",
-			AimAtSetting::aimAtCenter),
+		CENTER("Center", AimAtSetting::aimAtCenter),
 		
-		FEET("Feet", "Aims at the bottom of the target's hitbox.",
-			AimAtSetting::aimAtFeet);
+		FEET("Feet", AimAtSetting::aimAtFeet);
+		
+		private static final String TRANSLATION_KEY_PREFIX =
+			"description.wurst.setting.generic.aim_at.";
 		
 		private final String name;
-		private final String description;
+		private final WText description;
 		private final Function<Entity, Vec3> aimFunction;
 		
-		private AimAt(String name, String description,
-			Function<Entity, Vec3> aimFunction)
+		private AimAt(String name, Function<Entity, Vec3> aimFunction)
 		{
 			this.name = name;
-			this.description = description;
+			description =
+				WText.translated(TRANSLATION_KEY_PREFIX + name().toLowerCase());
 			this.aimFunction = aimFunction;
 		}
 		

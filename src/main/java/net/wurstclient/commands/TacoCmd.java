@@ -79,17 +79,17 @@ public final class TacoCmd extends Command
 	}
 	
 	@Override
-	public void onRenderGUI(GuiGraphicsExtractor context, float partialTicks)
+	public void onRenderGUI(GuiGraphicsExtractor extractor, float partialTicks)
 	{
 		int color = WURST.getHax().rainbowUiHack.isEnabled()
 			? RenderUtils.toIntColor(WURST.getGui().getAcColor(), 1)
 			: 0xFFFFFFFF;
 		
-		int x = context.guiWidth() / 2 - 32 + 76;
-		int y = context.guiHeight() - 32 - 19;
+		int x = extractor.guiWidth() / 2 - 32 + 76;
+		int y = extractor.guiHeight() - 32 - 19;
 		int w = 64;
 		int h = 32;
-		context.blit(RenderPipelines.GUI_TEXTURED, tacos[ticks / 8], x, y, 0, 0,
-			w, h, w, h, color);
+		extractor.blit(RenderPipelines.GUI_TEXTURED, tacos[ticks / 8], x, y, 0,
+			0, w, h, w, h, color);
 	}
 }

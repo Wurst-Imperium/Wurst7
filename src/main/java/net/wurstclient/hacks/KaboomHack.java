@@ -25,7 +25,6 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.RotationUtils;
 
 public final class KaboomHack extends Hack implements UpdateListener
 {
@@ -96,7 +95,7 @@ public final class KaboomHack extends Hack implements UpdateListener
 	
 	private ArrayList<BlockPos> getBlocksByDistanceReversed()
 	{
-		Vec3 eyesVec = RotationUtils.getEyesPos();
+		Vec3 eyesVec = MC.player.getEyePosition();
 		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = 36;
 		int blockRange = 6;

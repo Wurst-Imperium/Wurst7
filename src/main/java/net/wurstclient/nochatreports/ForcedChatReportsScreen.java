@@ -106,21 +106,22 @@ public final class ForcedChatReportsScreen extends Screen
 	}
 	
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor context, int mouseX,
+	public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks)
 	{
 		int centerX = width / 2;
 		int reasonY = (height - 68) / 2 - reasonHeight / 2;
 		int titleY = reasonY - font.lineHeight * 2;
 		
-		context.centeredText(font, title, centerX, titleY,
+		extractor.centeredText(font, title, centerX, titleY,
 			CommonColors.LIGHT_GRAY);
-		ActiveTextCollector otherContext = context.textRenderer();
+		ActiveTextCollector otherContext = extractor.textRenderer();
 		reasonFormatted.visitLines(TextAlignment.CENTER, centerX, reasonY, 9,
 			otherContext);
 		
 		for(Renderable drawable : renderables)
-			drawable.extractRenderState(context, mouseX, mouseY, partialTicks);
+			drawable.extractRenderState(extractor, mouseX, mouseY,
+				partialTicks);
 	}
 	
 	@Override

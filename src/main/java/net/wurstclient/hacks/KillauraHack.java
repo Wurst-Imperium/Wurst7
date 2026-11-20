@@ -7,8 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.Comparator;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -16,18 +14,22 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.HandleInputListener;
+import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.AimAtSetting;
+import net.wurstclient.settings.AimAtSetting.AimAt;
+import net.wurstclient.settings.AttackPrioritySetting;
+import net.wurstclient.settings.AttackPrioritySetting.AttackPriority;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
 import net.wurstclient.settings.AttackSwingSetting;
 import net.wurstclient.settings.AttackSwingSetting.AttackSwing;
 import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.EnumSetting;
+import net.wurstclient.settings.FovSliderSetting;
 import net.wurstclient.settings.PauseAttackOnContainersSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
@@ -35,12 +37,11 @@ import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"kill aura", "ForceField", "force field", "CrystalAura",
 	"crystal aura", "AutoCrystal", "auto crystal"})
-public final class KillauraHack extends Hack
-	implements UpdateListener, HandleInputListener, RenderListener
+public final class KillauraHack extends Hack implements UpdateListener,
+	PreMotionListener, HandleInputListener, RenderListener
 {
 	private final SliderSetting range = new SliderSetting("Range",
 		"Determines how far Killaura will reach to attack entities.\n"
@@ -59,15 +60,14 @@ public final class KillauraHack extends Hack
 			100, 0, 1000, 50, ValueDisplay.INTEGER.withPrefix("\u00b1")
 				.withSuffix("ms").withLabel(0, "off"));
 	
-	private final EnumSetting<Priority> priority = new EnumSetting<>("Priority",
-		"Determines which entity will be attacked first.\n"
-			+ "\u00a7lDistance\u00a7r - Attacks the closest entity.\n"
-			+ "\u00a7lAngle\u00a7r - Attacks the entity that requires the least head movement.\n"
-			+ "\u00a7lHealth\u00a7r - Attacks the weakest entity.",
-		Priority.values(), Priority.ANGLE);
+	private final AttackPrioritySetting priority =
+		AttackPrioritySetting.withoutAngleDistOption(
+			AttackPrioritySetting.genericDescription(), AttackPriority.ANGLE);
 	
-	private final SliderSetting fov =
-		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	private final FovSliderSetting fov = FovSliderSetting.genericCombat(360);
+	
+	private final AimAtSetting aimAt =
+		new AimAtSetting(AimAtSetting.genericDescription(this), AimAt.CENTER);
 	
 	private final AttackSwingSetting attackSwing = new AttackSwingSetting(
 		AttackSwingSetting.genericCombatDescription(this), AttackSwing.CLIENT);
@@ -102,6 +102,7 @@ public final class KillauraHack extends Hack
 		addSetting(speedRandMS);
 		addSetting(priority);
 		addSetting(fov);
+		addSetting(aimAt);
 		addSetting(attackSwing);
 		addSetting(damageIndicator);
 		addSetting(pauseOnContainers);
@@ -126,6 +127,7 @@ public final class KillauraHack extends Hack
 		
 		speed.resetTimer(speedRandMS.getValue());
 		EVENTS.add(UpdateListener.class, this);
+		EVENTS.add(PreMotionListener.class, this);
 		EVENTS.add(HandleInputListener.class, this);
 		EVENTS.add(RenderListener.class, this);
 	}
@@ -134,6 +136,7 @@ public final class KillauraHack extends Hack
 	protected void onDisable()
 	{
 		EVENTS.remove(UpdateListener.class, this);
+		EVENTS.remove(PreMotionListener.class, this);
 		EVENTS.remove(HandleInputListener.class, this);
 		EVENTS.remove(RenderListener.class, this);
 		
@@ -144,39 +147,44 @@ public final class KillauraHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		target = null;
+		renderTarget = null;
 		speed.updateTimer();
-		if(!speed.isTimeToAttack())
-			return;
 		
 		if(pauseOnContainers.shouldPause())
 			return;
 		
-		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities();
 		double rangeSq = range.getValueSq();
-		stream =
-			stream.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq);
-		
-		if(fov.getValue() < 360.0)
-			stream = stream.filter(e -> RotationUtils.getAngleToLookVec(
-				e.getBoundingBox().getCenter()) <= fov.getValue() / 2.0);
+		Stream<Entity> stream = EntityUtils.getMeleeAttackableEntities()
+			.filter(e -> EntityUtils.distanceToHitboxSq(e) <= rangeSq)
+			.filter(fov.asEntityPredicate(aimAt::getAimPoint))
+			.filter(e -> !checkLOS.isChecked()
+				|| BlockUtils.hasLineOfSight(aimAt.getAimPoint(e)));
 		
 		stream = entityFilters.applyTo(stream);
 		
-		target = stream.min(priority.getSelected().comparator).orElse(null);
+		target =
+			stream.min(priority.getComparator(aimAt::getAimPoint)).orElse(null);
 		renderTarget = target;
 		if(target == null)
 			return;
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
+	}
+	
+	@Override
+	public void onPreMotion()
+	{
+		if(target == null)
+			return;
 		
-		Vec3 hitVec = target.getBoundingBox().getCenter();
-		if(checkLOS.isChecked() && !BlockUtils.hasLineOfSight(hitVec))
+		if(!speed.isTimeToAttack())
 		{
 			target = null;
 			return;
 		}
 		
-		WURST.getRotationFaker().faceVectorPacket(hitVec);
+		WURST.getRotationFaker().faceVectorPacket(aimAt.getAimPoint(target));
 	}
 	
 	@Override
@@ -214,32 +222,5 @@ public final class KillauraHack extends Hack
 		
 		RenderUtils.drawSolidBox(matrixStack, box, quadColor, false);
 		RenderUtils.drawOutlinedBox(matrixStack, box, lineColor, false);
-	}
-	
-	private enum Priority
-	{
-		DISTANCE("Distance", EntityUtils::distanceToHitboxSq),
-		
-		ANGLE("Angle",
-			e -> RotationUtils
-				.getAngleToLookVec(e.getBoundingBox().getCenter())),
-		
-		HEALTH("Health", e -> e instanceof LivingEntity
-			? ((LivingEntity)e).getHealth() : Integer.MAX_VALUE);
-		
-		private final String name;
-		private final Comparator<Entity> comparator;
-		
-		private Priority(String name, ToDoubleFunction<Entity> keyExtractor)
-		{
-			this.name = name;
-			comparator = Comparator.comparingDouble(keyExtractor);
-		}
-		
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }

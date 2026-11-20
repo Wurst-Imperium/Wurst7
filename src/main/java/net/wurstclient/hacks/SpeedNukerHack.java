@@ -7,9 +7,8 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.List;
 import java.util.stream.Stream;
 
 import net.minecraft.core.BlockPos;
@@ -27,7 +26,6 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.BlockBreaker;
 import net.wurstclient.util.BlockUtils;
-import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"speed nuker", "FastNuker", "fast nuker"})
 @DontSaveState
@@ -86,7 +84,7 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		if(commonSettings.isIdModeWithAir())
 			return;
 		
-		Vec3 eyesVec = RotationUtils.getEyesPos();
+		Vec3 eyesVec = MC.player.getEyePosition();
 		BlockPos eyesBlock = BlockPos.containing(eyesVec);
 		double rangeSq = range.getValueSq();
 		int blockRange = range.getValueCeil();
@@ -94,16 +92,14 @@ public final class SpeedNukerHack extends Hack implements UpdateListener
 		Stream<BlockPos> stream =
 			BlockUtils.getAllInBoxStream(eyesBlock, blockRange)
 				.filter(BlockUtils::canBeClicked)
-				.filter(commonSettings::shouldBreakBlock);
+				.filter(commonSettings::shouldBreakBlock)
+				.filter(pos -> !commonSettings.isSphereShape()
+					|| pos.distToCenterSqr(eyesVec) <= rangeSq);
 		
-		if(commonSettings.isSphereShape())
-			stream =
-				stream.filter(pos -> pos.distToCenterSqr(eyesVec) <= rangeSq);
-		
-		ArrayList<BlockPos> blocks = stream
+		List<BlockPos> blocks = stream
 			.sorted(
 				Comparator.comparingDouble(pos -> pos.distToCenterSqr(eyesVec)))
-			.collect(Collectors.toCollection(ArrayList::new));
+			.toList();
 		
 		if(blocks.isEmpty())
 			return;

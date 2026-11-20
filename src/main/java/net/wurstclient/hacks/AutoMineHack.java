@@ -77,9 +77,8 @@ public final class AutoMineHack extends Hack
 			return;
 		}
 		
-		HitResult hitResult = MC.hitResult;
-		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
-			|| !(hitResult instanceof BlockHitResult bHitResult))
+		if(!(MC.hitResult instanceof BlockHitResult bHitResult)
+			|| bHitResult.getType() != HitResult.Type.BLOCK)
 		{
 			im.stopDestroyBlock();
 			return;

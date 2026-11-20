@@ -139,20 +139,24 @@ public enum EntityUtils
 	
 	public static double distanceToHitboxSq(Entity e)
 	{
-		Vec3 start = RotationUtils.getEyesPos();
+		Vec3 start = MC.player.getEyePosition();
 		AABB box = e.getBoundingBox();
-		double x = Mth.clamp(start.x, box.minX, box.maxX);
-		double y = Mth.clamp(start.y, box.minY, box.maxY);
-		double z = Mth.clamp(start.z, box.minZ, box.maxZ);
+		double x = Math.clamp(start.x, box.minX, box.maxX);
+		double y = Math.clamp(start.y, box.minY, box.maxY);
+		double z = Math.clamp(start.z, box.minZ, box.maxZ);
 		return start.distanceToSqr(new Vec3(x, y, z));
 	}
 	
 	public static EntityHitResult createHitResult(Entity e)
 	{
+		return createHitResult(e, e.getBoundingBox().getCenter());
+	}
+	
+	public static EntityHitResult createHitResult(Entity e, Vec3 aimPoint)
+	{
 		AABB box = e.getBoundingBox();
-		Vec3 start = RotationUtils.getEyesPos();
-		Vec3 end = box.getCenter();
-		Vec3 hitVec = box.clip(start, end).orElse(start);
+		Vec3 start = MC.player.getEyePosition();
+		Vec3 hitVec = box.clip(start, aimPoint).orElse(start);
 		return new EntityHitResult(e, hitVec);
 	}
 }

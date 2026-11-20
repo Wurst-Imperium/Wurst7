@@ -30,7 +30,7 @@ public abstract class Component
 		
 	}
 	
-	public abstract void render(GuiGraphicsExtractor context, int mouseX,
+	public abstract void render(GuiGraphicsExtractor extractor, int mouseX,
 		int mouseY, float partialTicks);
 	
 	public abstract int getDefaultWidth();

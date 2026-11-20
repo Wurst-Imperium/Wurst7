@@ -25,6 +25,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"trigger bot", "AutoAttack", "auto attack", "AutoClicker",
 	"auto clicker"})
@@ -144,12 +145,15 @@ public final class TriggerBotHack extends Hack
 		if(!attackWhileBlocking.isChecked() && player.isUsingItem())
 			return;
 		
-		if(MC.hitResult == null
-			|| !(MC.hitResult instanceof EntityHitResult eResult))
+		if(!(MC.hitResult instanceof EntityHitResult hit))
 			return;
 		
-		Entity target = eResult.getEntity();
+		Entity target = hit.getEntity();
 		if(!isCorrectEntity(target))
+			return;
+		
+		if(!RotationUtils.isFacingBoxServerSide(target.getBoundingBox(),
+			range.getValue()))
 			return;
 		
 		WURST.getHax().autoSwordHack.setSlot(target);

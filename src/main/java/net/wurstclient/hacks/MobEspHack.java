@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Interaction;
@@ -154,8 +153,8 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	private int getColor(Entity e)
 	{
 		float f = MC.player.distanceTo(e) / 20F;
-		float r = Mth.clamp(2 - f, 0, 1);
-		float g = Mth.clamp(f, 0, 1);
+		float r = Math.clamp(2 - f, 0, 1);
+		float g = Math.clamp(f, 0, 1);
 		float[] rgb = {r, g, 0};
 		return RenderUtils.toIntColor(rgb, 0.5F);
 	}

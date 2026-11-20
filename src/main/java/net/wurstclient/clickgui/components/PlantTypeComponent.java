@@ -69,7 +69,7 @@ public final class PlantTypeComponent extends Component
 	}
 	
 	@Override
-	public void render(GuiGraphicsExtractor context, int mouseX, int mouseY,
+	public void render(GuiGraphicsExtractor extractor, int mouseX, int mouseY,
 		float partialTicks)
 	{
 		int harvestWidth = TR.width(HARVEST);
@@ -102,32 +102,32 @@ public final class PlantTypeComponent extends Component
 		
 		// background
 		int bgColor = getFillColor(false);
-		context.fill(x1, y1, x2, y3, bgColor);
-		context.fill(x1, y3, x3, y2, bgColor);
-		context.fill(x4, y3, x5, y2, bgColor);
-		context.fill(x6, y3, x2, y2, bgColor);
+		extractor.fill(x1, y1, x2, y3, bgColor);
+		extractor.fill(x1, y3, x3, y2, bgColor);
+		extractor.fill(x4, y3, x5, y2, bgColor);
+		extractor.fill(x6, y3, x2, y2, bgColor);
 		
 		// icon
-		RenderUtils.drawItem(context, setting.getIcon(), x1, y1, true);
+		RenderUtils.drawItem(extractor, setting.getIcon(), x1, y1, true);
 		
 		// boxes
-		context.fill(x3, y3, x4, y2, getFillColor(hHarvest));
-		context.fill(x5, y3, x6, y2, getFillColor(hReplant));
+		extractor.fill(x3, y3, x4, y2, getFillColor(hHarvest));
+		extractor.fill(x5, y3, x6, y2, getFillColor(hReplant));
 		int outlineColor = RenderUtils.toIntColor(GUI.getAcColor(), 0.5F);
-		RenderUtils.drawBorder2D(context, x3, y3, x4, y2, outlineColor);
-		RenderUtils.drawBorder2D(context, x5, y3, x6, y2, outlineColor);
+		RenderUtils.drawBorder2D(extractor, x3, y3, x4, y2, outlineColor);
+		RenderUtils.drawBorder2D(extractor, x5, y3, x6, y2, outlineColor);
 		
 		// checks
 		if(setting.isHarvestingEnabled())
-			ClickGuiIcons.drawCheck(context, x3, y3, x4, y2, hHarvest, false);
+			ClickGuiIcons.drawCheck(extractor, x3, y3, x4, y2, hHarvest, false);
 		if(setting.isReplantingEnabled())
-			ClickGuiIcons.drawCheck(context, x5, y3, x6, y2, hReplant, false);
+			ClickGuiIcons.drawCheck(extractor, x5, y3, x6, y2, hReplant, false);
 		
 		// text
 		String name = setting.getName();
-		context.text(TR, name, x3 + 2, y1 + 3, GUI.getTxtColor(), false);
-		context.text(TR, HARVEST, x4 + 2, y3 + 2, GUI.getTxtColor(), false);
-		context.text(TR, REPLANT, x6 + 2, y3 + 2, GUI.getTxtColor(), false);
+		extractor.text(TR, name, x3 + 2, y1 + 3, GUI.getTxtColor(), false);
+		extractor.text(TR, HARVEST, x4 + 2, y3 + 2, GUI.getTxtColor(), false);
+		extractor.text(TR, REPLANT, x6 + 2, y3 + 2, GUI.getTxtColor(), false);
 	}
 	
 	private int getFillColor(boolean hovering)

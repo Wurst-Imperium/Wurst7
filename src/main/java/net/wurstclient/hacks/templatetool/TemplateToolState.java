@@ -43,19 +43,19 @@ public abstract class TemplateToolState
 	}
 	
 	public final void onRenderGUI(TemplateToolHack hack,
-		GuiGraphicsExtractor context, float partialTicks)
+		GuiGraphicsExtractor extractor, float partialTicks)
 	{
 		String message = getMessage(hack);
 		Font tr = MC.font;
 		int msgWidth = tr.width(message);
 		
-		int msgX1 = context.guiWidth() / 2 - msgWidth / 2;
+		int msgX1 = extractor.guiWidth() / 2 - msgWidth / 2;
 		int msgX2 = msgX1 + msgWidth + 2;
-		int msgY1 = context.guiHeight() / 2 + 1;
+		int msgY1 = extractor.guiHeight() / 2 + 1;
 		int msgY2 = msgY1 + 10;
 		
-		context.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
-		context.text(tr, message, msgX1 + 2, msgY1 + 1, CommonColors.WHITE,
+		extractor.fill(msgX1, msgY1, msgX2, msgY2, 0x80000000);
+		extractor.text(tr, message, msgX1 + 2, msgY1 + 1, CommonColors.WHITE,
 			false);
 	}
 	

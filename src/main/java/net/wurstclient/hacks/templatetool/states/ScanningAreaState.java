@@ -39,7 +39,7 @@ public final class ScanningAreaState extends TemplateToolState
 		int lengthY = Math.abs(start.getY() - end.getY()) + 1;
 		int lengthZ = Math.abs(start.getZ() - end.getZ()) + 1;
 		totalBlocks = lengthX * lengthY * lengthZ;
-		blocksPerTick = Mth.clamp(totalBlocks / 30, 1, 1024);
+		blocksPerTick = Math.clamp(totalBlocks / 30, 1, 1024);
 		iterator = BlockUtils.getAllInBox(start, end).iterator();
 	}
 	

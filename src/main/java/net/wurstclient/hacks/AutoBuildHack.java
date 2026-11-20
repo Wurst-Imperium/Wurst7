@@ -167,17 +167,15 @@ public final class AutoBuildHack extends Hack
 		if(status != Status.IDLE)
 			return;
 		
-		HitResult hitResult = MC.hitResult;
-		if(hitResult == null || hitResult.getType() != HitResult.Type.BLOCK
-			|| !(hitResult instanceof BlockHitResult blockHitResult))
+		if(!(MC.hitResult instanceof BlockHitResult hit)
+			|| hit.getType() != HitResult.Type.BLOCK)
 			return;
 		
-		BlockPos hitResultPos = blockHitResult.getBlockPos();
-		if(!BlockUtils.canBeClicked(hitResultPos))
+		BlockPos hitPos = hit.getBlockPos();
+		if(!BlockUtils.canBeClicked(hitPos))
 			return;
 		
-		BlockPos startPos =
-			hitResultPos.relative(blockHitResult.getDirection());
+		BlockPos startPos = hitPos.relative(hit.getDirection());
 		Direction direction = MC.player.getDirection();
 		remainingBlocks = template.getBlocksToPlace(startPos, direction);
 		
@@ -223,7 +221,7 @@ public final class AutoBuildHack extends Hack
 		RenderUtils.drawOutlinedBoxes(matrixStack, outlineBoxes, black, true);
 		
 		int green = 0x2600FF00;
-		Vec3 eyesPos = RotationUtils.getEyesPos();
+		Vec3 eyesPos = MC.player.getEyePosition();
 		double rangeSq = range.getValueSq();
 		List<AABB> greenBoxes = blocksToDraw.stream()
 			.filter(pos -> pos.distToCenterSqr(eyesPos) <= rangeSq)
