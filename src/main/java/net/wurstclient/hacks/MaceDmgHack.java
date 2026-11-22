@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MaceItem;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
@@ -42,13 +43,17 @@ public final class MaceDmgHack extends Hack
 	{
 		if(!MC.player.getMainHandItem().is(Items.MACE))
 			return;
-			
-		// See ServerGamePacketListenerImpl.handleMovePlayer()
-		// for why it's using these numbers.
-		// Also, let me know if you find a way to bypass that check.
+		
+		// Limited by ServerGamePacketListenerImpl.handleMovePlayer()
+		double fakeFallDistance = Math.sqrt(500);
+		
+		if(MaceItem.canSmashAttack(MC.player)
+			&& MC.player.fallDistance > fakeFallDistance)
+			return;
+		
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
-		sendFakeY(Math.sqrt(500));
+		sendFakeY(fakeFallDistance);
 		sendFakeY(0);
 	}
 	
