@@ -10,7 +10,6 @@ package net.wurstclient.hacks;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.phys.EntityHitResult;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
@@ -41,9 +40,6 @@ public final class MaceDmgHack extends Hack
 	@Override
 	public void onPlayerAttacksEntity(Entity target)
 	{
-		if(!(MC.hitResult instanceof EntityHitResult))
-			return;
-		
 		if(!MC.player.getMainHandItem().is(Items.MACE))
 			return;
 			
