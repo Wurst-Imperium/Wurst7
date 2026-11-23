@@ -249,6 +249,7 @@
   "description.wurst.hack.liquids": "Allows you to place blocks in liquids.",
   "description.wurst.hack.lsd": "Causes hallucinations.",
   "description.wurst.hack.macedmg": "Increases your damage when attacking with a mace.",
+  "description.wurst.setting.macedmg.filter_creative": "Won't increase mace damage against players in Creative mode.",
   "description.wurst.hack.masstpa": "Sends a TPA request to all players.",
   "description.wurst.hack.mileycyrus": "Makes you twerk.",
   "description.wurst.hack.mobesp": "Highlights nearby mobs.",

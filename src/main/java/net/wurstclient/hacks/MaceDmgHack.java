@@ -17,16 +17,23 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.filters.FilterCreativeSetting;
 import net.wurstclient.util.EntityUtils;
+import net.wurstclient.util.text.WText;
 
 @SearchTags({"mace dmg", "MaceDamage", "mace damage"})
 public final class MaceDmgHack extends Hack
 	implements PlayerAttacksEntityListener
 {
+	private final FilterCreativeSetting filterCreative =
+		new FilterCreativeSetting(WText.translated(
+			"description.wurst.setting.macedmg.filter_creative"), true);
+	
 	public MaceDmgHack()
 	{
 		super("MaceDMG");
 		setCategory(Category.COMBAT);
+		addSetting(filterCreative);
 	}
 	
 	@Override
@@ -45,8 +52,11 @@ public final class MaceDmgHack extends Hack
 	public void onPlayerAttacksEntity(Entity target)
 	{
 		if(!MC.player.getMainHandItem().is(Items.MACE)
-			|| MC.player.isFallFlying()
-			|| !EntityUtils.IS_ATTACKABLE_MELEE.test(target))
+			|| MC.player.isFallFlying())
+			return;
+		
+		if(!EntityUtils.IS_ATTACKABLE_MELEE.test(target)
+			|| !filterCreative.test(target))
 			return;
 		
 		double fakeFallDistance = findFakeFallDistance();
