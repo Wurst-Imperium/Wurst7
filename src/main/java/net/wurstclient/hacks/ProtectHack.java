@@ -53,7 +53,7 @@ public final class ProtectHack extends Hack
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericCombat(false),
-			FilterCreativeSetting.genericCombat(false),
+			FilterCreativeSetting.genericCombat(true),
 			FilterSleepingSetting.genericCombat(false),
 			FilterFlyingSetting.genericCombat(0),
 			FilterHostileSetting.genericCombat(false),
