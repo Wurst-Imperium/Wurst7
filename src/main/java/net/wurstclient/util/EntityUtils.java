@@ -18,6 +18,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
@@ -83,6 +84,7 @@ public enum EntityUtils
 	public static final Predicate<Entity> IS_ATTACKABLE_MELEE =
 		e -> e != null && e.isAlive()
 			&& (e instanceof LivingEntity || e instanceof EndCrystal
+				|| e instanceof EnderDragonPart
 				|| (e instanceof Projectile
 					&& e.is(EntityTypeTags.REDIRECTABLE_PROJECTILE))
 				|| e instanceof ShulkerBullet || e instanceof Interaction)
