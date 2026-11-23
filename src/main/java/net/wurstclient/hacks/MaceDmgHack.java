@@ -7,10 +7,12 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Pos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MaceItem;
+import net.minecraft.world.phys.AABB;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
@@ -45,8 +47,9 @@ public final class MaceDmgHack extends Hack
 			|| MC.player.isFallFlying())
 			return;
 		
-		// Limited by ServerGamePacketListenerImpl.handleMovePlayer()
-		double fakeFallDistance = Math.sqrt(500);
+		double fakeFallDistance = findFakeFallDistance();
+		if(fakeFallDistance <= 1.5)
+			return;
 		
 		if(MaceItem.canSmashAttack(MC.player)
 			&& MC.player.fallDistance > fakeFallDistance)
@@ -56,6 +59,33 @@ public final class MaceDmgHack extends Hack
 			sendFakeY(0);
 		sendFakeY(fakeFallDistance);
 		sendFakeY(0);
+	}
+	
+	private double findFakeFallDistance()
+	{
+		// Limited by ServerGamePacketListenerImpl.handleMovePlayer()
+		double maxDistance = Math.sqrt(500);
+		
+		AABB playerBox = MC.player.getBoundingBox();
+		if(!MC.level.noBlockCollision(MC.player, playerBox)
+			|| !MC.level.noEntityCollision(MC.player, playerBox))
+			return 0;
+		
+		for(double distance = maxDistance; distance > 1.5; distance -= 0.25)
+		{
+			AABB box = playerBox.move(0, distance, 0);
+			
+			if(!BlockPos.betweenClosedStream(box.deflate(1e-7))
+				.allMatch(pos -> MC.level.isOutsideBuildHeight(pos)
+					|| MC.level.isLoaded(pos)))
+				continue;
+			
+			if(MC.level.noBlockCollision(MC.player, box)
+				&& MC.level.noEntityCollision(MC.player, box))
+				return distance;
+		}
+		
+		return 0;
 	}
 	
 	private void sendFakeY(double offset)
