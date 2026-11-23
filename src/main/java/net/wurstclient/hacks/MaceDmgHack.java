@@ -41,7 +41,8 @@ public final class MaceDmgHack extends Hack
 	@Override
 	public void onPlayerAttacksEntity(Entity target)
 	{
-		if(!MC.player.getMainHandItem().is(Items.MACE))
+		if(!MC.player.getMainHandItem().is(Items.MACE)
+			|| MC.player.isFallFlying())
 			return;
 		
 		// Limited by ServerGamePacketListenerImpl.handleMovePlayer()
