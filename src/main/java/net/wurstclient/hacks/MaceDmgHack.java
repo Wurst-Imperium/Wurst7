@@ -17,6 +17,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.EntityUtils;
 
 @SearchTags({"mace dmg", "MaceDamage", "mace damage"})
 public final class MaceDmgHack extends Hack
@@ -44,7 +45,8 @@ public final class MaceDmgHack extends Hack
 	public void onPlayerAttacksEntity(Entity target)
 	{
 		if(!MC.player.getMainHandItem().is(Items.MACE)
-			|| MC.player.isFallFlying())
+			|| MC.player.isFallFlying()
+			|| !EntityUtils.IS_ATTACKABLE_MELEE.test(target))
 			return;
 		
 		double fakeFallDistance = findFakeFallDistance();
