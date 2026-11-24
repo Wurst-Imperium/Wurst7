@@ -11,7 +11,6 @@ import java.io.File;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,11 +26,9 @@ import com.mojang.blaze3d.platform.WindowEventHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
-import net.minecraft.client.gui.screens.social.PlayerSocialManager;
 import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.multiplayer.ProfileKeyPairManager;
-import net.minecraft.client.multiplayer.signaling.SignalingClient;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.phys.EntityHitResult;
@@ -57,16 +54,6 @@ public abstract class MinecraftMixin
 	public MultiPlayerGameMode gameMode;
 	@Shadow
 	public LocalPlayer player;
-	@Shadow
-	@Final
-	private User user;
-	@Shadow
-	@Final
-	@Mutable
-	private SignalingClient signalingClient;
-	@Shadow
-	@Final
-	private PlayerSocialManager playerSocialManager;
 	
 	@Unique
 	private MinecraftServicesDiscoveryService wurstDiscoveryService;
@@ -223,27 +210,15 @@ public abstract class MinecraftMixin
 	public void setWurstUser(User user)
 	{
 		wurstUser = user;
-		User activeUser = user == null ? this.user : user;
-		String accessToken = activeUser.getAccessToken();
-		boolean isOffline = accessToken == null || accessToken.isBlank()
-			|| accessToken.equals("0") || accessToken.equals("null");
-		
-		signalingClient.close();
-		if(!isOffline)
-		{
-			signalingClient =
-				new SignalingClient(activeUser, wurstDiscoveryService);
-			signalingClient.addPresenceListener(
-				playerSocialManager.getPresenceHandler()::updatePresenceWith);
-			signalingClient.connect();
-		}
-		
 		if(user == null)
 		{
 			wurstProfileKeys = null;
 			return;
 		}
 		
+		String accessToken = user.getAccessToken();
+		boolean isOffline = accessToken == null || accessToken.isBlank()
+			|| accessToken.equals("0") || accessToken.equals("null");
 		UserApiService userApiService = isOffline ? UserApiService.OFFLINE
 			: wurstDiscoveryService.createUserApiService(accessToken);
 		wurstProfileKeys = ProfileKeyPairManager.create(userApiService, user,

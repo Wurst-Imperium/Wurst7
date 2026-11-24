@@ -270,8 +270,8 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 		// buttons
 		if(activeButton != null)
 		{
-			minecraft.getSoundManager().play(
-				SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1));
+			minecraft.getSoundManager()
+				.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK));
 			activeButton.press();
 			WurstClient.INSTANCE.getNavigator()
 				.addPreference(feature.getName());
