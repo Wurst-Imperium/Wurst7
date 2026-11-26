@@ -35,11 +35,10 @@ public abstract class GameRendererMixin
 	private void onUpdate(DeltaTracker deltaTracker, CallbackInfo ci)
 	{
 		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.lsdHack.isEnabled()
-			|| hax.remoteViewHack.isViewingEntity())
+		if(hax == null || !hax.lsdHack.isEnabled())
 			return;
 		
-		if(!requestedPostEffects.contains(LsdHack.LSD_POST_EFFECT))
-			requestedPostEffects.add(LsdHack.LSD_POST_EFFECT);
+		requestedPostEffects.removeIf(LsdHack.LSD_POST_EFFECT::equals);
+		requestedPostEffects.add(LsdHack.LSD_POST_EFFECT);
 	}
 }
