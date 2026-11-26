@@ -20,7 +20,6 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.Identifier;
 import net.wurstclient.WurstClient;
-import net.wurstclient.hack.HackList;
 import net.wurstclient.hacks.LsdHack;
 
 @Mixin(GameRenderer.class)
@@ -34,8 +33,7 @@ public abstract class GameRendererMixin
 		at = @At("TAIL"))
 	private void onUpdate(DeltaTracker deltaTracker, CallbackInfo ci)
 	{
-		HackList hax = WurstClient.INSTANCE.getHax();
-		if(hax == null || !hax.lsdHack.isEnabled())
+		if(!WurstClient.INSTANCE.getHax().lsdHack.isEnabled())
 			return;
 		
 		requestedPostEffects.removeIf(LsdHack.LSD_POST_EFFECT::equals);
