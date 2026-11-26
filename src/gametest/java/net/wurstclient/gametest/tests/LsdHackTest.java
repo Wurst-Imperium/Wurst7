@@ -10,11 +10,14 @@ package net.wurstclient.gametest.tests;
 import static net.wurstclient.gametest.WurstClientTestHelper.*;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import com.mojang.blaze3d.platform.NativeImage;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Blocks;
 import net.wurstclient.gametest.SingleplayerTest;
 import net.wurstclient.hacks.LsdHack;
@@ -32,32 +35,56 @@ public final class LsdHackTest extends SingleplayerTest
 	{
 		logger.info("Testing LSD hack");
 		
+		Identifier lsd = LsdHack.LSD_POST_EFFECT;
+		Identifier invert = Identifier.withDefaultNamespace("invert");
+		
 		// Swap gray smooth stone background with red wool so that
 		// the hue shift is easy to detect
 		setBlocksAndWait(blocks -> blocks.fill(-12, -60, 10, 12, -48, 10,
 			Blocks.WOOL.red()));
 		context.waitTick();
 		Path disabledPath = context.takeScreenshot("lsd_disabled");
-		
 		runWurstCommand("t LSD on");
-		waitFor(
-			mc -> mc.player.getActivePostEffects()
-				.contains(LsdHack.LSD_POST_EFFECT),
-			"LSD post-effect did not activate.");
+		waitForAppliedEffects("after enabling LSD", lsd);
 		
-		// At this phase, the wool should look green.
+		// At this phase, the wool should look green
 		context.waitFor(mc -> mc.level.getGameTime() % 20 == 5);
 		Path enabledPath = context.takeScreenshot("lsd_enabled");
 		assertLsdChangedImage(disabledPath, enabledPath);
 		
-		// Clean up
-		runWurstCommand("t LSD off");
+		// Change post-effects on the server
+		runCommand("posteffect add @s minecraft:invert");
+		waitForAppliedEffects("after the server added invert", invert, lsd);
+		runCommand("posteffect clear @s");
+		waitForAppliedEffects("after the server cleared post-effects", lsd);
+		
+		// LSD should survive a respawn
+		LocalPlayer oldPlayer = context.computeOnClient(mc -> mc.player);
+		runCommand("gamerule immediate_respawn true");
+		runCommand("kill @s");
 		waitFor(
-			mc -> !mc.player.getActivePostEffects()
-				.contains(LsdHack.LSD_POST_EFFECT),
-			"LSD post-effect did not deactivate.");
+			mc -> mc.player != null && mc.player != oldPlayer
+				&& mc.player.isAlive() && mc.gui.screen() == null,
+			"Player did not respawn.");
+		waitForAppliedEffects("after respawning", lsd);
+		
+		// Clean up
+		runCommand("gamerule immediate_respawn false");
+		runCommand("tp @s 0 -57 0 0 0");
+		waitForHandSwing();
+		runWurstCommand("t LSD off");
+		waitForAppliedEffects("after disabling LSD");
 		setBlocksAndWait(blocks -> blocks.fill(-12, -60, 10, 12, -48, 10,
 			Blocks.SMOOTH_STONE));
+		clearParticles();
+		clearChat();
+	}
+	
+	private void waitForAppliedEffects(String situation, Identifier... effects)
+	{
+		List<Identifier> expected = List.of(effects);
+		waitFor(mc -> mc.gameRenderer.getAppliedPostEffects().equals(expected),
+			"Expected post-effects " + expected + " " + situation + ".");
 	}
 	
 	private void assertLsdChangedImage(Path disabledPath, Path enabledPath)

@@ -62,6 +62,7 @@
     "infinichat.ChatScreenMixin",
     "jesus.BlockStateBaseMixin",
     "liquids.LocalPlayerMixin",
+    "lsd.GameRendererMixin",
     "nameprotect.StringDecomposerMixin",
     "nametags.EntityRendererMixin",
     "nametags.LivingEntityRendererMixin",
